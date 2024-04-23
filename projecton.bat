@@ -1,0 +1,1 @@
+"C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\venv\scripts\python" main.py

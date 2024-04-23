@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Remote Web Pages</title>
+    <link rel="stylesheet" href="./resources/help/styles.css">
+</head>
+<body>
+    <h1>Remote Web Pages</h1>
+    <p>When the program is run, a local web server is run in the background. This server has three web pages: The first
+    two are <strong>remote-control</strong> pages and the third is a <strong>stage view</strong> page. These web pages
+    are served up as a website that can be accessed by any device connected to the same network as
+    the computer running ProjectOn.</p>
+    <p>The remote-control pages allow you to change what's showing on the projector without having to be right in front
+    of the computer on which ProjectOn is running.</p>
+    <p>The stage view page simply shows the lyrics or text of the current slide and is useful to use as a display for
+    your musician(s).</p>
+    <p>Access to these pages is accomplished through a web browser pointed to the IP address of the computer
+    running ProjectOn and using ProjectOn's <strong>port: 15171</strong>. The two remote-control pages are located at:
+    "<strong>/mremote</strong>", which is optimized for mobile devices, and one optimized for computers at "<strong>
+	/remote</strong>". The stage view page is found at "<strong>/stage</strong>".</p>
+    <p><strong>Too long, didn't read?</strong> The easiest way to find these addresses is by choosing "About" from 
+	the "Help" menu. The program knows the IP addres of the computer it's running on, so this will show you the proper 
+	addresses.<p>
+    <p>But, let's see how to do this manually:</p>
+    <ol>
+        <li>On the computer running ProjectOn, find that computer's IP address. The quickest, easiest way to do this
+        is to open your Windows menu by clicking the Windows Icon in your taskbar, and then typing in "cmd". Click on
+        "Command Prompt" and a new window will open. There, type in "ipconfig" (without the quotes) and press "Enter".
+        From the results that follow, find the "IPv4" address under either "Wireless LAN Adapter" or "Ethernet Adapter"
+		depending on how the computer is connected to the internet. You can now close that window.
+        </li>
+        <li>
+        Let's say that the computer's IP address is 192.168.0.4. The address you will type into the web browser in
+        another computer or device will be "192.168.0.4:15171/" followed by the name of the page.
+        </li>
+        <li>So, to access the different web pages, you would type these addresses into your browser:<br />
+            <ul>
+                <li><strong>Mobile-friendly remote</strong>: 192.168.0.4:15171/mremote</li>
+                <li><strong>Regular remote</strong>: 192.168.0.4:15171/remote</li>
+                <li><strong>Stage view</strong>: 192.168.0.4:15171/stage</li>
+            </ul>
+        </li>
+    </ol>
+    <hr>
+    <img class="wrap" src="resources/help/remote.png">
+    <p>Both remote-control web pages have the same functions and layout. Across the top of the page you'll see four
+    buttons on the left and two on the right. The four on the left perform these functions:</p>
+    <ul>
+        <li>Go to the previous item in the Order of Service</li>
+        <li>Go to the previous slide</li>
+        <li>Go to the next slide</li>
+        <li>Go to the next item in the Order of Service</li>
+    </ul>
+    <p>while the two on the right perform these functions:</p>
+    <ul>
+        <li>Show/Hide a black screen</li>
+        <li>Show/Hide the logo screen</li>
+    </ul>
+    <p>If the black screen or logo screen is currently showing, clicking or tapping an order of service or slide
+    item will hide them and show that item</p>
+    <p>Clicking on any item on the left will show the first slide of that item, while clicking on any item on the right
+    will show that particular slide. All lyrics and the text of scripture passages will show up on the right. This
+    is particularly helpful if you are using the remote control from the pulpit or lectern.</p>
+</body>
+</html>

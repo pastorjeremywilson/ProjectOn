@@ -1,0 +1,51 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+h1 {
+    font-size: 24pt;
+    font-weight: 900;
+    color: #5555aa;
+}
+
+h2 {
+    font-size: 16pt;
+    font-weight: 900;
+    color: #5555aa;
+}
+
+p {
+    font-size: 14pt;
+}
+
+div {
+    display: block;
+}
+
+img {
+    border: 2px solid black;
+}
+
+ul, ol {
+	display: inline-block;
+	margin-left: 0px;
+}
+
+li {
+    font-size: 14pt;
+	list-style-position: outside;
+	margin-bottom: 5px;
+}
+
+.wrap {
+    float: left;
+    margin: 10px;
+}
+
+.icon {
+    width: 20px;
+    height: auto;
+    padding: 5px;
+    border: 2px solid black;
+    margin: 0px 10px;
+}

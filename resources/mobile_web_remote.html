@@ -1,0 +1,322 @@
+<html>
+	<head>
+		<title>
+			ProjectOn Web Remote
+		</title>
+	
+		<style>
+			html {
+				box-sizing: border-box;
+			}
+
+			*, *:before, *:after {
+				box-sizing: inherit;
+			}
+
+			#header {
+				flex: 5%;
+				display: flex;
+				flex-direction: column;
+				padding: 10px;
+				width: 100%;
+				position: fixed;
+				left: 0;
+				top: 0;
+				background-color: #aaaaff;
+			}
+
+			#title {
+				display: flex;
+				justify-content: center;
+				width: auto;
+				color: white;
+				font-family: 'Helvetica', sans-serif;
+				font-size: 3vh;
+				font-weight: bold;
+			}
+
+			#buttons {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+			}
+
+			button {
+				padding-top: 30px;
+				padding-bottom: 30px;
+				background: none;
+				border: none;
+				text-align: left;
+				font-family: 'Helvetica', sans-serif;
+				font-weight: bold;
+				font-size: 2.5vh;
+			}
+
+			.nav {
+				border: 5px solid white;
+				border-radius: 10px;
+				background-size: 60px;
+				background-repeat: no-repeat;
+				background-position: center;
+				width: 96px;
+				height: 96px;
+				padding: 10px;
+			}
+
+			.nav:hover {
+				background-repeat: no-repeat;
+				background-position: center;
+				background-color: darkGrey;
+			}
+
+			.nav:pressed {
+				background-color: none;
+			}
+
+			#black_screen {
+				background-image: url({{ url_for('static', filename='black_display.svg') }});
+				margin-right: 40px;
+			}
+
+			#logo_screen {
+				background-image: url({{ url_for('static', filename='logo_display.svg') }});
+			}
+
+			#item_back {
+				background-image: url({{ url_for('static', filename='item_back.svg') }});
+				margin-right: 40px;
+			}
+
+			#slide_back {
+				background-image: url({{ url_for('static', filename='slide_back.svg') }});
+				margin-right: 40px;
+			}
+
+			#slide_forward {
+				background-image: url({{ url_for('static', filename='slide_forward.svg') }});
+				margin-right: 40px;
+			}
+
+			#item_forward {
+				background-image: url({{ url_for('static', filename='item_forward.svg') }});
+			}
+
+			#main {
+				display: flex;
+				flex-direction: row;
+			}
+
+			#oos, #slides {
+				flex: 50%;
+				layout: block;
+				border: 3px solid #aaaaff;
+				margin: 10px;
+				padding: 20px;
+				overflow-y: auto;
+			}
+
+			.subtitle {
+				margin-bottom: 2.5vh;
+				text-decoration: underline;
+				font-family: 'Helvetica', sans-serif;
+				font-weight: bold;
+				font-size: 2.5vh;
+			}
+
+			.current {
+				padding-top: 30px;
+				padding-bottom: 30px;
+				font-size: 2.5vh;
+				background: #aaaaff;
+				border: none;
+			}
+			
+			button:hover {
+				background: lightGrey;
+			}
+
+			.text {
+				font-family: 'Helvetica', sans-serif;
+				font-size: 2vh;
+				font-weight: normal;
+				text-align: left;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<div id="header">`
+			<div id="title">ProjectOn Remote</div>`
+			<div id="buttons">
+				<div id="header-left">
+					<button id="item_back" class="nav" onclick="itemBack()"></button>
+					<button id="slide_back" class="nav" onclick="slideBack()"></button>
+					<button id="slide_forward" class="nav" onclick="slideForward()"></button>
+					<button id="item_forward" class="nav" onclick="itemForward()"></button>
+				</div>
+				<div id="header-right>">
+					<button id="black_screen" class="nav" onclick="blackScreen()"></button>
+					<button id="logo_screen" class="nav" onclick="logoScreen()"></button>
+				</div>
+			</div>
+		</div>
+
+		<div id="main">
+			<div id="oos">
+				<div class="subtitle">
+					Order of Service
+				</div>
+				<form id="oos_form" method="POST">{{ oos | safe}}</form>
+			</div>
+
+			<div id="slides">
+				<div class="subtitle">
+					Slides
+				</div>
+				<form id="slide_form" method="POST">{{ slides | safe}}</form>
+			</div>
+		</div>
+	</body>
+    
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+	<script type="text/javascript" charset="utf-8">
+		var h = document.getElementById('header').clientHeight;
+		bodyHeight = document.body.clientHeight;
+
+		document.getElementById('main').style.paddingTop = h + 'px';
+		document.getElementById('oos').style.height = (bodyHeight - h - 40) + 'px';
+		document.getElementById('slides').style.height = (bodyHeight - h - 40) + 'px';
+
+		var socket = io();
+		socket.on('update_oos', function(text) {
+			document.getElementById("oos_form").innerHTML = text;
+		});
+
+		socket.on('update_slides', function(text) {
+			document.getElementById("slide_form").innerHTML = text;
+		});
+
+		socket.on('change_current_oos', function(num) {
+			oos_html = document.getElementById("oos_form").innerHTML;
+			oos_html = oos_html.replace('class="current" ', '');
+
+			let regex = new RegExp('<button id="' + num + '".*?>');
+			replacement = '<button id="' + num + '" class="current" type="submit" name="oos_button" value="' + num + '">';
+			oos_html = oos_html.replace(regex, replacement);
+
+			document.getElementById("oos_form").innerHTML = oos_html;
+		});
+
+		socket.on('change_current_slide', function(num) {
+			slide_html = document.getElementById("slide_form").innerHTML;
+			slide_html = slide_html.replace('class="current" ', '');
+
+			let regex = new RegExp('<button id="' + num + '".*?>');
+			replacement = '<button id="' + num + '" type="submit" class="current" name="slide_button" value="' + num + '">';
+			slide_html = slide_html.replace(regex, replacement);
+
+			document.getElementById("slide_form").innerHTML = slide_html;
+		});
+
+		form = document.getElementById('oos_form');
+		if (form.attachEvent) {
+			form.attachEvent("submit", oosClick);
+		} else {
+			form.addEventListener("submit", oosClick);
+		}
+
+		form = document.getElementById('slide_form');
+		if (form.attachEvent) {
+			form.attachEvent("submit", slideClick);
+		} else {
+			form.addEventListener("submit", slideClick);
+		}
+
+		function blackScreen() {
+			var request = new XMLHttpRequest();
+			request.open('POST', '/remote');
+			request.send('black_screen');
+		}
+
+		function logoScreen() {
+			var request = new XMLHttpRequest();
+			request.open('POST', '/remote');
+			request.send('logo_screen');
+		}
+
+		function itemBack() {
+			var request = new XMLHttpRequest();
+			request.open('POST', '/remote');
+			request.send('item_back');
+
+			var button = document.getElementById(document.querySelector('div[id="oos"] button[class="current"]').id);
+			var buttonHeight = window.getComputedStyle(button).height.replace('px', '');
+			var newScroll = document.getElementById('oos').scrollTop - parseInt(buttonHeight);
+			document.getElementById('oos').scrollTop = newScroll;
+		}
+
+		function slideBack() {
+			var request = new XMLHttpRequest();
+			request.open('POST', '/remote');
+			request.send('slide_back');
+
+			var button = document.getElementById(document.querySelector('div[id="slides"] button[class="current"]').id);
+			var buttonHeight = window.getComputedStyle(button).height.replace('px', '');
+			var newScroll = document.getElementById('slides').scrollTop - parseInt(buttonHeight);
+			document.getElementById('slides').scrollTop = newScroll;
+		}
+
+		function slideForward() {
+			var request = new XMLHttpRequest();
+			request.open('POST', '/remote');
+			request.send('slide_forward');
+
+			var button = document.getElementById(document.querySelector('div[id="slides"] button[class="current"]').id);
+			var buttonHeight = window.getComputedStyle(button).height.replace('px', '');
+			var newScroll = document.getElementById('slides').scrollTop + parseInt(buttonHeight);
+			document.getElementById('slides').scrollTop = newScroll;
+		}
+
+		function itemForward() {
+			var request = new XMLHttpRequest();
+			request.open('POST', '/remote');
+			request.send('item_forward');
+
+			var button = document.getElementById(document.querySelector('div[id="oos"] button[class="current"]').id);
+			var buttonHeight = window.getComputedStyle(button).height.replace('px', '');
+			var newScroll = document.getElementById('oos').scrollTop + parseInt(buttonHeight);
+			document.getElementById('oos').scrollTop = newScroll;
+		}
+
+		function oosClick(evt) {
+			evt.preventDefault();
+			num = document.activeElement.getAttribute('value');
+
+			var request = new XMLHttpRequest();
+			request.open('POST', '/remote');
+			formData = new FormData();
+			formData.append('oos_title', num);
+			request.send(formData);
+
+			oos_html = document.getElementById("oos_form").innerHTML;
+			oos_html = oos_html.replace('class="current" ', '');
+
+			let regex = new RegExp('<button id="' + num + '".*?>');
+			replacement = '<button id="' + num + '" class="current" type="submit" name="oos_button" value="' + num + '">';
+			oos_html = oos_html.replace(regex, replacement);
+
+			document.getElementById("oos_form").innerHTML = oos_html;
+		}
+
+		function slideClick(evt) {
+			evt.preventDefault();
+			num = document.activeElement.getAttribute('value');
+
+			var request = new XMLHttpRequest();
+			request.open('POST', '/remote');
+			formData = new FormData();
+			formData.append('slide_title', num);
+			request.send(formData);
+		}
+	</script>
+</html>

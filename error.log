@@ -1,0 +1,748 @@
+1704827012.527067:
+    QFontDatabase(a0: QFontDatabase): not enough arguments on line 1016 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in FontFaceListWidget.__init__
+1704827119.4041479:
+    QFontDatabase(a0: QFontDatabase): not enough arguments on line 1016 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in FontFaceListWidget.__init__
+1704827349.043562:
+    type object 'Qt' has no attribute 'IgnoreAspectRatio' on line 520 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.populate_video_list
+1704900073.0941231:
+    'global_song_background' on line 543 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1704900176.8995836:
+    type object 'Qt' has no attribute 'MatchExactly' on line 663 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1704900259.7341437:
+    wrapped C/C++ object of type QWidget has been deleted on line 669 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1704900288.200264:
+    wrapped C/C++ object of type QWidget has been deleted on line 669 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1704929306.8644383:
+    'FontFaceComboBox' object has no attribute 'item' on line 244 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1704929701.1882846:
+    'FontFaceComboBox' object has no attribute 'item' on line 586 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705009054.8039887:
+    'shadow_color' on line 233 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1705083259.0845912:
+    [WinError 3] The system cannot find the path specified: 'C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on../data' on line 891 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in CheckFiles.run
+1705083425.3776731:
+    [WinError 3] The system cannot find the path specified: 'C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on../data' on line 895 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in CheckFiles.run
+1705083441.672611:
+    [WinError 3] The system cannot find the path specified: 'C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on../data' on line 895 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in CheckFiles.run
+1705083465.5807881:
+    [WinError 3] The system cannot find the path specified: 'C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on../data' on line 895 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in CheckFiles.run
+1705263680.1057587:
+    GUI.live_from_remote_signal[str] signal has 1 argument(s) but 0 provided on line 44 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\web_remote.py in RemoteServer.remote
+1705263751.8707945:
+    GUI.live_from_remote_signal[str] signal has 1 argument(s) but 0 provided on line 45 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\web_remote.py in RemoteServer.remote
+2024-01-16 22:32:33.802226:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:41.603431:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:42.500339:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:43.098687:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:43.625262:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:44.107551:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:44.726925:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:45.452962:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:45.650499:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:45.828348:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:46.009033:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:46.176677:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:46.358930:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:46.522718:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:46.702041:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:46.880853:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:47.053814:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:47.231343:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:47.393914:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:47.575161:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:47.745850:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:47.917308:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:48.083080:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:48.267383:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:48.440426:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:48.611562:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:48.792727:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:48.959235:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:49.117407:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:49.305576:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:49.476784:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:49.658780:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:49.830501:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:49.991153:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:50.168178:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:50.352483:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:50.514491:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:50.691486:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:50.855954:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:51.045586:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:51.223538:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:51.403955:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:51.574948:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:51.751652:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:51.919274:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:52.102620:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:52.275392:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:52.451758:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:52.625765:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:52.810985:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:52.988285:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:53.168067:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:53.347935:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:53.523443:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:53.698531:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:53.869589:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:54.043921:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:54.225566:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:54.396742:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:54.586649:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:54.772004:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:54.947896:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:55.116669:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:55.309797:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:55.491325:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:55.674121:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:55.850705:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:32:56.019856:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:01.795777:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:01.973388:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:02.161277:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:02.334488:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:02.525386:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:02.705039:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:02.879549:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:03.047920:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:03.228934:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:03.415398:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:03.582360:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:03.750982:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:03.925101:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:04.095776:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:04.267666:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:04.452895:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:04.620169:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:04.827764:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:05.013160:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:05.171144:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:05.358813:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:05.533282:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:05.705352:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:05.897697:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:06.095053:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:06.283894:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:06.530888:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:06.703061:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:06.880148:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:07.060307:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:07.268495:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:07.449397:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:07.641308:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:07.823301:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:08.012768:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:08.192594:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:08.375750:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:08.579862:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:08.770421:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:08.946481:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:09.122874:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:21.357608:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:21.538145:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:21.731920:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:21.919931:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:22.084799:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:22.276976:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:22.448049:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:22.629017:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:22.786858:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:22.954869:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:23.127666:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:23.315237:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:23.514397:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:23.641448:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:23.829784:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:23.995354:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:24.163360:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:24.320473:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:24.482567:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:24.658631:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label2024-01-16 22:33:24.820250:
+    UNHANDLED EXCEPTION
+    'RuntimeError'
+    wrapped C/C++ object of type QLabel has been deleted
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py, line 156 in update_status_label1705850997.8485947:
+    argument of type 'NoneType' is not iterable on line 566 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705851066.2736924:
+    argument of type 'NoneType' is not iterable on line 567 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705851099.6620746:
+    argument of type 'NoneType' is not iterable on line 568 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705851139.8892887:
+    argument of type 'NoneType' is not iterable on line 596 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705941972.5897365:
+    can only concatenate str (not "NoneType") to str on line 579 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705942016.232211:
+    can only concatenate str (not "NoneType") to str on line 579 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705942124.3260474:
+    itemData(self, index: int, role: int = Qt.UserRole): too many arguments on line 599 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705942170.0439196:
+    itemData(self, index: int, role: int = Qt.UserRole): too many arguments on line 599 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705942266.3774304:
+    'NoneType' object has no attribute 'setStyleSheet' on line 539 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+1705965383.2963655:
+    'song_background' on line 561 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1705965768.1525328:
+    'NoneType' object has no attribute 'scaled' on line 1027 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.add_scripture_item
+1706383996.3844604:
+    'ccli_num' on line 19 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.__init__
+1706384067.551052:
+    'song_background' on line 38 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.__init__
+1706398349.2558076:
+    wrapped C/C++ object of type QWidget has been deleted on line 790 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1706398395.990619:
+    wrapped C/C++ object of type QWidget has been deleted on line 790 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+1707340905.3804262:
+    'GUI' object has no attribute 'gui' on line 1111 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1707341125.0337243:
+    'GUI' object has no attribute 'gui' on line 1112 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708021659.643716:
+    'int' object is not subscriptable on line 1219 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708021733.737668:
+    list index out of range on line 1222 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708021809.0605924:
+    list index out of range on line 1222 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708021832.6449077:
+    can only concatenate list (not "str") to list on line 1222 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708021878.1819103:
+    can only concatenate list (not "str") to list on line 1222 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708022845.2431877:
+    list index out of range on line 1192 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708023867.0371778:
+    list index out of range on line 1192 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708023900.0816956:
+    list index out of range on line 1192 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1708120144.2338684:
+    name 'app' is not defined on line 162 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\web_remote.py in RemoteServer.run
+1708120167.130634:
+    name 'app' is not defined on line 162 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\web_remote.py in RemoteServer.run
+1708120220.7997575:
+    name 'app' is not defined on line 162 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\web_remote.py in RemoteServer.run
+1708120248.9358869:
+    name 'app' is not defined on line 162 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\web_remote.py in RemoteServer.run
+1708120271.1854546:
+    name 'app' is not defined on line 162 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\web_remote.py in RemoteServer.run
+unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error1709931002.1628017:
+    'LyricDisplayWidget' object has no attribute 'lyric_label' on line 1146 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+unknown server error1709931738.6931777:
+    'NoneType' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709931784.7039647:
+    'NoneType' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709931852.6179268:
+    'NoneType' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709931890.8922052:
+    'NoneType' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709931921.456811:
+    'NoneType' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709931953.2374034:
+    'NoneType' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709932089.9560554:
+    'NoneType' object has no attribute 'height' on line 1156 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709932127.2454474:
+    'NoneType' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709932151.6626751:
+    'NoneType' object has no attribute 'height' on line 1156 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709932187.2069225:
+    'NoneType' object has no attribute 'height' on line 1157 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709932212.2519665:
+    'NoneType' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709932272.2355537:
+    'QPainterPath' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709932362.6426253:
+    'QPainterPath' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1709932381.4021022:
+    'QPainterPath' object has no attribute 'height' on line 1155 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1710119798.2483158:
+    list index out of range on line 1191 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.parse_scripture_by_verse
+1710123965.2424252:
+    'NoneType' object has no attribute 'data' on line 894 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710124029.0617187:
+    'NoneType' object has no attribute 'data' on line 894 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710124067.684159:
+    'NoneType' object has no attribute 'data' on line 895 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710124087.89374:
+    'NoneType' object has no attribute 'data' on line 895 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710124292.48423:
+    'NoneType' object has no attribute 'data' on line 897 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710124316.039835:
+    'NoneType' object has no attribute 'text' on line 922 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710124539.1807752:
+    arguments did not match any overloaded call:
+  insertItem(self, row: int, item: Optional[QListWidgetItem]): argument 1 has unexpected type 'NoneType'
+  insertItem(self, row: int, label: Optional[str]): argument 1 has unexpected type 'NoneType' on line 919 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+unknown server error1710199114.2566247:
+    arguments did not match any overloaded call:
+  boundingRect(self, text: Optional[str], textOption: QTextOption): argument 1 has unexpected type 'list'
+  boundingRect(self, text: Optional[str]): argument 1 has unexpected type 'list'
+  boundingRect(self, rect: QRect, flags: int, text: Optional[str], tabStops: int = 0, tabArray: Optional[List[int]] = None): argument 1 has unexpected type 'list'
+  boundingRect(self, x: int, y: int, width: int, height: int, flags: int, text: Optional[str], tabStops: int = 0, tabArray: Optional[List[int]] = None): argument 1 has unexpected type 'list' on line 1538 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in LyricDisplayWidget.paint_text
+1710199141.110938:
+    string index out of range on line 1538 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in LyricDisplayWidget.paint_text
+1710203452.9729805:
+    cannot access local variable 'text' where it is not associated with a value on line 1341 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in LyricDisplayWidget.paint_text
+1710267155.699469:
+    arguments did not match any overloaded call:
+  QPoint(): too many arguments
+  QPoint(xpos: int, ypos: int): argument 1 has unexpected type 'float'
+  QPoint(a0: QPoint): argument 1 has unexpected type 'float' on line 1432 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in LyricDisplayWidget.paint_text
+unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error1710371886.3892:
+    arguments did not match any overloaded call:
+  QColor(color: Qt.GlobalColor): argument 1 has unexpected type 'str'
+  QColor(rgb: int): argument 1 has unexpected type 'str'
+  QColor(rgba64: QRgba64): argument 1 has unexpected type 'str'
+  QColor(variant: Any): too many arguments
+  QColor(): too many arguments
+  QColor(r: int, g: int, b: int, alpha: int = 255): argument 1 has unexpected type 'str'
+  QColor(name: str): too many arguments
+  QColor(a0: QColor): argument 1 has unexpected type 'str' on line 268 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710371891.771794:
+    arguments did not match any overloaded call:
+  QColor(color: Qt.GlobalColor): argument 1 has unexpected type 'str'
+  QColor(rgb: int): argument 1 has unexpected type 'str'
+  QColor(rgba64: QRgba64): argument 1 has unexpected type 'str'
+  QColor(variant: Any): too many arguments
+  QColor(): too many arguments
+  QColor(r: int, g: int, b: int, alpha: int = 255): argument 1 has unexpected type 'str'
+  QColor(name: str): too many arguments
+  QColor(a0: QColor): argument 1 has unexpected type 'str' on line 268 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710371893.3146172:
+    'NoneType' object has no attribute 'scaled' on line 1085 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.add_scripture_item
+1710371920.2805378:
+    invalid literal for int() with base 10: 'black' on line 269 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710371923.6964157:
+    invalid literal for int() with base 10: 'black' on line 269 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710371925.1762364:
+    'NoneType' object has no attribute 'scaled' on line 1086 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.add_scripture_item
+unknown server error1710384602.2440696:
+    'GUI' object has no attribute 'use_shadow' on line 278 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710384606.5356472:
+    'GUI' object has no attribute 'use_shadow' on line 278 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710384608.0591254:
+    'NoneType' object has no attribute 'scaled' on line 1094 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.add_scripture_item
+unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error1710450228.9008472:
+    'NoneType' object has no attribute 'data' on line 907 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710450244.5344608:
+    'NoneType' object has no attribute 'data' on line 907 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710450323.4781232:
+    'NoneType' object has no attribute 'data' on line 907 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710450355.9149885:
+    'NoneType' object has no attribute 'data' on line 907 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710450409.6735523:
+    'NoneType' object has no attribute 'data' on line 907 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_song_to_service
+1710457222.2296274:
+    'self' on line 777 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.error_log
+1710457358.5956707:
+    'GUI' object has no attribute 'use_shadow' on line 285 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710457361.7758853:
+    'NoneType' object has no attribute 'scaled' on line 1059 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.add_scripture_item
+1710457362.4848182:
+    'GUI' object has no attribute 'use_shadow' on line 285 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710457369.365781:
+    'song_background' on line 51 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.__init__
+1710457383.6793592:
+    can only concatenate str (not "NoneType") to str on line 374 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1710541691.2459497:
+    'ProjectOn' object has no attribute 'image_list' on line 706 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.load_service
+unknown server errorunknown server errorunknown server error1713390663.5002809:
+    'NoneType' object has no attribute 'data' on line 628 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_preview
+unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error1713553918.9862564:
+    cannot access local variable 'table' where it is not associated with a value on line 492 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.delete_item
+1713553922.513416:
+    cannot access local variable 'table' where it is not associated with a value on line 492 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.delete_item
+1713554112.4213235:
+    [WinError 2] The system cannot find the file specified: 'C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on/data/videos/Video MP4_Lake - testfile.mp4' on line 483 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.delete_item
+1713554121.0878649:
+    [WinError 2] The system cannot find the file specified: 'C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on/data/videos/Video MP4_Lake - testfile.mp4' on line 483 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.delete_item
+unknown server errorunknown server errorunknown server error1713554510.9125838:
+    [WinError 2] The system cannot find the file specified: 'C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on/data/videos/Video MP4_Lake - testfile.mp4' on line 483 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.delete_item
+1713554749.1445634:
+    cannot access local variable 'table' where it is not associated with a value on line 495 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.delete_item
+unknown server error
