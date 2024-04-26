@@ -570,9 +570,9 @@ class ProjectOn(QObject):
                 self.gui.tool_bar.font_list_widget.setCurrentText('Arial')
 
             service_items = {
-                'global_song_background': self.gui.tool_bar.song_background_combobox.currentText(),
-                'global_bible_background': self.gui.tool_bar.bible_background_combobox.currentText(),
-                'global_font': self.gui.tool_bar.font_list_widget.currentText()
+                'global_song_background': self.settings['global_song_background'],
+                'global_bible_background': self.settings['global_bible_background'],
+                'global_font': self.settings['global_font']
             }
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
@@ -1264,7 +1264,7 @@ class ImageCombobox(QComboBox):
     def __init__(self, gui, type):
         """
         :param gui.GUI gui: The current instance of GUI
-        :param str type: Whether this is creating a combobox of 'logo' or 'background' images
+        :param str type: Whether this is creating a combobox of 'logo', 'song', or 'bible' images
         """
         super().__init__()
         self.gui = gui
@@ -1275,6 +1275,8 @@ class ImageCombobox(QComboBox):
         self.setIconSize(QSize(96, 54))
         self.setMaximumWidth(240)
         self.setFont(self.gui.standard_font)
+
+        self.currentIndexChanged.connect(self.index_changed)
 
         if type == 'logo':
             self.addItem('Choose Logo Image', userData='choose_logo')
@@ -1293,6 +1295,16 @@ class ImageCombobox(QComboBox):
         else:
             self.currentIndexChanged.connect(self.gui.tool_bar.change_background)
         self.refresh()
+
+    def index_changed(self):
+        file_name = self.itemData(self.currentIndex(), Qt.ItemDataRole.UserRole)
+        if type == 'logo':
+            self.gui.main.settings['logo_image'] = file_name
+        elif type == 'song':
+            self.gui.main.settings['global_song_background'] = file_name
+        elif type == 'bible':
+            self.gui.main.settings['global_bible_background'] = file_name
+        self.gui.main.save_settings()
 
     def refresh(self):
         """

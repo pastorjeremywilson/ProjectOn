@@ -1,3 +1,6 @@
-Standardize context menus for media widget
 Fix logo image dropdown in settings
 Help section
+    - openlp import
+    - file locations
+add credentials saved splash
+add store ccli credentials to menu

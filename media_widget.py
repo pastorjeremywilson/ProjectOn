@@ -1520,6 +1520,8 @@ class CustomListWidget(QListWidget):
         elif self.currentItem().data(30) == 'web':
             self.gui.media_widget.populate_web_list()
 
+        self.gui.preview_widget.slide_list.clear()
+
 
 class CustomLineEdit(QLineEdit):
     """

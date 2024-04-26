@@ -48,10 +48,10 @@ class SettingsWidget(QWidget):
 
                 self.song_background_combobox.setCurrentIndex(
                     self.song_background_combobox.findData(
-                        self.gui.main.settings['song_background'], Qt.ItemDataRole.UserRole))
+                        self.gui.main.settings['global_song_background'], Qt.ItemDataRole.UserRole))
                 self.bible_background_combobox.setCurrentIndex(
                     self.bible_background_combobox.findData(
-                        self.gui.main.settings['bible_background'], Qt.ItemDataRole.UserRole))
+                        self.gui.main.settings['global_bible_background'], Qt.ItemDataRole.UserRole))
                 self.logo_background_combobox.setCurrentIndex(
                     self.logo_background_combobox.findData(
                         self.gui.main.settings['logo_image'], Qt.ItemDataRole.UserRole))
@@ -538,10 +538,10 @@ class SettingsWidget(QWidget):
             self.gui.tool_bar.song_background_combobox.refresh()
             self.gui.tool_bar.bible_background_combobox.refresh()
 
-            self.song_background_combobox.setCurrentText(self.gui.main.settings['song_background'])
-            self.bible_background_combobox.setCurrentText(self.gui.main.settings['bible_background'])
-            self.gui.tool_bar.song_background_combobox.setCurrentText(self.gui.main.settings['song_background'])
-            self.gui.tool_bar.bible_background_combobox.setCurrentText(self.gui.main.settings['bible_background'])
+            self.song_background_combobox.setCurrentText(self.gui.main.settings['global_song_background'])
+            self.bible_background_combobox.setCurrentText(self.gui.main.settings['global_bible_background'])
+            self.gui.tool_bar.song_background_combobox.setCurrentText(self.gui.main.settings['global_song_background'])
+            self.gui.tool_bar.bible_background_combobox.setCurrentText(self.gui.main.settings['global_bible_background'])
 
             QMessageBox.information(
                 self,
@@ -561,10 +561,10 @@ class SettingsWidget(QWidget):
         self.gui.main.settings['use_outline'] = self.outline_checkbox.isChecked()
         self.gui.main.settings['outline_color'] = self.outline_color_slider.color_slider.value()
         self.gui.main.settings['outline_width'] = self.outline_width_slider.offset_slider.value()
-        self.gui.main.settings['song_background'] = self.song_background_combobox.itemData(
+        self.gui.main.settings['global_song_background'] = self.song_background_combobox.itemData(
             self.song_background_combobox.currentIndex(), Qt.ItemDataRole.UserRole
         )
-        self.gui.main.settings['bible_background'] = self.bible_background_combobox.itemData(
+        self.gui.main.settings['global_bible_background'] = self.bible_background_combobox.itemData(
             self.logo_background_combobox.currentIndex(), Qt.ItemDataRole.UserRole
         )
         self.gui.main.settings['logo_image'] = self.logo_background_combobox.itemData(

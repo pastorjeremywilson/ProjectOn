@@ -1,17 +1,20 @@
-import math
+import os.path
 import re
 import time
+from xml.etree import ElementTree
 
 import requests
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QMargins, QRunnable, QPoint, QPointF, QRect
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QMargins, QRunnable, QPointF
 from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QPaintEvent, QPainter, QPen, QBrush, QPainterPath, QPalette
-from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QAudioDevice, QMediaDevices
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QGraphicsDropShadowEffect, QMessageBox, QHBoxLayout, QScrollArea, QTextBrowser, QPushButton
+    QMessageBox, QHBoxLayout, QScrollArea, QTextBrowser, QPushButton, QFileDialog, QDialog, \
+    QLineEdit
 
 from help import Help
+from importers import Importers
 from live_widget import LiveWidget
 from media_widget import MediaWidget
 from oos_widget import OOSWidget
@@ -222,18 +225,30 @@ class GUI(QObject):
         open_action.triggered.connect(self.main.load_service)
 
         self.open_recent_menu = file_menu.addMenu('Open Recent Service')
-        for item in self.main.settings['used_services']:
-            open_recent_action = self.open_recent_menu.addAction(item[1])
-            open_recent_action.setData(item[0] + '/' + item[1])
-            open_recent_action.triggered.connect(lambda: self.main.load_service(open_recent_action.data()))
+        if 'used_services' in self.main.settings.keys():
+            for item in self.main.settings['used_services']:
+                open_recent_action = self.open_recent_menu.addAction(item[1])
+                open_recent_action.setData(item[0] + '/' + item[1])
+                open_recent_action.triggered.connect(lambda: self.main.load_service(open_recent_action.data()))
 
         save_action = file_menu.addAction('Save Service')
         save_action.triggered.connect(self.main.save_service)
 
         file_menu.addSeparator()
 
-        import_action = file_menu.addAction('Import Songs from OpenLP')
-        import_action.triggered.connect(self.tool_bar.import_songs)
+        import_menu = file_menu.addMenu('Import')
+
+        openlp_import_action = import_menu.addAction('Import Songs from OpenLP')
+        openlp_import_action.triggered.connect(self.tool_bar.import_songs)
+
+        ccli_import_action = import_menu.addAction('Import Songs from CCLI SongSelect')
+        ccli_import_action.triggered.connect(self.ccli_import)
+
+        chord_pro_import_action = import_menu.addAction('Import a ChordPro Song')
+        chord_pro_import_action.triggered.connect(self.chord_pro_import)
+
+        open_lyrics_import_action = import_menu.addAction('Import an OpenLyrics Song')
+        open_lyrics_import_action.triggered.connect(self.open_lyrics_import)
 
         file_menu.addSeparator()
 
@@ -276,6 +291,18 @@ class GUI(QObject):
 
         about_action = help_menu.addAction('About')
         about_action.triggered.connect(self.show_about)
+
+    def ccli_import(self):
+        from songselect_import import SongselectImport
+        SongselectImport(self)
+
+    def chord_pro_import(self):
+        importer = Importers(self)
+        importer.do_import(importer.CHORDPRO)
+
+    def open_lyrics_import(self):
+        importer = Importers(self)
+        importer.do_import(importer.OPENLYRICS)
 
     def show_help(self):
         self.help = Help(self)
@@ -693,7 +720,7 @@ class GUI(QObject):
 
         file_name_split = file.split('/')
         file_name = file_name_split[len(file_name_split) - 1]
-        self.main.settings['song_background'] = file_name
+        self.main.settings['global_song_background'] = file_name
         self.main.save_settings()
 
     def set_bible_background(self, file):
@@ -709,7 +736,7 @@ class GUI(QObject):
 
         file_name_split = file.split('/')
         file_name = file_name_split[len(file_name_split) - 1]
-        self.main.settings['bible_background'] = file_name
+        self.main.settings['global_bible_background'] = file_name
         self.main.save_settings()
 
     def set_logo_image(self, file):
