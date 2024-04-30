@@ -1,6 +1,4 @@
-Fix logo image dropdown in settings
 Help section
-    - openlp import
     - file locations
-add credentials saved splash
-add store ccli credentials to menu
+
+Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?

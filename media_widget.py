@@ -5,14 +5,15 @@ import sqlite3
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt6.QtCore import Qt, QSize, QTimer, QPoint
+from PyQt6.QtCore import Qt, QSize, QPoint
 from PyQt6.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen, QAction
 from PyQt6.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, \
-    QSizePolicy, QGridLayout, QStyleOption, QStyle
+    QGridLayout, QStyleOption, QStyle
 
 from edit_widget import EditWidget
 from get_scripture import GetScripture
+from widgets import AutoSelectLineEdit
 
 
 class MediaWidget(QTabWidget):
@@ -87,7 +88,7 @@ class MediaWidget(QTabWidget):
         search_label.setFont(self.gui.standard_font)
         search_layout.addWidget(search_label)
 
-        self.search_line_edit = CustomLineEdit()
+        self.search_line_edit = AutoSelectLineEdit()
         self.search_line_edit.textChanged.connect(self.song_search)
         search_layout.addWidget(self.search_line_edit)
 
@@ -185,7 +186,7 @@ class MediaWidget(QTabWidget):
         bible_search_label.setFont(self.gui.standard_font)
         bible_search_layout.addWidget(bible_search_label)
 
-        self.bible_search_line_edit = CustomLineEdit()
+        self.bible_search_line_edit = AutoSelectLineEdit()
         self.bible_search_line_edit.setFont(self.gui.standard_font)
         self.bible_search_line_edit.textEdited.connect(self.get_scripture)
         self.bible_search_line_edit.textChanged.connect(self.get_scripture)
@@ -1521,18 +1522,6 @@ class CustomListWidget(QListWidget):
             self.gui.media_widget.populate_web_list()
 
         self.gui.preview_widget.slide_list.clear()
-
-
-class CustomLineEdit(QLineEdit):
-    """
-    Implements QLineEdit to add the ability to select all text when this line edit receives focus.
-    """
-    def __init__(self):
-        super().__init__()
-
-    def focusInEvent(self, evt):
-        super().focusInEvent(evt)
-        QTimer.singleShot(0, self.selectAll)
 
 
 class OOSItemWidget(QWidget):

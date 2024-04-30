@@ -1,19 +1,26 @@
 import os.path
 
 from PyQt6.QtCore import Qt, QRectF, QPointF, QEvent
-from PyQt6.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath, QWheelEvent
+from PyQt6.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, \
-    QGraphicsDropShadowEffect, QSizePolicy, QCheckBox
+    QSizePolicy, QCheckBox
+
+from simple_splash import SimpleSplash
 
 
 class SettingsWidget(QWidget):
+    wait_widget = None
+
     def __init__(self, gui):
         super().__init__()
         self.accept_font_changes = False
         self.gui = gui
         self.min_width = 1000
+
+        self.show_wait_widget()
         self.init_components()
+        self.gui.main.app.processEvents()
 
         if self.gui.main.settings:
             try:
@@ -64,6 +71,11 @@ class SettingsWidget(QWidget):
 
         self.accept_font_changes = True
         self.change_font_sample()
+        self.gui.main.app.processEvents()
+        self.wait_widget.widget.deleteLater()
+
+    def show_wait_widget(self):
+        self.wait_widget = SimpleSplash(self.gui, 'Please wait...')
 
     def init_components(self):
         self.setParent(self.gui.main_window)
@@ -115,7 +127,7 @@ class SettingsWidget(QWidget):
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(self.deleteLater)
+        cancel_button.pressed.connect(self.cancel)
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 
@@ -214,7 +226,9 @@ class SettingsWidget(QWidget):
         return widget
 
     def font_settings(self):
-        from main import FontFaceComboBox, ShadowSlider, OffsetSlider
+        from widgets import OffsetSlider
+        from widgets import ShadowSlider
+        from widgets import FontFaceComboBox
 
         widget = QWidget()
         widget.setMinimumWidth(self.min_width)
@@ -378,6 +392,8 @@ class SettingsWidget(QWidget):
         return widget
 
     def background_settings(self):
+        from widgets import ImageCombobox
+
         widget = QWidget()
         widget.setMinimumWidth(self.min_width)
         widget.setObjectName('background_widget')
@@ -389,12 +405,11 @@ class SettingsWidget(QWidget):
         title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
         layout.addWidget(title_label)
 
-        from main import ImageCombobox
         song_background_label = QLabel('Global Song Background:')
         song_background_label.setFont(self.gui.standard_font)
         layout.addWidget(song_background_label)
 
-        self.song_background_combobox = ImageCombobox(self.gui, 'song')
+        self.song_background_combobox = ImageCombobox(self.gui, 'song', suppress_autosave=True)
         self.song_background_combobox.setMaximumWidth(500)
         layout.addWidget(self.song_background_combobox)
         layout.addSpacing(20)
@@ -403,7 +418,7 @@ class SettingsWidget(QWidget):
         bible_background_label.setFont(self.gui.standard_font)
         layout.addWidget(bible_background_label)
 
-        self.bible_background_combobox = ImageCombobox(self.gui, 'bible')
+        self.bible_background_combobox = ImageCombobox(self.gui, 'bible', suppress_autosave=True)
         self.bible_background_combobox.setMaximumWidth(500)
         layout.addWidget(self.bible_background_combobox)
         layout.addSpacing(20)
@@ -412,7 +427,7 @@ class SettingsWidget(QWidget):
         logo_background_label.setFont(self.gui.standard_font)
         layout.addWidget(logo_background_label)
 
-        self.logo_background_combobox = ImageCombobox(self.gui, 'logo')
+        self.logo_background_combobox = ImageCombobox(self.gui, 'logo', suppress_autosave=True)
         self.logo_background_combobox.setMaximumWidth(500)
         layout.addWidget(self.logo_background_combobox)
         layout.addSpacing(20)
@@ -497,7 +512,7 @@ class SettingsWidget(QWidget):
         label.setFont(self.gui.standard_font)
         layout.addWidget(label)
 
-        from main import ImageCombobox
+        from widgets import ImageCombobox
         combobox = ImageCombobox(self.gui, 'background')
         combobox.removeItem(1)
         combobox.removeItem(0)
@@ -591,6 +606,9 @@ class SettingsWidget(QWidget):
 
         self.gui.main.save_settings()
         self.gui.apply_settings()
+        self.deleteLater()
+
+    def cancel(self):
         self.deleteLater()
 
 

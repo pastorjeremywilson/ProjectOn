@@ -56,8 +56,8 @@ class Toolbar(QWidget):
         song_background_label.setFont(self.gui.standard_font)
         self.layout.addWidget(song_background_label)
 
-        from main import ImageCombobox
-        self.song_background_combobox = ImageCombobox(self.gui, 'Song')
+        from widgets import ImageCombobox
+        self.song_background_combobox = ImageCombobox(self.gui, 'song')
         self.song_background_combobox.setObjectName('song_background_combobox')
         self.song_background_combobox.setToolTip('Choose a Background for All Songs')
         self.layout.addWidget(self.song_background_combobox)
@@ -66,7 +66,7 @@ class Toolbar(QWidget):
         bible_background_label.setFont(self.gui.standard_font)
         self.layout.addWidget(bible_background_label)
 
-        self.bible_background_combobox = ImageCombobox(self.gui, 'Bible')
+        self.bible_background_combobox = ImageCombobox(self.gui, 'bible')
         self.bible_background_combobox.setObjectName('bible_background_combobox')
         self.bible_background_combobox.setToolTip('Choose a Background for Bible Slides')
         self.layout.addWidget(self.bible_background_combobox)
@@ -75,7 +75,7 @@ class Toolbar(QWidget):
         global_font_label.setFont(self.gui.standard_font)
         #self.layout.addWidget(global_font_label)
 
-        from main import FontFaceComboBox
+        from widgets import FontFaceComboBox
         self.font_list_widget = FontFaceComboBox(self.gui)
         self.font_list_widget.setToolTip('Set a Font for All Slides')
         self.font_list_widget.currentIndexChanged.connect(self.change_font)

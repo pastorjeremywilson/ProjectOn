@@ -6,6 +6,8 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QLineEdit, QWidget, QHBoxLayout, \
     QPushButton, QRadioButton, QButtonGroup
 
+from simple_splash import SimpleSplash
+
 
 class Importers:
     CHORDPRO = 0
@@ -355,22 +357,7 @@ class Importers:
                 else:
                     return
 
-            save_widget = QWidget()
-            save_widget.setStyleSheet('background: #5555ee')
-            save_widget.setParent(self.gui.main_window)
-            save_layout = QHBoxLayout()
-            save_widget.setLayout(save_layout)
-
-            save_label = QLabel('Saving...')
-            save_label.setStyleSheet('color: white;')
-            save_label.setFont(self.gui.list_title_font)
-            save_layout.addStretch()
-            save_layout.addWidget(save_label)
-            save_layout.addStretch()
-
-            save_widget.setGeometry(100, 150, 300, 100)
-            save_widget.show()
-            self.gui.main.app.processEvents()
+            save_widget = SimpleSplash(self.gui, 'Saving...')
 
             self.gui.main.save_song(song_data)
             self.gui.media_widget.populate_song_list()
@@ -378,4 +365,4 @@ class Importers:
             self.gui.media_widget.song_list.setCurrentItem(
                 self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
 
-            save_widget.deleteLater()
+            save_widget.widget.deleteLater()

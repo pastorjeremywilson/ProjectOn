@@ -6,15 +6,16 @@ from PyQt6.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, 
     QMessageBox, QCheckBox, QComboBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea
 
 from formattable_text_edit import FormattableTextEdit
+from simple_splash import SimpleSplash
 
 
 class EditWidget(QDialog):
     """
-    Provides a QDialog containing the necessary widgets to edit a song or custom slide.
+    Provides a QDialog containing the necessary widgets.py to edit a song or custom slide.
     """
     def __init__(self, gui, type, data=None, item_text=None):
         """
-        Provides a QDialog containing the necessary widgets to edit a song or custom slide.
+        Provides a QDialog containing the necessary widgets.py to edit a song or custom slide.
         :param gui.GUI gui: The current instance of GUI
         :param str type: The type of slide being edited: 'song' or 'custom'
         :param list of str data: Optional: The data contained in QListWidget.data()
@@ -50,7 +51,7 @@ class EditWidget(QDialog):
 
     def init_components(self):
         """
-        Create and add the necessary widgets to this dialog
+        Create and add the necessary widgets.py to this dialog
         """
         self.setParent(self.gui.main_window)
         self.setWindowFlag(Qt.WindowType.Window)
@@ -309,7 +310,7 @@ class EditWidget(QDialog):
         background_color_radio_button.setFont(self.gui.list_font)
         background_color_radio_button.pressed.connect(self.color_chooser)
 
-        from main import ImageCombobox
+        from widgets import ImageCombobox
         background_combobox = ImageCombobox(self.gui, 'edit')
         background_combobox.currentIndexChanged.connect(
             lambda: self.background_line_edit.setText(background_combobox.currentData(Qt.ItemDataRole.UserRole)))
@@ -384,7 +385,7 @@ class EditWidget(QDialog):
 
     def populate_song_data(self, song_data):
         """
-        Use the provided data to set the proper widgets to match the saved data
+        Use the provided data to set the proper widgets.py to match the saved data
         :param list of str song_data: The song's QListWidgetItem data
         """
         self.old_title = song_data[0]
@@ -438,7 +439,7 @@ class EditWidget(QDialog):
 
     def populate_custom_data(self, custom_data):
         """
-        Use the provided data to set the proper widgets to match the saved data
+        Use the provided data to set the proper widgets.py to match the saved data
         :param list of str custom_data: The custom slide's QListWidgetItem data
         """
         self.old_title = custom_data[0]
@@ -687,22 +688,7 @@ class EditWidget(QDialog):
                     else:
                         return
 
-            save_widget = QWidget()
-            save_widget.setStyleSheet('background: #5555ee')
-            save_widget.setParent(self)
-            save_layout = QHBoxLayout()
-            save_widget.setLayout(save_layout)
-
-            save_label = QLabel('Saving...')
-            save_label.setStyleSheet('color: white;')
-            save_label.setFont(self.gui.list_title_font)
-            save_layout.addStretch()
-            save_layout.addWidget(save_label)
-            save_layout.addStretch()
-
-            save_widget.setGeometry(100, 150, 300, 100)
-            save_widget.show()
-            self.gui.main.app.processEvents()
+            save_widget = SimpleSplash(self.gui, 'Saving...')
 
             self.gui.main.save_song(song_data, self.old_title)
             self.gui.media_widget.populate_song_list()
@@ -716,6 +702,7 @@ class EditWidget(QDialog):
                         break
 
             self.done(0)
+            save_widget.widget.deleteLater()
             if self.gui.oos_widget.oos_list_widget.currentItem():
                 self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
 
@@ -801,22 +788,7 @@ class EditWidget(QDialog):
                 else:
                     return
 
-        save_widget = QWidget()
-        save_widget.setStyleSheet('background: #5555ee')
-        save_widget.setParent(self)
-        save_layout = QHBoxLayout()
-        save_widget.setLayout(save_layout)
-
-        save_label = QLabel('Saving...')
-        save_label.setStyleSheet('color: white;')
-        save_label.setFont(self.gui.list_title_font)
-        save_layout.addStretch()
-        save_layout.addWidget(save_label)
-        save_layout.addStretch()
-
-        save_widget.setGeometry(100, 150, 300, 100)
-        save_widget.show()
-        self.gui.main.app.processEvents()
+        save_widget = SimpleSplash(self.gui, 'Saving...')
 
         self.gui.main.save_custom(custom_data, self.old_title)
         self.gui.media_widget.populate_custom_list()
@@ -831,6 +803,7 @@ class EditWidget(QDialog):
                     self.change_thumbnail(self.gui.oos_widget.oos_list_widget.item(i))
 
         self.done(0)
+        save_widget.widget.deleteLater()
         if self.gui.oos_widget.oos_list_widget.currentItem():
             self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
 

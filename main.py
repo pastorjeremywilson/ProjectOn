@@ -31,13 +31,13 @@ from os.path import exists
 from xml.etree import ElementTree
 
 import requests
-from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, QSize, pyqtSignal, QObject, QPoint, \
-    QEvent
-from PyQt6.QtGui import QPixmap, QFontDatabase, QFont, QIcon, QPainter, QBrush, QColor, QPen
-from PyQt6.QtWidgets import QApplication, QListWidget, QLabel, QListWidgetItem, QComboBox, QWidget, QHBoxLayout, \
-    QVBoxLayout, QFileDialog, QMessageBox, QListView, QProgressBar, QSlider, QGridLayout
+from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
+from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen
+from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
+    QProgressBar
 
 from gui import GUI
+from simple_splash import SimpleSplash
 from web_remote import RemoteServer
 
 
@@ -198,6 +198,7 @@ class ProjectOn(QObject):
             self.progress_bar.setValue(self.progress_bar.value() + 1)
             self.app.processEvents()
             self.status_update_count += 1
+            self.splash_widget.setFocus()
 
     def make_splash_screen(self):
         """
@@ -383,7 +384,7 @@ class ProjectOn(QObject):
         """
         connection = sqlite3.connect(self.database)
         cursor = connection.cursor()
-        data = cursor.execute('SELECT title FROM songs').fetchall()
+        data = cursor.execute('SELECT title FROM songs ORDER BY title').fetchall()
         song_titles = []
         for item in data:
             song_titles.append(item[0])
@@ -572,7 +573,15 @@ class ProjectOn(QObject):
             service_items = {
                 'global_song_background': self.settings['global_song_background'],
                 'global_bible_background': self.settings['global_bible_background'],
-                'global_font': self.settings['global_font']
+                'font_face': self.settings['font_face'],
+                'font_size': self.settings['font_size'],
+                'font_color': self.settings['font_color'],
+                'use_shadow': self.settings['use_shadow'],
+                'shadow_color': self.settings['shadow_color'],
+                'shadow_offset': self.settings['shadow_offset'],
+                'use_outline': self.settings['use_outline'],
+                'outline_color': self.settings['outline_color'],
+                'outline_width': self.settings['outline_width'],
             }
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
@@ -693,18 +702,7 @@ class ProjectOn(QObject):
         # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
         # provide a splash
         if len(result[0]) > 0:
-            wait_widget = QWidget()
-            wait_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
-            wait_widget.setStyleSheet('background: #5555aa')
-            wait_layout = QHBoxLayout()
-            wait_layout.setContentsMargins(10, 10, 10, 10)
-            wait_widget.setLayout(wait_layout)
-            wait_label = QLabel('Loading service...')
-            wait_label.setFont(QFont('Helvetica', 16, QFont.Weight.Bold))
-            wait_label.setStyleSheet('color: white;')
-            wait_layout.addWidget(wait_label)
-            wait_widget.show()
-            self.app.processEvents()
+            wait_widget = SimpleSplash(self.gui, 'Loading service...')
 
             try:
                 with open(result[0], 'r') as file:
@@ -714,9 +712,29 @@ class ProjectOn(QObject):
             except Exception:
                 logging.exception('')
 
-            self.settings['global_song_background'] = service_dict['global_song_background']
-            self.settings['global_bible_background'] = service_dict['global_bible_background']
-            self.settings['font_face'] = service_dict['global_font']
+            if 'global_song_background' in service_dict.keys():
+                self.settings['global_song_background'] = service_dict['global_song_background']
+            if 'global_bible_background' in service_dict.keys():
+                self.settings['global_bible_background'] = service_dict['global_bible_background']
+            if 'font_face' in service_dict.keys():
+                self.settings['font_face'] = service_dict['font_face']
+            if 'font_size' in service_dict.keys():
+                self.settings['font_size'] = service_dict['font_size']
+            if 'font_color' in service_dict.keys():
+                self.settings['font_color'] = service_dict['font_color']
+            if 'use_shadow' in service_dict.keys():
+                self.settings['use_shadow'] = service_dict['use_shadow']
+            if 'shadow_color' in service_dict.keys():
+                self.settings['shadow_color'] = service_dict['shadow_color']
+            if 'shadow_offset' in service_dict.keys():
+                self.settings['shadow_offset'] = service_dict['shadow_offset']
+            if 'use_outline' in service_dict.keys():
+                self.settings['use_outline'] = service_dict['use_outline']
+            if 'outline_color' in service_dict.keys():
+                self.settings['outline_color'] = service_dict['outline_color']
+            if 'outline_width' in service_dict.keys():
+                self.settings['outline_width'] = service_dict['outline_width']
+
             self.gui.apply_settings()
 
             # walk through the items saved in the file and load their QListWidgetItems into the order of service widget
@@ -948,7 +966,7 @@ class ProjectOn(QObject):
                 open_recent_action.triggered.connect(lambda: self.load_service(open_recent_action.data()))
 
             self.gui.changes = False
-            wait_widget.deleteLater()
+            wait_widget.widget.deleteLater()
 
     def import_xml_bible(self):
         file = QFileDialog.getOpenFileName(
@@ -1194,265 +1212,6 @@ class IndexImages(QRunnable):
         cursor.execute('INSERT INTO ' + table + ' (fileName, image) VALUES("' + file_name + '", ?)', (blob,))
         connection.commit()
         connection.close()
-
-
-class FontFaceListWidget(QListWidget):
-    """
-    Creates a custom QListWidget that displays all fonts on the system in their own style.
-    :param gui.GUI gui: The current instance of GUI
-    """
-    def __init__(self, gui):
-        """
-        :param gui.GUI gui: The current instance of GUI
-        """
-        super().__init__()
-        self.setMinimumHeight(60)
-        self.gui = gui
-
-        try:
-            for font in QFontDatabase.families():
-                if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
-                    self.gui.main.update_status_signal.emit(font, 'info')
-                list_label = QLabel(font)
-                list_label.setFont(QFont(font, 12))
-                item = QListWidgetItem()
-                item.setData(20, font)
-                self.addItem(item)
-                self.setItemWidget(item, list_label)
-
-            if self.gui.main.initial_startup:
-                self.gui.main.update_status_signal.emit('', 'info')
-        except Exception:
-            self.gui.main.error_log()
-
-
-class FontFaceComboBox(QComboBox):
-    """
-    Creates a custom QComboBox that displays all fonts on the system in their own style.
-    :param gui.GUI gui: The current instance of GUI
-    """
-    def __init__(self, gui):
-        """
-        :param gui.GUI gui: The current instance of GUI
-        """
-        super().__init__()
-        self.gui = gui
-
-        try:
-            row = 0
-            for font in QFontDatabase.families():
-                if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
-                    self.gui.main.update_status_signal.emit(font, 'info')
-                model = self.model()
-                self.addItem(font)
-                model.setData(model.index(row, 0), QFont(font, 14), Qt.ItemDataRole.FontRole)
-                row += 1
-
-        except Exception:
-            self.gui.main.error_log()
-
-    def wheelEvent(self, evt):
-        evt.ignore()
-
-
-class ImageCombobox(QComboBox):
-    """
-    Creates a custom QComboBox that displays a thumbnail of an image to be used.
-    """
-    def __init__(self, gui, type):
-        """
-        :param gui.GUI gui: The current instance of GUI
-        :param str type: Whether this is creating a combobox of 'logo', 'song', or 'bible' images
-        """
-        super().__init__()
-        self.gui = gui
-        self.type = type
-        self.setView(QListView())
-        self.setObjectName(type)
-
-        self.setIconSize(QSize(96, 54))
-        self.setMaximumWidth(240)
-        self.setFont(self.gui.standard_font)
-
-        self.currentIndexChanged.connect(self.index_changed)
-
-        if type == 'logo':
-            self.addItem('Choose Logo Image', userData='choose_logo')
-            self.addItem('Import a Logo Image', userData='import_logo')
-            self.table = 'imageThumbnails'
-        if type == 'edit':
-            self.addItem('Choose Custom Background', userData='choose_global')
-            self.table = 'backgroundThumbnails'
-        else:
-            self.addItem('Choose Global ' + type + ' Background', userData='choose_global')
-            self.addItem('Import a Background Image', userData='import_global')
-            self.table = 'backgroundThumbnails'
-
-        if type == 'edit_background':
-            self.removeItem(0)
-        else:
-            self.currentIndexChanged.connect(self.gui.tool_bar.change_background)
-        self.refresh()
-
-    def index_changed(self):
-        file_name = self.itemData(self.currentIndex(), Qt.ItemDataRole.UserRole)
-        if type == 'logo':
-            self.gui.main.settings['logo_image'] = file_name
-        elif type == 'song':
-            self.gui.main.settings['global_song_background'] = file_name
-        elif type == 'bible':
-            self.gui.main.settings['global_bible_background'] = file_name
-        self.gui.main.save_settings()
-
-    def refresh(self):
-        """
-        Method to refresh the combo box after changes to the image indices
-        """
-        self.clear()
-
-        if self.type == 'logo':
-            self.addItem('Choose Logo Image', userData='choose_logo')
-            self.addItem('Import a Logo Image', userData='import_logo')
-            self.table = 'imageThumbnails'
-        if self.type == 'edit':
-            self.addItem('Choose Custom Background', userData='choose_global')
-            self.table = 'backgroundThumbnails'
-        else:
-            self.addItem('Choose Global ' + self.type + ' Background', userData='choose_global')
-            self.addItem('Import a Background Image', userData='import_global')
-            self.table = 'backgroundThumbnails'
-        connection = None
-
-        try:
-            connection = sqlite3.connect(self.gui.main.database)
-            cursor = connection.cursor()
-            thumbnails = cursor.execute('SELECT * FROM ' + self.table).fetchall()
-
-            for record in thumbnails:
-                if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')
-                    self.gui.main.update_status_signal.emit(record[0], 'info')
-                pixmap = QPixmap()
-                pixmap.loadFromData(record[1], 'JPG')
-                icon = QIcon(pixmap)
-                self.addItem(icon, record[0].split('.')[0], userData=record[0])
-
-            if self.gui.main.initial_startup:
-                self.gui.main.update_status_signal.emit('', 'info')
-
-            connection.close()
-        except Exception:
-            self.gui.main.error_log()
-            if connection:
-                connection.close()
-
-    def wheelEvent(self, evt):
-        # prevent wheel scrolling, which is undesirable in the settings layout
-        evt.ignore()
-
-
-class ShadowSlider(QWidget):
-    """
-    Creates a widget containing a QSlider and Label which lets the user set the greyness of the display's shadow
-    :param gui.GUI gui: The current instance of GUI
-    """
-    def __init__(self, gui):
-        """
-        Creates a widget containing a QSlider and Label which lets the user set the greyness of the display's shadow
-        :param gui.GUI gui: The current instance of GUI
-        """
-        super().__init__()
-        self.gui = gui
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.setLayout(layout)
-
-        self.color_title = QLabel('Shadow Color:')
-        self.color_title.setStyleSheet('padding-bottom: 10px')
-        self.color_title.setFont(self.gui.list_font)
-        layout.addWidget(self.color_title)
-
-        slider_widget = QWidget()
-        slider_widget.setFixedWidth(300)
-        slider_layout = QGridLayout()
-        slider_layout.setContentsMargins(0, 0, 0, 0)
-        slider_layout.setVerticalSpacing(0)
-        slider_widget.setLayout(slider_layout)
-        layout.addWidget(slider_widget)
-
-        self.color_slider = QSlider()
-        self.color_slider.setObjectName('color_slider')
-        self.color_slider.setOrientation(Qt.Orientation.Horizontal)
-        self.color_slider.setFont(self.gui.list_font)
-        self.color_slider.setRange(0, 255)
-        self.color_slider.installEventFilter(self)
-        slider_layout.addWidget(self.color_slider, 0, 0, 1, 2)
-
-        min_label = QLabel('Black')
-        min_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(min_label, 1, 0, Qt.AlignmentFlag.AlignLeft)
-
-        max_label = QLabel('White')
-        max_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(max_label, 1, 1, Qt.AlignmentFlag.AlignRight)
-
-    def eventFilter(self, obj, evt):
-        if obj == self.color_slider and evt.type() == QEvent.Type.Wheel:
-            return True
-        else:
-            return super().eventFilter(obj, evt)
-
-
-class OffsetSlider(QWidget):
-    """
-    Creates a widget containing a QSlider and Label which lets the user set the distance of the display's shadow offset
-    :param gui.GUI gui: The current instance of GUI
-    """
-    def __init__(self, gui):
-        super().__init__()
-        self.gui = gui
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.setLayout(layout)
-
-        self.offset_title = QLabel('Shadow Offset:')
-        self.offset_title.setStyleSheet('padding-bottom: 10px')
-        self.offset_title.setFont(self.gui.list_font)
-        layout.addWidget(self.offset_title)
-
-        slider_widget = QWidget()
-        slider_widget.setFixedWidth(300)
-        slider_layout = QGridLayout()
-        slider_layout.setContentsMargins(0, 0, 0, 0)
-        slider_layout.setVerticalSpacing(0)
-        slider_widget.setLayout(slider_layout)
-        layout.addWidget(slider_widget)
-
-        self.offset_slider = QSlider()
-        self.offset_slider.setOrientation(Qt.Orientation.Horizontal)
-        self.offset_slider.setFont(self.gui.list_font)
-        self.offset_slider.setRange(0, 15)
-        self.offset_slider.setValue(self.gui.shadow_offset)
-        self.offset_slider.installEventFilter(self)
-        slider_layout.addWidget(self.offset_slider, 0, 0, 1, 2)
-
-        self.min_label = QLabel(str(self.offset_slider.minimum()) + 'px')
-        self.min_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(self.min_label, 1, 0, Qt.AlignmentFlag.AlignLeft)
-
-        self.max_label = QLabel(str(self.offset_slider.maximum()) + 'px')
-        self.max_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(self.max_label, 1, 1, Qt.AlignmentFlag.AlignRight)
-
-    def eventFilter(self, obj, evt):
-        if obj == self.offset_slider and evt.type() == QEvent.Type.Wheel:
-            return True
-        else:
-            return super().eventFilter(obj, evt)
 
 
 class ServerCheck(QRunnable):

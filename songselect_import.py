@@ -3,14 +3,15 @@ import re
 from asyncio import wait_for
 from os.path import exists
 
-from PyQt6 import QtCore, QtWebEngineWidgets
+from PyQt6 import QtCore
 from PyQt6.QtCore import QUrl, Qt
-from PyQt6.QtGui import QFont
-from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
+from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QMainWindow, QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
-    QMessageBox, QDialog, QListWidget
+from PyQt6.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
+    QMessageBox, QDialog
 from cryptography.fernet import Fernet
+
+from simple_splash import SimpleSplash
 
 
 class SongselectImport(QWidget):
@@ -21,12 +22,13 @@ class SongselectImport(QWidget):
     LOGOUT_URL = BASE_URL + '/account/logout'
     SEARCH_URL = BASE_URL + '/search/results'
     SONG_PAGE = BASE_URL + '/Songs/'
-    def __init__(self, gui):
+    def __init__(self, gui, suppress_browser=False):
         super().__init__()
         self.gui = gui
-        self.init_components()
 
-        self.show()
+        if not suppress_browser:
+            self.init_components()
+            self.show()
 
     def init_components(self):
         primary_screen_width = self.gui.primary_screen.size().width()
@@ -55,7 +57,8 @@ class SongselectImport(QWidget):
         nav_layout = QHBoxLayout(nav_widget)
         import_layout.addWidget(nav_widget)
 
-        self.back_button = QPushButton('<', self)
+        self.back_button = QPushButton(self)
+        self.back_button.setIcon(QIcon('resources/browser_back.svg'))
         nav_layout.addWidget(self.back_button)
 
         self.url_bar = QLineEdit(self)
@@ -167,6 +170,13 @@ class SongselectImport(QWidget):
 
             with open(self.gui.main.data_dir + '/ccli_data.dat', 'w') as file:
                 file.writelines([key.decode('utf-8') + '\n', enc_user.decode('utf-8') + '\n', enc_pass.decode('utf-8')])
+
+            QMessageBox.information(
+                self.gui.main_window,
+                'Credentials Saved',
+                'CCLI SongSelect credentials have been encrypted and saved.',
+                QMessageBox.StandardButton.Ok
+            )
 
             return user_name, password
         else:
@@ -346,22 +356,7 @@ class SongselectImport(QWidget):
                     else:
                         return
 
-                save_widget = QWidget()
-                save_widget.setStyleSheet('background: #5555ee')
-                save_widget.setParent(self)
-                save_layout = QHBoxLayout()
-                save_widget.setLayout(save_layout)
-
-                save_label = QLabel('Saving...')
-                save_label.setStyleSheet('color: white;')
-                save_label.setFont(self.gui.list_title_font)
-                save_layout.addStretch()
-                save_layout.addWidget(save_label)
-                save_layout.addStretch()
-
-                save_widget.setGeometry(100, 150, 300, 100)
-                save_widget.show()
-                self.gui.main.app.processEvents()
+                save_widget = SimpleSplash(self.gui, 'Saving...')
 
                 self.gui.main.save_song(song_data)
                 self.gui.media_widget.populate_song_list()
@@ -369,5 +364,5 @@ class SongselectImport(QWidget):
                 self.gui.media_widget.song_list.setCurrentItem(
                     self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
 
-                save_widget.deleteLater()
+                save_widget.widget.deleteLater()
                 self.deleteLater()

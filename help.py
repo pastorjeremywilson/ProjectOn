@@ -50,10 +50,13 @@ class Help(QMainWindow):
         tab_widget.addTab(self.edit_widget(), 'Edit Window')
         tab_widget.addTab(self.settings_widget(), 'Settings Window')
         tab_widget.addTab(self.remote_widget(), 'Remote Server')
+        tab_widget.addTab(self.import_widget(), 'Importing Songs')
 
     def intro_widget(self):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -67,6 +70,8 @@ class Help(QMainWindow):
     def main_screen_widget(self):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -80,6 +85,8 @@ class Help(QMainWindow):
     def media_widget(self):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -93,6 +100,8 @@ class Help(QMainWindow):
     def edit_widget(self):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -106,6 +115,8 @@ class Help(QMainWindow):
     def settings_widget(self):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -119,12 +130,29 @@ class Help(QMainWindow):
     def remote_widget(self):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
         remote_file = 'resources/help/remote.html'
         if exists(remote_file):
             with open(remote_file, 'r') as file:
+                web_view.setHtml(file.read(), self.base_url)
+
+        return widget
+
+    def import_widget(self):
+        widget = QWidget()
+        widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+
+        web_view = QWebEngineView()
+        widget.layout().addWidget(web_view)
+        import_file = 'resources/help/import.html'
+        if exists(import_file):
+            with open(import_file, 'r') as file:
                 web_view.setHtml(file.read(), self.base_url)
 
         return widget

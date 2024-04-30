@@ -22,7 +22,7 @@ class LiveWidget(QWidget):
 
     def init_components(self):
         """
-        Create the various widgets to be contained in this widget.
+        Create the various widgets.py to be contained in this widget.
         """
         layout = QVBoxLayout()
         layout.setSpacing(0)
