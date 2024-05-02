@@ -4,24 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="233d5086-b170-4655-9be9-a778c8a1e0ee" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/defaults/backgrounds/Plasmoid.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/backgrounds/bible.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/backgrounds/default_logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/backgrounds/desert.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/backgrounds/paper.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/backgrounds/prayer.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/bibles/SF_2009-01-23_ENG_KJV_(KING JAMES VERSION).xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/default_database.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/images/Go In Peace.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/images/Welcome.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/videos/Video MP4_Lake - testfile.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/defaults/videos/Video MP4_Lake - testfile.mp4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/projecton.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/projecton.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="233d5086-b170-4655-9be9-a778c8a1e0ee" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -180,7 +163,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714679502147</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Added some default files to be copied on a first run or if any of the items in the data folder are deleted.">
+      <option name="closed" value="true" />
+      <created>1714682822260</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1714682822260</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -201,7 +192,8 @@
     <MESSAGE value="Added more import and an export option(s)&#10;Consolodated many custom widget implementations into one file&#10;Created a standardized saving/waiting splash" />
     <MESSAGE value="Added an additional settings file to be saved in the user's %appdir% to save device-specific settings; namely, last used directory and used service files, since these may be in different locations depending on the device." />
     <MESSAGE value="Forgot to include parse_scripture_reference.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Forgot to include parse_scripture_reference.py" />
+    <MESSAGE value="Added some default files to be copied on a first run or if any of the items in the data folder are deleted." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added some default files to be copied on a first run or if any of the items in the data folder are deleted." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
