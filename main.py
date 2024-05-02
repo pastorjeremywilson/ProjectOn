@@ -95,9 +95,14 @@ class ProjectOn(QObject):
         if not exists(self.device_specific_config_file):
             device_specific_settings = {'used_services': '', 'last_save_dir': ''}
 
+        # ensure all needed files exist; thread it and wait until done before moving on
+        self.thread_pool = QThreadPool()
+        cf = CheckFiles(self)
+        self.thread_pool.start(cf)
+        self.thread_pool.waitForDone()
+
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
-        self.thread_pool = QThreadPool()
         self.server_thread_pool = QThreadPool()
         self.update_status_signal.connect(self.update_status_label)
 
@@ -147,11 +152,6 @@ class ProjectOn(QObject):
 
         self.update_status_signal.emit('Checking Files', 'status')
         self.app.processEvents()
-
-        # ensure all needed files exist; thread it and wait until done before moving on
-        cf = CheckFiles(self)
-        self.thread_pool.start(cf)
-        self.thread_pool.waitForDone()
 
         self.status_label.setText('Indexing Images')
         self.app.processEvents()
@@ -1099,6 +1099,7 @@ class CheckFiles(QRunnable):
         self.main = main
 
     def run(self):
+        defaults_dir = os.path.dirname(os.path.abspath(__file__)).replace('\\\\', '/') + '/resources/defaults'
         try:
             if not exists(self.main.data_dir):
                 os.mkdir(self.main.data_dir)
@@ -1112,55 +1113,51 @@ class CheckFiles(QRunnable):
                     'global_song_background': '',
                     'global_bible_background': '',
                     'logo_image': '',
-                    'last_save_dir': ''
+                    'last_save_dir': '',
+                    'last_status_count': 1000,
+                    'stage_font_size': 60,
+                    'use_shadow': False,
+                    'shadow_color': 190,
+                    'use_outline': True,
+                    'outline_color': 0,
+                    'outline_width': 3,
+                    'ccli_num': '',
+                    'used_services': [],
+                    'default_bible': ''
                 }
                 with open(self.main.config_file, 'w') as file:
                     file.write(json.dumps(config, indent=4))
 
             if not exists(self.main.database):
-                connection = sqlite3.connect(self.main.database)
-                cursor = connection.cursor()
-                command = ('CREATE TABLE songs ('
-                           'title TEXT,'
-                           'author TEXT,'
-                           'copyright TEXT,'
-                           'ccliNum TEXT,'
-                           'lyrics TEXT,'
-                           'vorder TEXT,'
-                           'footer TEXT,'
-                           'font TEXT,'
-                           'fontColor TEXT,'
-                           'background TEXT)')
-                cursor.execute(command)
-
-                command = ('CREATE TABLE backgroundThumbnails (fileName TEXT, image BLOB)')
-                cursor.execute(command)
-                connection.commit()
-
-                command = ('CREATE TABLE imageThumbnails (fileName TEXT, image BLOB)')
-                cursor.execute(command)
-                connection.commit()
-
-                command = ('CREATE TABLE customSlides (title TEXT text TEXT font TEXT fontColor TEXT background TEXT)')
-                cursor.execute(command)
-                connection.commit()
-
-                command = ('CREATE TABLE web (title TEXT, url TEXT)')
-                cursor.execute(command)
-                connection.commit()
-                connection.close()
+                shutil.copy(defaults_dir + '/default_database.db', self.main.database)
 
             if not exists(self.main.background_dir):
                 os.mkdir(self.main.background_dir)
+                default_background_dir = defaults_dir + '/backgrounds'
+                image_files = os.listdir(default_background_dir)
+                for file in image_files:
+                    shutil.copy(default_background_dir + '/' + file, self.main.background_dir + '/' + file)
 
             if not exists(self.main.image_dir):
                 os.mkdir(self.main.image_dir)
+                default_image_dir = defaults_dir + '/images'
+                image_files = os.listdir(default_image_dir)
+                for file in image_files:
+                    shutil.copy(default_image_dir + '/' + file, self.main.image_dir + '/' + file)
 
             if not exists(self.main.bible_dir):
                 os.mkdir(self.main.bible_dir)
+                default_bible_dir = defaults_dir + '/bibles'
+                bible_files = os.listdir(default_bible_dir)
+                for file in bible_files:
+                    shutil.copy(default_bible_dir + '/' + file, self.main.bible_dir + '/' + file)
 
             if not exists(self.main.video_dir):
                 os.mkdir(self.main.video_dir)
+                default_video_dir = defaults_dir + '/videos'
+                video_files = os.listdir(default_video_dir)
+                for file in video_files:
+                    shutil.copy(default_video_dir + '/' + file, self.main.video_dir + '/' + file)
         except Exception:
             self.main.error_log()
 
