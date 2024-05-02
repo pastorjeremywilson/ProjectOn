@@ -171,7 +171,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714682822260</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Changed background music of the test video">
+      <option name="closed" value="true" />
+      <created>1714683390304</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1714683390304</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -193,7 +201,8 @@
     <MESSAGE value="Added an additional settings file to be saved in the user's %appdir% to save device-specific settings; namely, last used directory and used service files, since these may be in different locations depending on the device." />
     <MESSAGE value="Forgot to include parse_scripture_reference.py" />
     <MESSAGE value="Added some default files to be copied on a first run or if any of the items in the data folder are deleted." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added some default files to be copied on a first run or if any of the items in the data folder are deleted." />
+    <MESSAGE value="Changed background music of the test video" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed background music of the test video" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
