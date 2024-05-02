@@ -459,6 +459,12 @@ class GUI(QObject):
         """
         try:
             # if/else all the settings because things occur
+            if 'global_song_background' in self.main.settings.keys():
+                self.global_song_background_pixmap = QPixmap(
+                    self.main.image_dir + '/' + self.main.settings['global_song_background'])
+            if 'global_bible_background' in self.main.settings.keys():
+                self.global_bible_background_pixmap = QPixmap(
+                    self.main.image_dir + '/' + self.main.settings['global_bible_background'])
             if 'font_face' in self.main.settings.keys():
                 self.global_font_face = self.main.settings['font_face']
             else:

@@ -69,8 +69,9 @@ class ProjectOn(QObject):
         #not currently implimented, but sets different directory locations for a portable or standard installment
         if self.portable:
             os.chdir(os.path.dirname(__file__))
-            self.data_dir = os.getcwd() + '/data'
+            self.data_dir = os.path.dirname(os.path.abspath(__file__)).replace('\\\\', '/') + '/data'
             self.config_file = self.data_dir + '/settings.json'
+            self.device_specific_config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')
             self.database = self.data_dir + '/projecton.db'
             self.background_dir = self.data_dir + '/backgrounds'
             self.image_dir = self.data_dir + '/images'
@@ -79,18 +80,20 @@ class ProjectOn(QObject):
         else:
             self.data_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
             self.config_file = self.data_dir + '/settings.json'
+            self.device_specific_config_file = self.data_dir + '/localConfig.json'
             self.database = self.data_dir + '/projecton.db'
             self.background_dir = self.data_dir + '/backgrounds'
             self.image_dir = self.data_dir + '/images'
             self.bible_dir = self.data_dir + '/bibles'
             self.video_dir = self.data_dir + '/videos'
 
-        self.config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn') + '/settings.json'
         if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
             os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
         if not exists(self.config_file):
             if exists(self.data_dir + '/settings.json'):
                 shutil.copy(self.data_dir + '/settings.json', self.config_file)
+        if not exists(self.device_specific_config_file):
+            device_specific_settings = {'used_services': '', 'last_save_dir': ''}
 
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
@@ -127,6 +130,13 @@ class ProjectOn(QObject):
                     self.settings = {}
         else:
             self.settings = default_settings
+
+        if exists(self.device_specific_config_file):
+            with open(self.device_specific_config_file, 'r') as file:
+                device_specific_settings = json.loads(file.read())
+
+            self.settings['used_services'] = device_specific_settings['used_services']
+            self.settings['last_save_dir'] = device_specific_settings['last_save_dir']
 
         for key in default_settings:
             if not key in self.settings.keys():
@@ -205,26 +215,35 @@ class ProjectOn(QObject):
         Create the splash screen that will show progress as the program is loading
         """
         self.splash_widget = QWidget()
+        self.splash_widget.setObjectName('splash_widget')
         self.splash_widget.setMinimumWidth(450)
         self.splash_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.splash_widget.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop, True)
-        self.splash_widget.setStyleSheet('background: #5555aa')
-        splash_layout = QVBoxLayout()
-        self.splash_widget.setLayout(splash_layout)
+        self.splash_widget.setStyleSheet(
+            '#splash_widget { background: #5555aa; }')
+        splash_layout = QVBoxLayout(self.splash_widget)
+        splash_layout.setContentsMargins(20, 20, 20, 20)
+
+        container = QWidget()
+        container.setObjectName('container')
+        container.setStyleSheet('#container { background: #5555aa; border: 2px solid white; }')
+        container_layout = QVBoxLayout(container)
+        container_layout.setContentsMargins(20, 20, 20, 20)
+        splash_layout.addWidget(container)
 
         self.title_label = QLabel('Starting ProjectOn...')
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title_label.setStyleSheet('color: white')
         self.title_label.setFont(QFont('Helvetica', 16, QFont.Weight.Bold))
-        splash_layout.addWidget(self.title_label, Qt.AlignmentFlag.AlignCenter)
-        splash_layout.addSpacing(20)
+        container_layout.addWidget(self.title_label, Qt.AlignmentFlag.AlignCenter)
+        container_layout.addSpacing(20)
 
         self.status_label = QLabel()
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.status_label.setStyleSheet('color: white')
         self.status_label.setFont(QFont('Helvetica', 12))
-        splash_layout.addWidget(self.status_label, Qt.AlignmentFlag.AlignCenter)
-        splash_layout.addSpacing(20)
+        container_layout.addWidget(self.status_label, Qt.AlignmentFlag.AlignCenter)
+        container_layout.addSpacing(20)
 
         self.progress_bar = QProgressBar()
         if self.settings['last_status_count']:
@@ -235,13 +254,13 @@ class ProjectOn(QObject):
             'QProgressBar { border: 1px solid white; background: white; } '
             'QProgressBar::chunk { background-color: #5555aa; }'
         )
-        splash_layout.addWidget(self.progress_bar)
+        container_layout.addWidget(self.progress_bar)
 
         self.info_label = QLabel()
         self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.info_label.setStyleSheet('color: white')
         self.info_label.setFont(QFont('Helvetica', 10))
-        splash_layout.addWidget(self.info_label)
+        container_layout.addWidget(self.info_label)
 
         self.splash_widget.show()
 
@@ -559,6 +578,13 @@ class ProjectOn(QObject):
         try:
             with open(self.data_dir + '/settings.json', 'w') as file:
                 file.write(json.dumps(self.settings, indent=4))
+
+            device_specific_settings = {}
+            device_specific_settings['used_services'] = self.settings['used_services']
+            device_specific_settings['last_save_dir'] = self.settings['last_save_dir']
+            with open(self.device_specific_config_file, 'w') as file:
+                file.write(json.dumps(device_specific_settings, indent=4))
+
         except Exception:
             self.error_log()
 
@@ -641,6 +667,25 @@ class ProjectOn(QObject):
                         'Service saved as\n' + filename.replace('/', '\\'),
                         QMessageBox.StandardButton.Ok
                     )
+
+                    # add this file to the recently used services menu
+                    if 'used_services' in self.settings.keys():
+                        used_services = self.settings['used_services']
+                    else:
+                        used_services = []
+
+                    add_file = True
+                    for item in used_services:
+                        if filename == item[1]:
+                            add_file = False
+
+                    if add_file:
+                        if len(used_services) == 5:
+                            used_services.pop(0)
+
+                        used_services.append([directory, filename])
+                        self.settings['used_services'] = used_services
+                        self.save_settings()
 
                     self.gui.current_file = filename
                     self.gui.changes = False
@@ -768,14 +813,22 @@ class ProjectOn(QObject):
                             from get_scripture import GetScripture
                             self.gui.main.get_scripture = GetScripture(self.gui.main)
                         passages = self.gui.main.get_scripture.get_passage(service_dict[key]['title'])
-                        scripture = ''
-                        for passage in passages[1]:
-                            scripture += passage + ' '
+                        if passages[0] == -1:
+                            QMessageBox.information(
+                                self.gui.main_window,
+                                'Error Loading Scripture',
+                                'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
+                                QMessageBox.StandardButton.Ok
+                            )
+                        else:
+                            scripture = ''
+                            for passage in passages[1]:
+                                scripture += passage + ' '
 
-                        reference = service_dict[key]['title']
-                        text = scripture
-                        version = self.gui.media_widget.bible_selector_combobox.currentText()
-                        self.gui.add_scripture_item(reference, scripture, version)
+                            reference = service_dict[key]['title']
+                            text = scripture
+                            version = self.gui.media_widget.bible_selector_combobox.currentText()
+                            self.gui.add_scripture_item(reference, scripture, version)
 
                     elif service_dict[key]['type'] == 'custom':
                         try:

@@ -137,6 +137,8 @@ class MediaWidget(QTabWidget):
         scripture_widget = QWidget()
         scripture_widget.setObjectName('scripture_widget')
         scripture_layout = QVBoxLayout()
+        scripture_layout.setSpacing(0)
+        scripture_layout.setContentsMargins(10, 0, 10, 10)
         scripture_widget.setLayout(scripture_layout)
 
         bible_selector_widget = QWidget()
@@ -179,6 +181,7 @@ class MediaWidget(QTabWidget):
 
         bible_search_widget = QWidget()
         bible_search_layout = QHBoxLayout()
+        bible_search_layout.setContentsMargins(10, 0, 10, 0)
         bible_search_widget.setLayout(bible_search_layout)
         scripture_layout.addWidget(bible_search_widget)
 
@@ -199,6 +202,14 @@ class MediaWidget(QTabWidget):
         clear_search_button.setFixedSize(30, 30)
         clear_search_button.pressed.connect(self.bible_search_line_edit.clear)
         bible_search_layout.addWidget(clear_search_button)
+
+        self.bible_search_status_label = QLabel()
+        self.bible_search_status_label.setFont(QFont('Helvetica', 8))
+        fm = bible_search_label.fontMetrics()
+        label_width = fm.boundingRect('Enter Passage:').width()
+        self.bible_search_status_label.setStyleSheet(
+            'color: white; padding-left: ' + str(label_width + (bible_search_layout.spacing() * 2)) + 'px;')
+        scripture_layout.addWidget(self.bible_search_status_label)
 
         button_widget = QWidget()
         button_layout = QHBoxLayout()

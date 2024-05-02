@@ -103,9 +103,11 @@ class ImageCombobox(QComboBox):
             self.gui.main.settings['logo_image'] = file_name
         elif self.type == 'song':
             self.gui.main.settings['global_song_background'] = file_name
+            self.gui.global_song_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(30) == 'song':
+                item = self.gui.oos_widget.oos_list_widget.item(i)
+                if item.data(29) == 'global_song' or item.data(30) == 'song':
                     item = self.gui.oos_widget.oos_list_widget.item(i)
                     widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
                     pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
@@ -114,9 +116,11 @@ class ImageCombobox(QComboBox):
                     widget.picture_label.setPixmap(pixmap)
         elif self.type == 'bible':
             self.gui.main.settings['global_bible_background'] = file_name
+            self.gui.global_bible_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(30) == 'bible':
+                item = self.gui.oos_widget.oos_list_widget.item(i)
+                if item.data(29) == 'global_bible' or item.data(30) == 'bible':
                     item = self.gui.oos_widget.oos_list_widget.item(i)
                     widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
                     pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
