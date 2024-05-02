@@ -834,26 +834,26 @@ class MediaWidget(QTabWidget):
             self.scripture_text_edit.clear()
             return
 
-        # create an instance of GetScripture if one doesn't alread exist
+        # create an instance of GetScripture if one doesn't already exist
         if not self.gui.main.get_scripture:
             self.gui.main.get_scripture = GetScripture(self.gui.main)
 
         self.scripture_text_edit.clear()
         passages = self.gui.main.get_scripture.get_passage(text)
 
-        if passages and not passages == -1:
-                self.formatted_reference = ''
-                reference_split = self.bible_search_line_edit.text().split(' ')
+        if passages and not passages[0] == -1:
+            self.formatted_reference = ''
+            reference_split = self.bible_search_line_edit.text().split(' ')
 
-                for i in range(len(reference_split)):
-                    if ':' in reference_split[i]:
-                        self.formatted_reference = passages[0] + ' ' + reference_split[i]
+            for i in range(len(reference_split)):
+                if ':' in reference_split[i]:
+                    self.formatted_reference = passages[0] + ' ' + reference_split[i]
 
-                scripture = ''
-                for passage in passages[1]:
-                    scripture += passage + ' '
+            scripture = ''
+            for passage in passages[1]:
+                scripture += passage + ' '
 
-                self.scripture_text_edit.setText(scripture.strip())
+            self.scripture_text_edit.setText(scripture.strip())
 
     def change_bible(self):
         """

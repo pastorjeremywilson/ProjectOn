@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="233d5086-b170-4655-9be9-a778c8a1e0ee" name="Changes" comment="" />
+    <list default="true" id="233d5086-b170-4655-9be9-a778c8a1e0ee" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/projecton.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/projecton.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/error.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -179,7 +185,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714683390304</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Correct wrong url in sample web slide">
+      <option name="closed" value="true" />
+      <created>1714683717970</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1714683717971</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -202,7 +216,8 @@
     <MESSAGE value="Forgot to include parse_scripture_reference.py" />
     <MESSAGE value="Added some default files to be copied on a first run or if any of the items in the data folder are deleted." />
     <MESSAGE value="Changed background music of the test video" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed background music of the test video" />
+    <MESSAGE value="Correct wrong url in sample web slide" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correct wrong url in sample web slide" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
