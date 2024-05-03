@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="233d5086-b170-4655-9be9-a778c8a1e0ee" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/print.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parse_scripture_reference.py" beforeDir="false" afterPath="$PROJECT_DIR$/parse_scripture_reference.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/print_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/print_dialog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -211,7 +205,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714703742031</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Added documentation to parse_scripture_reference.py">
+      <option name="closed" value="true" />
+      <created>1714752732290</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1714752732290</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -237,7 +239,8 @@
     <MESSAGE value="Correct wrong url in sample web slide" />
     <MESSAGE value="Fixed no newline when logging unhandled exception.&#10;Fixed unindexed passages variable when checking for -1 return value." />
     <MESSAGE value="Added ability to print the order of service" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added ability to print the order of service" />
+    <MESSAGE value="Added documentation to parse_scripture_reference.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added documentation to parse_scripture_reference.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
