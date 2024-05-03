@@ -1,5 +1,11 @@
 class ParseScriptureReference:
+    """
+    Class to take a human-readable scripture reference and split/standardize it according to book, chapter(s) and verses
+    """
     def __init__(self):
+        """
+        Class to take a human-readable scripture reference and split/standardize it according to book, chapter(s) and verses
+        """
         # list of bible books and their common abbreviations
         self.books = [
             ['Genesis', 'gen', 'ge', 'gn'],
@@ -126,6 +132,14 @@ class ParseScriptureReference:
         ]
 
     def parse_reference(self, reference):
+        """
+        Provides a method to parse a human-readable scripture reference into its book, chapter(s) and verse(s),
+        comparing the book to the commonly-used abbreviations defined in __init__ and determining if the book
+        has no chapters. Returns a dictionary containing book, chapter_start, chapter_end, verse_start, verse_end,
+        and a boolean stating whether the reference contains a book name that can be standardized.
+        :param str reference: the scripture reference
+        :return: dict
+        """
         parsed_reference = {
             'book': '',
             'chapter_start': '',

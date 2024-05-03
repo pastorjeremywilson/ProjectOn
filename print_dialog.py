@@ -7,7 +7,19 @@ from fitz import fitz
 
 
 class PrintDialog(QDialog):
+    """
+    Class implementing QDialog to show the user a print dialog, also showing a preview of the item to be printed.
+    :param str pdf_file: the path to a pdf file to print
+    :param GUI gui: the current instance of a gui
+    :param boolean landscape: optional: whether the pdf is to be printed in landscape orientation
+    """
     def __init__(self, pdf_file, gui, landscape=False):
+        """
+        Class implementing QDialog to show the user a print dialog, also showing a preview of the item to be printed.
+        :param str pdf_file: the path to a pdf file to print
+        :param GUI gui: the current instance of a gui
+        :param boolean landscape: optional: whether the pdf is to be printed in landscape orientation
+        """
         super().__init__()
         self.gui = gui
         self.landscape = landscape
@@ -32,6 +44,9 @@ class PrintDialog(QDialog):
         self.init_components()
 
     def init_components(self):
+        """
+        Creates the widgets to be shown in the dialog
+        """
         self.preview_label = QLabel('Preview:')
         self.preview_label.setFont(self.gui.bold_font)
         self.layout.addWidget(self.preview_label, 0, 0)
@@ -97,6 +112,9 @@ class PrintDialog(QDialog):
         self.layout.addWidget(ok_cancel_buttons, 2, 1)
 
     def get_printers(self):
+        """
+        Obtain a list of printers currently installed on the system
+        """
         win_management = wmi.WMI()
         printers = win_management.Win32_Printer()
 
@@ -112,6 +130,9 @@ class PrintDialog(QDialog):
         return printer_combobox
 
     def get_pages(self):
+        """
+        Gets the individual pages of the pdf file and converts each to a QPixmap
+        """
         for page in self.pdf:
             pixmap = page.get_pixmap()
 
@@ -121,18 +142,28 @@ class PrintDialog(QDialog):
             self.pages.append(q_pixmap)
 
     def previous_page(self):
+        """
+        Method to show the previous page in the PDF file upon user input
+        """
         if not self.current_page == 0:
             self.current_page -= 1
             self.page_label.setText('Page ' + str(self.current_page + 1) + ' of ' + str(self.num_pages))
             self.pdf_label.setPixmap(self.pages[self.current_page])
 
     def next_page(self):
+        """
+        Method to show the next page in the PDF file upon user input
+        """
         if not self.current_page == self.num_pages - 1:
             self.current_page += 1
             self.page_label.setText('Page ' + str(self.current_page + 1) + ' of ' + str(self.num_pages))
             self.pdf_label.setPixmap(self.pages[self.current_page])
 
     def do_print(self, printer):
+        """
+        Method to perform the printing function using ghostscript
+        :param str printer: the name of the user's chosen printer
+        """
         print('Opening print subprocess')
         CREATE_NO_WINDOW = 0x08000000
         if self.landscape:
@@ -166,6 +197,9 @@ class PrintDialog(QDialog):
         self.done(0)
 
     def cancel(self):
+        """
+        Method to end the QDialog upon user clicking the "Cancel" button
+        """
         self.done(0)
 
     def closeEvent(self, evt):
