@@ -656,8 +656,8 @@ class ProjectOn(QObject):
                     with open(filename, 'w') as file:
                         json.dump(service_items, file, indent=4)
 
-                    save_split = filename.split('/')
-                    directory = '/'.join(save_split[0:len(save_split) - 1])
+                    directory = os.path.dirname(filename)
+                    filename = filename.replace(directory, '').replace('/', '')
                     self.settings['last_save_dir'] = directory
                     self.save_settings()
 
@@ -669,23 +669,7 @@ class ProjectOn(QObject):
                     )
 
                     # add this file to the recently used services menu
-                    if 'used_services' in self.settings.keys():
-                        used_services = self.settings['used_services']
-                    else:
-                        used_services = []
-
-                    add_file = True
-                    for item in used_services:
-                        if filename == item[1]:
-                            add_file = False
-
-                    if add_file:
-                        if len(used_services) == 5:
-                            used_services.pop(0)
-
-                        used_services.append([directory, filename])
-                        self.settings['used_services'] = used_services
-                        self.save_settings()
+                    self.add_to_recently_used(directory, filename)
 
                     self.gui.current_file = filename
                     self.gui.changes = False
@@ -729,6 +713,7 @@ class ProjectOn(QObject):
         if save_result == -1:
             return
 
+        # open a file dialog if flename was not provided
         if not filename:
             if len(self.settings['last_save_dir']) > 0:
                 open_dir = self.settings['last_save_dir']
@@ -748,6 +733,7 @@ class ProjectOn(QObject):
         # provide a splash
         if len(result[0]) > 0:
             wait_widget = SimpleSplash(self.gui, 'Loading service...')
+            service_dict = None
 
             try:
                 with open(result[0], 'r') as file:
@@ -756,6 +742,15 @@ class ProjectOn(QObject):
                 json.dumps(service_dict, indent=4)
             except Exception:
                 logging.exception('')
+
+            if not service_dict:
+                QMessageBox.information(
+                    self.gui.main_window,
+                    'Error Loading Service',
+                    'Unable to load service. Please check that the file has not moved.',
+                    QMessageBox.StandardButton.Ok
+                )
+                return
 
             if 'global_song_background' in service_dict.keys():
                 self.settings['global_song_background'] = service_dict['global_song_background']
@@ -983,43 +978,48 @@ class ProjectOn(QObject):
             self.gui.live_widget.slide_list.clear()
 
             # set the last used directory in settings
-            if '\\' in result[0]:
-                dir_split = result[0].split('\\')
-            elif '/' in result[0]:
-                dir_split = result[0].split('/')
-            file_dir = '/'.join(dir_split[:len(dir_split) - 1])
-            file_name = dir_split[len(dir_split) - 1]
+            file_dir = os.path.dirname(result[0])
+            file_name = result[0].replace(file_dir, '').replace('/', '')
             self.settings['last_save_dir'] = file_dir
 
             # add this file to the recently used services menu
-            if 'used_services' in self.settings.keys():
-                used_services = self.settings['used_services']
-            else:
-                used_services = []
-
-            add_file = True
-            for item in used_services:
-                if file_name == item[1]:
-                    add_file = False
-
-            if add_file:
-                if len(used_services) == 5:
-                    used_services.pop(0)
-
-                used_services.append([file_dir, file_name])
-                self.settings['used_services'] = used_services
-                self.save_settings()
-
-            for action in self.gui.open_recent_menu.actions():
-                self.gui.open_recent_menu.removeAction(action)
-
-            for item in used_services:
-                open_recent_action = self.gui.open_recent_menu.addAction(item[1])
-                open_recent_action.setData(item[0] + '/' + item[1])
-                open_recent_action.triggered.connect(lambda: self.load_service(open_recent_action.data()))
+            self.add_to_recently_used(file_dir, file_name)
 
             self.gui.changes = False
             wait_widget.widget.deleteLater()
+
+    def add_to_recently_used(self, directory, file_name):
+        """
+        Provides a method to add a file to the user's recently used file menu if this file doesn't already exist
+        there.
+        :param str directory: directory file is located in
+        :param str file_name: the name of the file
+        """
+        if 'used_services' in self.settings.keys():
+            used_services = self.settings['used_services']
+        else:
+            used_services = []
+
+        add_file = True
+        for item in used_services:
+            if file_name == item[1]:
+                add_file = False
+
+        if add_file:
+            # remove a recently used file if 5 already exist
+            if len(used_services) == 5:
+                name = used_services[0][1]
+                used_services.pop(0)
+                self.gui.open_recent_menu.removeAction(self.gui.open_recent_menu.findChild(name))
+
+            # add this file to the recently used services menu
+            action = self.gui.open_recent_menu.addAction(file_name)
+            action.setData(directory + '/' + file_name)
+            action.triggered.connect(lambda: self.load_service(action.data()))
+
+            used_services.append([directory, file_name])
+            self.settings['used_services'] = used_services
+            self.save_settings()
 
     def import_xml_bible(self):
         file = QFileDialog.getOpenFileName(

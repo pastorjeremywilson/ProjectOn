@@ -1,8 +1,9 @@
 import re
 import time
+from io import BytesIO
 
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon
+from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QImage
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -233,6 +234,9 @@ class GUI(QObject):
         save_action = file_menu.addAction('Save Service')
         save_action.triggered.connect(self.main.save_service)
 
+        print_action = file_menu.addAction('Print Order of Service')
+        print_action.triggered.connect(self.print_oos)
+
         file_menu.addSeparator()
 
         import_menu = file_menu.addMenu('Import')
@@ -296,6 +300,68 @@ class GUI(QObject):
 
         about_action = help_menu.addAction('About')
         about_action.triggered.connect(self.show_about)
+
+    def print_oos(self):
+        """
+        Provides a method to create a printout of the current order of service
+        """
+        if self.oos_widget.oos_list_widget.count() == 0:
+            QMessageBox.information(
+                self.main_window,
+                'Nothing to do',
+                'There are no Order of Service items to print.',
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.utils import ImageReader
+        from PIL import Image
+        from print_dialog import PrintDialog
+
+        print_file_loc = './print.pdf'
+        marginH = 80
+        marginV = 80
+        font_size = 12
+        lineHeight = 56
+
+        # letter size = 612.0 x 792.0
+        # create variables based on letter-sized canvas
+        firstLine = 792 - marginV
+        lastLine = marginV
+        lineStart = marginH
+        lineEnd = 612 - marginH
+
+        print_file_loc = 'print.pdf'
+        canvas = canvas.Canvas(print_file_loc, pagesize=letter)
+        canvas.setFont('Helvetica', font_size)
+
+        currentLine = firstLine
+        canvas.setLineWidth(1.0)
+        for i in range(self.oos_widget.oos_list_widget.count()):
+            item = self.oos_widget.oos_list_widget.item(i)
+            widget = self.oos_widget.oos_list_widget.itemWidget(item)
+            if widget:
+                pixmap = widget.picture_label.pixmap()
+                type = widget.detail_label.text()
+                title = widget.title_label.text()
+
+                image = Image.fromqpixmap(pixmap)
+                image_reader = ImageReader(image)
+
+                canvas.drawImage(image_reader, lineStart, currentLine)
+                canvas.drawString(lineStart, currentLine - 12, type)
+                canvas.drawString(lineStart + 60, currentLine, title)
+                currentLine -= lineHeight
+
+                if currentLine < lastLine:
+                    canvas.showPage()
+                    currentLine = firstLine
+
+        canvas.save()
+        print_dialog = PrintDialog(print_file_loc, self)
+        print_dialog.exec()
 
     def ccli_import(self):
         from songselect_import import SongselectImport
