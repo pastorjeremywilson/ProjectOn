@@ -285,7 +285,7 @@ class OffsetSlider(QWidget):
 
 class CustomMainWindow(QMainWindow):
     """
-    Provides added functionality to QMainWindow, such as save on close and key bindings
+    Provides added functionality to QMainWindow, such as save on close
     """
     def __init__(self, gui):
         """
@@ -340,20 +340,6 @@ class CustomMainWindow(QMainWindow):
                 self.gui.timed_update.stop = True
             evt.accept()
 
-    def keyPressEvent(self, evt):
-        """
-        Provide keystrokes for hiding/showing the display screen and (for troubleshooting) the sample widget
-        :param evt:
-        :return:
-        """
-        if evt.key() == Qt.Key.Key_D and evt.modifiers() == Qt.KeyboardModifier.ControlModifier:
-            self.gui.show_hide_display_screen()
-        if evt.key() == Qt.Key.Key_H and evt.modifiers() == Qt.KeyboardModifier.ControlModifier:
-            if self.gui.sample_widget.isHidden():
-                self.gui.sample_widget.show()
-            else:
-                self.gui.sample_widget.hide()
-
 
 class CustomScrollArea(QScrollArea):
     """
@@ -401,20 +387,6 @@ class DisplayWidget(QWidget):
             self.showFullScreen()
         else:
             self.hide()
-
-    def keyPressEvent(self, evt):
-        """
-        Mirror the main window's keystrokes in the event this widget has focus
-        :param QKeyEvent evt: keyPressEvent
-        """
-        if evt.key() == Qt.Key.Key_D and evt.modifiers() == Qt.KeyboardModifier.ControlModifier:
-            if not self.sample:
-                self.gui.show_hide_display_screen()
-            else:
-                if self.gui.sample_widget.isHidden():
-                    self.gui.sample_widget.show()
-                else:
-                    self.gui.sample_widget.hide()
 
 
 class LyricDisplayWidget(QWidget):

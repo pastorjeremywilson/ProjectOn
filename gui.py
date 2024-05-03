@@ -3,7 +3,7 @@ import time
 from io import BytesIO
 
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QImage
+from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QImage, QKeySequence
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -219,9 +219,11 @@ class GUI(QObject):
         file_menu = menu_bar.addMenu('File')
 
         new_action = file_menu.addAction('Create a New Service')
+        new_action.setShortcut(QKeySequence('Ctrl+N'))
         new_action.triggered.connect(self.new_service)
 
         open_action = file_menu.addAction('Open a Service')
+        open_action.setShortcut(QKeySequence('Ctrl+O'))
         open_action.triggered.connect(self.main.load_service)
 
         self.open_recent_menu = file_menu.addMenu('Open Recent Service')
@@ -232,9 +234,11 @@ class GUI(QObject):
                 open_recent_action.triggered.connect(lambda: self.main.load_service(open_recent_action.data()))
 
         save_action = file_menu.addAction('Save Service')
+        save_action.setShortcut(QKeySequence('Ctrl+S'))
         save_action.triggered.connect(self.main.save_service)
 
         print_action = file_menu.addAction('Print Order of Service')
+        print_action.setShortcut(QKeySequence('Ctrl+P'))
         print_action.triggered.connect(self.print_oos)
 
         file_menu.addSeparator()
@@ -264,12 +268,15 @@ class GUI(QObject):
         tool_menu = menu_bar.addMenu('Tools')
 
         hide_action = tool_menu.addAction('Show/Hide Display Screen')
+        hide_action.setShortcut(QKeySequence('Ctrl+D'))
         hide_action.triggered.connect(self.show_hide_display_screen)
 
         black_action = tool_menu.addAction('Show/Hide Black Screen')
+        black_action.setShortcut(QKeySequence('Ctrl+B'))
         black_action.triggered.connect(self.display_black_screen)
 
         logo_action = tool_menu.addAction('Show/Hide Logo Screen')
+        logo_action.setShortcut(QKeySequence('Ctrl+L'))
         logo_action.triggered.connect(self.display_logo_screen)
 
         tool_menu.addSeparator()
@@ -282,6 +289,7 @@ class GUI(QObject):
         tool_menu.addSeparator()
 
         settings_action = tool_menu.addAction('Settings')
+        settings_action.setShortcut(QKeySequence('Ctrl+Alt+S'))
         settings_action.triggered.connect(self.tool_bar.open_settings)
 
         import_bible_action = tool_menu.addAction('Import XML Bible')
@@ -296,9 +304,11 @@ class GUI(QObject):
         help_menu = menu_bar.addMenu('Help')
 
         help_action = help_menu.addAction('Help Contents')
+        help_action.setShortcut(QKeySequence('F1'))
         help_action.triggered.connect(self.show_help)
 
         about_action = help_menu.addAction('About')
+        about_action.setShortcut(QKeySequence('Ctrl+A'))
         about_action.triggered.connect(self.show_about)
 
     def print_oos(self):

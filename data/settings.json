@@ -3,11 +3,11 @@
     "font_face": "Franklin Gothic Heavy",
     "font_size": 74,
     "font_color": "black",
-    "global_song_background": "city dawn.jpg",
-    "global_bible_background": "bible_2.png",
+    "global_song_background": "city dawn",
+    "global_bible_background": "bible_4.jpg",
     "logo_image": "Welcome Slide 1920x1200.svg",
     "last_save_dir": "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
-    "last_status_count": 2688,
+    "last_status_count": 2608,
     "stage_font_size": 60,
     "use_shadow": true,
     "shadow_color": 26,
@@ -23,11 +23,19 @@
         ],
         [
             "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
-            "2024-03-24 Service.pro"
+            "2024-01-21 Service.pro"
         ],
         [
             "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
-            "2024-04-28.pro"
+            "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services/2024-05-05.pro"
+        ],
+        [
+            "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
+            "2024-01-28 Service.pro"
+        ],
+        [
+            "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
+            "2024-02-18 Service.pro"
         ]
     ],
     "default_bible": "C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on/data/bibles/nasb.xml"

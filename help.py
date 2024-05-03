@@ -46,6 +46,7 @@ class Help(QMainWindow):
 
         tab_widget.addTab(self.intro_widget(), 'Introduction')
         tab_widget.addTab(self.main_screen_widget(), 'Main Screen')
+        tab_widget.addTab(self.menu_widget(), 'Menu Bar')
         tab_widget.addTab(self.media_widget(), 'Media Box')
         tab_widget.addTab(self.edit_widget(), 'Edit Window')
         tab_widget.addTab(self.settings_widget(), 'Settings Window')
@@ -153,6 +154,21 @@ class Help(QMainWindow):
         import_file = 'resources/help/import.html'
         if exists(import_file):
             with open(import_file, 'r') as file:
+                web_view.setHtml(file.read(), self.base_url)
+
+        return widget
+
+    def menu_widget(self):
+        widget = QWidget()
+        widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+
+        web_view = QWebEngineView()
+        widget.layout().addWidget(web_view)
+        menu_file = 'resources/help/menu_bar.html'
+        if exists(menu_file):
+            with open(menu_file, 'r') as file:
                 web_view.setHtml(file.read(), self.base_url)
 
         return widget

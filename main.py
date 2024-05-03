@@ -32,7 +32,7 @@ from xml.etree import ElementTree
 
 import requests
 from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
-from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen
+from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QAction
 from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar
 
@@ -592,6 +592,15 @@ class ProjectOn(QObject):
         """
         Saves the user's current order of service to a file chosen by the user.
         """
+        if self.gui.oos_widget.oos_list_widget.count() == 0:
+            QMessageBox.information(
+                self.gui.main_window,
+                'Nothing to do',
+                'There are no Order of Service items to save.',
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
         try:
             if not self.gui.tool_bar.font_list_widget.currentText():
                 self.gui.tool_bar.font_list_widget.setCurrentText('Arial')
@@ -1010,7 +1019,7 @@ class ProjectOn(QObject):
             if len(used_services) == 5:
                 name = used_services[0][1]
                 used_services.pop(0)
-                self.gui.open_recent_menu.removeAction(self.gui.open_recent_menu.findChild(name))
+                self.gui.open_recent_menu.removeAction(self.gui.open_recent_menu.findChild(QAction, name))
 
             # add this file to the recently used services menu
             action = self.gui.open_recent_menu.addAction(file_name)
