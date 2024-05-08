@@ -21,6 +21,7 @@ class MediaWidget(QTabWidget):
     Creates a custom QTabWidget to hold the various types of media that can be displayed.
     """
     song_data = None
+    passages = None
 
     def __init__(self, gui):
         """
@@ -827,6 +828,7 @@ class MediaWidget(QTabWidget):
         Method that retrieves the text in the bible widget's bible_search_line_edit and runs it through GetScripture,
         placing the results in the scripture_text_edit of the bible widget.
         """
+        self.passages = None
         text = self.bible_search_line_edit.text()
 
         # if the current changes means that the line edit is empty, also clear the scripture text edit
@@ -839,19 +841,19 @@ class MediaWidget(QTabWidget):
             self.gui.main.get_scripture = GetScripture(self.gui.main)
 
         self.scripture_text_edit.clear()
-        passages = self.gui.main.get_scripture.get_passage(text)
+        self.passages = self.gui.main.get_scripture.get_passage(text)
 
-        if passages and not passages[0] == -1:
+        if self.passages and not self.passages[0] == -1:
             self.formatted_reference = ''
             reference_split = self.bible_search_line_edit.text().split(' ')
 
             for i in range(len(reference_split)):
                 if ':' in reference_split[i]:
-                    self.formatted_reference = passages[0] + ' ' + reference_split[i]
+                    self.formatted_reference = self.passages[0] + ' ' + reference_split[i]
 
             scripture = ''
-            for passage in passages[1]:
-                scripture += passage + ' '
+            for passage in self.passages[1]:
+                scripture += passage[0] + ' ' + passage[1] + ' '
 
             self.scripture_text_edit.setText(scripture.strip())
 
@@ -890,11 +892,11 @@ class MediaWidget(QTabWidget):
         service's QListWidget
         :return:
         """
+        print('formatted_reference:', self.formatted_reference)
         if self.formatted_reference:
             reference = self.formatted_reference
-            text = self.scripture_text_edit.toPlainText()
             version = self.bible_selector_combobox.currentText()
-            self.gui.add_scripture_item(reference, text, version)
+            self.gui.add_scripture_item(reference, self.passages[1], version)
             self.formatted_reference = None
             self.gui.changes = True
 
@@ -905,15 +907,14 @@ class MediaWidget(QTabWidget):
         """
         if self.formatted_reference:
             reference = self.formatted_reference
-            text = self.scripture_text_edit.toPlainText()
             version = self.bible_selector_combobox.currentText()
 
             item = QListWidgetItem()
             item.setData(20, reference)
-            item.setData(21, self.gui.parse_scripture_by_verse(text))
+            item.setData(21, self.gui.parse_scripture_by_verse(self.passages[1]))
             item.setData(23, version)
             item.setData(30, 'bible')
-            item.setData(31, ['', reference, text])
+            item.setData(31, ['', reference, self.passages[1]])
 
             self.gui.send_to_preview(item)
             self.gui.preview_widget.slide_list.setCurrentRow(0)

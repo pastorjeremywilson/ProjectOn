@@ -5,17 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="233d5086-b170-4655-9be9-a778c8a1e0ee" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/help/file_menu.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/help/help_menu.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/help/menu_bar.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/help/tools_menu.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/alt-logo.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/font_settings.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/error.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/get_scripture.py" beforeDir="false" afterPath="$PROJECT_DIR$/get_scripture.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/help.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/import.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/import.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/print.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/print.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/toolbar.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -56,7 +57,7 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/pasto/Nextcloud/Documents/Python Workspace/project_on&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/pasto/Nextcloud/Documents/Python Workspace/project_on/widgets.py&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.appearance&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -232,7 +233,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714752757208</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Added keyboard shortcuts to various menu items and added a menu bar tab to the help window">
+      <option name="closed" value="true" />
+      <created>1714756743695</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1714756743695</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -259,7 +268,8 @@
     <MESSAGE value="Fixed no newline when logging unhandled exception.&#10;Fixed unindexed passages variable when checking for -1 return value." />
     <MESSAGE value="Added ability to print the order of service" />
     <MESSAGE value="Added documentation to parse_scripture_reference.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added documentation to parse_scripture_reference.py" />
+    <MESSAGE value="Added keyboard shortcuts to various menu items and added a menu bar tab to the help window" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added keyboard shortcuts to various menu items and added a menu bar tab to the help window" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

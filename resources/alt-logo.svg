@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 135.46666 135.46667"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="alt-logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="0.72426345"
+     inkscape:cx="358.98539"
+     inkscape:cy="243.69585"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="0.26458333"
+       spacingy="0.26458334"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.9;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';letter-spacing:2.6355px;fill:#5555aa;fill-opacity:1;stroke:#ffffff;stroke-width:1.80691;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       x="-0.87023407"
+       y="43.578476"
+       id="text10"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:25.4px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans Bold';fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:1.80691;stroke-opacity:1"
+         x="-0.87023407"
+         y="43.578476"
+         id="tspan10">PROJECT</tspan></text>
+    <rect
+       style="fill:#5555aa;fill-opacity:1;stroke:#5555aa;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2"
+       width="9.2349977"
+       height="26.497761"
+       x="47.943325"
+       y="64.430664" />
+    <rect
+       style="fill:#5555aa;fill-opacity:1;stroke:#5555aa;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3"
+       width="37.041668"
+       height="37.041668"
+       x="11.66851"
+       y="58.82774"
+       rx="8.2312536"
+       ry="8.2836666" />
+    <path
+       style="fill:#5555aa;fill-opacity:1;stroke:#ffffff;stroke-width:2.64583333;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="M 59.341165,63.892567 134.55881,44.364202 V 115.61634 L 59.341165,90.282253 c -13.64837,-2.638969 -13.64837,-23.750717 0,-26.389686 z"
+       id="path36"
+       sodipodi:nodetypes="ccccc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.9;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';letter-spacing:2.54827px;fill:#ffffff;fill-opacity:0;stroke:#ffffff;stroke-width:1.7471;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       x="80.893715"
+       y="86.423195"
+       id="text22"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:25.4px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans Bold';fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.7471;stroke-opacity:1"
+         x="80.893715"
+         y="86.423195"
+         id="tspan22">ON</tspan></text>
+    <rect
+       style="opacity:1;fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect38"
+       width="137.58333"
+       height="15.875001"
+       x="0"
+       y="0" />
+    <rect
+       style="opacity:1;fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect39"
+       width="137.58333"
+       height="15.875001"
+       x="0"
+       y="119.59167" />
+  </g>
+</svg>

@@ -602,8 +602,8 @@ class ProjectOn(QObject):
             return
 
         try:
-            if not self.gui.tool_bar.font_list_widget.currentText():
-                self.gui.tool_bar.font_list_widget.setCurrentText('Arial')
+            if not self.gui.tool_bar.font_widget.font_list_widget.currentText():
+                self.gui.tool_bar.font_widget.font_list_widget.setCurrentText('Arial')
 
             service_items = {
                 'global_song_background': self.settings['global_song_background'],

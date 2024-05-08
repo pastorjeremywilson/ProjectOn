@@ -1,9 +1,8 @@
 import re
 import time
-from io import BytesIO
 
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QImage, QKeySequence
+from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -334,7 +333,7 @@ class GUI(QObject):
         marginH = 80
         marginV = 80
         font_size = 12
-        lineHeight = 56
+        lineHeight = 36
 
         # letter size = 612.0 x 792.0
         # create variables based on letter-sized canvas
@@ -361,8 +360,10 @@ class GUI(QObject):
                 image_reader = ImageReader(image)
 
                 canvas.drawImage(image_reader, lineStart, currentLine)
-                canvas.drawString(lineStart, currentLine - 12, type)
-                canvas.drawString(lineStart + 60, currentLine, title)
+                canvas.setFont('Helvetica-Bold', font_size)
+                canvas.drawString(lineStart + 60, currentLine + 16, title)
+                canvas.setFont('Helvetica', font_size)
+                canvas.drawString(lineStart + 60, currentLine, type)
                 currentLine -= lineHeight
 
                 if currentLine < lastLine:
@@ -671,24 +672,24 @@ class GUI(QObject):
             self.tool_bar.bible_background_combobox.blockSignals(False)
 
             try:
-                self.tool_bar.font_list_widget.setCurrentText(self.global_font_face)
+                self.tool_bar.font_widget.font_list_widget.setCurrentText(self.global_font_face)
                 found = True
             except Exception:
                 found = False
 
             if not found:
                 QMessageBox.information(
-                    self.gui.main_window,
+                    self.main_window,
                     'Font Missing',
-                    f'Saved font "{self.settings["global_font"]}" not found in current list. Using current default.',
+                    f'Saved font "{self.main.settings["font_face"]}" not found in current list. Using current default.',
                     QMessageBox.StandardButton.Ok
                 )
 
-            self.tool_bar.font_list_widget.blockSignals(True)
-            self.tool_bar.font_list_widget.setCurrentText(self.main.settings['font_face'])
-            self.tool_bar.font_list_widget.blockSignals(False)
+            self.tool_bar.font_widget.apply_settings()
 
             self.set_logo_image(self.main.image_dir + '/' + self.main.settings['logo_image'])
+            self.change_display('live')
+            self.change_display('sample')
         except Exception:
             self.main.error_log()
 
@@ -1552,10 +1553,9 @@ class GUI(QObject):
         :param str text: The bible passage to be split
         """
         # configure the hidden sample widget according to the current font
+        print('text:', text)
         self.sample_lyric_widget.setFont(
             QFont(self.global_font_face, self.global_font_size, QFont.Weight.Bold))
-        self.sample_lyric_widget.setText(
-            '<p style="text-align: center; line-height: 120%;">' + text + '<p>')
         self.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
         self.sample_lyric_widget.footer_label.adjustSize()
         self.sample_lyric_widget.paint_text()
@@ -1569,95 +1569,80 @@ class GUI(QObject):
         footer_label_height = self.sample_lyric_widget.footer_label.height()
         preferred_height = secondary_screen_height - footer_label_height
 
-        if lyric_widget_height > preferred_height:
-            # walk through the text to locate and index the verse numbers
-            verse_indices = []
-            skip_next = False
-            for i in range(len(text)):
-                if text[i].isnumeric() and not skip_next:
-                    verse_indices.append(i)
-                    if i < len(text) - 1 and text[i + 1].isnumeric():
-                        skip_next = True
-                else:
-                    skip_next = False
+        # walk through the text to locate and index the verse numbers
+        """skip_next = False
+        for i in range(len(text)):
+            if text[i].isnumeric() and not skip_next:
+                verse_indices.append(i)
+                if i < len(text) - 1 and text[i + 1].isnumeric():
+                    skip_next = True
+            else:
+                skip_next = False"""
 
-            verses = []
-            start_index = 0
-            for index in verse_indices:
-                verses.append(text[start_index:index].strip())
-                start_index = index
-            verses.append(text[start_index:].strip())
-            verses.pop(0)
+        verse_index = 0
+        segment_indices = []
+        current_segment_index = 0
+        recursion_count = 0
+        parse_failed = False
+        while verse_index < len(text):
+            recursion_count += 1
+            if recursion_count > 1000:
+                parse_failed = True
+                break
 
-            self.sample_lyric_widget.setText('<p style="text-align: center; line-height: 120%;">')
-            self.sample_lyric_widget.paint_text()
-
-            verse_index = 0
-            segment_indices = []
-            current_segment_index = 0
-            recursion_count = 0
-            parse_failed = False
-            while verse_index < len(verses):
-                recursion_count += 1
-                if recursion_count > 1000:
-                    parse_failed = True
-                    break
-
-                # keep adding verses until the text overflows its widget, remove the last verse, and add to the slide texts
-                segment_indices.append([])
-                lyric_widget_height = 0
-                count = 0
-                while lyric_widget_height < preferred_height:
-                    if count > 0:
-                        if verse_index < len(verses):
-                            self.sample_lyric_widget.setText(self.sample_lyric_widget.text + ' ' + verses[verse_index])
-                            self.sample_lyric_widget.paint_text()
-
-                            lyric_widget_height = self.sample_lyric_widget.path.boundingRect().adjusted(
-                                0, 0, self.sample_lyric_widget.outline_width,
-                                self.sample_lyric_widget.outline_width).height()
-                        else:
-                            break
-                    else:
-                        self.sample_lyric_widget.setText(verses[verse_index])
+            # keep adding verses until the text overflows its widget, remove the last verse, and add to the slide texts
+            segment_indices.append([])
+            lyric_widget_height = 0
+            count = 0
+            while lyric_widget_height < preferred_height:
+                if count > 0:
+                    if verse_index < len(text):
+                        self.sample_lyric_widget.setText(
+                            self.sample_lyric_widget.text + ' ' + text[verse_index][0] + ' ' + text[verse_index][1])
                         self.sample_lyric_widget.paint_text()
 
                         lyric_widget_height = self.sample_lyric_widget.path.boundingRect().adjusted(
-                        0, 0, self.sample_lyric_widget.outline_width,
+                            0, 0, self.sample_lyric_widget.outline_width,
                             self.sample_lyric_widget.outline_width).height()
+                    else:
+                        break
+                else:
+                    self.sample_lyric_widget.setText(text[verse_index][0] + ' ' + text[verse_index][1])
+                    self.sample_lyric_widget.paint_text()
 
-                    segment_indices[current_segment_index].append(verse_index)
-                    count += 1
-                    verse_index += 1
+                    lyric_widget_height = self.sample_lyric_widget.path.boundingRect().adjusted(
+                    0, 0, self.sample_lyric_widget.outline_width,
+                        self.sample_lyric_widget.outline_width).height()
 
-                if len(segment_indices[current_segment_index]) > 1:
-                    segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
-                    verse_index -= 1
-                elif not verse_index == len(verses):
-                    verse_index -= 1
-                current_segment_index += 1
+                segment_indices[current_segment_index].append(verse_index)
+                count += 1
+                verse_index += 1
 
-            # show an error message should parsing fail for some reason
-            if parse_failed:
-                QMessageBox.information(
-                    self.main_window,
-                    'Scripture parsing failed',
-                    f'Failed parsing scripture into slides. Using one verse per slide.'
-                    f'\n\n"{verses[0][:30]}..."',
-                    QMessageBox.StandardButton.Ok
-                )
-                for verse in verses:
-                    if len(verse.strip()) > 0:
-                        slide_texts.append(verse.strip())
-            else:
-                for indices in segment_indices:
-                    if len(indices) > 0:
-                        current_segment = ''
-                        for index in indices:
-                            current_segment += verses[index] + ' '
-                        slide_texts.append(current_segment.strip())
+            if len(segment_indices[current_segment_index]) > 1:
+                segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
+                verse_index -= 1
+            elif not verse_index == len(text):
+                verse_index -= 1
+            current_segment_index += 1
+
+        # show an error message should parsing fail for some reason
+        if parse_failed:
+            QMessageBox.information(
+                self.main_window,
+                'Scripture parsing failed',
+                f'Failed parsing scripture into slides. Using one verse per slide.',
+                QMessageBox.StandardButton.Ok
+            )
+            for verse in text:
+                if len(verse.strip()) > 0:
+                    slide_texts.append(verse[0] + ' ' + verse[1])
         else:
-            slide_texts.append(text)
+            for indices in segment_indices:
+                if len(indices) > 0:
+                    current_segment = ''
+                    for index in indices:
+                        current_segment += text[index][0] + ' ' + text[index][1] + ' '
+                    slide_texts.append(current_segment.strip())
 
         return slide_texts
 

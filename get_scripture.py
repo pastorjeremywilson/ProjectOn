@@ -112,8 +112,14 @@ class GetScripture:
                                             verse_start = 1
 
                                     if (verse_start <= int(child.get('vnumber')) <= verse_end):
-                                        this_verse = child.get('vnumber') + ' ' + child.text + ' '
-                                        scripture_text.append(re.sub('\s+', ' ', this_verse).strip() + ' ')
+                                        verse_number = child.get('vnumber')
+                                        this_verse = child.text
+                                        scripture_text.append(
+                                            [
+                                                verse_number,
+                                                re.sub('\s+', ' ', this_verse).strip() + ' '
+                                            ]
+                                        )
                                 except ValueError:
                                     self.main.gui.media_widget.bible_search_status_label.setText('missing verse value')
                                     return (-1, 'missing verse value')

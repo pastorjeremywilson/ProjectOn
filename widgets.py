@@ -5,7 +5,8 @@ import requests
 from PyQt6.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer
 from PyQt6.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter
 from PyQt6.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
-    QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit
+    QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QToolTip, QStyle, QHBoxLayout, QSpinBox, \
+    QRadioButton, QButtonGroup, QCheckBox, QColorDialog
 
 
 class FontFaceListWidget(QListWidget):
@@ -217,15 +218,27 @@ class ShadowSlider(QWidget):
         self.color_slider.setFont(self.gui.list_font)
         self.color_slider.setRange(0, 255)
         self.color_slider.installEventFilter(self)
-        slider_layout.addWidget(self.color_slider, 0, 0, 1, 2)
+        slider_layout.addWidget(self.color_slider, 0, 0, 1, 3)
 
         min_label = QLabel('Black')
         min_label.setFont(self.gui.list_font)
         slider_layout.addWidget(min_label, 1, 0, Qt.AlignmentFlag.AlignLeft)
 
+        self.color_label = QLabel()
+        color_pixmap = QPixmap(20, 20)
+        color_pixmap.fill(QColor(self.color_slider.value(), self.color_slider.value(), self.color_slider.value()))
+        self.color_label.setPixmap(color_pixmap)
+        self.color_slider.sliderMoved.connect(lambda value: self.change_sample(value))
+        slider_layout.addWidget(self.color_label, 1, 1, Qt.AlignmentFlag.AlignCenter)
+
         max_label = QLabel('White')
         max_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(max_label, 1, 1, Qt.AlignmentFlag.AlignRight)
+        slider_layout.addWidget(max_label, 1, 2, Qt.AlignmentFlag.AlignRight)
+
+    def change_sample(self, value):
+        new_pixmap = QPixmap(20, 20)
+        new_pixmap.fill(QColor(value, value, value))
+        self.color_label.setPixmap(new_pixmap)
 
     def eventFilter(self, obj, evt):
         if obj == self.color_slider and evt.type() == QEvent.Type.Wheel:
@@ -266,21 +279,27 @@ class OffsetSlider(QWidget):
         self.offset_slider.setRange(0, 15)
         self.offset_slider.setValue(self.gui.shadow_offset)
         self.offset_slider.installEventFilter(self)
-        slider_layout.addWidget(self.offset_slider, 0, 0, 1, 2)
+        slider_layout.addWidget(self.offset_slider, 0, 0, 1, 3)
 
         self.min_label = QLabel(str(self.offset_slider.minimum()) + 'px')
         self.min_label.setFont(self.gui.list_font)
         slider_layout.addWidget(self.min_label, 1, 0, Qt.AlignmentFlag.AlignLeft)
 
+        self.current_label = QLabel(str(self.offset_slider.value()) + 'px')
+        self.current_label.setFont(self.gui.list_title_font)
+        slider_layout.addWidget(self.current_label, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        self.offset_slider.sliderMoved.connect(lambda value: self.current_label.setText(str(value) + 'px'))
+
         self.max_label = QLabel(str(self.offset_slider.maximum()) + 'px')
         self.max_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(self.max_label, 1, 1, Qt.AlignmentFlag.AlignRight)
+        slider_layout.addWidget(self.max_label, 1, 2, Qt.AlignmentFlag.AlignRight)
 
     def eventFilter(self, obj, evt):
         if obj == self.offset_slider and evt.type() == QEvent.Type.Wheel:
             return True
         else:
             return super().eventFilter(obj, evt)
+
 
 
 class CustomMainWindow(QMainWindow):
@@ -590,7 +609,7 @@ class LyricDisplayWidget(QWidget):
         brush.setStyle(Qt.BrushStyle.SolidPattern)
         pen = QPen()
         pen.setColor(self.outline_color)
-        pen.setWidth(3)
+        pen.setWidth(self.outline_width)
 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -640,3 +659,186 @@ class AutoSelectLineEdit(QLineEdit):
     def focusInEvent(self, evt):
         super().focusInEvent(evt)
         QTimer.singleShot(0, self.selectAll)
+
+
+class FontWidget(QWidget):
+    def __init__(self, gui):
+        super().__init__()
+        self.gui = gui
+        self.setParent(self.gui.main_window)
+        self.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
+        self.setWindowFlag(Qt.WindowType.Popup)
+        self.init_components()
+        self.apply_settings()
+
+    def init_components(self):
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.font_widget = QWidget()
+        self.font_widget.setObjectName('font_widget')
+        layout.addWidget(self.font_widget)
+        font_widget_layout = QGridLayout(self.font_widget)
+
+        self.font_widget.setStyleSheet('#font_widget { background: white; border: 1px solid #5555aa; }')
+        self.move(int(self.width() / 2), int(self.height() / 2))
+
+        global_font_label = QLabel('Global Font:')
+        global_font_label.setFont(self.gui.bold_font)
+        font_widget_layout.addWidget(global_font_label, 0, 0)
+
+        global_font_widget = QWidget()
+        global_font_layout = QHBoxLayout(global_font_widget)
+        font_widget_layout.addWidget(global_font_widget, 0, 1)
+
+        self.font_list_widget = FontFaceComboBox(self.gui)
+        self.font_list_widget.setToolTip('Set a Font for All Slides')
+        self.font_list_widget.currentIndexChanged.connect(self.change_font)
+        global_font_layout.addWidget(self.font_list_widget)
+
+        self.font_size_spinbox = QSpinBox()
+        self.font_size_spinbox.setMaximumWidth(100)
+        self.font_size_spinbox.setFont(self.gui.standard_font)
+        self.font_size_spinbox.setRange(10, 240)
+        self.font_size_spinbox.valueChanged.connect(self.change_font)
+        self.font_size_spinbox.installEventFilter(self)
+        global_font_layout.addWidget(self.font_size_spinbox)
+
+        font_color_widget = QWidget()
+        font_color_widget.setContentsMargins(0, 0, 0, 0)
+        font_color_layout = QHBoxLayout()
+        font_color_layout.setContentsMargins(0, 0, 0, 0)
+        font_color_widget.setLayout(font_color_layout)
+        global_font_layout.addWidget(font_color_widget)
+        global_font_layout.addStretch()
+
+        font_color_label = QLabel('Global Font Color:')
+        font_color_label.setFont(self.gui.bold_font)
+        font_color_layout.addWidget(font_color_label)
+
+        self.white_radio_button = QRadioButton('White')
+        self.white_radio_button.setObjectName('white')
+        self.white_radio_button.setFont(self.gui.standard_font)
+        font_color_layout.addWidget(self.white_radio_button)
+
+        self.black_radio_button = QRadioButton('Black')
+        self.black_radio_button.setObjectName('black')
+        self.black_radio_button.setFont(self.gui.standard_font)
+        font_color_layout.addWidget(self.black_radio_button)
+
+        self.custom_font_color_radio_button = QRadioButton('Custom')
+        self.custom_font_color_radio_button.setObjectName('custom')
+        self.custom_font_color_radio_button.setFont(self.gui.standard_font)
+        self.custom_font_color_radio_button.setObjectName('custom_font_color_radio_button')
+        self.custom_font_color_radio_button.pressed.connect(self.color_chooser)
+        font_color_layout.addWidget(self.custom_font_color_radio_button)
+
+        self.font_color_button_group = QButtonGroup()
+        self.font_color_button_group.addButton(self.white_radio_button)
+        self.font_color_button_group.addButton(self.black_radio_button)
+        self.font_color_button_group.addButton(self.custom_font_color_radio_button)
+        self.font_color_button_group.buttonClicked.connect(self.change_font)
+
+        self.shadow_checkbox = QCheckBox('Use Shadow')
+        self.shadow_checkbox.setFixedWidth(120)
+        self.shadow_checkbox.setFont(self.gui.bold_font)
+        self.shadow_checkbox.clicked.connect(self.change_font)
+        font_widget_layout.addWidget(self.shadow_checkbox, 1, 0)
+
+        shadow_widget = QWidget()
+        shadow_layout = QHBoxLayout()
+        shadow_widget.setLayout(shadow_layout)
+        font_widget_layout.addWidget(shadow_widget, 1, 1)
+
+        self.shadow_color_slider = ShadowSlider(self.gui)
+        self.shadow_color_slider.color_slider.valueChanged.connect(self.change_font)
+        shadow_layout.addWidget(self.shadow_color_slider)
+        shadow_layout.addSpacing(20)
+
+        self.shadow_offset_slider = OffsetSlider(self.gui)
+        self.shadow_offset_slider.offset_slider.valueChanged.connect(self.change_font)
+        shadow_layout.addWidget(self.shadow_offset_slider)
+        shadow_layout.addStretch()
+
+        self.outline_checkbox = QCheckBox('Use Outline')
+        self.outline_checkbox.setFixedWidth(120)
+        self.outline_checkbox.setFont(self.gui.bold_font)
+        self.outline_checkbox.clicked.connect(self.change_font)
+        font_widget_layout.addWidget(self.outline_checkbox, 2, 0)
+
+        outline_widget = QWidget()
+        outline_layout = QHBoxLayout()
+        outline_widget.setLayout(outline_layout)
+        font_widget_layout.addWidget(outline_widget, 2, 1)
+
+        self.outline_color_slider = ShadowSlider(self.gui)
+        self.outline_color_slider.color_slider.valueChanged.connect(self.change_font)
+        self.outline_color_slider.color_title.setText('Outline Color:')
+        outline_layout.addWidget(self.outline_color_slider)
+        outline_layout.addSpacing(20)
+
+        self.outline_width_slider = OffsetSlider(self.gui)
+        self.outline_width_slider.offset_slider.setRange(1, 10)
+        self.outline_width_slider.max_label.setText('10px')
+        self.outline_width_slider.offset_slider.valueChanged.connect(self.change_font)
+        self.outline_width_slider.offset_title.setText('Outline Width:')
+        outline_layout.addWidget(self.outline_width_slider)
+        outline_layout.addStretch()
+
+        self.adjustSize()
+
+    def apply_settings(self):
+        #self.font_list_widget.setCurrentText(self.gui.main.settings['font_face'])
+        self.font_list_widget.setCurrentIndex(
+            self.font_list_widget.findText(self.gui.main.settings['font_face'], Qt.MatchFlag.MatchExactly))
+        self.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
+
+        if self.gui.main.settings['font_color'] == 'white':
+            self.white_radio_button.setChecked(True)
+        elif self.gui.main.settings['font_color'] == 'black':
+            self.black_radio_button.setChecked(True)
+        else:
+            self.custom_font_color_radio_button.setChecked(True)
+            self.custom_font_color_radio_button.setText('Custom: ' + self.gui.main.settings['font_color'])
+            self.custom_font_color_radio_button.setObjectName(self.gui.main.settings['font_color'])
+
+        if self.gui.main.settings['use_shadow']:
+            self.shadow_checkbox.setChecked(True)
+        self.shadow_color_slider.color_slider.setValue(self.gui.main.settings['shadow_color'])
+        self.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
+
+        if self.gui.main.settings['use_outline']:
+            self.outline_checkbox.setChecked(True)
+        self.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
+        self.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
+
+    def change_font(self):
+        if not self.gui.main.initial_startup:
+            new_font_face = self.font_list_widget.currentText()
+            self.gui.global_font_face = new_font_face
+            self.gui.global_footer_font_face = new_font_face
+
+            self.gui.main.settings['font_face'] = new_font_face
+            self.gui.main.settings['font_size'] = self.font_size_spinbox.value()
+            self.gui.main.settings['font_color'] = self.font_color_button_group.checkedButton().objectName()
+            self.gui.main.settings['use_shadow'] = self.shadow_checkbox.isChecked()
+            self.gui.main.settings['shadow_color'] = self.shadow_color_slider.color_slider.value()
+            self.gui.main.settings['shadow_offset'] = self.shadow_offset_slider.offset_slider.value()
+            self.gui.main.settings['use_outline'] = self.outline_checkbox.isChecked()
+            self.gui.main.settings['outline_color'] = self.outline_color_slider.color_slider.value()
+            self.gui.main.settings['outline_width'] = self.outline_width_slider.offset_slider.value()
+            self.gui.apply_settings()
+
+    def color_chooser(self):
+        sender = self.sender()
+        color = QColorDialog.getColor(QColor(Qt.GlobalColor.black), self)
+        rgb = color.getRgb()
+        color_string = str(rgb[0]) + ', ' + str(rgb[1]) + ', ' + str(rgb[2])
+        self.custom_font_color_radio_button.setText('Custom: ' + color_string)
+        self.custom_font_color_radio_button.setObjectName(color_string)
+        sender.setChecked(True)
+        self.change_font()
+
+    def hideEvent(self, evt):
+        self.gui.main.save_settings()
+        super().hideEvent(evt)

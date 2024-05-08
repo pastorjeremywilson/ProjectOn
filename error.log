@@ -749,4 +749,34 @@ unknown server errorunknown server errorunknown server errorunknown server error
     'in <string>' requires string as left operand, not NoneType on line 533 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
 1714509296.1121643:
     'in <string>' requires string as left operand, not NoneType on line 533 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
-unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+1715097541.4164364:
+    'GUI' object has no attribute 'gui' on line 682 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098082.7402565:
+    'GUI' object has no attribute 'gui' on line 682 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098105.6853573:
+    'GUI' object has no attribute 'settings' on line 684 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098181.796269:
+    'global_font' on line 684 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098300.7153544:
+    'global_font' on line 684 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098352.9935062:
+    'Toolbar' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098425.8597558:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098454.8957393:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098480.1773324:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098501.5913525:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098662.486738:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098699.6729674:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098755.233859:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715115103.4516263:
+    can only concatenate str (not "NoneType") to str on line 541 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715115166.2765203:
+    can only concatenate str (not "NoneType") to str on line 541 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settingsunknown server errorunknown server error
