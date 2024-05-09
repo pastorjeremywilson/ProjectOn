@@ -60,6 +60,8 @@ class ProjectOn(QObject):
     info_label = None
     initial_startup = True
     portable = True
+    image_items = None
+    logo_items = None
 
     status_update_count = 0
 
@@ -185,9 +187,6 @@ class ProjectOn(QObject):
         for arg in sys.argv:
             if '.pro' in arg:
                 self.load_service(arg)
-
-        if len(self.settings) > 0:
-            self.gui.apply_settings()
 
         self.app.processEvents()
 
@@ -815,8 +814,9 @@ class ProjectOn(QObject):
                     elif service_dict[key]['type'] == 'bible':
                         if not self.gui.main.get_scripture:
                             from get_scripture import GetScripture
-                            self.gui.main.get_scripture = GetScripture(self.gui.main)
-                        passages = self.gui.main.get_scripture.get_passage(service_dict[key]['title'])
+                            self.get_scripture = GetScripture(self)
+                        passages = self.get_scripture.get_passage(service_dict[key]['title'])
+
                         if passages[0] == -1:
                             QMessageBox.information(
                                 self.gui.main_window,
@@ -825,14 +825,9 @@ class ProjectOn(QObject):
                                 QMessageBox.StandardButton.Ok
                             )
                         else:
-                            scripture = ''
-                            for passage in passages[1]:
-                                scripture += passage + ' '
-
                             reference = service_dict[key]['title']
-                            text = scripture
                             version = self.gui.media_widget.bible_selector_combobox.currentText()
-                            self.gui.add_scripture_item(reference, scripture, version)
+                            self.gui.add_scripture_item(reference, passages[1], version)
 
                     elif service_dict[key]['type'] == 'custom':
                         try:

@@ -3,7 +3,8 @@ import sqlite3
 
 import requests
 from PyQt6.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer
-from PyQt6.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter
+from PyQt6.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
+    QAction
 from PyQt6.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QToolTip, QStyle, QHBoxLayout, QSpinBox, \
     QRadioButton, QButtonGroup, QCheckBox, QColorDialog
@@ -21,7 +22,11 @@ class FontFaceListWidget(QListWidget):
         super().__init__()
         self.setMinimumHeight(60)
         self.gui = gui
+        self.blockSignals(True)
+        self.populate_widget()
+        self.blockSignals(False)
 
+    def populate_widget(self):
         try:
             for font in QFontDatabase.families():
                 if self.gui.main.initial_startup:
@@ -51,14 +56,16 @@ class FontFaceComboBox(QComboBox):
         """
         super().__init__()
         self.gui = gui
+        self.populate_widget()
 
+    def populate_widget(self):
         try:
             row = 0
+            model = self.model()
             for font in QFontDatabase.families():
                 if self.gui.main.initial_startup:
                     self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
                     self.gui.main.update_status_signal.emit(font, 'info')
-                model = self.model()
                 self.addItem(font)
                 model.setData(model.index(row, 0), QFont(font, 14), Qt.ItemDataRole.FontRole)
                 row += 1
@@ -82,6 +89,7 @@ class ImageCombobox(QComboBox):
         super().__init__()
         self.gui = gui
         self.type = type
+        self.table = None
         self.suppress_autosave = suppress_autosave
         self.setView(QListView())
         self.setObjectName(type)
@@ -143,33 +151,42 @@ class ImageCombobox(QComboBox):
             self.addItem('Choose Logo Image', userData='choose_logo')
             self.addItem('Import a Logo Image', userData='import_logo')
             self.table = 'imageThumbnails'
+            image_list = self.gui.main.logo_items
         elif self.type == 'edit':
             self.addItem('Choose Custom Background', userData='choose_global')
             self.table = 'backgroundThumbnails'
+            image_list = self.gui.main.image_items
         else:
             self.addItem('Choose Global ' + self.type + ' Background', userData='choose_global')
             self.addItem('Import a Background Image', userData='import_global')
             self.table = 'backgroundThumbnails'
+            image_list = self.gui.main.image_items
         connection = None
 
         try:
-            connection = sqlite3.connect(self.gui.main.database)
-            cursor = connection.cursor()
-            thumbnails = cursor.execute('SELECT * FROM ' + self.table).fetchall()
-
-            for record in thumbnails:
-                if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')
-                    self.gui.main.update_status_signal.emit(record[0], 'info')
-                pixmap = QPixmap()
-                pixmap.loadFromData(record[1], 'JPG')
-                icon = QIcon(pixmap)
-                self.addItem(icon, record[0].split('.')[0], userData=record[0])
+            # check if items for this combo box have already been created
+            if not image_list:
+                image_list = []
+                connection = sqlite3.connect(self.gui.main.database)
+                cursor = connection.cursor()
+                thumbnails = cursor.execute('SELECT * FROM ' + self.table).fetchall()
+                for record in thumbnails:
+                    if self.gui.main.initial_startup:
+                        self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')
+                        self.gui.main.update_status_signal.emit(record[0], 'info')
+                    pixmap = QPixmap()
+                    pixmap.loadFromData(record[1], 'JPG')
+                    icon = QIcon(pixmap)
+                    self.addItem(icon, record[0].split('.')[0], userData=record[0])
+                    image_list.append([icon, record[0].split('.')[0], record[0]])
+                connection.close()
+            else:
+                for item in image_list:
+                    self.addItem(item[0], item[1], userData=item[2])
 
             if self.gui.main.initial_startup:
                 self.gui.main.update_status_signal.emit('', 'info')
 
-            connection.close()
             self.blockSignals(False)
         except Exception:
             self.gui.main.error_log()
@@ -299,7 +316,6 @@ class OffsetSlider(QWidget):
             return True
         else:
             return super().eventFilter(obj, evt)
-
 
 
 class CustomMainWindow(QMainWindow):
@@ -662,14 +678,15 @@ class AutoSelectLineEdit(QLineEdit):
 
 
 class FontWidget(QWidget):
-    def __init__(self, gui):
+    def __init__(self, gui, draw_border=True):
         super().__init__()
         self.gui = gui
+        self.draw_border = draw_border
+
         self.setParent(self.gui.main_window)
         self.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
         self.setWindowFlag(Qt.WindowType.Popup)
         self.init_components()
-        self.apply_settings()
 
     def init_components(self):
         layout = QHBoxLayout(self)
@@ -680,7 +697,11 @@ class FontWidget(QWidget):
         layout.addWidget(self.font_widget)
         font_widget_layout = QGridLayout(self.font_widget)
 
-        self.font_widget.setStyleSheet('#font_widget { background: white; border: 1px solid #5555aa; }')
+        if self.draw_border:
+            self.font_widget.setStyleSheet('#font_widget { background: white; border: 1px solid #5555aa; }')
+        else:
+            self.font_widget.setStyleSheet('#font_widget { background: white;}')
+
         self.move(int(self.width() / 2), int(self.height() / 2))
 
         global_font_label = QLabel('Global Font:')
@@ -787,10 +808,24 @@ class FontWidget(QWidget):
 
         self.adjustSize()
 
+    def blockSignals(self, block):
+        super().blockSignals(block)
+
+        # also block all children widgets connected to functions
+        self.font_list_widget.blockSignals(block)
+        self.font_size_spinbox.blockSignals(block)
+        self.font_color_button_group.blockSignals(block)
+        self.shadow_checkbox.blockSignals(block)
+        self.shadow_color_slider.color_slider.blockSignals(block)
+        self.shadow_offset_slider.offset_slider.blockSignals(block)
+        self.outline_checkbox.blockSignals(block)
+        self.outline_color_slider.color_slider.blockSignals(block)
+        self.outline_width_slider.offset_slider.blockSignals(block)
+
     def apply_settings(self):
-        #self.font_list_widget.setCurrentText(self.gui.main.settings['font_face'])
-        self.font_list_widget.setCurrentIndex(
-            self.font_list_widget.findText(self.gui.main.settings['font_face'], Qt.MatchFlag.MatchExactly))
+        self.blockSignals(True)
+
+        self.font_list_widget.setCurrentText(self.gui.main.settings['font_face'])
         self.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
 
         if self.gui.main.settings['font_color'] == 'white':
@@ -805,29 +840,34 @@ class FontWidget(QWidget):
         if self.gui.main.settings['use_shadow']:
             self.shadow_checkbox.setChecked(True)
         self.shadow_color_slider.color_slider.setValue(self.gui.main.settings['shadow_color'])
+        self.shadow_color_slider.change_sample(self.gui.main.settings['shadow_color'])
         self.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
+        self.shadow_offset_slider.current_label.setText(str(self.gui.main.settings['shadow_offset']) + 'px')
 
         if self.gui.main.settings['use_outline']:
             self.outline_checkbox.setChecked(True)
         self.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
+        self.outline_color_slider.change_sample(self.gui.main.settings['outline_color'])
         self.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
+        self.outline_width_slider.current_label.setText(str(self.gui.main.settings['outline_width']) + 'px')
+        self.blockSignals(False)
 
     def change_font(self):
-        if not self.gui.main.initial_startup:
-            new_font_face = self.font_list_widget.currentText()
-            self.gui.global_font_face = new_font_face
-            self.gui.global_footer_font_face = new_font_face
+        new_font_face = self.font_list_widget.currentText()
+        self.gui.global_font_face = new_font_face
+        self.gui.global_footer_font_face = new_font_face
 
-            self.gui.main.settings['font_face'] = new_font_face
-            self.gui.main.settings['font_size'] = self.font_size_spinbox.value()
-            self.gui.main.settings['font_color'] = self.font_color_button_group.checkedButton().objectName()
-            self.gui.main.settings['use_shadow'] = self.shadow_checkbox.isChecked()
-            self.gui.main.settings['shadow_color'] = self.shadow_color_slider.color_slider.value()
-            self.gui.main.settings['shadow_offset'] = self.shadow_offset_slider.offset_slider.value()
-            self.gui.main.settings['use_outline'] = self.outline_checkbox.isChecked()
-            self.gui.main.settings['outline_color'] = self.outline_color_slider.color_slider.value()
-            self.gui.main.settings['outline_width'] = self.outline_width_slider.offset_slider.value()
-            self.gui.apply_settings()
+        self.gui.main.settings['font_face'] = new_font_face
+        self.gui.main.settings['font_size'] = self.font_size_spinbox.value()
+        self.gui.main.settings['font_color'] = self.font_color_button_group.checkedButton().objectName()
+        self.gui.main.settings['use_shadow'] = self.shadow_checkbox.isChecked()
+        self.gui.main.settings['shadow_color'] = self.shadow_color_slider.color_slider.value()
+        self.gui.main.settings['shadow_offset'] = self.shadow_offset_slider.offset_slider.value()
+        self.gui.main.settings['use_outline'] = self.outline_checkbox.isChecked()
+        self.gui.main.settings['outline_color'] = self.outline_color_slider.color_slider.value()
+        self.gui.main.settings['outline_width'] = self.outline_width_slider.offset_slider.value()
+
+        self.gui.apply_settings()
 
     def color_chooser(self):
         sender = self.sender()

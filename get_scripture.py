@@ -2,6 +2,8 @@ import re
 import xml.etree.ElementTree as ET
 from os.path import exists
 
+from PyQt6.QtWidgets import QMessageBox
+
 from parse_scripture_reference import ParseScriptureReference
 
 
@@ -21,12 +23,19 @@ class GetScripture:
         self.main = main
 
         # create a xml tree from the program's default bible
-        if self.main.gui.default_bible and exists(self.main.gui.default_bible):
+        if 'default_bible' in self.main.settings.keys() and exists(self.main.settings['default_bible']):
             try:
-                tree = ET.parse(main.gui.default_bible)
+                tree = ET.parse(self.main.settings['default_bible'])
                 self.root = tree.getroot()
             except Exception:
                 self.main.error_log()
+        else:
+            QMessageBox.information(
+                self.main.gui.main_window,
+                'No Default Bible',
+                'Please set a default bible before searching or loading a scripture passage.',
+                QMessageBox.StandardButton.Ok
+            )
 
     def get_passage(self, reference):
         """

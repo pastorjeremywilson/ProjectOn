@@ -119,10 +119,29 @@ class GUI(QObject):
 
         self.init_components()
 
+        self.position_screens(self.primary_screen, self.secondary_screen)
+        self.sample_widget.show()
+        self.sample_widget.hide()
+
+        self.central_layout = QGridLayout()
+        self.central_widget.setLayout(self.central_layout)
+
+        self.add_widgets()
+
+        self.main_window.showMaximized()
+
+        if len(self.screens) > 1:
+            self.display_widget.show()
+        else:
+            self.tool_bar.show_display_button.setStyleSheet('background: white')
+
         self.main.update_status_signal.emit('Creating GUI: Building Menu Bar', 'status')
         self.create_menu_bar()
         self.main.update_status_signal.emit('Creating GUI: Creating Special Display Widgets', 'status')
         self.make_special_display_widgets()
+
+        if len(self.main.settings) > 0:
+            self.apply_settings()
 
     def init_components(self):
         """
@@ -157,22 +176,6 @@ class GUI(QObject):
         self.sample_widget.setLayout(self.sample_layout)
         self.sample_lyric_widget = LyricDisplayWidget(self, for_sample=True)
         self.sample_layout.addWidget(self.sample_lyric_widget)
-
-        self.position_screens(self.primary_screen, self.secondary_screen)
-        self.sample_widget.show()
-        self.sample_widget.hide()
-
-        self.central_layout = QGridLayout()
-        self.central_widget.setLayout(self.central_layout)
-
-        self.add_widgets()
-
-        self.main_window.showMaximized()
-
-        if len(self.screens) > 1:
-            self.display_widget.show()
-        else:
-            self.tool_bar.show_display_button.setStyleSheet('background: white')
 
     def add_widgets(self):
         """
@@ -542,66 +545,31 @@ class GUI(QObject):
             if 'global_bible_background' in self.main.settings.keys():
                 self.global_bible_background_pixmap = QPixmap(
                     self.main.image_dir + '/' + self.main.settings['global_bible_background'])
-            if 'font_face' in self.main.settings.keys():
-                self.global_font_face = self.main.settings['font_face']
-            else:
-                self.global_font_face = 'Helvetica'
-            if 'font_size' in self.main.settings.keys():
-                self.global_font_size = self.main.settings['font_size']
-            else:
-                self.global_font_size = 60
-            if 'font_color' in self.main.settings.keys():
-                self.global_font_color = self.main.settings['font_color']
-            else:
-                self.global_font_color = 'white'
-            if 'use_shadow' in self.main.settings.keys():
-                self.use_shadow = self.main.settings['use_shadow']
-            else:
-                self.use_shadow = True
-            if 'shadow_color' in self.main.settings.keys():
-                self.shadow_color = self.main.settings['shadow_color']
-            else:
-                self.shadow_color = 0
-            if 'shadow_offset' in self.main.settings.keys():
-                self.shadow_offset = self.main.settings['shadow_offset']
-            else:
-                self.shadow_offset = 5
-            if 'use_outline' in self.main.settings.keys():
-                self.use_outline = self.main.settings['use_outline']
-            else:
-                self.use_outline = False
-            if 'outline_color' in self.main.settings.keys():
-                self.outline_color = self.main.settings['outline_color']
-            else:
-                self.outline_color = 0
-            if 'outline_width' in self.main.settings.keys():
-                self.outline_width = self.main.settings['outline_width']
-            else:
-                self.outline_width = 3
-            if 'stage_font_size' in self.main.settings.keys():
-                self.stage_font_size = self.main.settings['stage_font_size']
-            else:
-                self.stage_font_size = 60
-            if 'default_bible' in self.main.settings.keys():
-                self.default_bible = self.main.settings['default_bible']
 
             # apply the font, shadow, and outline settings to main and sample lyric widgets.py
             for lyric_widget in [self.lyric_widget, self.sample_lyric_widget]:
-                if self.global_font_color == 'black':
+                if self.main.settings['font_color'] == 'black':
                     lyric_widget.fill_color = QColor(0, 0, 0)
-                elif self.global_font_color == 'white':
+                elif self.main.settings['font_color'] == 'white':
                     lyric_widget.fill_color = QColor(255, 255, 255)
                 else:
-                    font_color_split = self.global_font_color.split(', ')
+                    font_color_split = self.main.settings['font_color'].split(', ')
                     lyric_widget.fill_color = QColor(
                         int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
 
-                lyric_widget.use_shadow = self.use_shadow
-                lyric_widget.shadow_color = QColor(self.shadow_color, self.shadow_color, self.shadow_color)
-                lyric_widget.shadow_offset = int(self.shadow_offset)
-                lyric_widget.use_outline = self.use_outline
-                lyric_widget.outline_color = QColor(self.outline_color, self.outline_color, self.outline_color)
-                lyric_widget.outline_width = int(self.outline_width)
+                lyric_widget.use_shadow = self.main.settings['use_shadow']
+                lyric_widget.shadow_color = QColor(
+                    self.main.settings['shadow_color'],
+                    self.main.settings['shadow_color'],
+                    self.main.settings['shadow_color']
+                )
+                lyric_widget.shadow_offset = int(self.main.settings['shadow_offset'])
+                lyric_widget.use_outline = self.main.settings['use_outline']
+                lyric_widget.outline_color = QColor(
+                    self.main.settings['outline_color'],
+                    self.main.settings['outline_color'],
+                    self.main.settings['outline_color'])
+                lyric_widget.outline_width = int(self.main.settings['outline_width'])
 
             self.tool_bar.song_background_combobox.blockSignals(True)
             self.tool_bar.bible_background_combobox.blockSignals(True)
@@ -642,8 +610,6 @@ class GUI(QObject):
                     if (self.main.settings['global_bible_background']
                             in self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole)):
                         index = i
-                        self.main.settings['global_bible_background'] = (
-                            self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole))
 
             # set the bible background combobox to the saved bible background
             if index and not index == -1:
@@ -668,24 +634,10 @@ class GUI(QObject):
                         QMessageBox.StandardButton.Ok
                     )
 
+            self.tool_bar.font_widget.apply_settings()
+
             self.tool_bar.song_background_combobox.blockSignals(False)
             self.tool_bar.bible_background_combobox.blockSignals(False)
-
-            try:
-                self.tool_bar.font_widget.font_list_widget.setCurrentText(self.global_font_face)
-                found = True
-            except Exception:
-                found = False
-
-            if not found:
-                QMessageBox.information(
-                    self.main_window,
-                    'Font Missing',
-                    f'Saved font "{self.main.settings["font_face"]}" not found in current list. Using current default.',
-                    QMessageBox.StandardButton.Ok
-                )
-
-            self.tool_bar.font_widget.apply_settings()
 
             self.set_logo_image(self.main.image_dir + '/' + self.main.settings['logo_image'])
             self.change_display('live')
@@ -1158,21 +1110,25 @@ class GUI(QObject):
             if current_item.data(27) and not current_item.data(27) == 'global':
                 font_face = current_item.data(27)
             else:
-                font_face = self.global_font_face
+                font_face = self.main.settings['font_face']
 
             if current_item.data(32) and not current_item.data(32) == 'global':
                 font_size = int(current_item.data(32))
             else:
-                font_size = self.global_font_size
+                font_size = self.main.settings['font_size']
 
             lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
             lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
-            lyric_widget.use_shadow = self.use_shadow
+            lyric_widget.use_shadow = self.main.settings['use_shadow']
             lyric_widget.shadow_color = QColor(self.shadow_color, self.shadow_color, self.shadow_color)
-            lyric_widget.shadow_offset = self.shadow_offset
-            lyric_widget.use_outline = self.use_outline
-            lyric_widget.outline_color = QColor(self.outline_color, self.outline_color, self.outline_color)
-            lyric_widget.outline_width = self.outline_width
+            lyric_widget.shadow_offset = self.main.settings['shadow_offset']
+            lyric_widget.use_outline = self.main.settings['use_outline']
+            lyric_widget.outline_color = QColor(
+                self.main.settings['outline_color'],
+                self.main.settings['outline_color'],
+                self.main.settings['outline_color']
+            )
+            lyric_widget.outline_width = self.main.settings['outline_width']
 
             #set the font color
             if current_item.data(28) and not current_item.data(28) == 'global':
@@ -1182,12 +1138,12 @@ class GUI(QObject):
                 lyric_widget.fill_color = QColor(
                     int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
             else:
-                if self.global_font_color == 'black':
+                if self.main.settings['font_color'] == 'black':
                     lyric_widget.fill_color = QColor(0, 0, 0)
-                elif self.global_font_color == 'white':
+                elif self.main.settings['font_color'] == 'white':
                     lyric_widget.fill_color = QColor(255, 255, 255)
                 else:
-                    font_color_split = self.global_font_color.split(', ')
+                    font_color_split = self.main.settings['font_color'].split(', ')
                     lyric_widget.fill_color = QColor(
                         int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
 
@@ -1553,9 +1509,8 @@ class GUI(QObject):
         :param str text: The bible passage to be split
         """
         # configure the hidden sample widget according to the current font
-        print('text:', text)
         self.sample_lyric_widget.setFont(
-            QFont(self.global_font_face, self.global_font_size, QFont.Weight.Bold))
+            QFont(self.main.settings['font_face'], self.main.settings['font_size'], QFont.Weight.Bold))
         self.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
         self.sample_lyric_widget.footer_label.adjustSize()
         self.sample_lyric_widget.paint_text()
@@ -1602,8 +1557,11 @@ class GUI(QObject):
                         self.sample_lyric_widget.paint_text()
 
                         lyric_widget_height = self.sample_lyric_widget.path.boundingRect().adjusted(
-                            0, 0, self.sample_lyric_widget.outline_width,
-                            self.sample_lyric_widget.outline_width).height()
+                            0,
+                            0,
+                            self.sample_lyric_widget.outline_width,
+                            self.sample_lyric_widget.outline_width
+                        ).height()
                     else:
                         break
                 else:
@@ -1619,8 +1577,13 @@ class GUI(QObject):
                 verse_index += 1
 
             if len(segment_indices[current_segment_index]) > 1:
-                segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
-                verse_index -= 1
+                if not verse_index == len(text):
+                    segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
+                    verse_index -= 1
+                elif verse_index == len(text) and lyric_widget_height > preferred_height:
+                    segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
+                    verse_index -= 1
+
             elif not verse_index == len(text):
                 verse_index -= 1
             current_segment_index += 1

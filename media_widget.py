@@ -169,7 +169,7 @@ class MediaWidget(QTabWidget):
                     self.bible_selector_combobox.setCurrentText(name)
                     default_bible_exists = True
             if not default_bible_exists:
-                self.gui.default_bible = bibles[0][0]
+                self.gui.main.settings['default_bible'] = bibles[0][0]
                 self.bible_selector_combobox.setCurrentIndex(0)
         self.bible_selector_combobox.currentIndexChanged.connect(self.change_bible)
         bible_selector_layout.addWidget(self.bible_selector_combobox)
@@ -559,12 +559,12 @@ class MediaWidget(QTabWidget):
             if item.data(27) and not item.data(27) == 'global':
                 font_face = item.data(27)
             else:
-                font_face = self.gui.global_font_face
+                font_face = self.gui.main.settings['font_face']
 
             if item.data(32) and not item.data(32) == 'global':
                 font_size = int(item.data(32))
             else:
-                font_size = self.gui.global_font_size
+                font_size = self.gui.main.settings['font_size']
 
             self.gui.sample_lyric_widget.setFont(
                 QFont(font_face, font_size, QFont.Weight.Bold))
@@ -863,7 +863,7 @@ class MediaWidget(QTabWidget):
         bible_selector_combobox. Re-calls get_scripture() if there is text in the bible_search_line_edit.
         """
         self.gui.main.get_scripture = None
-        self.gui.default_bible = self.bible_selector_combobox.itemData(
+        self.gui.main.settings['default_bible'] = self.bible_selector_combobox.itemData(
             self.bible_selector_combobox.currentIndex(), Qt.ItemDataRole.UserRole)
         if len(self.bible_search_line_edit.text()) > 0:
             self.get_scripture()
@@ -892,7 +892,6 @@ class MediaWidget(QTabWidget):
         service's QListWidget
         :return:
         """
-        print('formatted_reference:', self.formatted_reference)
         if self.formatted_reference:
             reference = self.formatted_reference
             version = self.bible_selector_combobox.currentText()
@@ -930,7 +929,6 @@ class MediaWidget(QTabWidget):
         edit_widget = EditWidget(self.gui, type)
 
     def send_to_live(self):
-        print(self.sender().parent().parent().objectName())
         self.gui.preview_widget.slide_list.setCurrentRow(0)
         self.gui.send_to_live()
 

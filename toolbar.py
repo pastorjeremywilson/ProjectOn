@@ -13,6 +13,9 @@ from widgets import ImageCombobox, FontWidget
 class Toolbar(QWidget):
     layout = None
     font_widget = None
+    song_background_combobox = None
+    bible_background_combobox = None
+    sw = None
 
     def __init__(self, gui):
         super().__init__()
