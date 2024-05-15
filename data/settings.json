@@ -38,5 +38,6 @@
             "2024-05-12 Service.pro"
         ]
     ],
-    "default_bible": "C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on/data/bibles/nasb.xml"
+    "default_bible": "C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on/data/bibles/nasb.xml",
+    "theme": "dark"
 }

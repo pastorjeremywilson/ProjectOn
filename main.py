@@ -1080,7 +1080,7 @@ class ProjectOn(QObject):
                 f'in\n'
                 f'    {clss}.{method}'
             )
-            date_time = time.time()
+            date_time = time.ctime(time.time())
             log_text = (f'\n{date_time}:\n'
                         f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
 
@@ -1338,7 +1338,7 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
         else:
             formatted_traceback += '    ' + full_traceback_split[i] + '\n'
 
-    date_time = time.time()
+    date_time = time.ctime(time.time())
     log_text = (f'\n{date_time}:\n'
                 f'    UNHANDLED EXCEPTION\n'
                 f'    {exc_type}\n'

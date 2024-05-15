@@ -1,17 +1,18 @@
 import re
 import time
 
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QTimer
+from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QPalette
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QListWidget, QTabWidget, QScrollArea, QComboBox, QLineEdit, \
+    QTextEdit, QStyle
 
 from help import Help
 from importers import Importers
-from live_widget import LiveWidget
+from live_widget import LiveWidget, CustomListWidget
 from media_widget import MediaWidget
 from oos_widget import OOSWidget
 from openlyrics_export import OpenlyricsExport
@@ -50,6 +51,8 @@ class GUI(QObject):
     video_widget = None
     media_player = None
     timed_update = None
+    central_widget = None
+    central_layout = None
 
     standard_font = QFont('Helvetica', 12)
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
@@ -94,6 +97,8 @@ class GUI(QObject):
         self.server_alert_signal.connect(self.show_server_alert)
         self.shadow_color = 0
         self.shadow_offset = 6
+        self.widget_item_background_color = 'white'
+        self.widget_item_font_color = 'black'
 
         self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
 
@@ -118,22 +123,11 @@ class GUI(QObject):
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
         self.init_components()
+        self.add_widgets()
 
         self.position_screens(self.primary_screen, self.secondary_screen)
         self.sample_widget.show()
         self.sample_widget.hide()
-
-        self.central_layout = QGridLayout()
-        self.central_widget.setLayout(self.central_layout)
-
-        self.add_widgets()
-
-        self.main_window.showMaximized()
-
-        if len(self.screens) > 1:
-            self.display_widget.show()
-        else:
-            self.tool_bar.show_display_button.setStyleSheet('background: white')
 
         self.main.update_status_signal.emit('Creating GUI: Building Menu Bar', 'status')
         self.create_menu_bar()
@@ -143,18 +137,31 @@ class GUI(QObject):
         if len(self.main.settings) > 0:
             self.apply_settings()
 
+        self.main_window.showMaximized()
+
+        if len(self.screens) > 1:
+            self.display_widget.show()
+        else:
+            self.tool_bar.show_display_button.setStyleSheet('background: white')
+
     def init_components(self):
         """
         Creates and positions the main window, the display widget, and the hidden sample_widget needed for properly
         formatting the display widget.
         """
+
         self.main_window = CustomMainWindow(self)
         self.main_window.setObjectName('main_window')
         self.main_window.setStyleSheet('#main_window { background: darkGrey; }')
         self.main_window.setWindowIcon(QIcon('resources/logo.ico'))
         self.main_window.setWindowTitle('ProjectOn')
+
         self.central_widget = QWidget()
+        self.central_widget.setObjectName('central_widget')
+
         self.main_window.setCentralWidget(self.central_widget)
+        self.central_layout = QGridLayout()
+        self.central_widget.setLayout(self.central_layout)
 
         self.main.update_status_signal.emit('Creating GUI: Building Display Widget', 'status')
         self.display_widget = DisplayWidget(self)
@@ -186,6 +193,7 @@ class GUI(QObject):
         self.tool_bar.init_components()
 
         toolbar_scroll_area = CustomScrollArea()
+        toolbar_scroll_area.setObjectName('toolbar_scroll_area')
         toolbar_scroll_area.setWidget(self.tool_bar)
         toolbar_scroll_area.setFixedHeight(self.tool_bar.height() + toolbar_scroll_area.horizontalScrollBar().height())
         toolbar_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -290,6 +298,14 @@ class GUI(QObject):
 
         tool_menu.addSeparator()
 
+        theme_menu = tool_menu.addMenu('Theme')
+
+        light_action = theme_menu.addAction('Light')
+        light_action.triggered.connect(lambda: self.apply_theme('light'))
+
+        dark_action = theme_menu.addAction('Dark')
+        dark_action.triggered.connect(lambda: self.apply_theme('dark'))
+
         settings_action = tool_menu.addAction('Settings')
         settings_action.setShortcut(QKeySequence('Ctrl+Alt+S'))
         settings_action.triggered.connect(self.tool_bar.open_settings)
@@ -312,6 +328,103 @@ class GUI(QObject):
         about_action = help_menu.addAction('About')
         about_action.setShortcut(QKeySequence('Ctrl+A'))
         about_action.triggered.connect(self.show_about)
+
+    def apply_theme(self, theme):
+        widgets = []
+        for widget in self.central_widget.findChildren(QListWidget):
+            widgets.append(widget)
+        for widget in self.tool_bar.findChildren(QLabel):
+            widgets.append(widget)
+        for widget in self.tool_bar.findChildren(QPushButton):
+            widgets.append(widget)
+        for widget in self.tool_bar.findChildren(QComboBox):
+            widgets.append(widget)
+        for i in range(self.media_widget.count()):
+            widgets.append(self.media_widget.widget(i))
+            for line_edit in self.media_widget.widget(i).findChildren(QLineEdit):
+                widgets.append(line_edit)
+            for text_edit in self.media_widget.widget(i).findChildren(QTextEdit):
+                widgets.append(text_edit)
+            for label in self.media_widget.widget(i).findChildren(QLabel):
+                widgets.append(label)
+            for combobox in self.media_widget.widget(i).findChildren(QComboBox):
+                widgets.append(combobox)
+            for button in self.media_widget.widget(i).findChildren(QPushButton):
+                widgets.append(button)
+        widgets.append(self.central_widget.findChild(QScrollArea))
+        widgets.append(self.tool_bar.parent())
+
+        if theme == 'light':
+            self.main.settings['theme'] = 'light'
+            self.main.save_settings()
+
+            background_color = 'white'
+            border_color = 'black'
+            font_color = 'black'
+            self.widget_item_font_color = 'black'
+            selected_color = '#aaaaff'
+
+            self.central_widget.setStyleSheet('background: darkgrey;')
+
+        else:
+            self.main.settings['theme'] = 'dark'
+            self.main.save_settings()
+
+            background_color = '#303030'
+            border_color = '#505050'
+            font_color = '#bfbfbf'
+            self.widget_item_font_color = '#bfbfbf'
+            selected_color = '#220055'
+
+            self.central_widget.setStyleSheet('#central_widget { background: black; }')
+
+        for widget in widgets:
+            if isinstance(widget, QListWidget):
+                widget.setStyleSheet(
+                    'QListWidget { background: ' + background_color
+                    + '; color: ' + font_color + '; } '
+                    'QListWidget::item { background: ' + background_color
+                    + '; color: ' + font_color + '; } '
+                    + 'QListWidget::item:selected { background: ' + selected_color + '; '
+                      'color: ' + font_color + '; }')
+            elif isinstance(widget, QPushButton):
+                widget.setStyleSheet(
+                    'QPushButton { background: ' + background_color
+                    + '; border-right: 1px solid ' + border_color + '; } '
+                    'QPushButton:hover { background: ' + selected_color
+                    + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; } '
+                    'QPushButton:pressed { background: ' + background_color
+                    + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; }'
+                )
+            else:
+                if 'background' in widget.styleSheet():
+                    widget.setStyleSheet(
+                        re.sub('background:.*?;', 'background: ' + background_color + ';', widget.styleSheet()))
+                elif '}' in widget.styleSheet():
+                    widget.setStyleSheet(
+                        widget.styleSheet().replace(' }', ' background: ' + background_color + '; }'))
+                else:
+                    widget.setStyleSheet(widget.styleSheet() + ' background: ' + background_color + ';')
+                if 'border' in widget.styleSheet() and 'border: none' not in widget.styleSheet():
+                    color_info = re.findall('solid .*?;', widget.styleSheet())
+                    widget.setStyleSheet(widget.styleSheet().replace(color_info[0], 'solid ' + border_color + ';'))
+                if 'color' in widget.styleSheet():
+                    widget.setStyleSheet(
+                        re.sub('color:.*?;', 'color: ' + font_color + ';', widget.styleSheet()))
+                elif '}' in widget.styleSheet():
+                    widget.setStyleSheet(
+                        widget.styleSheet().replace(' }', ' color: ' + font_color + '; }'))
+                else:
+                    widget.setStyleSheet(widget.styleSheet() + ' color: ' + font_color + ';')
+
+        for i in range(self.oos_widget.oos_list_widget.count()):
+            self.oos_widget.oos_list_widget.itemWidget(self.oos_widget.oos_list_widget.item(i)).set_style_sheet()
+
+        for i in range(self.preview_widget.slide_list.count()):
+            self.preview_widget.slide_list.itemWidget(self.preview_widget.slide_list.item(i)).set_style_sheet()
+
+        for i in range(self.live_widget.slide_list.count()):
+            self.live_widget.slide_list.itemWidget(self.live_widget.slide_list.item(i)).set_style_sheet()
 
     def print_oos(self):
         """
@@ -515,7 +628,7 @@ class GUI(QObject):
         """
         Provides a method to grab the display widget and scale it down as a preview.
         """
-        if not self.video_widget.isHidden():
+        if self.video_widget:
             try:
                 frame = self.sink.videoFrame()
                 image = frame.toImage()
@@ -526,10 +639,11 @@ class GUI(QObject):
             pixmap = self.display_widget.grab(self.display_widget.rect())
 
         try:
-            pixmap = pixmap.scaled(
-                int(self.display_widget.width() / 5), int(self.display_widget.height() / 5),
-                Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            self.live_widget.preview_label.setPixmap(pixmap)
+            if pixmap:
+                pixmap = pixmap.scaled(
+                    int(self.display_widget.width() / 5), int(self.display_widget.height() / 5),
+                    Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                self.live_widget.preview_label.setPixmap(pixmap)
         except Exception:
             self.main.error_log()
 
@@ -545,6 +659,10 @@ class GUI(QObject):
             if 'global_bible_background' in self.main.settings.keys():
                 self.global_bible_background_pixmap = QPixmap(
                     self.main.image_dir + '/' + self.main.settings['global_bible_background'])
+            if 'theme' in self.main.settings.keys():
+                self.apply_theme(self.main.settings['theme'])
+            else:
+                self.apply_theme('light')
 
             # apply the font, shadow, and outline settings to main and sample lyric widgets.py
             for lyric_widget in [self.lyric_widget, self.sample_lyric_widget]:
@@ -1019,19 +1137,28 @@ class GUI(QObject):
         Method to change what it being displayed in the display widget or the hidden sample widget.
         :param str widget: 'live' or 'sample' widget that is being changed
         """
+
         display_widget = None
         lyric_widget = None
         current_item = None
+
         if widget == 'live':
+            # handle stopping the media player carefully to avoid an Access Violation
+            if self.media_player:
+                if self.media_player.isPlaying():
+                    QTimer.singleShot(0, self.media_player.stop)
+                    self.timed_update.stop = True
+                self.media_player.deleteLater()
+                self.video_widget.deleteLater()
+                self.main.app.processEvents()
+                self.media_player = None
+                self.video_widget = None
+
             display_widget = self.display_widget
             lyric_widget = self.lyric_widget
             current_item = self.live_widget.slide_list.currentItem()
 
             self.live_widget.preview_label.clear()
-            if self.media_player.isPlaying():
-                self.media_player.stop()
-                self.media_player.setPosition(0)
-                self.live_widget.player_controls.hide()
             if self.timed_update:
                 self.timed_update.stop = True
                 self.main.thread_pool.waitForDone()
@@ -1048,6 +1175,9 @@ class GUI(QObject):
             display_widget = self.sample_widget
             lyric_widget = self.sample_lyric_widget
             current_item = self.preview_widget.slide_list.currentItem()
+            # do nothing if we're working with the sample widget and the item is a video
+            if current_item and current_item.data(30) == 'video':
+                return
 
         display_widget.background_label.clear()
 
@@ -1103,8 +1233,6 @@ class GUI(QObject):
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
                 else:
                     lyrics_html = ''
-                    self.media_player.setSource(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
-                    self.live_widget.player_controls.show()
 
             #set the font
             if current_item.data(27) and not current_item.data(27) == 'global':
@@ -1176,8 +1304,6 @@ class GUI(QObject):
                 if not current_item.data(30) == 'video' and not current_item.data(30) == 'web':
                     if not self.web_view.isHidden():
                         self.web_view.hide()
-                    if not self.video_widget.isHidden():
-                        self.video_widget.hide()
                     if not self.blackout_widget.isHidden():
                         self.blackout_widget.hide()
                     if not self.logo_widget.isHidden():
@@ -1187,6 +1313,13 @@ class GUI(QObject):
                     if current_item.data(30) == 'image':
                         self.lyric_widget.hide()
                 elif current_item.data(30) == 'video':
+                    self.make_video_widget()
+                    self.video_widget.show()
+                    self.media_player.setSource(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
+                    self.media_player.play()
+                    self.timed_update = TimedPreviewUpdate(self)
+                    self.main.thread_pool.start(self.timed_update)
+
                     if not self.lyric_widget.isHidden():
                         self.lyric_widget.hide()
                     if not self.web_view.isHidden():
@@ -1195,12 +1328,7 @@ class GUI(QObject):
                         self.blackout_widget.hide()
                     if not self.logo_widget.isHidden():
                         self.logo_widget.hide()
-                    if self.video_widget.isHidden():
-                        self.video_widget.show()
-                    self.media_player.play()
 
-                    self.timed_update = TimedPreviewUpdate(self)
-                    self.main.thread_pool.start(self.timed_update)
                 elif current_item.data(30) == 'web':
                     if not self.lyric_widget.isHidden():
                         self.lyric_widget.hide()
@@ -1208,14 +1336,15 @@ class GUI(QObject):
                         self.blackout_widget.hide()
                     if not self.logo_widget.isHidden():
                         self.logo_widget.hide()
-                    if not self.video_widget.isHidden():
-                        self.video_widget.hide()
                     if self.web_view.isHidden():
                         self.web_view.show()
 
                     self.timed_update = TimedPreviewUpdate(self)
                     self.main.thread_pool.start(self.timed_update)
                     self.live_widget.slide_list.setFocus()
+
+                if not current_item.data(30) == 'video':
+                    self.live_widget.player_controls.hide()
 
             # change the preview image
             if widget == 'live':
@@ -1251,21 +1380,6 @@ class GUI(QObject):
         self.web_view = QWebEngineView()
         self.display_layout.addWidget(self.web_view)
 
-        self.video_widget = QVideoWidget()
-        self.video_widget.setGeometry(self.display_widget.geometry())
-        self.media_player = QMediaPlayer()
-        self.media_player.playingChanged.connect(self.media_playing_change)
-        self.media_player.errorOccurred.connect(self.media_error)
-        self.media_player.setVideoOutput(self.video_widget)
-        devices = QMediaDevices.audioOutputs()
-        for device in devices:
-            if device.isDefault():
-                self.audio_output = QAudioOutput(device)
-                self.audio_output.setVolume(1.0)
-                self.media_player.setAudioOutput(self.audio_output)
-        self.sink = self.media_player.videoSink()
-        self.display_layout.addWidget(self.video_widget)
-
         self.blackout_widget = QWidget()
         self.blackout_widget.setStyleSheet('background-color: black;')
         self.display_layout.addWidget(self.blackout_widget)
@@ -1294,8 +1408,24 @@ class GUI(QObject):
 
         self.lyric_widget.hide()
         self.web_view.hide()
-        self.video_widget.hide()
         self.blackout_widget.hide()
+
+    def make_video_widget(self):
+        self.video_widget = QVideoWidget()
+        self.video_widget.setGeometry(self.display_widget.geometry())
+        self.display_layout.addWidget(self.video_widget)
+
+        self.media_player = QMediaPlayer()
+        self.media_player.playingChanged.connect(self.media_playing_change)
+        self.media_player.errorOccurred.connect(self.media_error)
+        self.media_player.setVideoOutput(self.video_widget)
+        devices = QMediaDevices.audioOutputs()
+        for device in devices:
+            if device.isDefault():
+                self.audio_output = QAudioOutput(device)
+                self.audio_output.setVolume(1.0)
+                self.media_player.setAudioOutput(self.audio_output)
+        self.sink = self.media_player.videoSink()
 
     def media_playing_change(self):
         if self.media_player.playbackState() == QMediaPlayer.PlaybackState.StoppedState:
@@ -1593,11 +1723,12 @@ class GUI(QObject):
             QMessageBox.information(
                 self.main_window,
                 'Scripture parsing failed',
-                f'Failed parsing scripture into slides. Using one verse per slide.',
+                'Failed parsing scripture into slides. Likely cause is a screen size that is too small for the '
+                'display font.\n\nUsing one verse per slide.',
                 QMessageBox.StandardButton.Ok
             )
             for verse in text:
-                if len(verse.strip()) > 0:
+                if len(verse[1].strip()) > 0:
                     slide_texts.append(verse[0] + ' ' + verse[1])
         else:
             for indices in segment_indices:
@@ -1627,4 +1758,4 @@ class TimedPreviewUpdate(QRunnable):
     def run(self):
         while not self.stop:
             self.gui.grab_display_signal.emit()
-            time.sleep(1.0)
+            time.sleep(0.1)

@@ -649,20 +649,38 @@ class LyricItemWidget(QWidget):
     """
     def __init__(self, gui, title, segment_text):
         super().__init__()
+        self.gui = gui
+        self.setObjectName('lyric_item_widget')
+
         segment_text = re.sub('<br.*?>', '\n', segment_text)
         segment_text = re.sub('<.*?>', '', segment_text)
 
         self.segment_title = QLabel(title)
+        self.segment_title.setObjectName('lyric_item_widget_title')
         self.segment_title.setFont(gui.list_title_font)
 
         self.segment_text = QLabel(segment_text)
+        self.segment_title.setObjectName('lyric_item_widget_text')
         self.segment_text.setWordWrap(True)
-        self.segment_text.setFont(gui.list_font)
+        self.segment_text.setFont(self.gui.list_font)
 
         layout = QVBoxLayout()
         self.setLayout(layout)
         layout.addWidget(self.segment_title)
         layout.addWidget(self.segment_text)
+
+        self.installEventFilter(self)
+
+    def eventFilter(self, object, event):
+        if event.type() == QEvent.Type.ParentChange:
+            self.set_style_sheet()
+            return True
+        else:
+            return False
+
+    def set_style_sheet(self):
+        self.segment_title.setStyleSheet('background: none; color: ' + self.gui.widget_item_font_color + ';')
+        self.segment_text.setStyleSheet('background: none; color: ' + self.gui.widget_item_font_color + ';')
 
 
 class AutoSelectLineEdit(QLineEdit):

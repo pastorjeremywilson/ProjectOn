@@ -50,6 +50,11 @@ hr {
     margin: 10px;
 }
 
+.inlineSpace {
+    margin-right: 10px;
+    border: none !important;
+}
+
 .icon {
     width: 20px;
     height: auto;

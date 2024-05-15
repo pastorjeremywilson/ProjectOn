@@ -879,4 +879,14 @@ unknown server errorunknown server errorunknown server errorunknown server error
   addItem(self, text: Optional[str], userData: Any = None): argument 1 has unexpected type 'QIcon'
   addItem(self, icon: QIcon, text: Optional[str], userData: Any = None): argument 2 has unexpected type 'list' on line 180 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
 1715266571.8632169:
-    'NoneType' object has no attribute 'close' on line 185 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refreshunknown server errorunknown server error
+    'NoneType' object has no attribute 'close' on line 185 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refreshunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Wed May 15 14:25:09 2024:
+    'NoneType' object has no attribute 'isPlaying' on line 1151 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.change_display
+Wed May 15 14:25:42 2024:
+    'NoneType' object has no attribute 'isPlaying' on line 1151 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.change_display
+Wed May 15 14:42:52 2024:
+    'NoneType' object has no attribute 'deleteLater' on line 1147 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.change_displayunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Wed May 15 15:22:12 2024:
+    wrapped C/C++ object of type QVideoSink has been deleted on line 633 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Wed May 15 15:22:17 2024:
+    cannot access local variable 'pixmap' where it is not associated with a value on line 642 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.grab_display

@@ -24,8 +24,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="2.0938813"
-     inkscape:cx="94.561236"
-     inkscape:cy="98.620683"
+     inkscape:cx="94.561234"
+     inkscape:cy="99.098263"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -38,71 +38,53 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:0.79375px;word-spacing:0.926042px;fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       x="33.965885"
-       y="50.932293"
-       id="text11"><tspan
-         sodipodi:role="line"
-         id="tspan11"
-         style="fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:3.96875"
+    <g
+       id="g1"
+       transform="matrix(1.8479849,0,0,1.8479849,-51.440366,-53.151672)">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:0.79375px;word-spacing:0.926042px;fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          x="33.965885"
-         y="50.932293">A</tspan></text>
+         y="50.932293"
+         id="text11"><tspan
+           sodipodi:role="line"
+           id="tspan11"
+           style="fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:3.96875"
+           x="33.965885"
+           y="50.932293">A</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:0.79375px;word-spacing:0.926042px;fill:#f9f9f9;stroke:#5555aa;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         x="30.452818"
+         y="48.680126"
+         id="text10"><tspan
+           sodipodi:role="line"
+           id="tspan10"
+           style="fill:#f9f9f9;stroke-width:3.96875"
+           x="30.452818"
+           y="48.680126">A</tspan></text>
+    </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:0.79375px;word-spacing:0.926042px;fill:#f9f9f9;stroke:#5555aa;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       x="3.0326457"
-       y="22.389467"
-       id="text6"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:39.2882px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:1.57854px;word-spacing:1.84163px;fill:#f9f9f9;stroke:#ffffff;stroke-width:7.89271;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       x="19.53656"
+       y="46.135204"
+       id="text1"><tspan
          sodipodi:role="line"
-         id="tspan6"
-         style="fill:#f9f9f9;stroke-width:3.96875"
-         x="3.0326457"
-         y="22.389467">A</tspan></text>
+         id="tspan1"
+         style="font-size:39.2882px;stroke:#ffffff;stroke-width:7.89271"
+         x="19.53656"
+         y="46.135204">A</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.7556px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:0.79375px;word-spacing:0.926042px;fill:#f9f9f9;stroke:#5555aa;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       x="4.8475075"
-       y="51.058655"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:39.2882px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:1.57854px;word-spacing:1.84163px;fill:#f9f9f9;stroke:#5555aa;stroke-width:7.89271;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       x="22.727022"
+       y="48.97031"
        id="text7"><tspan
          sodipodi:role="line"
          id="tspan7"
-         style="font-size:19.7556px;stroke-width:3.96875"
-         x="4.8475075"
-         y="51.058655">A</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:0.79375px;word-spacing:0.926042px;fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       x="33.875011"
-       y="23.676796"
-       id="text9"><tspan
-         sodipodi:role="line"
-         id="tspan9"
-         style="fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:3.96875"
-         x="33.875011"
-         y="23.676796">A</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:0.79375px;word-spacing:0.926042px;fill:#f9f9f9;fill-opacity:1;stroke:#f2f2f2;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       x="30.452818"
-       y="21.631306"
-       id="text8"><tspan
-         sodipodi:role="line"
-         id="tspan8"
-         style="fill:#f9f9f9;fill-opacity:1;stroke:#f2f2f2;stroke-width:3.96875"
-         x="30.452818"
-         y="21.631306">A</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.8;font-family:'Gothic725 Blk BT';-inkscape-font-specification:'Gothic725 Blk BT';letter-spacing:0.79375px;word-spacing:0.926042px;fill:#f9f9f9;stroke:#5555aa;stroke-width:3.96875;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       x="30.452818"
-       y="48.680126"
-       id="text10"><tspan
-         sodipodi:role="line"
-         id="tspan10"
-         style="fill:#f9f9f9;stroke-width:3.96875"
-         x="30.452818"
-         y="48.680126">A</tspan></text>
+         style="font-size:39.2882px;stroke-width:7.89271"
+         x="22.727022"
+         y="48.97031">A</tspan></text>
   </g>
 </svg>

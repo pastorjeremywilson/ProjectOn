@@ -85,21 +85,26 @@
 
 			#item_back {
 				background-image: url({{ url_for('static', filename='item_back.svg') }});
-				margin-right: 40px;
+				margin-left: auto;
+				margin-right: auto;
 			}
 
 			#slide_back {
 				background-image: url({{ url_for('static', filename='slide_back.svg') }});
-				margin-right: 40px;
+				margin-left: auto;
+				margin-right: auto;
 			}
 
 			#slide_forward {
 				background-image: url({{ url_for('static', filename='slide_forward.svg') }});
-				margin-right: 40px;
+				margin-left: auto;
+				margin-right: auto;
 			}
 
 			#item_forward {
 				background-image: url({{ url_for('static', filename='item_forward.svg') }});
+				margin-left: auto;
+				margin-right: auto;
 			}
 
 			#main {
@@ -114,6 +119,11 @@
 				margin: 10px;
 				padding: 20px;
 				overflow-y: scroll;
+			}
+
+			#nav-buttons {
+				background-color: #aaaaff;
+				max-width: 90px;
 			}
 
 			.subtitle {
@@ -158,10 +168,6 @@
 			<div id="title">ProjectOn Remote</div>
 				<div id="buttons">
 					<div id="header-left">
-						<button id="item_back" class="nav" onclick="itemBack()"></button>
-						<button id="slide_back" class="nav" onclick="slideBack()"></button>
-						<button id="slide_forward" class="nav" onclick="slideForward()"></button>
-						<button id="item_forward" class="nav" onclick="itemForward()"></button>
 					</div>
 					<div id="header-right>">
 						<button id="black_screen" class="nav" onclick="blackScreen()"></button>
@@ -183,6 +189,13 @@
 					Slides
 				</div>
 				<form id="slide_form" method="POST">{{ slides | safe}}</form>
+			</div>
+
+			<div id="nav-buttons">
+				<button id="item_back" class="nav" onclick="itemBack()"></button>
+				<button id="slide_back" class="nav" onclick="slideBack()"></button>
+				<button id="slide_forward" class="nav" onclick="slideForward()"></button>
+				<button id="item_forward" class="nav" onclick="itemForward()"></button>
 			</div>
 		</div>
 	</body>

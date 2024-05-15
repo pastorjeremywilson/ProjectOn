@@ -1,7 +1,7 @@
-from PyQt6.QtCore import Qt, QSize, pyqtSignal
+from PyQt6.QtCore import Qt, QSize, pyqtSignal, QTimer
 from PyQt6.QtGui import QIcon
 from PyQt6.QtMultimedia import QMediaPlayer
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QHBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout
 
 
 class LiveWidget(QWidget):
@@ -24,33 +24,42 @@ class LiveWidget(QWidget):
         """
         Create the various widgets.py to be contained in this widget.
         """
-        layout = QVBoxLayout()
+        self.setObjectName('live_widget')
+
+        layout = QGridLayout(self)
         layout.setSpacing(0)
-        self.setLayout(layout)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setRowStretch(0, 20)
+        layout.setRowStretch(1, 1)
+
+        container = QWidget()
+        container.setObjectName('container')
+        container.setStyleSheet('#container { border: 2px solid black; }')
+        layout.addWidget(container, 0, 0)
+
+        container_layout = QGridLayout(container)
+        container_layout.setSpacing(0)
+        container_layout.setContentsMargins(2, 2, 2, 2)
+        container_layout.setRowStretch(0, 1)
+        container_layout.setRowStretch(1, 20)
 
         title_label = QLabel('Live')
+        title_label.setObjectName('title_label')
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setFont(self.gui.standard_font)
+        title_label.setFont(self.gui.bold_font)
         title_label.setStyleSheet(
-            'background: white; color: black; padding-top: 5px; padding-bottom: 5px; border: 2px solid #5555aa;')
-        layout.addWidget(title_label)
+            'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
+        container_layout.addWidget(title_label, 0, 0)
 
         self.slide_list = CustomListWidget(self.gui)
         self.slide_list.setObjectName('slide_list')
-        self.slide_list.setStyleSheet('#slide_list { border: 2px solid black; border-top: 0; }')
+        self.slide_list.setStyleSheet('#slide_list { border: none; }')
         self.slide_list.setFont(self.gui.standard_font)
-        layout.addWidget(self.slide_list)
-        layout.addSpacing(10)
+        container_layout.addWidget(self.slide_list, 1, 0)
 
-        preview_container = QWidget()
-        preview_container.setStyleSheet('border: 0')
-        preview_layout = QHBoxLayout()
-        preview_container.setLayout(preview_layout)
-        layout.addWidget(preview_container)
         self.preview_label = QLabel()
-        preview_layout.addStretch()
-        preview_layout.addWidget(self.preview_label)
-        preview_layout.addStretch()
+        self.preview_label.setStyleSheet('margin-top: 20px;')
+        layout.addWidget(self.preview_label, 1, 0, Qt.AlignmentFlag.AlignCenter)
 
         self.player_controls = QWidget()
         player_layout = QHBoxLayout()
@@ -82,7 +91,7 @@ class LiveWidget(QWidget):
         player_layout.addWidget(stop_button)
         player_layout.addStretch()
 
-        layout.addWidget(self.player_controls)
+        layout.addWidget(self.player_controls, 2, 0, Qt.AlignmentFlag.AlignCenter)
         self.player_controls.hide()
 
     def video_control(self):
@@ -95,13 +104,12 @@ class LiveWidget(QWidget):
         elif sender.objectName() == 'play':
             # pause or play depending on the current mediaStatus
             if self.gui.media_player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
-                print('pausing')
                 self.gui.media_player.pause()
             else:
-                print('playing')
                 self.gui.media_player.play()
         elif sender.objectName() == 'stop':
-            self.gui.media_player.stop()
+            # handle stopping the media player carefully to avoid an Access Violation
+            QTimer.singleShot(0, self.gui.media_player.stop)
 
     def web_buttons(self, button):
         """

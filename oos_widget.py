@@ -23,32 +23,37 @@ class OOSWidget(QWidget):
         """
         Method to create and lay out all of this widget's components.
         """
-        layout = QVBoxLayout()
+        self.setObjectName('oos_widget')
+
+        layout = QVBoxLayout(self)
         layout.setSpacing(0)
-        self.setLayout(layout)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        container = QWidget()
+        container.setObjectName('container')
+        container.setStyleSheet('#container { border: 2px solid black; }')
+        layout.addWidget(container)
+
+        container_layout = QGridLayout(container)
+        container_layout.setSpacing(0)
+        container_layout.setContentsMargins(2, 2, 2, 2)
+        container_layout.setRowStretch(0, 1)
+        container_layout.setRowStretch(1, 20)
+        container_layout.setRowStretch(2, 20)
 
         title_label = QLabel('Order of Service')
+        title_label.setObjectName('title_label')
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setFont(self.gui.standard_font)
+        title_label.setFont(self.gui.bold_font)
         title_label.setStyleSheet(
-            'background: lightGrey; color: black; border: 2px solid black; border-bottom: 0;')
-        layout.addWidget(title_label)
-
-        list_widget = QWidget()
-        list_widget.setObjectName('list_widget')
-        list_widget.setStyleSheet('#list_widget { border: 2px solid black; padding: 2px; }')
-        list_layout = QGridLayout()
-        list_layout.setSpacing(0)
-        list_layout.setContentsMargins(2, 2, 2, 2)
-        list_layout.setColumnStretch(0, 50)
-        list_widget.setLayout(list_layout)
-        layout.addWidget(list_widget)
+            'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
+        container_layout.addWidget(title_label, 0, 0, 1, 2)
 
         self.oos_list_widget = CustomListWidget(self.gui)
         self.oos_list_widget.setObjectName('oos_list_widget')
         self.oos_list_widget.setStyleSheet('#oos_list_widget { margin: 0; }')
-        self.oos_list_widget.setFont(self.gui.standard_font)
-        list_layout.addWidget(self.oos_list_widget, 0, 0, 2, 1)
+        self.oos_list_widget.setFont(self.gui.bold_font)
+        container_layout.addWidget(self.oos_list_widget, 1, 0, 2, 1)
 
         move_up_button = QPushButton()
         move_up_button.setIcon(QIcon('./resources/item_up.svg'))
@@ -61,7 +66,7 @@ class OOSWidget(QWidget):
         )
         move_up_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
         move_up_button.pressed.connect(self.move_item_up)
-        list_layout.addWidget(move_up_button, 0, 1)
+        container_layout.addWidget(move_up_button, 1, 1)
 
         move_down_button = QPushButton()
         move_down_button.setIcon(QIcon('./resources/item_down.svg'))
@@ -74,7 +79,7 @@ class OOSWidget(QWidget):
         )
         move_down_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
         move_down_button.pressed.connect(self.move_item_down)
-        list_layout.addWidget(move_down_button, 1, 1)
+        container_layout.addWidget(move_down_button, 2, 1)
 
     def move_item_up(self):
         """
@@ -158,6 +163,9 @@ class CustomListWidget(QListWidget):
         :param QDropEvent evt: dropEvent
         :return:
         """
+        if evt.source() == self:
+            super().dropEvent(evt)
+            return
         item = evt.source().currentItem().clone()
         item.setText('')
         row = self.row(self.itemAt(QPoint(int(evt.position().x()), int(evt.position().y()))))

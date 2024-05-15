@@ -22,6 +22,7 @@ class Toolbar(QWidget):
         self.gui = gui
 
     def init_components(self):
+        self.setObjectName('toolbar')
         self.layout = QHBoxLayout()
         self.setMaximumHeight(60)
         self.setLayout(self.layout)

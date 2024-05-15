@@ -5,7 +5,7 @@ import sqlite3
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt6.QtCore import Qt, QSize, QPoint
+from PyQt6.QtCore import Qt, QSize, QPoint, QEvent
 from PyQt6.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen, QAction
 from PyQt6.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, \
@@ -49,6 +49,8 @@ class MediaWidget(QTabWidget):
         """
         Calls for the creation of all media tabs contained in this widget.
         """
+        self.setObjectName('media_widget')
+
         self.gui.main.update_status_signal.emit('Loading Songs', 'info')
         self.addTab(self.make_song_tab(), 'Songs')
         self.gui.main.update_status_signal.emit('Loading Bible', 'info')
@@ -171,6 +173,11 @@ class MediaWidget(QTabWidget):
             if not default_bible_exists:
                 self.gui.main.settings['default_bible'] = bibles[0][0]
                 self.bible_selector_combobox.setCurrentIndex(0)
+                self.gui.main.save_settings()
+                tree = ElementTree.parse(self.gui.main.settings['default_bible'])
+                root = tree.getroot()
+                name = root.attrib['biblename']
+
         self.bible_selector_combobox.currentIndexChanged.connect(self.change_bible)
         bible_selector_layout.addWidget(self.bible_selector_combobox)
 
@@ -1548,6 +1555,7 @@ class OOSItemWidget(QWidget):
         """
         super().__init__()
         self.setObjectName('item_widget')
+        self.gui = gui
 
         item_layout = QGridLayout()
         item_layout.setColumnStretch(1, 10)
@@ -1560,14 +1568,25 @@ class OOSItemWidget(QWidget):
         item_layout.addWidget(self.picture_label, 0, 0, 2, 1)
 
         self.title_label = QLabel(title)
-        self.title_label.setFont(gui.list_title_font)
-        self.title_label.setStyleSheet('margin-top: 5px;')
+        self.title_label.setFont(self.gui.list_title_font)
         item_layout.addWidget(self.title_label, 0, 1)
 
         self.detail_label = QLabel(detail)
-        self.detail_label.setFont(gui.list_font)
-        self.detail_label.setStyleSheet('margin-bottom: 5px;')
+        self.detail_label.setFont(self.gui.list_font)
         item_layout.addWidget(self.detail_label, 1, 1)
+
+        self.installEventFilter(self)
+
+    def eventFilter(self, object, event):
+        if event.type() == QEvent.Type.ParentChange:
+            self.set_style_sheet()
+            return True
+        else:
+            return False
+
+    def set_style_sheet(self):
+        self.title_label.setStyleSheet('background: none; color: ' + self.gui.widget_item_font_color + ';')
+        self.detail_label.setStyleSheet('background: none; color: ' + self.gui.widget_item_font_color + ';')
 
     def paintEvent(self, pe):
         o = QStyleOption()
