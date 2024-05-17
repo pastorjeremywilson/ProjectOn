@@ -890,3 +890,97 @@ Wed May 15 15:22:12 2024:
     wrapped C/C++ object of type QVideoSink has been deleted on line 633 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
 Wed May 15 15:22:17 2024:
     cannot access local variable 'pixmap' where it is not associated with a value on line 642 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Wed May 15 18:22:54 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 18:24:11 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 18:32:18 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 18:58:29 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 18:59:32 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 19:00:18 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 19:01:34 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 19:02:05 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 19:06:51 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 19:07:22 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 19:07:50 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:51:02 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:51:56 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:52:37 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:53:22 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:54:37 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:55:36 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:56:55 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:57:52 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 21:00:59 2024:
+    setStyleSheet(self, styleSheet: Optional[str]): not enough arguments on line 443 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:04:20 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 397 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:05:00 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 397 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:06:11 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 397 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:10:09 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 397 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:12:33 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 417 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:18:53 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 421 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server errorunknown server errorunknown server errorunknown server error
+Thu May 16 09:17:23 2024:
+    'FontFaceComboBox' object has no attribute 'apply_settings' on line 427 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.apply_settingsunknown server errorunknown server error
+Thu May 16 11:21:51 2024:
+    'int' object has no attribute 'replace' on line 366 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu May 16 11:23:39 2024:
+    'int' object has no attribute 'replace' on line 366 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu May 16 11:24:09 2024:
+    'int' object has no attribute 'replace' on line 366 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_songunknown server errorunknown server errorunknown server error
+Thu May 16 12:36:14 2024:
+    near ",": syntax error on line 403 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_songunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Thu May 16 14:46:03 2024:
+    'NoneType' object is not subscriptable on line 1096 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Thu May 16 14:48:24 2024:
+    'NoneType' object is not subscriptable on line 1115 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_liveunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Thu May 16 16:36:58 2024:
+    invalid literal for int() with base 10: 'rgb(0' on line 702 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Thu May 16 16:37:42 2024:
+    invalid literal for int() with base 10: 'rgb(0' on line 702 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Thu May 16 16:40:17 2024:
+    invalid literal for int() with base 10: 'rgb(0' on line 702 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Thu May 16 16:40:33 2024:
+    invalid literal for int() with base 10: 'rgb(0' on line 702 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settingsunknown server error
+Thu May 16 16:54:43 2024:
+    can only concatenate str (not "int") to str on line 452 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:56:13 2024:
+    can only concatenate str (not "bool") to str on line 452 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:57:30 2024:
+    can only concatenate str (not "bool") to str on line 452 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:58:26 2024:
+    can only concatenate str (not "bool") to str on line 452 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:59:12 2024:
+    'list' object cannot be interpreted as an integer on line 450 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:59:45 2024:
+    can only concatenate str (not "bool") to str on line 454 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 17:01:37 2024:
+    'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 10:17:59 2024:
+    'NoneType' object has no attribute 'blockSignals' on line 894 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.blockSignals
+Fri May 17 10:18:36 2024:
+    'NoneType' object has no attribute 'blockSignals' on line 894 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.blockSignalsunknown server error
+Fri May 17 10:19:13 2024:
+    find(a0: PyQt6.sip.voidptr): argument 1 has unexpected type 'str' on line 916 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.apply_settingsunknown server error

@@ -39,6 +39,7 @@ from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBo
 from gui import GUI
 from simple_splash import SimpleSplash
 from web_remote import RemoteServer
+from widgets import StandardItemWidget
 
 
 class ProjectOn(QObject):
@@ -362,30 +363,42 @@ class ProjectOn(QObject):
         try:
             for i in range(len(song_data)):
                 if song_data[i]:
-                    song_data[i] = song_data[i].replace('"', '""')
+                    song_data[i] = (str(song_data[i])).replace('"', '""')
                 else:
                     song_data[i] = ''
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
 
             if old_title:
-                sql = ('UPDATE songs SET '
-                       'title="' + song_data[0] + '", '
-                       'author="' + song_data[1] + '", '
-                       'copyright="' + song_data[2] + '", '
-                       'ccliNum="' + song_data[3] + '", '
-                       'lyrics="' + song_data[4] + '", '
-                       'vorder="' + song_data[5] + '", '
-                       'footer="' + song_data[6] + '", ' 
-                       'font="' + song_data[7] + '", ' 
-                       'fontColor="' + song_data[8] + '", ' 
-                       'background="' + song_data[9] + '", '
-                       'font_size="' + song_data[10] + '" WHERE title="' + old_title + '"')
+                sql = (
+                    'UPDATE songs SET '
+                    'title="' + song_data[0] + '", '
+                    'author="' + song_data[1] + '", '
+                    'copyright="' + song_data[2] + '", '
+                    'ccliNum="' + song_data[3] + '", '
+                    'lyrics="' + song_data[4] + '", '
+                    'vorder="' + song_data[5] + '", '
+                    'footer="' + song_data[6] + '", ' 
+                    'font="' + song_data[7] + '", ' 
+                    'fontColor="' + song_data[8] + '", ' 
+                    'background="' + song_data[9] + '", '
+                    'font_size="' + song_data[10] + '", '
+                    'use_shadow="' + song_data[11] + '", '
+                    'shadow_color="' + song_data[12] + '", '
+                    'shadow_offset="' + song_data[13] + '", '
+                    'use_outline="' + song_data[14] + '", '
+                    'outline_color="' + song_data[15] + '", '
+                    'outline_width="' + song_data[16] + '", '
+                    'override_global="' + song_data[17] + '" WHERE title="' + old_title + '"'
+                )
             else:
                 sql = ('INSERT INTO songs (title, author, copyright, ccliNum, lyrics, vorder, footer, font, fontColor, '
-                       'background) VALUES ("' + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
+                       'background, font_size, use_shadow, shadow_color, shadow_offset, use_outline, outline_color, '
+                       'outline_width, override_global) VALUES ("' + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
                        + song_data[3] + '","' + song_data[4] + '","' + song_data[5] + '","' + song_data[6]
-                       + '","' + song_data[7] + '","' + song_data[8] + '","' + song_data[9] + '")')
+                       + '","' + song_data[7] + '","' + song_data[8] + '","' + song_data[9] + '","' + song_data[10]
+                       + '","' + song_data[11] + '","' + song_data[12] + '","' + song_data[13] + '","' + song_data[14]
+                       + '","' + song_data[15] + '","' + song_data[16] + '")')
 
             cursor.execute(sql)
             connection.commit()
@@ -432,9 +445,6 @@ class ProjectOn(QObject):
         """
         connection = None
         try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-
             if old_title:
                 sql = ('UPDATE customSlides SET '
                        'title="' + custom_data[0] + '", '
@@ -442,12 +452,24 @@ class ProjectOn(QObject):
                        'font="' + custom_data[2] + '", ' 
                        'fontColor="' + custom_data[3] + '", ' 
                        'background="' + custom_data[4] + '", '
-                       'font_size="' + custom_data[5] + '" WHERE title="' + old_title + '"')
+                       'font_size="' + custom_data[5] + '", '
+                       'use_shadow="' + custom_data[6] + '", '
+                       'shadow_color="' + custom_data[7] + '", '
+                       'shadow_offset="' + custom_data[8] + '", '
+                       'use_outline="' + custom_data[9] + '", '
+                       'outline_color="' + custom_data[10] + '", '
+                       'outline_width="' + custom_data[11] + '", '
+                       'override_global="' + custom_data[12] + '" WHERE title="' + old_title + '"')
             else:
-                sql = ('INSERT INTO customSlides (title, text, font, fontColor, background) VALUES '
-                       '("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2] + '","'
-                       + custom_data[3] + '","' + custom_data[4] + '")')
+                sql = ('INSERT INTO customSlides (title, text, font, fontColor, background, font_size, use_shadow, '
+                       'shadow_color, shadow_offset, use_outline, outline_color, outline_width, override_global)'
+                       ' VALUES ("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2] + '","'
+                       + custom_data[3] + '","' + custom_data[4] + '","' + custom_data[5] + '","' + custom_data[6]
+                       + '","' + custom_data[7] + '","' + custom_data[8] + '","' + custom_data[9]
+                       + '","' + custom_data[10] + '","' + custom_data[11] + '","' + custom_data[12] + '")')
 
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
             cursor.execute(sql)
             connection.commit()
             connection.close()
@@ -491,19 +513,19 @@ class ProjectOn(QObject):
         """
         connection = None
         try:
-            if item.data(30) == 'song':
+            if item.data(40) == 'song':
                 table = 'songs'
                 description = 'Song'
-            elif item.data(30) == 'custom':
+            elif item.data(40) == 'custom':
                 table = 'customSlides'
                 description = 'Custom Slide'
-            elif item.data(30) == 'video':
+            elif item.data(40) == 'video':
                 os.remove(self.video_dir + '/' + item.data(20))
                 filename_split = item.data(20).split('.')
                 thumbnail_filename = '.'.join(filename_split[:len(filename_split) - 1]) + '.jpg'
                 os.remove(self.video_dir + '/' + thumbnail_filename)
                 return
-            elif item.data(30) == 'web':
+            elif item.data(40) == 'web':
                 table = 'web'
                 description = 'Web Page'
             else:
@@ -601,8 +623,8 @@ class ProjectOn(QObject):
             return
 
         try:
-            if not self.gui.tool_bar.font_widget.font_list_widget.currentText():
-                self.gui.tool_bar.font_widget.font_list_widget.setCurrentText('Arial')
+            if not self.gui.tool_bar.font_widget.font_combo_box.currentText():
+                self.gui.tool_bar.font_widget.font_combo_box.setCurrentText('Arial')
 
             service_items = {
                 'global_song_background': self.settings['global_song_background'],
@@ -621,16 +643,16 @@ class ProjectOn(QObject):
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 service_items[i] = {
                     'title': self.gui.oos_widget.oos_list_widget.item(i).data(20),
-                    'type': self.gui.oos_widget.oos_list_widget.item(i).data(30)
+                    'type': self.gui.oos_widget.oos_list_widget.item(i).data(40)
                 }
             """for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 service_items[i] = {}
                 for j in range(20, 33):
-                    if j == 21 and self.gui.oos_widget.oos_list_widget.item(i).data(30) == 'bible':
+                    if j == 21 and self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'bible':
                         service_items[i][j] = self.gui.oos_widget.oos_list_widget.item(i).data(j)
                     elif j == 31:
                         service_items[i][j] = self.gui.oos_widget.oos_list_widget.item(i).data(j)
-                        if self.gui.oos_widget.oos_list_widget.item(i).data(30) == 'image':
+                        if self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'image':
                             service_items[i][j][2] = ''
                     else:
                         if type(self.gui.oos_widget.oos_list_widget.item(i).data(j)) == bytes:
@@ -849,7 +871,7 @@ class ProjectOn(QObject):
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
                             widget_item = QListWidgetItem()
-                            for i in range(20, 33):
+                            for i in range(20, 41):
                                 widget_item.setData(i, custom_item.data(i))
 
                             if widget_item.data(29) == 'global_song':
@@ -868,7 +890,7 @@ class ProjectOn(QObject):
                                 pixmap = QPixmap(self.gui.main.background_dir + '/' + widget_item.data(29))
                                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-                            widget = OOSItemWidget(self.gui, pixmap, widget_item.data(20), 'Custom')
+                            widget = StandardItemWidget(self.gui, widget_item.data(20), 'Custom', pixmap)
 
                             widget_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(widget_item)
@@ -897,7 +919,7 @@ class ProjectOn(QObject):
                             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                                    Qt.TransformationMode.SmoothTransformation)
 
-                            widget = OOSItemWidget(self.gui, pixmap, image_item.data(20), 'Image')
+                            widget = StandardItemWidget(self.gui, image_item.data(20), 'Image', pixmap)
 
                             image_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(image_item)
@@ -927,7 +949,7 @@ class ProjectOn(QObject):
                             pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio,
                                                    Qt.TransformationMode.SmoothTransformation)
 
-                            widget = OOSItemWidget(self.gui, pixmap, video_item.data(20), 'Image')
+                            widget = StandardItemWidget(self.gui, video_item.data(20), 'Video', pixmap)
 
                             video_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(video_item)
@@ -954,7 +976,7 @@ class ProjectOn(QObject):
                             item = QListWidgetItem()
                             item.setData(20, web_item.data(20))
                             item.setData(21, web_item.data(21))
-                            item.setData(30, 'web')
+                            item.setData(40, 'web')
                             item.setData(31, ['', web_item.data(20),
                                               web_item.data(21)])
 
@@ -970,7 +992,7 @@ class ProjectOn(QObject):
                             painter.drawText(QPoint(2, 20), 'WWW')
                             painter.end()
 
-                            widget = OOSItemWidget(self.gui,pixmap, web_item.data(21), 'Web')
+                            widget = StandardItemWidget(self.gui, web_item.data(21), 'Web', pixmap)
 
                             item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(item)

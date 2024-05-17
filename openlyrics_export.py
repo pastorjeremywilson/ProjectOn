@@ -36,6 +36,7 @@ class OpenlyricsExport(QWidget):
         layout.addWidget(check_button_widget)
 
         self.song_list = QListWidget()
+        self.song_list.setObjectName('song_list')
         self.song_list.setFont(self.gui.standard_font)
         for title in self.gui.main.get_song_titles():
             item = QListWidgetItem(title, self.song_list)

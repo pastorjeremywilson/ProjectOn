@@ -1,13 +1,13 @@
 {
     "selected_screen_name": "\\\\.\\DISPLAY1",
-    "font_face": "Franklin Gothic Heavy",
-    "font_size": 72,
+    "font_face": "FrankGoth BT",
+    "font_size": 70,
     "font_color": "white",
     "global_song_background": "flame corners.png",
     "global_bible_background": "bible_1.png",
     "logo_image": "Welcome Slide 1920x1200.svg",
     "last_save_dir": "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
-    "last_status_count": 2608,
+    "last_status_count": 4377,
     "stage_font_size": 60,
     "use_shadow": true,
     "shadow_color": 57,
@@ -17,10 +17,6 @@
     "outline_width": 3,
     "ccli_num": "",
     "used_services": [
-        [
-            "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
-            "2024-01-21 Service.pro"
-        ],
         [
             "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
             "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services/2024-05-05.pro"
@@ -36,8 +32,12 @@
         [
             "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
             "2024-05-12 Service.pro"
+        ],
+        [
+            "C:/Users/pasto/Nextcloud/LBCN/Church Work/Nampa/ProjectOn Services",
+            "Bruce Sleeper Funeral.pro"
         ]
     ],
     "default_bible": "C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on/data/bibles/nasb.xml",
-    "theme": "dark"
+    "theme": "light"
 }

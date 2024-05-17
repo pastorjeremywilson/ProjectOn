@@ -108,8 +108,7 @@ class LiveWidget(QWidget):
             else:
                 self.gui.media_player.play()
         elif sender.objectName() == 'stop':
-            # handle stopping the media player carefully to avoid an Access Violation
-            QTimer.singleShot(0, self.gui.media_player.stop)
+            self.gui.media_player.stop()
 
     def web_buttons(self, button):
         """
@@ -161,6 +160,7 @@ class CustomListWidget(QListWidget):
         """
         super().__init__()
         self.gui = gui
+        self.setObjectName('CustomListWidget')
         self.currentItemChanged.connect(self.change_display)
 
     def change_display(self):

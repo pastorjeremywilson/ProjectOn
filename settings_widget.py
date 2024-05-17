@@ -106,17 +106,18 @@ class SettingsWidget(QWidget):
         if self.accept_font_changes:
             self.font_sample.setFont(
                 QFont(
-                    self.font_settings_widget.font_list_widget.currentText(),
+                    #self.font_settings_widget.font_combo_box.currentText(),
+                    self.font_settings_widget.font_list_widget.currentItem().data(20),
                     self.font_settings_widget.font_size_spinbox.value(),
                     QFont.Weight.Bold))
 
-            fill_color = self.font_settings_widget.font_color_button_group.checkedButton().objectName()
-            if fill_color == 'black':
+            color = self.font_settings_widget.font_color_button_group.checkedButton().objectName()
+            if color == 'black':
                 self.font_sample.fill_color = QColor(0, 0, 0)
-            elif fill_color == 'white':
+            elif color == 'white':
                 self.font_sample.fill_color = QColor(255, 255, 255)
             else:
-                fill_color_split = fill_color.split(', ')
+                fill_color_split = self.font_settings_widget.custom_font_color_radio_button.objectName().split(', ')
                 self.font_sample.fill_color = QColor(
                     int(fill_color_split[0]), int(fill_color_split[1]), int(fill_color_split[2]))
 
@@ -221,8 +222,17 @@ class SettingsWidget(QWidget):
         self.font_sample.setObjectName('font_sample')
         font_layout.addWidget(self.font_sample)
 
-        self.font_settings_widget = FontWidget(self.gui, draw_border=False)
+        self.font_settings_widget = FontWidget(self.gui, draw_border=False, auto_update=False)
         font_layout.addWidget(self.font_settings_widget)
+        self.font_settings_widget.font_list_widget.currentRowChanged.connect(self.change_font_sample)
+        self.font_settings_widget.font_size_spinbox.valueChanged.connect(self.change_font_sample)
+        self.font_settings_widget.font_color_button_group.buttonClicked.connect(self.change_font_sample)
+        self.font_settings_widget.shadow_checkbox.stateChanged.connect(self.change_font_sample)
+        self.font_settings_widget.shadow_color_slider.color_slider.valueChanged.connect(self.change_font_sample)
+        self.font_settings_widget.shadow_offset_slider.offset_slider.valueChanged.connect(self.change_font_sample)
+        self.font_settings_widget.outline_checkbox.stateChanged.connect(self.change_font_sample)
+        self.font_settings_widget.outline_color_slider.color_slider.valueChanged.connect(self.change_font_sample)
+        self.font_settings_widget.outline_width_slider.offset_slider.valueChanged.connect(self.change_font_sample)
 
         stage_font_widget = QWidget()
         stage_font_layout = QHBoxLayout()
@@ -451,8 +461,8 @@ class SettingsWidget(QWidget):
 
     def sync_with_toolbar(self):
         self.gui.tool_bar.font_widget.blockSignals(True)
-        self.gui.tool_bar.font_widget.font_list_widget.setCurrentText(
-            self.font_settings_widget.font_list_widget.currentText())
+        self.gui.tool_bar.font_widget.font_combo_box.setCurrentText(
+            self.font_settings_widget.font_combo_box.currentText())
         self.gui.tool_bar.font_widget.font_size_spinbox.setValue(self.font_settings_widget.font_size_spinbox.value())
         if self.font_settings_widget.font_color_button_group.checkedButton().objectName() == 'white':
             self.gui.tool_bar.font_widget.white_radio_button.setChecked(True)
@@ -478,7 +488,8 @@ class SettingsWidget(QWidget):
 
     def save(self):
         self.gui.main.settings['selected_screen_name'] = self.screen_button_group.checkedButton().objectName()
-        self.gui.main.settings['font_face'] = self.font_settings_widget.font_list_widget.currentText()
+        #self.gui.main.settings['font_face'] = self.font_settings_widget.font_combo_box.currentText()
+        self.gui.main.settings['font_face'] = self.font_settings_widget.font_list_widget.currentItem().data(20)
         self.gui.main.settings['font_size'] = self.font_settings_widget.font_size_spinbox.value()
         self.gui.main.settings['font_color'] = (
             self.font_settings_widget.font_color_button_group.checkedButton().objectName())

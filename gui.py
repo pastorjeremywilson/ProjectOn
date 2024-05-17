@@ -19,7 +19,8 @@ from openlyrics_export import OpenlyricsExport
 from preview_widget import PreviewWidget
 from songselect_import import SongselectImport
 from toolbar import Toolbar
-from widgets import CustomMainWindow, CustomScrollArea, DisplayWidget, LyricDisplayWidget, LyricItemWidget
+from widgets import CustomMainWindow, CustomScrollArea, DisplayWidget, LyricDisplayWidget, StandardItemWidget, \
+    FontFaceComboBox
 
 
 class GUI(QObject):
@@ -121,6 +122,7 @@ class GUI(QObject):
                 self.secondary_screen = self.primary_screen
 
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
+        self.preloaded_font_combo_box = FontFaceComboBox(self)
 
         self.init_components()
         self.add_widgets()
@@ -141,8 +143,9 @@ class GUI(QObject):
 
         if len(self.screens) > 1:
             self.display_widget.show()
+            self.tool_bar.show_display_button.setChecked(False)
         else:
-            self.tool_bar.show_display_button.setStyleSheet('background: white')
+            self.tool_bar.show_display_button.setChecked(True)
 
     def init_components(self):
         """
@@ -310,6 +313,8 @@ class GUI(QObject):
         settings_action.setShortcut(QKeySequence('Ctrl+Alt+S'))
         settings_action.triggered.connect(self.tool_bar.open_settings)
 
+        tool_menu.addSeparator()
+
         import_bible_action = tool_menu.addAction('Import XML Bible')
         import_bible_action.triggered.connect(self.main.import_xml_bible)
 
@@ -330,6 +335,10 @@ class GUI(QObject):
         about_action.triggered.connect(self.show_about)
 
     def apply_theme(self, theme):
+        """
+        Method to apply color changes to the GUI's widgets
+        :param str theme: "light" or "dark" theme
+        """
         widgets = []
         for widget in self.central_widget.findChildren(QListWidget):
             widgets.append(widget)
@@ -345,8 +354,6 @@ class GUI(QObject):
                 widgets.append(line_edit)
             for text_edit in self.media_widget.widget(i).findChildren(QTextEdit):
                 widgets.append(text_edit)
-            for label in self.media_widget.widget(i).findChildren(QLabel):
-                widgets.append(label)
             for combobox in self.media_widget.widget(i).findChildren(QComboBox):
                 widgets.append(combobox)
             for button in self.media_widget.widget(i).findChildren(QPushButton):
@@ -364,7 +371,7 @@ class GUI(QObject):
             self.widget_item_font_color = 'black'
             selected_color = '#aaaaff'
 
-            self.central_widget.setStyleSheet('background: darkgrey;')
+            self.central_widget.setStyleSheet('#central_widget { background: darkgrey; }')
 
         else:
             self.main.settings['theme'] = 'dark'
@@ -379,24 +386,7 @@ class GUI(QObject):
             self.central_widget.setStyleSheet('#central_widget { background: black; }')
 
         for widget in widgets:
-            if isinstance(widget, QListWidget):
-                widget.setStyleSheet(
-                    'QListWidget { background: ' + background_color
-                    + '; color: ' + font_color + '; } '
-                    'QListWidget::item { background: ' + background_color
-                    + '; color: ' + font_color + '; } '
-                    + 'QListWidget::item:selected { background: ' + selected_color + '; '
-                      'color: ' + font_color + '; }')
-            elif isinstance(widget, QPushButton):
-                widget.setStyleSheet(
-                    'QPushButton { background: ' + background_color
-                    + '; border-right: 1px solid ' + border_color + '; } '
-                    'QPushButton:hover { background: ' + selected_color
-                    + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; } '
-                    'QPushButton:pressed { background: ' + background_color
-                    + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; }'
-                )
-            else:
+            if not isinstance(widget, QListWidget) and not isinstance(widget, QPushButton):
                 if 'background' in widget.styleSheet():
                     widget.setStyleSheet(
                         re.sub('background:.*?;', 'background: ' + background_color + ';', widget.styleSheet()))
@@ -416,6 +406,29 @@ class GUI(QObject):
                         widget.styleSheet().replace(' }', ' color: ' + font_color + '; }'))
                 else:
                     widget.setStyleSheet(widget.styleSheet() + ' color: ' + font_color + ';')
+            elif isinstance(widget, QListWidget):
+                widget.setStyleSheet(
+                    'QListWidget { background: ' + background_color
+                    + '; color: ' + font_color + '; } '
+                    'QListWidget::item { background: ' + background_color
+                    + '; color: ' + font_color + '; } '
+                    + 'QListWidget::item:selected { background: ' + selected_color + '; '
+                      'color: ' + font_color + '; }')
+                for i in range(widget.count()):
+                    if widget.itemWidget(widget.item(i)):
+                        widget.itemWidget(widget.item(i)).set_style_sheet()
+            elif isinstance(widget, QPushButton):
+                widget.setStyleSheet(
+                    'QPushButton { background: ' + background_color
+                    + '; border-right: 1px solid ' + border_color + '; } '
+                    'QPushButton:hover { background: ' + selected_color
+                    + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; } '
+                    'QPushButton:pressed { background: ' + background_color
+                    + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; } '
+                    'QPushButton:checked { background: ' + selected_color + '; }'
+                )
+
+        return
 
         for i in range(self.oos_widget.oos_list_widget.count()):
             self.oos_widget.oos_list_widget.itemWidget(self.oos_widget.oos_list_widget.item(i)).set_style_sheet()
@@ -425,6 +438,19 @@ class GUI(QObject):
 
         for i in range(self.live_widget.slide_list.count()):
             self.live_widget.slide_list.itemWidget(self.live_widget.slide_list.item(i)).set_style_sheet()
+
+        for i in range(self.media_widget.custom_list.count()):
+            if self.media_widget.custom_list.itemWidget(self.media_widget.custom_list.item(i)):
+                self.media_widget.custom_list.itemWidget(self.media_widget.custom_list.item(i)).set_style_sheet()
+
+        for i in range(self.media_widget.image_list.count()):
+            self.media_widget.image_list.itemWidget(self.media_widget.image_list.item(i)).set_style_sheet()
+
+        for i in range(self.media_widget.web_list.count()):
+            self.media_widget.web_list.itemWidget(self.media_widget.web_list.item(i)).setStyleSheet()
+
+        for i in range(self.media_widget.video_list.count()):
+            self.media_widget.video_list.itemWidget(self.media_widget.video_list.item(i)).setStyleSheet()
 
     def print_oos(self):
         """
@@ -671,7 +697,8 @@ class GUI(QObject):
                 elif self.main.settings['font_color'] == 'white':
                     lyric_widget.fill_color = QColor(255, 255, 255)
                 else:
-                    font_color_split = self.main.settings['font_color'].split(', ')
+                    font_color = self.main.settings['font_color'].replace('rgb(', '').replace(')', '')
+                    font_color_split = font_color.split(', ')
                     lyric_widget.fill_color = QColor(
                         int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
 
@@ -927,31 +954,30 @@ class GUI(QObject):
         if item:
             self.preview_widget.slide_list.clear()
 
-            if item.data(30) == 'song':
-                if item.data(31):
-                    for i in range(len(item.data(31))):
+            if item.data(40) == 'song':
+                if item.data(24):
+                    for i in range(len(item.data(24))):
                         list_item = QListWidgetItem()
-                        for j in range(20, 31):
+                        for j in range(20, 41):
                             list_item.setData(j, item.data(j))
 
-                        list_item.setData(31, [item.data(31)[i][0], item.data(31)[i][1], item.data(31)[i][2]])
-                        list_item.setData(32, item.data(32))
-                        lyric_widget = LyricItemWidget(self, list_item.data(31)[1], list_item.data(31)[2])
+                        list_item.setData(24, [item.data(24)[i][0], item.data(24)[i][1], item.data(24)[i][2]])
+                        lyric_widget = StandardItemWidget(self, list_item.data(24)[1], list_item.data(24)[2])
                         list_item.setSizeHint(lyric_widget.sizeHint())
                         self.preview_widget.slide_list.addItem(list_item)
                         self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            elif item.data(30) == 'bible':
+            elif item.data(40) == 'bible':
                 slide_texts = item.data(21)
                 for i in range(len(slide_texts)):
                     title = item.data(20)
                     list_item = QListWidgetItem()
-                    for j in range(20, 32):
+                    for j in range(20, 41):
                         list_item.setData(j, item.data(j))
                     list_item.setData(20, title)
                     list_item.setData(21, slide_texts[i])
                     list_item.setData(22, item.text())
-                    list_item.setData(30, 'bible')
+                    list_item.setData(40, 'bible')
 
                     new_title = title.split(':')[0] + ':'
                     first_num_found = False
@@ -988,60 +1014,51 @@ class GUI(QObject):
 
                     list_item.setData(31, ['', new_title, slide_texts[i]])
 
-                    lyric_widget = LyricItemWidget(self, new_title, slide_texts[i])
+                    lyric_widget = StandardItemWidget(self, new_title, slide_texts[i], None, True)
                     list_item.setSizeHint(lyric_widget.sizeHint())
                     self.preview_widget.slide_list.addItem(list_item)
                     self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            elif item.data(30) == 'image':
-                lyric_widget = LyricItemWidget(self, item.data(20), '')
+            elif item.data(40) == 'image':
+                lyric_widget = StandardItemWidget(self, item.data(20))
                 list_item = QListWidgetItem()
-                for j in range(20, 32):
+                for j in range(20, 41):
                     list_item.setData(j, item.data(j))
                 list_item.setSizeHint(lyric_widget.sizeHint())
                 self.preview_widget.slide_list.addItem(list_item)
                 self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            elif item.data(30) == 'custom':
-                lyric_widget = LyricItemWidget(self, item.data(20), item.data(21))
+            elif item.data(40) == 'custom':
+                lyric_widget = StandardItemWidget(self, item.data(20), item.data(21))
                 list_item = QListWidgetItem()
-                list_item.setData(32, item.data(32))
-                for j in range(20, 32):
+                for j in range(20, 41):
                     list_item.setData(j, item.data(j))
                 list_item.setSizeHint(lyric_widget.sizeHint())
                 self.preview_widget.slide_list.addItem(list_item)
                 self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            elif item.data(30) == 'web':
-                lyric_widget = LyricItemWidget(self, item.data(20), item.data(21))
+            elif item.data(40) == 'web':
+                lyric_widget = StandardItemWidget(self, item.data(20), item.data(21))
                 list_item = QListWidgetItem()
-                for j in range(20, 32):
+                for j in range(20, 41):
                     list_item.setData(j, item.data(j))
                 list_item.setSizeHint(lyric_widget.sizeHint())
                 self.preview_widget.slide_list.addItem(list_item)
                 self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            elif item.data(30) == 'video':
+            elif item.data(40) == 'video':
                 self.preview_widget.slide_list.clear()
 
-                widget = QWidget()
-                layout = QHBoxLayout()
-                widget.setLayout(layout)
-
-                image_label = QLabel()
                 pixmap = QPixmap(
                     self.main.video_dir + '/' + item.data(20).split('.')[0] + '.jpg')
-                pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                image_label.setPixmap(pixmap)
-                layout.addWidget(image_label)
+                pixmap = pixmap.scaled(
+                    96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-                label = QLabel(item.data(20).split('.')[0])
-                label.setFont(self.list_font)
-                layout.addWidget(label)
+                widget = StandardItemWidget(self, item.data(20).split('.')[0], '', pixmap)
 
                 list_item = QListWidgetItem()
                 list_item.setData(20, item.data(20))
-                list_item.setData(30, 'video')
+                list_item.setData(40, 'video')
                 list_item.setSizeHint(widget.sizeHint())
 
                 self.preview_widget.slide_list.addItem(list_item)
@@ -1062,23 +1079,23 @@ class GUI(QObject):
 
             for i in range(self.oos_widget.oos_list_widget.count()):
                 widget = self.oos_widget.oos_list_widget.itemWidget(self.oos_widget.oos_list_widget.item(i))
-                if widget:
-                    widget.setStyleSheet('QWidget#item_widget { border: 0; }')
 
             item_index = self.preview_widget.slide_list.currentRow()
             for i in range(self.preview_widget.slide_list.count()):
                 original_item = self.preview_widget.slide_list.item(i)
                 size_hint = original_item.sizeHint()
                 item = QListWidgetItem()
-                for j in range(20, 33):
+                for j in range(20, 41):
                     item.setData(j, original_item.data(j))
 
-                if item.data(30) == 'image':
-                    lyric_widget = LyricItemWidget(self, original_item.data(20), '')
-                elif item.data(30) == 'video':
-                    lyric_widget = LyricItemWidget(self, item.data(20), '')
+                if item.data(40) == 'image':
+                    lyric_widget = StandardItemWidget(self, original_item.data(20), '')
+                elif item.data(40) == 'video':
+                    lyric_widget = StandardItemWidget(self, item.data(20), '')
+                elif item.data(40) == 'song':
+                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2])
                 else:
-                    lyric_widget = LyricItemWidget(self, item.data(31)[1], item.data(31)[2])
+                    lyric_widget = StandardItemWidget(self, item.data(31)[1], item.data(31)[2])
 
                 self.live_widget.slide_list.addItem(item)
                 self.live_widget.slide_list.setItemWidget(item, lyric_widget)
@@ -1092,13 +1109,18 @@ class GUI(QObject):
             # create the slide buttons to be sent to the remote web page
             slide_buttons = ''
             for i in range(self.live_widget.slide_list.count()):
-                if self.live_widget.slide_list.item(i).data(30) == 'video':
+                if self.live_widget.slide_list.item(i).data(40) == 'video':
                     title = self.live_widget.slide_list.item(i).data(20)
+                elif self.live_widget.slide_list.item(i).data(40) == 'song':
+                    title = self.live_widget.slide_list.item(i).data(24)[1]
                 else:
                     title = self.live_widget.slide_list.item(i).data(31)[1]
-                if (not self.live_widget.slide_list.item(i).data(30) == 'image'
-                        and not self.live_widget.slide_list.item(i).data(30) == 'video'):
-                    text = self.live_widget.slide_list.item(i).data(31)[2]
+                if (not self.live_widget.slide_list.item(i).data(40) == 'image'
+                        and not self.live_widget.slide_list.item(i).data(40) == 'video'):
+                    if self.live_widget.slide_list.item(i).data(40) == 'song':
+                        text = self.live_widget.slide_list.item(i).data(24)[2]
+                    else:
+                        text = self.live_widget.slide_list.item(i).data(31)[2]
                     text = re.sub('<p.*?>', '', text)
                     text = text.replace('</p>', '')
                 else:
@@ -1146,13 +1168,14 @@ class GUI(QObject):
             # handle stopping the media player carefully to avoid an Access Violation
             if self.media_player:
                 if self.media_player.isPlaying():
-                    QTimer.singleShot(0, self.media_player.stop)
-                    self.timed_update.stop = True
+                    self.media_player.stop()
+                    if self.timed_update:
+                        self.timed_update.stop = True
                 self.media_player.deleteLater()
                 self.video_widget.deleteLater()
-                self.main.app.processEvents()
                 self.media_player = None
                 self.video_widget = None
+                self.timed_update = None
 
             display_widget = self.display_widget
             lyric_widget = self.lyric_widget
@@ -1163,27 +1186,24 @@ class GUI(QObject):
                 self.timed_update.stop = True
                 self.main.thread_pool.waitForDone()
             if not self.blackout_widget.isHidden():
-                self.tool_bar.black_screen_button.setStyleSheet('background: darkGrey')
+                self.tool_bar.black_screen_button.setChecked(True)
             if self.logo_widget and not self.logo_widget.isHidden():
-                self.tool_bar.logo_screen_button.setStyleSheet('background: darkGrey')
+                self.tool_bar.logo_screen_button.setChecked(True)
             if display_widget.isHidden():
                 if not self.primary_screen == self.secondary_screen:
                     display_widget.show()
-                    self.tool_bar.show_display_button.setStyleSheet('background: darkGrey')
+                    self.tool_bar.show_display_button.setChecked(False)
 
         elif widget == 'sample':
             display_widget = self.sample_widget
             lyric_widget = self.sample_lyric_widget
             current_item = self.preview_widget.slide_list.currentItem()
-            # do nothing if we're working with the sample widget and the item is a video
-            if current_item and current_item.data(30) == 'video':
-                return
 
         display_widget.background_label.clear()
 
         if current_item:
             # set the background
-            if current_item.data(30) == 'song' or current_item.data(30) == 'custom':
+            if current_item.data(40) == 'song' or current_item.data(40) == 'custom':
                 if current_item.data(29) == 'global_song':
                     display_widget.background_label.clear()
                     display_widget.setStyleSheet('#display_widget { background-color: none } ')
@@ -1201,12 +1221,15 @@ class GUI(QObject):
                     display_widget.setStyleSheet('#display_widget { background-color: none } ')
                     self.custom_pixmap = QPixmap(self.main.background_dir + '/' + current_item.data(29))
                     display_widget.background_label.setPixmap(self.custom_pixmap)
-            elif current_item.data(30) == 'bible':
+            elif current_item.data(40) == 'bible':
                 display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
-            elif current_item.data(30) == 'image':
+            elif current_item.data(40) == 'image':
                 pixmap = QPixmap(self.main.image_dir + '/' + current_item.data(20))
                 display_widget.background_label.setPixmap(pixmap)
-            elif current_item.data(30) == 'video':
+            elif current_item.data(40) == 'web':
+                display_widget.background_label.setStyleSheet('background: black;')
+            elif current_item.data(40) == 'video':
+                display_widget.background_label.setStyleSheet('background: black;')
                 display_widget.background_label.clear()
                 pixmap = QPixmap(self.main.video_dir + '/' + current_item.data(20).split('.')[0] + '.jpg')
                 pixmap = pixmap.scaled(
@@ -1214,57 +1237,89 @@ class GUI(QObject):
                 display_widget.background_label.setPixmap(pixmap)
 
             # set the lyrics html
-            if current_item.data(30) == 'song':
-                lyrics_html = current_item.data(31)[2]
-            elif current_item.data(30) == 'bible' or current_item.data(23) == 'custom':
+            if current_item.data(40) == 'song':
+                lyrics_html = current_item.data(24)[2]
+            elif current_item.data(40) == 'bible' or current_item.data(23) == 'custom':
                 lyrics_html = current_item.data(21)
-            elif current_item.data(30) == 'image':
+            elif current_item.data(40) == 'image':
                 lyrics_html = ''
-            elif current_item.data(30) == 'custom':
+            elif current_item.data(40) == 'custom':
                 lyrics_html = current_item.data(21)
-            elif current_item.data(30) == 'web':
+            elif current_item.data(40) == 'web':
                 if widget == 'sample':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
                 else:
                     lyrics_html = ''
                     self.web_view.load(QUrl(current_item.data(21)))
-            elif current_item.data(30) == 'video':
+            elif current_item.data(40) == 'video':
                 if widget == 'sample':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
                 else:
                     lyrics_html = ''
 
-            #set the font
-            if current_item.data(27) and not current_item.data(27) == 'global':
+            #set the font, using the song's font data if override_global is True
+            if current_item.data(37) == 'True':
                 font_face = current_item.data(27)
+                font_size = int(current_item.data(30))
+                font_color = current_item.data(28)
+                use_shadow = False
+                if current_item.data(31) == 'True':
+                    use_shadow = True
+                if current_item.data(32) and not current_item.data(32) == 'None':
+                    shadow_color = int(current_item.data(32))
+                else:
+                    shadow_color = self.main.settings['shadow_color']
+                if current_item.data(33) and not current_item.data(33) == 'None':
+                    shadow_offset = int(current_item.data(33))
+                else:
+                    shadow_offset = self.main.settings['shadow_offset']
+                use_outline = False
+                if current_item.data(34) == 'True':
+                    use_outline = True
+                if current_item.data(35) and not current_item.data(35) == 'None':
+                    outline_color = int(current_item.data(35))
+                else:
+                    outline_color = self.main.settings['outline_color']
+                if current_item.data(36) and not current_item.data(36) == 'None':
+                    outline_width = int(current_item.data(36))
+                else:
+                    outline_width = self.main.settings['outline_width']
             else:
                 font_face = self.main.settings['font_face']
-
-            if current_item.data(32) and not current_item.data(32) == 'global':
-                font_size = int(current_item.data(32))
-            else:
                 font_size = self.main.settings['font_size']
+                font_color = self.main.settings['font_color']
+                use_shadow = self.main.settings['use_shadow']
+                shadow_color = self.main.settings['shadow_color']
+                shadow_offset = self.main.settings['shadow_offset']
+                use_outline = self.main.settings['use_outline']
+                outline_color = self.main.settings['outline_color']
+                outline_width = self.main.settings['outline_width']
 
             lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
             lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
-            lyric_widget.use_shadow = self.main.settings['use_shadow']
-            lyric_widget.shadow_color = QColor(self.shadow_color, self.shadow_color, self.shadow_color)
-            lyric_widget.shadow_offset = self.main.settings['shadow_offset']
-            lyric_widget.use_outline = self.main.settings['use_outline']
-            lyric_widget.outline_color = QColor(
-                self.main.settings['outline_color'],
-                self.main.settings['outline_color'],
-                self.main.settings['outline_color']
-            )
-            lyric_widget.outline_width = self.main.settings['outline_width']
+            lyric_widget.use_shadow = use_shadow
+            lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
+            lyric_widget.shadow_offset = shadow_offset
+            lyric_widget.use_outline = use_outline
+            lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
+            lyric_widget.outline_width = outline_width
 
             #set the font color
-            if current_item.data(28) and not current_item.data(28) == 'global':
-                color = current_item.data(28).replace('rgb(', '')
-                color = color.replace(')', '')
-                font_color_split = color.split(', ')
-                lyric_widget.fill_color = QColor(
-                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+            if not font_color == 'global':
+                if font_color == 'white':
+                    lyric_widget.fill_color = QColor(Qt.GlobalColor.white)
+                elif font_color == 'black':
+                    lyric_widget.fill_color = QColor(Qt.GlobalColor.black)
+                elif '#' in font_color:
+                    color = font_color.replace('#', '')
+                    rgb_color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
+                    lyric_widget.fill_color = QColor(rgb_color)
+                else:
+                    color = font_color.replace('rgb(', '')
+                    color = color.replace(')', '')
+                    font_color_split = color.split(', ')
+                    lyric_widget.fill_color = QColor(
+                        int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
             else:
                 if self.main.settings['font_color'] == 'black':
                     lyric_widget.fill_color = QColor(0, 0, 0)
@@ -1290,7 +1345,7 @@ class GUI(QObject):
                 if len(self.main.settings['ccli_num']) > 0:
                     footer_text += '\nCCLI License #: ' + self.main.settings['ccli_num']
                 lyric_widget.footer_label.setText(footer_text)
-            elif current_item.data(30) == 'bible':
+            elif current_item.data(40) == 'bible':
                 lyric_widget.footer_label.setText(
                     current_item.data(20) + ' (' + current_item.data(23) + ')')
             else:
@@ -1301,7 +1356,7 @@ class GUI(QObject):
 
             # hide or show the appropriate widgets.py
             if widget == 'live':
-                if not current_item.data(30) == 'video' and not current_item.data(30) == 'web':
+                if not current_item.data(40) == 'video' and not current_item.data(40) == 'web':
                     if not self.web_view.isHidden():
                         self.web_view.hide()
                     if not self.blackout_widget.isHidden():
@@ -1310,9 +1365,9 @@ class GUI(QObject):
                         self.logo_widget.hide()
                     if self.lyric_widget.isHidden():
                         self.lyric_widget.show()
-                    if current_item.data(30) == 'image':
+                    if current_item.data(40) == 'image':
                         self.lyric_widget.hide()
-                elif current_item.data(30) == 'video':
+                elif current_item.data(40) == 'video':
                     self.make_video_widget()
                     self.video_widget.show()
                     self.media_player.setSource(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
@@ -1329,26 +1384,25 @@ class GUI(QObject):
                     if not self.logo_widget.isHidden():
                         self.logo_widget.hide()
 
-                elif current_item.data(30) == 'web':
+                elif current_item.data(40) == 'web':
                     if not self.lyric_widget.isHidden():
                         self.lyric_widget.hide()
                     if not self.blackout_widget.isHidden():
                         self.blackout_widget.hide()
                     if not self.logo_widget.isHidden():
                         self.logo_widget.hide()
-                    if self.web_view.isHidden():
-                        self.web_view.show()
+                    self.web_view.show()
 
                     self.timed_update = TimedPreviewUpdate(self)
                     self.main.thread_pool.start(self.timed_update)
                     self.live_widget.slide_list.setFocus()
 
-                if not current_item.data(30) == 'video':
+                if not current_item.data(40) == 'video':
                     self.live_widget.player_controls.hide()
 
             # change the preview image
             if widget == 'live':
-                if not current_item.data(30) == 'web' and not current_item.data(30) == 'video':
+                if not current_item.data(40) == 'web' and not current_item.data(40) == 'video':
                     pixmap = display_widget.grab(display_widget.rect())
                     pixmap = pixmap.scaled(
                         int(display_widget.width() / 5), int(display_widget.height() / 5),
@@ -1359,10 +1413,10 @@ class GUI(QObject):
                     stage_html = re.sub('<p.*?>', '', lyrics_html)
                     stage_html = stage_html.replace('</p>', '')
                     self.main.remote_server.socketio.emit('update_stage', [stage_html, self.stage_font_size])
-                elif current_item.data(30) == 'web':
+                elif current_item.data(40) == 'web':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
                     self.main.remote_server.socketio.emit('update_stage', [lyrics_html, self.stage_font_size])
-                elif current_item.data(30) == 'video':
+                elif current_item.data(40) == 'video':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
                     self.main.remote_server.socketio.emit('update_stage', [lyrics_html, self.stage_font_size])
             elif widget == 'sample':
@@ -1402,7 +1456,7 @@ class GUI(QObject):
             )
             self.logo_label.setPixmap(pixmap)
             self.logo_widget.show()
-            self.tool_bar.logo_screen_button.setStyleSheet('background: white')
+            self.tool_bar.logo_screen_button.setChecked(True)
         else:
             self.logo_widget.hide()
 
@@ -1441,12 +1495,12 @@ class GUI(QObject):
         """
         Method to toggle between showing and hiding the display screen.
         """
-        if self.display_widget.isHidden():
+        if self.tool_bar.show_display_button.isChecked():
             self.display_widget.show()
-            self.tool_bar.show_display_button.setStyleSheet('background: darkGrey')
+            self.tool_bar.show_display_button.setChecked(False)
         else:
             self.display_widget.hide()
-            self.tool_bar.show_display_button.setStyleSheet('background: white')
+            self.tool_bar.show_display_button.setChecked(True)
         self.live_widget.slide_list.setFocus()
 
     def display_black_screen(self):
@@ -1454,34 +1508,31 @@ class GUI(QObject):
         Method to toggle a black screen on and off
         """
         # ensure that the display widget is showing and hide the other widgets.py
-        if self.blackout_widget.isHidden():
-            if not self.lyric_widget.isHidden():
-                self.lyric_widget.hide()
-            if not self.video_widget.isHidden():
-                self.video_widget.hide()
-            if not self.logo_widget.isHidden():
-                self.logo_widget.hide()
-                self.tool_bar.logo_screen_button.setStyleSheet('background: darkGrey')
-            if not self.web_view.isHidden():
-                self.web_view.hide()
-            if self.display_widget.isHidden():
-                self.display_widget.show()
-
-                self.tool_bar.show_display_button.setStyleSheet('background: darkGrey')
-            self.blackout_widget.show()
-            self.tool_bar.black_screen_button.setStyleSheet('background: white')
-
-        else:
+        if self.tool_bar.black_screen_button.isChecked():
             self.blackout_widget.hide()
-            self.tool_bar.black_screen_button.setStyleSheet('background: darkGrey')
-
             if self.live_widget.slide_list.currentItem():
-                if self.live_widget.slide_list.currentItem().data(30) == 'web':
+                if self.live_widget.slide_list.currentItem().data(40) == 'web':
                     self.web_view.show()
-                elif self.live_widget.slide_list.currentItem().data(30) == 'video':
+                elif self.live_widget.slide_list.currentItem().data(40) == 'video':
                     self.video_widget.show()
                 else:
                     self.lyric_widget.show()
+            self.tool_bar.black_screen_button.setChecked(False)
+        else:
+            if not self.lyric_widget.isHidden():
+                self.lyric_widget.hide()
+            if self.video_widget and not self.video_widget.isHidden():
+                self.video_widget.hide()
+            if not self.web_view.isHidden():
+                self.web_view.hide()
+            if not self.logo_widget.isHidden():
+                self.logo_widget.hide()
+                self.tool_bar.logo_screen_button.setChecked(False)
+            if self.display_widget.isHidden():
+                self.tool_bar.show_display_button.setChecked(False)
+                self.display_widget.show()
+            self.blackout_widget.show()
+            self.tool_bar.black_screen_button.setChecked(True)
         self.live_widget.slide_list.setFocus()
 
     def display_logo_screen(self):
@@ -1489,35 +1540,35 @@ class GUI(QObject):
         Method to toggle the logo widget on and off
         """
         if len(self.main.settings['logo_image']) > 0:
-            if self.logo_widget.isHidden():
+            if self.tool_bar.logo_screen_button.isChecked():
+                self.logo_widget.hide()
+
+                if self.live_widget.slide_list.currentItem():
+                    if self.live_widget.slide_list.currentItem().data(40) == 'web':
+                        self.web_view.show()
+                    elif self.live_widget.slide_list.currentItem().data(40) == 'video':
+                        self.video_widget.show()
+                    else:
+                        self.lyric_widget.show()
+                self.tool_bar.logo_screen_button.setChecked(False)
+
+            else:
                 if not self.lyric_widget.isHidden():
                     self.lyric_widget.hide()
-                if not self.video_widget.isHidden():
+                if self.video_widget and not self.video_widget.isHidden():
                     self.video_widget.hide()
                 if not self.web_view.isHidden():
                     self.web_view.hide()
                 if not self.blackout_widget.isHidden():
-                    self.blackout_widget.hide()
-                    self.tool_bar.black_screen_button.setStyleSheet('background: darkGrey')
+                    self.blackout_widget.show()
+                    self.tool_bar.black_screen_button.setChecked(False)
                 if self.display_widget.isHidden():
                     self.display_widget.show()
-                    self.tool_bar.show_display_button.setStyleSheet('background: darkGrey')
+                    self.tool_bar.show_display_button.setChecked(False)
 
                 self.logo_widget.show()
                 self.logo_label.show()
-                self.tool_bar.logo_screen_button.setStyleSheet('background: white')
-
-            else:
-                self.logo_widget.hide()
-                self.tool_bar.logo_screen_button.setStyleSheet('background: darkGrey')
-
-                if self.live_widget.slide_list.currentItem():
-                    if self.live_widget.slide_list.currentItem().data(30) == 'web':
-                        self.web_view.show()
-                    elif self.live_widget.slide_list.currentItem().data(30) == 'video':
-                        self.video_widget.show()
-                    else:
-                        self.lyric_widget.show()
+                self.tool_bar.logo_screen_button.setChecked(True)
         self.live_widget.slide_list.setFocus()
 
     def format_display_lyrics(self, lyrics):
@@ -1559,14 +1610,13 @@ class GUI(QObject):
         item.setData(20, reference)
         item.setData(21, self.parse_scripture_by_verse(text))
         item.setData(23, version)
-        item.setData(30, 'bible')
+        item.setData(40, 'bible')
         item.setData(31, ['', reference, text])
 
         from media_widget import OOSItemWidget
         label_pixmap = self.global_bible_background_pixmap.scaled(
             50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        widget = OOSItemWidget(self, label_pixmap, reference, 'Scripture')
-
+        widget = StandardItemWidget(self, reference, 'Scripture', label_pixmap)
         item.setSizeHint(widget.sizeHint())
         self.oos_widget.oos_list_widget.addItem(item)
         self.oos_widget.oos_list_widget.setItemWidget(item, widget)

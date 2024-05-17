@@ -1,5 +1,6 @@
-Add the rest of the font settings to the edit window's advanced options
-Keep working on dark and light themes - refine buttons
+Get font face to show in font widget
+Keep working on dark and light themes
+Figure out why crash happens if video is played first followed by web view
 
 Help section
     - file locations

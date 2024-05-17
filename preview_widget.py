@@ -69,6 +69,7 @@ class CustomListWidget(QListWidget):
     def __init__(self, gui):
         super().__init__()
         self.gui = gui
+        self.setObjectName('CustomListWidget')
 
     def keyPressEvent(self, evt):
         if evt.key() == Qt.Key.Key_Space:

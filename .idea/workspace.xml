@@ -5,38 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="233d5086-b170-4655-9be9-a778c8a1e0ee" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/compile_config_and_installers/ProjectOnDebug.spec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/help/bible_background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/help/song_background.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton-console.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton-console.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/projecton.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/projecton.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/error.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/live_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/live_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/openlyrics_export.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlyrics_export.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/preview_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/preview_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/add_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/add_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/add_to_service_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/add_to_service_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/black_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/black_display.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/font_settings.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/font_settings.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/edit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/main_screen.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/main_screen.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/toolbar.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/toolbar.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/mobile_web_remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/mobile_web_remote.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/new.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/new.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/no_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/no_display.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/open.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/open.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/save.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/save.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/send_to_live_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/send_to_live_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/settings.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/settings.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/web_remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/web_remote.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/toolbar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -277,7 +261,15 @@
       <option name="project" value="LOCAL" />
       <updated>1715283535275</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Fixed Access Violation crash when re-playing a video&#10;&#10;Added light and dark themes - probably need some more refinement">
+      <option name="closed" value="true" />
+      <created>1715808442071</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1715808442072</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -308,7 +300,8 @@
     <MESSAGE value="Added a font settings popup to the toolbar and adjusted the font saving procedures to accommodate.&#10;&#10;Changed the way scripture passages are retrieved and parsed so that verses with numbers in them (that aren't the verse numbers themselves) aren't interpreted as separate verses." />
     <MESSAGE value="Fixed toolbar loading order problem" />
     <MESSAGE value="Ensured that default bible is set in settings if any bibles exist in the data folder and that key doesn't exist in settings.&#10;&#10;Improved scripture parsing into slides so that the last verse isn't automatically put on to a new slide, but only if it being added overflows the lyric widget." />
-    <option name="LAST_COMMIT_MESSAGE" value="Ensured that default bible is set in settings if any bibles exist in the data folder and that key doesn't exist in settings.&#10;&#10;Improved scripture parsing into slides so that the last verse isn't automatically put on to a new slide, but only if it being added overflows the lyric widget." />
+    <MESSAGE value="Fixed Access Violation crash when re-playing a video&#10;&#10;Added light and dark themes - probably need some more refinement" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed Access Violation crash when re-playing a video&#10;&#10;Added light and dark themes - probably need some more refinement" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

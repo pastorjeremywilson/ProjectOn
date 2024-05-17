@@ -113,6 +113,7 @@ class CustomListWidget(QListWidget):
         """
         super().__init__()
         self.gui = gui
+        self.setObjectName('CustomListWidget')
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
@@ -159,7 +160,7 @@ class CustomListWidget(QListWidget):
 
     def dropEvent(self, evt):
         """
-        Overrides dropEvent to properly add a QListWidget item to this widget based on the type stored in data(30).
+        Overrides dropEvent to properly add a QListWidget item to this widget based on the type stored in data(40).
         :param QDropEvent evt: dropEvent
         :return:
         """
@@ -172,15 +173,15 @@ class CustomListWidget(QListWidget):
         if row == -1:
             row = self.count()
 
-        if evt.source().currentItem().data(30) == 'song':
+        if evt.source().currentItem().data(40) == 'song':
             self.gui.media_widget.add_song_to_service(item, row)
-        elif evt.source().currentItem().data(30) == 'custom':
+        elif evt.source().currentItem().data(40) == 'custom':
             self.gui.media_widget.add_custom_to_service(item, row)
-        elif evt.source().currentItem().data(30) == 'image':
+        elif evt.source().currentItem().data(40) == 'image':
             self.gui.media_widget.add_image_to_service(item, row)
-        elif evt.source().currentItem().data(30) == 'video':
+        elif evt.source().currentItem().data(40) == 'video':
             self.gui.media_widget.add_video_to_service(item, row)
-        elif evt.source().currentItem().data(30) == 'web':
+        elif evt.source().currentItem().data(40) == 'web':
             self.gui.media_widget.add_web_to_service(item, row)
 
         remote_oos_buttons = ''
@@ -207,9 +208,9 @@ class CustomListWidget(QListWidget):
 
         edit_text = None
         if self.itemAt(self.item_pos):
-            if self.itemAt(self.item_pos).data(30) == 'song':
+            if self.itemAt(self.item_pos).data(40) == 'song':
                 edit_text = 'Edit Song'
-            elif self.itemAt(self.item_pos).data(30) == 'custom':
+            elif self.itemAt(self.item_pos).data(40) == 'custom':
                 edit_text = 'Edit Custom Slide'
 
             if edit_text:
@@ -229,11 +230,11 @@ class CustomListWidget(QListWidget):
         :return:
         """
         if self.itemAt(self.item_pos):
-            if self.itemAt(self.item_pos).data(30) == 'song':
+            if self.itemAt(self.item_pos).data(40) == 'song':
                 item_text = self.itemAt(self.item_pos).data(20)
                 song_info = self.gui.main.get_song_data(item_text)
                 song_edit = EditWidget(self.gui, 'song', song_info, item_text)
-            elif self.itemAt(self.item_pos).data(30) == 'custom':
+            elif self.itemAt(self.item_pos).data(40) == 'custom':
                 item_text = self.itemAt(self.item_pos).data(20)
                 custom_info = self.gui.main.get_custom_data(item_text)
                 song_edit = EditWidget(self.gui, 'custom', custom_info, item_text)

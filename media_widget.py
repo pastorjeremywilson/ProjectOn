@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabe
 
 from edit_widget import EditWidget
 from get_scripture import GetScripture
-from widgets import AutoSelectLineEdit
+from widgets import AutoSelectLineEdit, StandardItemWidget
 
 
 class MediaWidget(QTabWidget):
@@ -467,25 +467,32 @@ class MediaWidget(QTabWidget):
                     self.gui.main.update_status_signal.emit('Loading Songs - ' + item[0], 'info')
                 list_item = QListWidgetItem(item[0])
                 for i in range(len(item)):
-                    if i == 10:
-                        list_item.setData(32, item[i])
-                    else:
-                        list_item.setData(i + 20, item[i])
-                list_item.setData(30, 'song')
+                    list_item.setData(i + 20, item[i])
+                list_item.setData(24, self.gui.format_display_lyrics(list_item.data(24)))
+                list_item.setData(40, 'song')
 
                 self.song_list.addItem(list_item)
-        #data 20: Title
-        #data 21: Author
-        #data 22: Copyright
-        #data 23: CCLI Song Num
-        #data 24: Lyrics (with <br />)
-        #data 25: Verse Order
-        #data 26: Footer (bool)
-        #data 27: Font
-        #data 28: Font Color
-        #data 29: Background (with file type ending)
-        #data 30: Type
-        #data 31: Segment Code ([Segment Code, Segment Title, Segment Text])
+        """
+        data 20: Title
+        data 21: Author
+        data 22: Copyright
+        data 23: CCLI Song Num
+        data 24: Lyrics (with <br />)
+        data 25: Verse Order
+        data 26: Footer (bool)
+        data 27: Font (global or name)
+        data 28: Font Color (global or color)
+        data 29: Background (with file type ending)
+        data 30: Font Size
+        data 31: Use Shadow
+        data 32: Shadow Color
+        data 33: Shadow Offset
+        data 34: Use Outline
+        data 35: Outline Color
+        data 36: Outline Width
+        data 37: Override Global
+        data 40: Type
+        """
 
     def parse_song_data(self, item):
         """
@@ -494,7 +501,7 @@ class MediaWidget(QTabWidget):
         :param QListWidgetItem item: The item containing the song data
         :return list of str segments: The song's individual segments
         """
-        self.lyric_dictionary = self.gui.format_display_lyrics(item.data(24))
+        self.lyric_dictionary = item.data(24)
         segments = []
 
         if len(item.data(25)) > 0:
@@ -562,21 +569,54 @@ class MediaWidget(QTabWidget):
                     new_text = re.sub('</span>', '</u>', new_text)
                     segment_text = segment_text.replace(text, new_text)
 
-            # set the font
-            if item.data(27) and not item.data(27) == 'global':
+            # set the font, using the song's font data if override_global is True
+            if item.data(37) == 'True':
                 font_face = item.data(27)
+                font_size = int(item.data(30))
+                font_color = item.data(28)
+                use_shadow = False
+                if item.data(31) == 'True':
+                    use_shadow = True
+                if item.data(32) and not item.data(32) == 'None':
+                    shadow_color = int(item.data(32))
+                else:
+                    shadow_color = self.gui.main.settings['shadow_color']
+                if item.data(33) and not item.data(33) == 'None':
+                    shadow_offset = int(item.data(33))
+                else:
+                    shadow_offset = self.gui.main.settings['shadow_offset']
+                use_outline = False
+                if item.data(34) == 'True':
+                    use_outline = True
+                if item.data(35) and not item.data(35) == 'None':
+                    outline_color = int(item.data(35))
+                else:
+                    outline_color = self.gui.main.settings['outline_color']
+                if item.data(36) and not item.data(36) == 'None':
+                    outline_width = int(item.data(36))
+                else:
+                    outline_width = self.gui.main.settings['outline_width']
             else:
                 font_face = self.gui.main.settings['font_face']
-
-            if item.data(32) and not item.data(32) == 'global':
-                font_size = int(item.data(32))
-            else:
                 font_size = self.gui.main.settings['font_size']
+                font_color = self.gui.main.settings['font_color']
+                use_shadow = self.gui.main.settings['use_shadow']
+                shadow_color = self.gui.main.settings['shadow_color']
+                shadow_offset = self.gui.main.settings['shadow_offset']
+                use_outline = self.gui.main.settings['use_outline']
+                outline_color = self.gui.main.settings['outline_color']
+                outline_width = self.gui.main.settings['outline_width']
 
-            self.gui.sample_lyric_widget.setFont(
-                QFont(font_face, font_size, QFont.Weight.Bold))
-            self.gui.sample_lyric_widget.footer_label.setFont(
-                QFont(font_face, self.gui.global_footer_font_size, QFont.Weight.Bold))
+            lyric_widget = self.gui.sample_lyric_widget
+
+            lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
+            lyric_widget.footer_label.setFont(QFont(font_face, self.gui.global_footer_font_size))
+            lyric_widget.use_shadow = use_shadow
+            lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
+            lyric_widget.shadow_offset = shadow_offset
+            lyric_widget.use_outline = use_outline
+            lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
+            lyric_widget.outline_width = outline_width
 
             segment_text = '<p style="text-align: center; line-height: 120%;">' + segment_text + '</p>'
 
@@ -672,21 +712,32 @@ class MediaWidget(QTabWidget):
                 text = '<p style="text-align: center; line-height: 120%;">' + text + '</p>'
 
                 widget_item = QListWidgetItem(item[0])
-                widget_item.setData(32, item[5])
                 widget_item.setData(20, item[0])
                 widget_item.setData(21, text)
-                widget_item.setData(27, item[2])
-                widget_item.setData(28, item[3])
-                widget_item.setData(29, item[4])
-                widget_item.setData(30, 'custom')
-                widget_item.setData(31, ['', item[0], text])
+
+                for i in range(2, 13):
+                    widget_item.setData(25 + i, item[i])
+                widget_item.setData(40, 'custom')
+
+                widget_item.setData(24, ['', item[0], text])
                 self.custom_list.addItem(widget_item)
 
-                #data 20: title
-                #data 21: text
-                #data 27: font
-                #data 28: font_color
-                #data 29: background (with type ending)
+        """
+        data 20: title
+        data 21: text
+        data 27: Font (global or name)
+        data 28: Font Color (global or color)
+        data 29: Background (with file type ending)
+        data 30: Font Size
+        data 31: Use Shadow
+        data 32: Shadow Color
+        data 33: Shadow Offset
+        data 34: Use Outline
+        data 35: Outline Color
+        data 36: Outline Width
+        data 37: Override Global
+        data 40: Type
+        """
 
     def populate_image_list(self):
         """
@@ -704,22 +755,12 @@ class MediaWidget(QTabWidget):
                 pixmap = QPixmap()
                 pixmap.loadFromData(record[1])
 
-                widget = QWidget()
-                layout = QHBoxLayout()
-                widget.setLayout(layout)
-
-                image_label = QLabel()
-                image_label.setPixmap(pixmap)
-                layout.addWidget(image_label)
-
-                label = QLabel(record[0])
-                label.setFont(self.gui.standard_font)
-                layout.addWidget(QLabel(record[0]))
+                widget = StandardItemWidget(self.gui, record[0], '', pixmap)
 
                 item = QListWidgetItem()
                 item.setData(20, record[0])
                 item.setData(21, record[1])
-                item.setData(30, 'image')
+                item.setData(40, 'image')
                 item.setData(31, ['', record[0], record[1]])
                 item.setSizeHint(widget.sizeHint())
                 self.image_list.addItem(item)
@@ -746,23 +787,14 @@ class MediaWidget(QTabWidget):
                             video_file = other_file
 
                     if video_file:
-                        widget = QWidget()
-                        layout = QHBoxLayout()
-                        widget.setLayout(layout)
-
-                        image_label = QLabel()
                         pixmap = QPixmap(self.gui.main.video_dir + '/' + file)
                         pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                        image_label.setPixmap(pixmap)
-                        layout.addWidget(image_label)
 
-                        label = QLabel(video_file.split('.')[0])
-                        label.setFont(self.gui.list_font)
-                        layout.addWidget(label)
+                        widget = StandardItemWidget(self.gui, video_file.split('.')[0], '', pixmap)
 
                         item = QListWidgetItem()
                         item.setData(20, video_file)
-                        item.setData(30, 'video')
+                        item.setData(40, 'video')
                         item.setSizeHint(widget.sizeHint())
 
                         self.video_list.addItem(item)
@@ -788,20 +820,10 @@ class MediaWidget(QTabWidget):
                     item = QListWidgetItem()
                     item.setData(20, record[0])
                     item.setData(21, record[1])
-                    item.setData(30, 'web')
+                    item.setData(40, 'web')
                     item.setData(31, ['', record[0], record[1]])
 
-                    widget = QWidget()
-                    layout = QVBoxLayout()
-                    widget.setLayout(layout)
-
-                    title_label = QLabel(record[0])
-                    title_label.setFont(self.gui.list_title_font)
-                    layout.addWidget(title_label)
-
-                    text_label = QLabel(record[1])
-                    text_label.setFont(self.gui.list_font)
-                    layout.addWidget(text_label)
+                    widget = StandardItemWidget(self.gui, record[0], record[1])
 
                     self.web_list.addItem(item)
                     item.setSizeHint(widget.sizeHint())
@@ -919,7 +941,7 @@ class MediaWidget(QTabWidget):
             item.setData(20, reference)
             item.setData(21, self.gui.parse_scripture_by_verse(self.passages[1]))
             item.setData(23, version)
-            item.setData(30, 'bible')
+            item.setData(40, 'bible')
             item.setData(31, ['', reference, self.passages[1]])
 
             self.gui.send_to_preview(item)
@@ -1051,19 +1073,9 @@ class MediaWidget(QTabWidget):
             item = QListWidgetItem()
             item.setData(20, title_line_edit.text())
             item.setData(21, url_line_edit.text())
-            item.setData(30, 'web')
+            item.setData(40, 'web')
 
-            widget = QWidget()
-            layout = QVBoxLayout()
-            widget.setLayout(layout)
-
-            title_label = QLabel(title_line_edit.text())
-            title_label.setFont(self.gui.list_title_font)
-            layout.addWidget(title_label)
-
-            text_label = QLabel(url_line_edit.text())
-            text_label.setFont(self.gui.list_font)
-            layout.addWidget(text_label)
+            widget = StandardItemWidget(self.gui, title_line_edit.text(), url_line_edit.text())
 
             self.web_list.addItem(item)
             item.setSizeHint(widget.sizeHint())
@@ -1116,6 +1128,7 @@ class MediaWidget(QTabWidget):
                 thumbnail_layout.addWidget(label)
 
                 thumbnail_list = QListWidget()
+                thumbnail_list.setObjectName('thumbnail_list')
                 thumbnail_list.currentItem()
                 thumbnail_list.itemClicked.connect(
                     lambda: self.copy_video(file_name, thumbnail_list.currentItem().data(20), thumbnail_widget))
@@ -1124,19 +1137,11 @@ class MediaWidget(QTabWidget):
                 file_list = os.listdir('./')
                 for file in file_list:
                     if file.startswith('thumbnail'):
-                        widget = QWidget()
-                        layout = QHBoxLayout()
-                        widget.setLayout(layout)
-
-                        image_label = QLabel()
                         pixmap = QPixmap('./' + file)
                         pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                        image_label.setPixmap(pixmap)
-                        layout.addWidget(image_label)
 
-                        title_label = QLabel('Frame ' + file.split('.')[0].replace('thumbnail', ''))
-                        title_label.setFont(self.gui.standard_font)
-                        layout.addWidget(title_label)
+                        widget = StandardItemWidget(
+                            self.gui, 'Frame ' + file.split('.')[0].replace('thumbnail', ''), '', pixmap)
 
                         item = QListWidgetItem()
                         item.setData(20, file)
@@ -1189,12 +1194,12 @@ class MediaWidget(QTabWidget):
         """
         if not item and self.song_list.currentItem():
             item = QListWidgetItem()
-            for i in range(20, 33):
+            for i in range(20, 41):
                 item.setData(i, self.song_list.currentItem().data(i))
 
-        if not from_load_service and item:
+        if item and not from_load_service:
             item.setText(None)
-            item.setData(31, self.parse_song_data(item))
+            #item.setData(24, self.parse_song_data(item))
 
             # Create a thumbnail of either the global song background or the custom background associated with this song
             if item.data(29) == 'global_song':
@@ -1215,7 +1220,7 @@ class MediaWidget(QTabWidget):
                 pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-            widget = OOSItemWidget(self.gui, pixmap, item.data(20), 'Song')
+            widget = StandardItemWidget(self.gui, item.data(20), 'Song', pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if not row:
@@ -1227,9 +1232,9 @@ class MediaWidget(QTabWidget):
         else:
             # handle this differently if it's being created while loading a service file
             widget_item = QListWidgetItem()
-            for i in range(20, 33):
+            for i in range(20, 41):
                 widget_item.setData(i, item.data(i))
-            widget_item.setData(31, self.parse_song_data(item))
+            widget_item.setData(24, self.parse_song_data(item))
 
             if widget_item.data(29) == 'global_song':
                 pixmap = self.gui.global_song_background_pixmap
@@ -1253,7 +1258,7 @@ class MediaWidget(QTabWidget):
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                        Qt.TransformationMode.SmoothTransformation)
 
-            widget = OOSItemWidget(self.gui, pixmap, item.data(20), 'Song')
+            widget = StandardItemWidget(self.gui, item.data(20), 'Song', pixmap)
 
             widget_item.setSizeHint(widget.sizeHint())
             self.gui.oos_widget.oos_list_widget.addItem(widget_item)
@@ -1272,7 +1277,7 @@ class MediaWidget(QTabWidget):
                 add_item = True
             item.setData(20, self.image_list.currentItem().data(20))
             item.setData(21, self.image_list.currentItem().data(21))
-            item.setData(30, 'image')
+            item.setData(40, 'image')
             item.setData(31, self.image_list.currentItem().data(31))
 
             pixmap = QPixmap()
@@ -1280,7 +1285,7 @@ class MediaWidget(QTabWidget):
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
 
-            widget = OOSItemWidget(self.gui, pixmap, item.data(20), 'Image')
+            widget = StandardItemWidget(self.gui, item.data(20), 'Image', pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if add_item:
@@ -1301,7 +1306,7 @@ class MediaWidget(QTabWidget):
             if not item:
                 item = QListWidgetItem()
                 add_item = True
-            for i in range(20, 33):
+            for i in range(20, 41):
                 item.setData(i, self.custom_list.currentItem().data(i))
 
             if item.data(29) == 'global_song':
@@ -1320,7 +1325,7 @@ class MediaWidget(QTabWidget):
                 pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-            widget = OOSItemWidget(self.gui, pixmap, self.custom_list.currentItem().text(), 'Custom Slide')
+            widget = StandardItemWidget(self.gui, self.custom_list.currentItem().text(), 'Custom Slide', pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if add_item:
@@ -1343,7 +1348,7 @@ class MediaWidget(QTabWidget):
                 add_item = True
             item.setData(20, self.web_list.currentItem().data(20))
             item.setData(21, self.web_list.currentItem().data(21))
-            item.setData(30, 'web')
+            item.setData(40, 'web')
             item.setData(31, ['', self.web_list.currentItem().data(20), self.web_list.currentItem().data(21)])
 
             pixmap = QPixmap(50, 27)
@@ -1358,8 +1363,8 @@ class MediaWidget(QTabWidget):
             painter.drawText(QPoint(2, 20), 'WWW')
             painter.end()
 
-            widget = OOSItemWidget(
-                self.gui, pixmap, item.data(20), self.web_list.currentItem().data(21))
+            widget = StandardItemWidget(
+                self.gui, item.data(20), self.web_list.currentItem().data(21), pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if add_item:
@@ -1381,13 +1386,14 @@ class MediaWidget(QTabWidget):
                 item = QListWidgetItem()
                 add_item = True
             item.setData(20,  self.video_list.currentItem().data(20))
-            item.setData(30, 'video')
+            item.setData(40, 'video')
 
             pixmap = QPixmap(
                 self.gui.main.video_dir + '/' + self.video_list.currentItem().data(20).split('.')[0] + '.jpg')
             pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-            widget = OOSItemWidget(self.gui, pixmap, self.video_list.currentItem().data(20).split('.')[0], 'Video')
+            widget = StandardItemWidget(
+                self.gui, self.video_list.currentItem().data(20).split('.')[0], 'Video', pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if add_item:
@@ -1466,39 +1472,27 @@ class CustomListWidget(QListWidget):
         Overrides mouseDoubleClickEvent to provide the ability to add an item to the order of service upon double-click.
         :param QMouseEvent evt: mouseEvent
         """
-        if self.currentItem().data(30) == 'song':
+        if self.currentItem().data(40) == 'song':
             self.gui.media_widget.add_song_to_service()
-        elif self.currentItem().data(30) == 'custom':
+        elif self.currentItem().data(40) == 'custom':
             self.gui.media_widget.add_custom_to_service()
-        elif self.currentItem().data(30) == 'web':
+        elif self.currentItem().data(40) == 'web':
             self.gui.media_widget.add_web_to_service()
-        elif self.currentItem().data(30) == 'image':
+        elif self.currentItem().data(40) == 'image':
             self.gui.media_widget.add_image_to_service()
-        elif self.currentItem().data(30) == 'video':
+        elif self.currentItem().data(40) == 'video':
             self.gui.media_widget.add_video_to_service()
 
         self.gui.oos_widget.oos_list_widget.setCurrentRow(self.gui.oos_widget.oos_list_widget.count() - 1)
         self.gui.oos_widget.oos_list_widget.setFocus()
-
-    def mousePressEvent(self, evt):
-        """
-        Allows for a song item to be parsed when the mouse is clicked on it so that it can be shown in the preview
-        widget.
-        :param QMouseEvent evt: mouseEvent
-        """
-        super().mousePressEvent(evt)
-        if evt.button() == Qt.MouseButton.LeftButton:
-            if self.currentItem():
-                if self.currentItem().data(30) == 'song':
-                    self.currentItem().setData(31, self.gui.media_widget.parse_song_data(self.currentItem()))
-                self.gui.send_to_preview(self.currentItem())
-                super().mousePressEvent(evt)
 
     def current_item_changed(self):
         """
         Method to send the current item to the preview widget upon the current item being changed.
         """
         if self.currentItem():
+            if self.currentItem().data(40) == 'song' and isinstance(self.currentItem().data(24), dict):
+                self.currentItem().setData(24, self.gui.media_widget.parse_song_data(self.currentItem()))
             self.gui.send_to_preview(self.currentItem())
 
     def edit_song(self):
@@ -1506,11 +1500,11 @@ class CustomListWidget(QListWidget):
         Method to create a EditWidget for a song or custom slide.
         """
         if self.itemAt(self.item_pos):
-            if self.currentItem().data(30) == 'song':
+            if self.currentItem().data(40) == 'song':
                 item_text = self.itemAt(self.item_pos).text()
                 song_info = self.gui.main.get_song_data(item_text)
                 EditWidget(self.gui, 'song', song_info, item_text)
-            elif self.currentItem().data(30) == 'custom':
+            elif self.currentItem().data(40) == 'custom':
                 item_text = self.itemAt(self.item_pos).text()
                 custom_info = self.gui.main.get_custom_data(item_text)
                 EditWidget(self.gui, 'custom', custom_info, item_text)
@@ -1529,13 +1523,13 @@ class CustomListWidget(QListWidget):
         if response == QMessageBox.StandardButton.Yes:
             self.gui.main.delete_item(self.currentItem())
 
-        if self.currentItem().data(30) == 'song':
+        if self.currentItem().data(40) == 'song':
             self.gui.media_widget.populate_song_list()
-        elif self.currentItem().data(30) == 'custom':
+        elif self.currentItem().data(40) == 'custom':
             self.gui.media_widget.populate_custom_list()
-        elif self.currentItem().data(30) == 'video':
+        elif self.currentItem().data(40) == 'video':
             self.gui.media_widget.populate_video_list()
-        elif self.currentItem().data(30) == 'web':
+        elif self.currentItem().data(40) == 'web':
             self.gui.media_widget.populate_web_list()
 
         self.gui.preview_widget.slide_list.clear()
