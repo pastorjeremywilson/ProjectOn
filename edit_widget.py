@@ -3,7 +3,7 @@ import re
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFontDatabase, QColor, QPixmap, QPainter, QBrush
 from PyQt6.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
-    QMessageBox, QCheckBox, QComboBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea
+    QMessageBox, QCheckBox, QComboBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget
 
 from formattable_text_edit import FormattableTextEdit
 from simple_splash import SimpleSplash
@@ -342,9 +342,15 @@ class EditWidget(QDialog):
             self.show_hide_advanced_options()
 
         if song_data[7] == 'global':
-            self.font_widget.font_combo_box.setCurrentText(self.gui.main.settings['font_face'])
+            for i in range(self.font_widget.font_list_widget.count()):
+                if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['font_face']:
+                    self.font_widget.font_list_widget.setCurrentRow(i)
+                    break
         else:
-            self.font_widget.font_combo_box.setCurrentText(song_data[7])
+            for i in range(self.font_widget.font_list_widget.count()):
+                if self.font_widget.font_list_widget.item(i).data(20) == song_data[7]:
+                    self.font_widget.font_list_widget.setCurrentRow(i)
+                    break
 
         if song_data[8] == 'global':
             if self.gui.main.settings['font_color'] == 'black':
@@ -435,11 +441,20 @@ class EditWidget(QDialog):
 
         if custom_data[2]:
             if 'global' in custom_data[2]:
-                self.font_widget.font_combo_box.setCurrentText(self.gui.main.settings['font_face'])
+                for i in range(self.font_widget.font_list_widget.count()):
+                    if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['font_face']:
+                        self.font_widget.font_list_widget.setCurrentRow(i)
+                        break
             else:
-                self.font_widget.font_combo_box.setCurrentText(custom_data[2])
+                for i in range(self.font_widget.font_list_widget.count()):
+                    if self.font_widget.font_list_widget.item(i).data(20) == custom_data[2]:
+                        self.font_widget.font_list_widget.setCurrentRow(i)
+                        break
         else:
-            self.font_widget.font_combo_box.setCurrentText(self.gui.main.settings['font_face'])
+            for i in range(self.font_widget.font_list_widget.count()):
+                if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['font_face']:
+                    self.font_widget.font_list_widget.setCurrentRow(i)
+                    break
 
         if 'global' in custom_data[3]:
             if self.gui.main.settings['font_color'] == 'black':
@@ -623,7 +638,7 @@ class EditWidget(QDialog):
         else:
             footer = 'false'
 
-        font = self.font_widget.font_combo_box.currentText()
+        font = self.font_widget.font_list_widget.currentItem().data(20)
 
         font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
 
@@ -759,7 +774,7 @@ class EditWidget(QDialog):
         else:
             override_global = 'False'
 
-        font = self.font_widget.font_combo_box.currentText()
+        font = self.font_widget.font_list_widget.currentItem().data(20)
 
         font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
 

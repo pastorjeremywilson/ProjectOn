@@ -461,8 +461,8 @@ class SettingsWidget(QWidget):
 
     def sync_with_toolbar(self):
         self.gui.tool_bar.font_widget.blockSignals(True)
-        self.gui.tool_bar.font_widget.font_combo_box.setCurrentText(
-            self.font_settings_widget.font_combo_box.currentText())
+        self.gui.tool_bar.font_widget.font_list_widget.setCurrentRow(
+            self.font_settings_widget.font_list_widget.currentRow())
         self.gui.tool_bar.font_widget.font_size_spinbox.setValue(self.font_settings_widget.font_size_spinbox.value())
         if self.font_settings_widget.font_color_button_group.checkedButton().objectName() == 'white':
             self.gui.tool_bar.font_widget.white_radio_button.setChecked(True)

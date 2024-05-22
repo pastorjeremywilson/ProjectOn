@@ -13,33 +13,10 @@
 				box-sizing: inherit;
 			}
 
-			#header {
-				flex: 5%;
+			body {
 				display: flex;
 				flex-direction: column;
-				padding: 10px;
-				width: 100%;
-				position: fixed;
-				left: 0;
-				top: 0;
-				background-color: #aaaaff;
-			}
-
-			#title {
-				display: flex;
-				justify-content: center;
-				width: auto;
-				color: white;
-				font-family: 'Helvetica', sans-serif;
-				font-size: 4vh;
-				font-weight: bold;
-			}
-
-			#buttons {
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-				margin-top: 10px;
+				align-content: start;
 			}
 
 			button {
@@ -53,15 +30,47 @@
 				font-size: 2.5vh;
 			}
 
+			#header {
+				flex: 10%;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				position: fixed;
+				width: 100%;
+				padding: 20px 40px;
+				margin-bottom: 0px;
+				background-color: #aaaaff;
+			}
+
+			#title {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: white;
+				font-family: 'Helvetica', sans-serif;
+				font-size: 4vh;
+				font-weight: bold;
+			}
+
+			#screen-buttons {
+				display: flex;
+			}
+
+			.screen:hover {
+				background-repeat: no-repeat;
+				background-position: center;
+				background-color: darkGrey;
+			}
+
 			.nav {
-				border: 5px solid white;
+				flex: 25%;
+				border: 2px solid white;
 				border-radius: 10px;
 				background-size: 40px;
 				background-repeat: no-repeat;
 				background-position: center;
 				width: 60px;
 				height: 60px;
-				padding: 20px;
 			}
 
 			.nav:hover {
@@ -85,45 +94,55 @@
 
 			#item_back {
 				background-image: url({{ url_for('static', filename='item_back.svg') }});
-				margin-left: auto;
-				margin-right: auto;
+				margin-bottom: 20px;
 			}
 
 			#slide_back {
 				background-image: url({{ url_for('static', filename='slide_back.svg') }});
-				margin-left: auto;
-				margin-right: auto;
+				margin-bottom: 20px;
 			}
 
 			#slide_forward {
 				background-image: url({{ url_for('static', filename='slide_forward.svg') }});
-				margin-left: auto;
-				margin-right: auto;
+				margin-bottom: 20px;
 			}
 
 			#item_forward {
 				background-image: url({{ url_for('static', filename='item_forward.svg') }});
-				margin-left: auto;
-				margin-right: auto;
 			}
 
 			#main {
+				flex: 92%;
 				display: flex;
 				flex-direction: row;
+				padding: 0px;
+				margin-top: 0px;
 			}
 
 			#oos, #slides {
 				flex: 50%;
 				layout: block;
 				border: 3px solid #aaaaff;
-				margin: 10px;
 				padding: 20px;
 				overflow-y: scroll;
 			}
 
+			#oos {
+				margin-right: 5px;
+			}
+
+			#slides {
+				margin-left: 5px;
+			}
+
 			#nav-buttons {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
 				background-color: #aaaaff;
 				max-width: 90px;
+				padding: 10px;
+				margin: 0px;
 			}
 
 			.subtitle {
@@ -166,14 +185,10 @@
 	<body>
 		<div id="header">
 			<div id="title">ProjectOn Remote</div>
-				<div id="buttons">
-					<div id="header-left">
-					</div>
-					<div id="header-right>">
-						<button id="black_screen" class="nav" onclick="blackScreen()"></button>
-						<button id="logo_screen" class="nav" onclick="logoScreen()"></button>
-					</div>
-				</div>
+			<div id="screen-buttons">
+				<button id="black_screen" class="nav" onclick="blackScreen()"></button>
+				<button id="logo_screen" class="nav" onclick="logoScreen()"></button>
+			</div>
 		</div>
 
 		<div id="main">

@@ -1,18 +1,17 @@
 import re
 import time
 
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QTimer
-from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QPalette
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
+from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QListWidget, QTabWidget, QScrollArea, QComboBox, QLineEdit, \
-    QTextEdit, QStyle
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QListWidget, QScrollArea, QComboBox, QLineEdit, QTextEdit
 
 from help import Help
 from importers import Importers
-from live_widget import LiveWidget, CustomListWidget
+from live_widget import LiveWidget
 from media_widget import MediaWidget
 from oos_widget import OOSWidget
 from openlyrics_export import OpenlyricsExport
@@ -84,6 +83,7 @@ class GUI(QObject):
         :param ProjectOn main: The current instance of ProjectOn
         """
         super().__init__()
+        self.audio_output = None
         self.main = main
 
         # if settings exist, set the secondary screen (the display screen) to the one in the settings
@@ -369,6 +369,7 @@ class GUI(QObject):
             border_color = 'black'
             font_color = 'black'
             self.widget_item_font_color = 'black'
+            hover_color = '#ddddff'
             selected_color = '#aaaaff'
 
             self.central_widget.setStyleSheet('#central_widget { background: darkgrey; }')
@@ -381,6 +382,7 @@ class GUI(QObject):
             border_color = '#505050'
             font_color = '#bfbfbf'
             self.widget_item_font_color = '#bfbfbf'
+            hover_color = '#000000'
             selected_color = '#220055'
 
             self.central_widget.setStyleSheet('#central_widget { background: black; }')
@@ -413,7 +415,8 @@ class GUI(QObject):
                     'QListWidget::item { background: ' + background_color
                     + '; color: ' + font_color + '; } '
                     + 'QListWidget::item:selected { background: ' + selected_color + '; '
-                      'color: ' + font_color + '; }')
+                      'color: ' + font_color + '; }'
+                    + 'QListWidget::item:hover { background: ' + hover_color + '; }')
                 for i in range(widget.count()):
                     if widget.itemWidget(widget.item(i)):
                         widget.itemWidget(widget.item(i)).set_style_sheet()
@@ -426,31 +429,8 @@ class GUI(QObject):
                     'QPushButton:pressed { background: ' + background_color
                     + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; } '
                     'QPushButton:checked { background: ' + selected_color + '; }'
+                    + 'QPushButton:hover { background: ' + hover_color + '; }'
                 )
-
-        return
-
-        for i in range(self.oos_widget.oos_list_widget.count()):
-            self.oos_widget.oos_list_widget.itemWidget(self.oos_widget.oos_list_widget.item(i)).set_style_sheet()
-
-        for i in range(self.preview_widget.slide_list.count()):
-            self.preview_widget.slide_list.itemWidget(self.preview_widget.slide_list.item(i)).set_style_sheet()
-
-        for i in range(self.live_widget.slide_list.count()):
-            self.live_widget.slide_list.itemWidget(self.live_widget.slide_list.item(i)).set_style_sheet()
-
-        for i in range(self.media_widget.custom_list.count()):
-            if self.media_widget.custom_list.itemWidget(self.media_widget.custom_list.item(i)):
-                self.media_widget.custom_list.itemWidget(self.media_widget.custom_list.item(i)).set_style_sheet()
-
-        for i in range(self.media_widget.image_list.count()):
-            self.media_widget.image_list.itemWidget(self.media_widget.image_list.item(i)).set_style_sheet()
-
-        for i in range(self.media_widget.web_list.count()):
-            self.media_widget.web_list.itemWidget(self.media_widget.web_list.item(i)).setStyleSheet()
-
-        for i in range(self.media_widget.video_list.count()):
-            self.media_widget.video_list.itemWidget(self.media_widget.video_list.item(i)).setStyleSheet()
 
     def print_oos(self):
         """
@@ -494,9 +474,9 @@ class GUI(QObject):
             item = self.oos_widget.oos_list_widget.item(i)
             widget = self.oos_widget.oos_list_widget.itemWidget(item)
             if widget:
-                pixmap = widget.picture_label.pixmap()
-                type = widget.detail_label.text()
-                title = widget.title_label.text()
+                pixmap = widget.icon.pixmap()
+                type = widget.subtitle.text()
+                title = widget.title.text()
 
                 image = Image.fromqpixmap(pixmap)
                 image_reader = ImageReader(image)
@@ -1012,7 +992,7 @@ class GUI(QObject):
                     else:
                         new_title += first_num + '-' + last_num
 
-                    list_item.setData(31, ['', new_title, slide_texts[i]])
+                    list_item.setData(24, ['', new_title, slide_texts[i]])
 
                     lyric_widget = StandardItemWidget(self, new_title, slide_texts[i], None, True)
                     list_item.setSizeHint(lyric_widget.sizeHint())
@@ -1095,7 +1075,7 @@ class GUI(QObject):
                 elif item.data(40) == 'song':
                     lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2])
                 else:
-                    lyric_widget = StandardItemWidget(self, item.data(31)[1], item.data(31)[2])
+                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2])
 
                 self.live_widget.slide_list.addItem(item)
                 self.live_widget.slide_list.setItemWidget(item, lyric_widget)
@@ -1114,13 +1094,13 @@ class GUI(QObject):
                 elif self.live_widget.slide_list.item(i).data(40) == 'song':
                     title = self.live_widget.slide_list.item(i).data(24)[1]
                 else:
-                    title = self.live_widget.slide_list.item(i).data(31)[1]
+                    title = self.live_widget.slide_list.item(i).data(24)[1]
                 if (not self.live_widget.slide_list.item(i).data(40) == 'image'
                         and not self.live_widget.slide_list.item(i).data(40) == 'video'):
                     if self.live_widget.slide_list.item(i).data(40) == 'song':
                         text = self.live_widget.slide_list.item(i).data(24)[2]
                     else:
-                        text = self.live_widget.slide_list.item(i).data(31)[2]
+                        text = self.live_widget.slide_list.item(i).data(24)[2]
                     text = re.sub('<p.*?>', '', text)
                     text = text.replace('</p>', '')
                 else:
@@ -1148,6 +1128,11 @@ class GUI(QObject):
             elif self.oos_widget.oos_list_widget.currentRow() == self.oos_widget.oos_list_widget.count() - 1:
                 self.send_to_preview(self.oos_widget.oos_list_widget.currentItem())
 
+            if self.live_widget.slide_list.item(0).data(40) == 'video':
+                self.live_widget.player_controls.show()
+            else:
+                self.live_widget.player_controls.hide()
+
             self.live_widget.blockSignals(False)
             self.oos_widget.oos_list_widget.blockSignals(False)
             self.live_widget.slide_list.setFocus()
@@ -1171,10 +1156,13 @@ class GUI(QObject):
                     self.media_player.stop()
                     if self.timed_update:
                         self.timed_update.stop = True
+                self.media_player.source().clear()
                 self.media_player.deleteLater()
                 self.video_widget.deleteLater()
                 self.media_player = None
                 self.video_widget = None
+                self.audio_output = None
+                self.sink = None
                 self.timed_update = None
 
             display_widget = self.display_widget
@@ -1397,9 +1385,6 @@ class GUI(QObject):
                     self.main.thread_pool.start(self.timed_update)
                     self.live_widget.slide_list.setFocus()
 
-                if not current_item.data(40) == 'video':
-                    self.live_widget.player_controls.hide()
-
             # change the preview image
             if widget == 'live':
                 if not current_item.data(40) == 'web' and not current_item.data(40) == 'video':
@@ -1611,9 +1596,8 @@ class GUI(QObject):
         item.setData(21, self.parse_scripture_by_verse(text))
         item.setData(23, version)
         item.setData(40, 'bible')
-        item.setData(31, ['', reference, text])
+        item.setData(24, ['', reference, text])
 
-        from media_widget import OOSItemWidget
         label_pixmap = self.global_bible_background_pixmap.scaled(
             50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
         widget = StandardItemWidget(self, reference, 'Scripture', label_pixmap)
@@ -1721,7 +1705,7 @@ class GUI(QObject):
         parse_failed = False
         while verse_index < len(text):
             recursion_count += 1
-            if recursion_count > 1000:
+            if recursion_count > len(text):
                 parse_failed = True
                 break
 
@@ -1768,13 +1752,13 @@ class GUI(QObject):
                 verse_index -= 1
             current_segment_index += 1
 
-        # show an error message should parsing fail for some reason
+        # show an error message should parsing fail
         if parse_failed:
             QMessageBox.information(
                 self.main_window,
                 'Scripture parsing failed',
-                'Failed parsing scripture into slides. Likely cause is a screen size that is too small for the '
-                'display font.\n\nUsing one verse per slide.',
+                'A verse in this passage is too long to fit on the display screen. Consider decreasing the font '
+                'size or use a higher resolution display.',
                 QMessageBox.StandardButton.Ok
             )
             for verse in text:

@@ -761,7 +761,7 @@ class MediaWidget(QTabWidget):
                 item.setData(20, record[0])
                 item.setData(21, record[1])
                 item.setData(40, 'image')
-                item.setData(31, ['', record[0], record[1]])
+                item.setData(24, ['', record[0], record[1]])
                 item.setSizeHint(widget.sizeHint())
                 self.image_list.addItem(item)
                 self.image_list.setItemWidget(item, widget)
@@ -821,7 +821,7 @@ class MediaWidget(QTabWidget):
                     item.setData(20, record[0])
                     item.setData(21, record[1])
                     item.setData(40, 'web')
-                    item.setData(31, ['', record[0], record[1]])
+                    item.setData(24, ['', record[0], record[1]])
 
                     widget = StandardItemWidget(self.gui, record[0], record[1])
 
@@ -942,7 +942,7 @@ class MediaWidget(QTabWidget):
             item.setData(21, self.gui.parse_scripture_by_verse(self.passages[1]))
             item.setData(23, version)
             item.setData(40, 'bible')
-            item.setData(31, ['', reference, self.passages[1]])
+            item.setData(24, ['', reference, self.passages[1]])
 
             self.gui.send_to_preview(item)
             self.gui.preview_widget.slide_list.setCurrentRow(0)
@@ -1275,10 +1275,9 @@ class MediaWidget(QTabWidget):
             if not item:
                 item = QListWidgetItem()
                 add_item = True
-            item.setData(20, self.image_list.currentItem().data(20))
-            item.setData(21, self.image_list.currentItem().data(21))
-            item.setData(40, 'image')
-            item.setData(31, self.image_list.currentItem().data(31))
+
+            for i in range(20, 41):
+                item.setData(i, self.image_list.currentItem().data(i))
 
             pixmap = QPixmap()
             pixmap.loadFromData(self.image_list.currentItem().data(21), 'JPG')
@@ -1349,7 +1348,7 @@ class MediaWidget(QTabWidget):
             item.setData(20, self.web_list.currentItem().data(20))
             item.setData(21, self.web_list.currentItem().data(21))
             item.setData(40, 'web')
-            item.setData(31, ['', self.web_list.currentItem().data(20), self.web_list.currentItem().data(21)])
+            item.setData(24, ['', self.web_list.currentItem().data(20), self.web_list.currentItem().data(21)])
 
             pixmap = QPixmap(50, 27)
             painter = QPainter(pixmap)
@@ -1533,57 +1532,3 @@ class CustomListWidget(QListWidget):
             self.gui.media_widget.populate_web_list()
 
         self.gui.preview_widget.slide_list.clear()
-
-
-class OOSItemWidget(QWidget):
-    """
-    Implements QWidget to create a standardized widget to be applied as a QListWidget ItemWidget
-    """
-    def __init__(self, gui, pixmap, title, detail):
-        """
-        Implements QWidget to create a standardized widget to be applied as a QListWidget ItemWidget
-        :param gui.GUI gui: The current instance of GUI
-        :param QPixmap pixmap: The pixmap to be used as a thumbnail
-        :param str title: The title of the widget
-        :param str detail: The subtitle of the widget
-        """
-        super().__init__()
-        self.setObjectName('item_widget')
-        self.gui = gui
-
-        item_layout = QGridLayout()
-        item_layout.setColumnStretch(1, 10)
-        item_layout.setSpacing(5)
-        self.setLayout(item_layout)
-
-        self.picture_label = QLabel()
-        self.picture_label.setFixedSize(50, 27)
-        self.picture_label.setPixmap(pixmap)
-        item_layout.addWidget(self.picture_label, 0, 0, 2, 1)
-
-        self.title_label = QLabel(title)
-        self.title_label.setFont(self.gui.list_title_font)
-        item_layout.addWidget(self.title_label, 0, 1)
-
-        self.detail_label = QLabel(detail)
-        self.detail_label.setFont(self.gui.list_font)
-        item_layout.addWidget(self.detail_label, 1, 1)
-
-        self.installEventFilter(self)
-
-    def eventFilter(self, object, event):
-        if event.type() == QEvent.Type.ParentChange:
-            self.set_style_sheet()
-            return True
-        else:
-            return False
-
-    def set_style_sheet(self):
-        self.title_label.setStyleSheet('background: none; color: ' + self.gui.widget_item_font_color + ';')
-        self.detail_label.setStyleSheet('background: none; color: ' + self.gui.widget_item_font_color + ';')
-
-    def paintEvent(self, pe):
-        o = QStyleOption()
-        o.initFrom(self)
-        p = QPainter(self)
-        self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, o, p, self)

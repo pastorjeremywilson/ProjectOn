@@ -623,8 +623,8 @@ class ProjectOn(QObject):
             return
 
         try:
-            if not self.gui.tool_bar.font_widget.font_combo_box.currentText():
-                self.gui.tool_bar.font_widget.font_combo_box.setCurrentText('Arial')
+            if not self.gui.tool_bar.font_widget.font_list_widget.currentItem().data(20):
+                self.gui.tool_bar.font_widget.font_list_widget.setCurrentRow(0)
 
             service_items = {
                 'global_song_background': self.settings['global_song_background'],
@@ -809,7 +809,6 @@ class ProjectOn(QObject):
 
             # walk through the items saved in the file and load their QListWidgetItems into the order of service widget
             self.gui.oos_widget.oos_list_widget.clear()
-            from media_widget import OOSItemWidget
             for key in service_dict:
                 if key.isnumeric():
                     if service_dict[key]['type'] == 'song':
@@ -977,7 +976,7 @@ class ProjectOn(QObject):
                             item.setData(20, web_item.data(20))
                             item.setData(21, web_item.data(21))
                             item.setData(40, 'web')
-                            item.setData(31, ['', web_item.data(20),
+                            item.setData(24, ['', web_item.data(20),
                                               web_item.data(21)])
 
                             pixmap = QPixmap(50, 27)

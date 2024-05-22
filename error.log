@@ -983,4 +983,24 @@ Fri May 17 10:17:59 2024:
 Fri May 17 10:18:36 2024:
     'NoneType' object has no attribute 'blockSignals' on line 894 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.blockSignalsunknown server error
 Fri May 17 10:19:13 2024:
-    find(a0: PyQt6.sip.voidptr): argument 1 has unexpected type 'str' on line 916 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.apply_settingsunknown server error
+    find(a0: PyQt6.sip.voidptr): argument 1 has unexpected type 'str' on line 916 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.apply_settingsunknown server errorunknown server errorunknown server error
+Fri May 17 12:57:54 2024:
+    'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 12:58:51 2024:
+    'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 13:01:09 2024:
+    'NoneType' object is not subscriptable on line 1117 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 13:02:04 2024:
+    'NoneType' object is not subscriptable on line 1123 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 13:02:42 2024:
+    'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_liveunknown server error
+Sat May 18 14:46:42 2024:
+    UNHANDLED EXCEPTION
+    'AttributeError'
+    'QWidget' object has no attribute 'mouse_release_signal'
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py, line 265 in eventFilter
+Sat May 18 14:46:48 2024:
+    UNHANDLED EXCEPTION
+    'TypeError'
+    invalid result from CustomSlider.mouseReleaseEvent()
+    unknown server errorunknown server error

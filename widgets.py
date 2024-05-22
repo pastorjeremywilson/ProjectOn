@@ -2,7 +2,7 @@ import re
 import sqlite3
 
 import requests
-from PyQt6.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer
+from PyQt6.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal
 from PyQt6.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
     QAction
 from PyQt6.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
@@ -123,7 +123,7 @@ class ImageCombobox(QComboBox):
                     pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
                     pixmap = pixmap.scaled(
                         50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                    widget.picture_label.setPixmap(pixmap)
+                    widget.icon.setPixmap(pixmap)
         elif self.type == 'bible':
             self.gui.main.settings['global_bible_background'] = file_name
             self.gui.global_bible_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
@@ -136,7 +136,7 @@ class ImageCombobox(QComboBox):
                     pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
                     pixmap = pixmap.scaled(
                         50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                    widget.picture_label.setPixmap(pixmap)
+                    widget.icon.setPixmap(pixmap)
 
         if not self.suppress_autosave:
             self.gui.main.save_settings()
@@ -230,7 +230,7 @@ class ShadowSlider(QWidget):
         slider_widget.setLayout(slider_layout)
         layout.addWidget(slider_widget)
 
-        self.color_slider = QSlider()
+        self.color_slider = CustomSlider()
         self.color_slider.setObjectName('color_slider')
         self.color_slider.setOrientation(Qt.Orientation.Horizontal)
         self.color_slider.setFont(self.gui.list_font)
@@ -261,6 +261,15 @@ class ShadowSlider(QWidget):
     def eventFilter(self, obj, evt):
         if obj == self.color_slider and evt.type() == QEvent.Type.Wheel:
             return True
+        elif obj == self.color_slider and evt.type() == QEvent.Type.MouseButtonRelease:
+            parent = self.parent()
+            while parent.parent():
+                if hasattr(parent, 'mouse_release_signal'):
+                    parent.mouse_release_signal.emit(self.color_slider.value())
+                    break
+                else:
+                    parent = parent.parent()
+            return super().eventFilter(obj, evt)
         else:
             return super().eventFilter(obj, evt)
 
@@ -291,7 +300,7 @@ class OffsetSlider(QWidget):
         slider_widget.setLayout(slider_layout)
         layout.addWidget(slider_widget)
 
-        self.offset_slider = QSlider()
+        self.offset_slider = CustomSlider()
         self.offset_slider.setOrientation(Qt.Orientation.Horizontal)
         self.offset_slider.setFont(self.gui.list_font)
         self.offset_slider.setRange(0, 15)
@@ -315,6 +324,15 @@ class OffsetSlider(QWidget):
     def eventFilter(self, obj, evt):
         if obj == self.offset_slider and evt.type() == QEvent.Type.Wheel:
             return True
+        elif obj == self.offset_slider and evt.type() == QEvent.Type.MouseButtonRelease:
+            parent = self.parent()
+            while parent.parent():
+                if hasattr(parent, 'mouse_release_signal'):
+                    parent.mouse_release_signal.emit(self.offset_slider.value())
+                    break
+                else:
+                    parent = parent.parent()
+            return super().eventFilter(obj, evt)
         else:
             return super().eventFilter(obj, evt)
 
@@ -723,6 +741,7 @@ class FontWidget(QWidget):
     """
     Implements QWidget that contains all of the settings that can be applied to the display font
     """
+    mouse_release_signal = pyqtSignal(int)
     def __init__(self, gui, draw_border=True, auto_update=True):
         """
         Implements QWidget that contains all of the settings that can be applied to the display font
@@ -746,6 +765,8 @@ class FontWidget(QWidget):
         self.gui = gui
         self.draw_border = draw_border
         self.auto_update = auto_update
+
+        self.mouse_release_signal.connect(lambda value: self.change_font(value))
 
         self.setParent(self.gui.main_window)
         self.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
@@ -861,12 +882,14 @@ class FontWidget(QWidget):
         font_widget_layout.addWidget(shadow_widget, 3, 1)
 
         self.shadow_color_slider = ShadowSlider(self.gui)
-        self.shadow_color_slider.color_slider.valueChanged.connect(self.change_font)
+        self.shadow_color_slider.setObjectName('shadow_color_slider')
+        #self.shadow_color_slider.color_slider.valueChanged.connect(self.change_font)
         shadow_layout.addWidget(self.shadow_color_slider)
         shadow_layout.addSpacing(20)
 
         self.shadow_offset_slider = OffsetSlider(self.gui)
-        self.shadow_offset_slider.offset_slider.valueChanged.connect(self.change_font)
+        self.shadow_offset_slider.setObjectName('shadow_offset_slider')
+        #self.shadow_offset_slider.offset_slider.valueChanged.connect(self.change_font)
         shadow_layout.addWidget(self.shadow_offset_slider)
         shadow_layout.addStretch()
 
@@ -885,15 +908,17 @@ class FontWidget(QWidget):
         font_widget_layout.addWidget(outline_widget, 5, 1)
 
         self.outline_color_slider = ShadowSlider(self.gui)
-        self.outline_color_slider.color_slider.valueChanged.connect(self.change_font)
+        self.outline_color_slider.setObjectName('outline_color_slider')
+        #self.outline_color_slider.color_slider.valueChanged.connect(self.change_font)
         self.outline_color_slider.color_title.setText('Outline Color:')
         outline_layout.addWidget(self.outline_color_slider)
         outline_layout.addSpacing(20)
 
         self.outline_width_slider = OffsetSlider(self.gui)
+        self.outline_width_slider.setObjectName('outline_width_slider')
         self.outline_width_slider.offset_slider.setRange(1, 10)
         self.outline_width_slider.max_label.setText('10px')
-        self.outline_width_slider.offset_slider.valueChanged.connect(self.change_font)
+        #self.outline_width_slider.offset_slider.valueChanged.connect(self.change_font)
         self.outline_width_slider.offset_title.setText('Outline Width:')
         outline_layout.addWidget(self.outline_width_slider)
         outline_layout.addStretch()
@@ -959,11 +984,26 @@ class FontWidget(QWidget):
         self.outline_width_slider.current_label.setText(str(self.gui.main.settings['outline_width']) + 'px')
         self.blockSignals(False)
 
-    def change_font(self):
+    def change_font(self, value=None):
         """
         applies the currently chosen font settings to gui's global_font_face, global_footer_font_face, and settings
         """
+
+        shadow_color = None
+        shadow_offset = None
+        outline_color = None
+        outline_width = None
         if not self.signalsBlocked() and self.auto_update:
+            if value:
+                if self.sender().objectName() == 'shadow_color_slider':
+                    shadow_color = value
+                elif self.sender().objectName() == 'shadow_offset_slider':
+                    shadow_offset = value
+                elif self.sender().objectName() == 'outline_color_slider':
+                    outline_color = value
+                elif self.sender().objectName() == 'outline_width_slider':
+                    outline_width = value
+
             new_font_face = self.font_list_widget.currentItem().data(20)
             self.gui.global_font_face = new_font_face
             self.gui.global_footer_font_face = new_font_face
@@ -974,11 +1014,23 @@ class FontWidget(QWidget):
             if self.font_color_button_group.checkedButton():
                 self.gui.main.settings['font_color'] = self.font_color_button_group.checkedButton().objectName()
             self.gui.main.settings['use_shadow'] = self.shadow_checkbox.isChecked()
-            self.gui.main.settings['shadow_color'] = self.shadow_color_slider.color_slider.value()
-            self.gui.main.settings['shadow_offset'] = self.shadow_offset_slider.offset_slider.value()
+            if shadow_color:
+                self.gui.main.settings['shadow_color'] = shadow_color
+            else:
+                self.gui.main.settings['shadow_color'] = self.shadow_color_slider.color_slider.value()
+            if shadow_offset:
+                self.gui.main.settings['shadow_offset'] = shadow_offset
+            else:
+                self.gui.main.settings['shadow_offset'] = self.shadow_offset_slider.offset_slider.value()
             self.gui.main.settings['use_outline'] = self.outline_checkbox.isChecked()
-            self.gui.main.settings['outline_color'] = self.outline_color_slider.color_slider.value()
-            self.gui.main.settings['outline_width'] = self.outline_width_slider.offset_slider.value()
+            if outline_color:
+                self.gui.main.settings['outline_color'] = outline_color
+            else:
+                self.gui.main.settings['outline_color'] = self.outline_color_slider.color_slider.value()
+            if outline_width:
+                self.gui.main.settings['outline_width'] = outline_width
+            else:
+                self.gui.main.settings['outline_width'] = self.outline_width_slider.offset_slider.value()
 
             self.gui.apply_settings()
 
@@ -1001,3 +1053,17 @@ class FontWidget(QWidget):
         """
         self.gui.main.save_settings()
         super().hideEvent(evt)
+
+
+class CustomSlider(QSlider):
+    def __init__(self):
+        super().__init__()
+        self.mouse_pressed = False
+
+    def mousePressEvent(self, evt):
+        self.mouse_pressed = True
+        super().mousePressEvent(evt)
+
+    def mouseReleaseEvent(self, evt):
+        self.mouse_pressed = False
+        super().mouseReleaseEvent(evt)

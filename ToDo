@@ -1,6 +1,7 @@
-Get font face to show in font widget
 Keep working on dark and light themes
 Figure out why crash happens if video is played first followed by web view
+Use separate css for mobile remote
+
 
 Help section
     - file locations
