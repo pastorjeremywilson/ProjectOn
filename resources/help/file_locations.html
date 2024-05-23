@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Import Options</title>
+    <link rel="stylesheet" href="./resources/help/styles.css">
+</head>
+<body>
+    <h1>File Locations</h1>
+    <img class="wrap" src="resources/help/files.svg" width="50px">
+    <p>Below are the locations of files you may want to find.</p>
+
+    <hr>
+
+    <p><strong>Data Files</strong></p>
+    <p>The database, configuration file, images, videos, and bibles are stored in the program's directory (usually
+    C:\Program Files\ProjectOn or C:\Program Files (x86)\ProjectOn). There you will find a folder called "_internal"
+    in which is another folder called "data". In this data folder are multiple folders and files:</p>
+    <ul>
+        <li><strong>backgrounds</strong>: A folder containing all the slide background images you have imported</li>
+        <li><strong>bibles</strong>: A folder containing any XML bibles you have imported</li>
+        <li><strong>images</strong>: A folder containing any images you have imported</li>
+        <li><strong>videos</strong>: A folder containing any videos you have imported</li>
+        <li><strong>projecton.db</strong>: The main program database, in SQLite format</li>
+        <li><strong>settings.json</strong>: The program's settings file, in JSON format</li>
+    </ul>
+
+    <hr>
+
+    <p><strong>Device-Specific Settings</strong></p>
+    <p>If the program has been installed on a shared drive or cloud folder, some settings are specific to the
+    computer it is being run on. These are stored in a folder named "ProjectOn" under the user's "roaming" Folder in the
+    "AppData" folder. The file is named "<strong>localConfig.json</strong>" and is in the JSON format.</p>
+    <p>This is most easily found by opening Windows' File Explorer and typing into the navigation bar,
+    "<strong>%appdata%\ProjectOn</strong>" (without the quotes).</p>
+
+    <hr>
+
+    <p><strong>Error Log</strong></st></p>
+    <p>A log file is created by the program which tracks any errors that might occur while the program is running.
+    Should you need to locate this file, it is found in the main program directory in the '_internal' folder. It
+    is named "<strong>error.log</strong>".</p>
+
+</body>
+</html>

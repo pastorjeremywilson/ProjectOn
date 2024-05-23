@@ -145,6 +145,8 @@ class ProjectOn(QObject):
 
             self.settings['used_services'] = device_specific_settings['used_services']
             self.settings['last_save_dir'] = device_specific_settings['last_save_dir']
+            if 'last_status_count' in device_specific_settings.keys():
+                self.settings['last_status_count'] = device_specific_settings['last_status_count']
 
         for key in default_settings:
             if not key in self.settings.keys():
@@ -603,6 +605,7 @@ class ProjectOn(QObject):
             device_specific_settings = {}
             device_specific_settings['used_services'] = self.settings['used_services']
             device_specific_settings['last_save_dir'] = self.settings['last_save_dir']
+            device_specific_settings['last_status_count'] = self.settings['last_status_count']
             with open(self.device_specific_config_file, 'w') as file:
                 file.write(json.dumps(device_specific_settings, indent=4))
 

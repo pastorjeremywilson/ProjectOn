@@ -52,6 +52,7 @@ class Help(QMainWindow):
         tab_widget.addTab(self.settings_widget(), 'Settings Window')
         tab_widget.addTab(self.remote_widget(), 'Remote Server')
         tab_widget.addTab(self.import_widget(), 'Importing Songs')
+        tab_widget.addTab(self.file_widget(), 'File Locations')
 
     def intro_widget(self):
         widget = QWidget()
@@ -169,6 +170,21 @@ class Help(QMainWindow):
         menu_file = 'resources/help/menu_bar.html'
         if exists(menu_file):
             with open(menu_file, 'r') as file:
+                web_view.setHtml(file.read(), self.base_url)
+
+        return widget
+
+    def file_widget(self):
+        widget = QWidget()
+        widget.setLayout(QVBoxLayout())
+        widget.layout().setContentsMargins(40, 20, 40, 20)
+        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+
+        web_view = QWebEngineView()
+        widget.layout().addWidget(web_view)
+        file_file = 'resources/help/file_locations.html'
+        if exists(file_file):
+            with open(file_file, 'r') as file:
                 web_view.setHtml(file.read(), self.base_url)
 
         return widget
