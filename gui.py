@@ -339,7 +339,9 @@ class GUI(QObject):
         Method to apply color changes to the GUI's widgets
         :param str theme: "light" or "dark" theme
         """
+        # Walk through the different types of widgets in different areas of the GUI, storing them in a list
         widgets = []
+        media_widgets = []
         for widget in self.central_widget.findChildren(QListWidget):
             widgets.append(widget)
         for widget in self.tool_bar.findChildren(QLabel):
@@ -349,7 +351,7 @@ class GUI(QObject):
         for widget in self.tool_bar.findChildren(QComboBox):
             widgets.append(widget)
         for i in range(self.media_widget.count()):
-            widgets.append(self.media_widget.widget(i))
+            media_widgets.append(self.media_widget.widget(i))
             for line_edit in self.media_widget.widget(i).findChildren(QLineEdit):
                 widgets.append(line_edit)
             for text_edit in self.media_widget.widget(i).findChildren(QTextEdit):
@@ -361,6 +363,7 @@ class GUI(QObject):
         widgets.append(self.central_widget.findChild(QScrollArea))
         widgets.append(self.tool_bar.parent())
 
+        # Set the variety of colors that will be used in each theme
         if theme == 'light':
             self.main.settings['theme'] = 'light'
             self.main.save_settings()
@@ -371,9 +374,9 @@ class GUI(QObject):
             self.widget_item_font_color = 'black'
             hover_color = '#ddddff'
             selected_color = '#aaaaff'
+            tab_color = 'lightGrey'
 
             self.central_widget.setStyleSheet('#central_widget { background: darkgrey; }')
-
         else:
             self.main.settings['theme'] = 'dark'
             self.main.save_settings()
@@ -382,33 +385,15 @@ class GUI(QObject):
             border_color = '#505050'
             font_color = '#bfbfbf'
             self.widget_item_font_color = '#bfbfbf'
-            hover_color = '#000000'
-            selected_color = '#220055'
+            hover_color = '#404040'
+            selected_color = '#505050'
+            tab_color = '#404040'
 
             self.central_widget.setStyleSheet('#central_widget { background: black; }')
 
+        # walk through the stored widgets and apply the theme colors accordingly
         for widget in widgets:
-            if not isinstance(widget, QListWidget) and not isinstance(widget, QPushButton):
-                if 'background' in widget.styleSheet():
-                    widget.setStyleSheet(
-                        re.sub('background:.*?;', 'background: ' + background_color + ';', widget.styleSheet()))
-                elif '}' in widget.styleSheet():
-                    widget.setStyleSheet(
-                        widget.styleSheet().replace(' }', ' background: ' + background_color + '; }'))
-                else:
-                    widget.setStyleSheet(widget.styleSheet() + ' background: ' + background_color + ';')
-                if 'border' in widget.styleSheet() and 'border: none' not in widget.styleSheet():
-                    color_info = re.findall('solid .*?;', widget.styleSheet())
-                    widget.setStyleSheet(widget.styleSheet().replace(color_info[0], 'solid ' + border_color + ';'))
-                if 'color' in widget.styleSheet():
-                    widget.setStyleSheet(
-                        re.sub('color:.*?;', 'color: ' + font_color + ';', widget.styleSheet()))
-                elif '}' in widget.styleSheet():
-                    widget.setStyleSheet(
-                        widget.styleSheet().replace(' }', ' color: ' + font_color + '; }'))
-                else:
-                    widget.setStyleSheet(widget.styleSheet() + ' color: ' + font_color + ';')
-            elif isinstance(widget, QListWidget):
+            if isinstance(widget, QListWidget):
                 widget.setStyleSheet(
                     'QListWidget { background: ' + background_color
                     + '; color: ' + font_color + '; } '
@@ -431,6 +416,49 @@ class GUI(QObject):
                     'QPushButton:checked { background: ' + selected_color + '; }'
                     + 'QPushButton:hover { background: ' + hover_color + '; }'
                 )
+            else:
+                if 'background' in widget.styleSheet():
+                    widget.setStyleSheet(
+                        re.sub('background:.*?;', 'background: ' + background_color + ';', widget.styleSheet()))
+                elif '}' in widget.styleSheet():
+                    widget.setStyleSheet(
+                        widget.styleSheet().replace(' }', ' background: ' + background_color + '; }'))
+                else:
+                    widget.setStyleSheet(widget.styleSheet() + ' background: ' + background_color + ';')
+                if 'border' in widget.styleSheet() and 'border: none' not in widget.styleSheet():
+                    color_info = re.findall('solid .*?;', widget.styleSheet())
+                    widget.setStyleSheet(widget.styleSheet().replace(color_info[0], 'solid ' + border_color + ';'))
+                if 'color' in widget.styleSheet():
+                    widget.setStyleSheet(
+                        re.sub('color:.*?;', 'color: ' + font_color + ';', widget.styleSheet()))
+                elif '}' in widget.styleSheet():
+                    widget.setStyleSheet(
+                        widget.styleSheet().replace(' }', ' color: ' + font_color + '; }'))
+                else:
+                    widget.setStyleSheet(widget.styleSheet() + ' color: ' + font_color + ';')
+
+        # handle the widgets in the media widget differently to provide a better appearance
+        self.media_widget.setStyleSheet(
+            'QTabWidget { background: ' + tab_color + '; } '
+            'QTabBar::tab { background: ' + tab_color + '; color: ' + font_color + '; padding: 5px 10px; }'
+            'QTabBar::tab:selected { background: ' + selected_color + '; } '
+            'QTabBar::tab:hover { background: ' + hover_color + '; }'
+        )
+        for widget in media_widgets:
+            widget.setStyleSheet('background: ' + tab_color + ';')
+            for button in widget.findChildren(QPushButton):
+                button.setStyleSheet(
+                    'QPushButton { background: ' + background_color + '; color: ' + font_color + '; }'
+                    'QPushButton:hover { background: ' + hover_color + '; }'
+                    'QPushButton:pressed { background: ' + selected_color + '; }'
+                )
+            for line_edit in widget.findChildren(QLineEdit):
+                line_edit.setStyleSheet(
+                    'background: ' + background_color
+                    + '; color: ' + font_color
+                    + '; border: 1px solid ' + border_color + ';')
+            for label in widget.findChildren(QLabel):
+                label.setStyleSheet('color: ' + font_color + ';')
 
     def print_oos(self):
         """

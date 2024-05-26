@@ -5,12 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="233d5086-b170-4655-9be9-a778c8a1e0ee" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/help/file_locations.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/help/files.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/help.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/defaults/default_database.db" beforeDir="false" afterPath="$PROJECT_DIR$/resources/defaults/default_database.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/projecton.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/projecton.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/error.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/alt-logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/alt-logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/edit_advanced.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/edit_advanced.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/edit_custom.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/edit_custom.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/edit_song.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/edit_song.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/font_settings.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/font_settings.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/settings.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +60,7 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/pasto/Nextcloud/Documents/Python Workspace/project_on/resources/help&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/pasto/Desktop/whisper-main&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.appearance&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -274,7 +284,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716413782976</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Stored the 'status_update_count' in the device-specific settings file instead of the main settings file.&#10;Added &quot;File Locations&quot; tab to the help window.">
+      <option name="closed" value="true" />
+      <created>1716494115341</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1716494115341</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -308,7 +326,8 @@
     <MESSAGE value="Fixed Access Violation crash when re-playing a video&#10;&#10;Added light and dark themes - probably need some more refinement" />
     <MESSAGE value="Made improvements to light and dark themes&#10;Made improvements to the font widget&#10;Ensured that changes made in the font widget when it's in the edit widget doesn't change the global font settings&#10;Added extra font settings columns to the database's song and custom tables" />
     <MESSAGE value="Made improvements to light and dark themes&#10;Created a standardized QListItemWidget for all QListWidget items&#10;Fixed some bugs in the font widget&#10;Improved the layout of the web remote and mobile web remote&#10;Decreased iteration count for parsing scripture to one more than verses" />
-    <option name="LAST_COMMIT_MESSAGE" value="Made improvements to light and dark themes&#10;Created a standardized QListItemWidget for all QListWidget items&#10;Fixed some bugs in the font widget&#10;Improved the layout of the web remote and mobile web remote&#10;Decreased iteration count for parsing scripture to one more than verses" />
+    <MESSAGE value="Stored the 'status_update_count' in the device-specific settings file instead of the main settings file.&#10;Added &quot;File Locations&quot; tab to the help window." />
+    <option name="LAST_COMMIT_MESSAGE" value="Stored the 'status_update_count' in the device-specific settings file instead of the main settings file.&#10;Added &quot;File Locations&quot; tab to the help window." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

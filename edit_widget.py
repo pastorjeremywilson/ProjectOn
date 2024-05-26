@@ -1,6 +1,6 @@
 import re
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QFontDatabase, QColor, QPixmap, QPainter, QBrush
 from PyQt6.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QComboBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget
@@ -10,7 +10,7 @@ from simple_splash import SimpleSplash
 from widgets import StandardItemWidget, FontWidget
 
 
-class EditWidget(QDialog):
+class EditWidget(QWidget):
     """
     Provides a QDialog containing the necessary widgets.py to edit a song or custom slide.
     """
@@ -27,28 +27,24 @@ class EditWidget(QDialog):
         self.type = type
         self.lyrics_edit = None
         self.item_text = item_text
-        self.setModal(True)
         self.old_title = None
         self.new_song = False
         if not data:
             self.new_song = True
 
+        self.setObjectName('edit_widget')
+        self.setWindowFlag(Qt.WindowType.Window)
         self.init_components()
 
+        self.main_widget.adjustSize()
         preferred_height = int(self.gui.primary_screen.size().height() * 4 / 5)
-        widget_height = self.main_widget.height() + self.scroll_area.horizontalScrollBar().height()
-        if preferred_height < widget_height:
-            self.height = preferred_height
-        else:
-            self.height = widget_height
-        self.setGeometry(50, 50, self.scroll_area.width(), self.height)
-        self.setMaximumHeight(self.gui.primary_screen.size().height() - 20)
+        self.setGeometry(50, 50, self.scroll_area.width(), preferred_height)
         self.title_line_edit.setFocus()
         if data and type == 'song':
             self.populate_song_data(data)
         elif data and type == 'custom':
             self.populate_custom_data(data)
-        self.exec()
+        self.show()
 
     def init_components(self):
         """
@@ -75,11 +71,11 @@ class EditWidget(QDialog):
         main_layout.addWidget(title_widget)
 
         title_label = QLabel('Title:')
-        title_label.setFont(self.gui.list_font)
+        title_label.setFont(self.gui.bold_font)
         title_layout.addWidget(title_label)
 
         self.title_line_edit = QLineEdit()
-        self.title_line_edit.setFont(self.gui.list_font)
+        self.title_line_edit.setFont(self.gui.standard_font)
         title_layout.addWidget(self.title_line_edit)
 
         if self.type == 'song':
@@ -90,11 +86,11 @@ class EditWidget(QDialog):
             main_layout.addWidget(author_widget)
 
             author_label = QLabel('Author:')
-            author_label.setFont(self.gui.list_font)
+            author_label.setFont(self.gui.bold_font)
             author_layout.addWidget(author_label)
 
             self.author_line_edit = QLineEdit()
-            self.author_line_edit.setFont(self.gui.list_font)
+            self.author_line_edit.setFont(self.gui.standard_font)
             author_layout.addWidget(self.author_line_edit)
 
             copyright_widget = QWidget()
@@ -104,11 +100,11 @@ class EditWidget(QDialog):
             main_layout.addWidget(copyright_widget)
 
             copyright_label = QLabel('Copyright:')
-            copyright_label.setFont(self.gui.list_font)
+            copyright_label.setFont(self.gui.bold_font)
             copyright_layout.addWidget(copyright_label)
 
             self.copyright_line_edit = QLineEdit()
-            self.copyright_line_edit.setFont(self.gui.list_font)
+            self.copyright_line_edit.setFont(self.gui.standard_font)
             copyright_layout.addWidget(self.copyright_line_edit)
 
             ccli_widget = QWidget()
@@ -118,66 +114,131 @@ class EditWidget(QDialog):
             main_layout.addWidget(ccli_widget)
 
             ccli_label = QLabel('CCLI Song Number:')
-            ccli_label.setFont(self.gui.list_font)
+            ccli_label.setFont(self.gui.bold_font)
             ccli_layout.addWidget(ccli_label)
 
             self.ccli_num_line_edit = QLineEdit()
-            self.ccli_num_line_edit.setFont(self.gui.list_font)
+            self.ccli_num_line_edit.setFont(self.gui.standard_font)
             ccli_layout.addWidget(self.ccli_num_line_edit)
 
         main_layout.addSpacing(20)
 
         lyrics_label = QLabel('Lyrics')
-        lyrics_label.setFont(self.gui.list_title_font)
+        lyrics_label.setFont(self.gui.bold_font)
         main_layout.addWidget(lyrics_label)
+
+        if self.type == 'song':
+            lyrics_widget = QWidget()
+            lyrics_widget.setObjectName('lyrics_widget')
+            lyrics_layout = QGridLayout(lyrics_widget)
+            lyrics_layout.setRowStretch(0, 1)
+            lyrics_layout.setRowStretch(1, 20)
+            lyrics_layout.setColumnStretch(0, 10)
+            lyrics_layout.setColumnStretch(1, 1)
+            lyrics_layout.setColumnStretch(2, 1)
+            main_layout.addWidget(lyrics_widget)
+
+        self.lyrics_edit = FormattableTextEdit(self.gui)
+        self.lyrics_edit.setFont(self.gui.standard_font)
+        if self.type == 'song':
+            lyrics_layout.addWidget(self.lyrics_edit, 0, 0, 3, 1)
+        else:
+            main_layout.addWidget(self.lyrics_edit)
+
+        if self.type == 'song':
+            segment_label = QLabel('Segments')
+            segment_label.setFont(self.gui.standard_font)
+            lyrics_layout.addWidget(segment_label, 0, 1)
+
+            song_order_label = QLabel('Song Order')
+            song_order_label.setFont(self.gui.standard_font)
+            lyrics_layout.addWidget(song_order_label, 0, 2)
+
+            self.song_section_list_widget = QListWidget()
+            self.song_section_list_widget.setAcceptDrops(False)
+            self.song_section_list_widget.setDragEnabled(True)
+            self.song_section_list_widget.setDragDropMode(QListWidget.DragDropMode.DragOnly)
+            self.song_section_list_widget.setMinimumWidth(120)
+            self.song_section_list_widget.setToolTip('Drag and drop the song segments into the song order box to '
+                                                     'set the oder in which verses, choruses, etc. are displayed')
+            self.song_section_list_widget.setFont(self.gui.standard_font)
+            self.song_section_list_widget.setStyleSheet(
+                'QListWidget { background: rgba(0, 0, 0, 0); }'
+                'QListWidget::item { background: white; border: 1px solid black; margin: 2px; }'
+                'QListWidget::item:selected { background: #5555aa; color: white; } '
+                'QListWidget::item:hover { background: #aaaaff; } '
+            )
+            lyrics_layout.addWidget(self.song_section_list_widget, 1, 1)
+
+            self.song_order_list_widget = CustomListWidget()
+            self.song_order_list_widget.setAcceptDrops(True)
+            self.song_order_list_widget.setDragEnabled(True)
+            self.song_order_list_widget.setDefaultDropAction(Qt.DropAction.MoveAction)
+            self.song_order_list_widget.setMinimumWidth(120)
+            self.song_order_list_widget.setToolTip('Press "Delete" to remove an item from the song order list')
+            self.song_order_list_widget.setFont(self.gui.standard_font)
+            self.song_order_list_widget.setStyleSheet(
+                'QListWidget::item { background: white; border: 1px solid black; margin: 2px; }'
+                'QListWidget::item:selected { background: #5555aa; color: white; } '
+                'QListWidget::item:hover { background: #aaaaff; } '
+            )
+            lyrics_layout.addWidget(self.song_order_list_widget, 1, 2)
 
         if self.type == 'song':
             tool_bar = QWidget()
             toolbar_layout = QHBoxLayout()
             tool_bar.setLayout(toolbar_layout)
             main_layout.addWidget(tool_bar)
+            button_size = QSize(100, 30)
+
+            tag_label = QLabel('Insert a Tag:')
+            tag_label.setFont(self.gui.standard_font)
+            toolbar_layout.addWidget(tag_label)
 
             verse_button = QPushButton('Verse')
-            verse_button.setFont(self.gui.list_font)
+            verse_button.setFixedSize(button_size)
+            verse_button.setFont(self.gui.standard_font)
             verse_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            verse_button.pressed.connect(lambda: self.add_tag('v'))
+            verse_button.pressed.connect(self.add_tag)
             toolbar_layout.addWidget(verse_button)
 
             chorus_button = QPushButton('Chorus')
-            chorus_button.setFont(self.gui.list_font)
+            chorus_button.setFixedSize(button_size)
+            chorus_button.setFont(self.gui.standard_font)
             chorus_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            chorus_button.pressed.connect(lambda: self.add_tag('c'))
+            chorus_button.pressed.connect(self.add_tag)
             toolbar_layout.addWidget(chorus_button)
 
             pre_chorus_button = QPushButton('Pre-Chorus')
-            pre_chorus_button.setFont(self.gui.list_font)
+            pre_chorus_button.setFixedSize(button_size)
+            pre_chorus_button.setFont(self.gui.standard_font)
             pre_chorus_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            pre_chorus_button.pressed.connect(lambda: self.add_tag('p'))
+            pre_chorus_button.pressed.connect(self.add_tag)
             toolbar_layout.addWidget(pre_chorus_button)
 
             bridge_button = QPushButton('Bridge')
-            bridge_button.setFont(self.gui.list_font)
+            bridge_button.setFixedSize(button_size)
+            bridge_button.setFont(self.gui.standard_font)
             bridge_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            bridge_button.pressed.connect(lambda: self.add_tag('b'))
+            bridge_button.pressed.connect(self.add_tag)
             toolbar_layout.addWidget(bridge_button)
 
             tag_button = QPushButton('Tag')
-            tag_button.setFont(self.gui.list_font)
+            tag_button.setFixedSize(button_size)
+            tag_button.setFont(self.gui.standard_font)
             tag_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            tag_button.pressed.connect(lambda: self.add_tag('t'))
+            tag_button.pressed.connect(self.add_tag)
             toolbar_layout.addWidget(tag_button)
 
             ending_button = QPushButton('Ending')
-            ending_button.setFont(self.gui.list_font)
+            ending_button.setFixedSize(button_size)
+            ending_button.setFont(self.gui.standard_font)
             ending_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            ending_button.pressed.connect(lambda: self.add_tag('e'))
+            ending_button.pressed.connect(self.add_tag)
             toolbar_layout.addWidget(ending_button)
+            toolbar_layout.addStretch()
 
-        self.lyrics_edit = FormattableTextEdit(self.gui)
-        self.lyrics_edit.setFont(self.gui.list_font)
-        main_layout.addWidget(self.lyrics_edit)
-
-        if self.type == 'song':
+        """if self.type == 'song':
             song_order_widget = QWidget()
             song_order_layout = QHBoxLayout()
             song_order_widget.setLayout(song_order_layout)
@@ -189,55 +250,77 @@ class EditWidget(QDialog):
 
             self.song_order_line_edit = QLineEdit()
             self.song_order_line_edit.setFont(self.gui.list_font)
-            song_order_layout.addWidget(self.song_order_line_edit)
+            song_order_layout.addWidget(self.song_order_line_edit)"""
+
+        advanced_options_expander = QWidget()
+        advanced_options_layout = QHBoxLayout(advanced_options_expander)
+        main_layout.addWidget(advanced_options_expander)
+
+        self.advanced_options_button = QPushButton('+')
+        self.advanced_options_button.setFixedSize(QSize(20, 20))
+        self.advanced_options_button.setFont(self.gui.bold_font)
+        self.advanced_options_button.pressed.connect(self.show_hide_advanced_options)
+        advanced_options_layout.addWidget(self.advanced_options_button)
+
+        advanced_options_label = QLabel('Show/Hide Advanced Options')
+        advanced_options_label.setFont(self.gui.bold_font)
+        advanced_options_layout.addWidget(advanced_options_label)
+        advanced_options_layout.addStretch()
 
         advanced_options_widget = QWidget()
         advanced_options_layout = QHBoxLayout()
         advanced_options_widget.setLayout(advanced_options_layout)
         main_layout.addWidget(advanced_options_widget)
 
-        self.advanced_options_checkbox = QCheckBox('Override Global Settings')
-        self.advanced_options_checkbox.setFont(self.gui.list_title_font)
-        self.advanced_options_checkbox.clicked.connect(self.show_hide_advanced_options)
-        advanced_options_layout.addWidget(self.advanced_options_checkbox)
-        advanced_options_layout.addStretch()
-
         self.format_widget = QWidget()
-        format_layout = QHBoxLayout()
+        format_layout = QVBoxLayout()
         self.format_widget.setLayout(format_layout)
         main_layout.addWidget(self.format_widget)
         self.format_widget.hide()
 
+        self.override_global_checkbox = QCheckBox('Override Global Settings')
+        self.override_global_checkbox.setToolTip(
+            'Checking this box will apply all of the below settings to this song/custom slide')
+        self.override_global_checkbox.setFont(self.gui.bold_font)
+        self.override_global_checkbox.clicked.connect(self.show_hide_advanced_options)
+        format_layout.addWidget(self.override_global_checkbox)
+
         if self.type == 'song':
             self.footer_checkbox = QCheckBox('Use Footer for this song')
-            self.footer_checkbox.setFont(self.gui.list_font)
+            self.footer_checkbox.setToolTip(
+                'Unchecking this box will prevent the slide footer from being displayed')
+            self.footer_checkbox.setFont(self.gui.bold_font)
             self.footer_checkbox.setChecked(True)
             format_layout.addWidget(self.footer_checkbox)
 
+        slide_settings_container = QWidget()
+        slide_settings_layout = QHBoxLayout(slide_settings_container)
+        format_layout.addWidget(slide_settings_container)
+
         self.font_widget = FontWidget(self.gui, draw_border=False, auto_update=False)
-        format_layout.addWidget(self.font_widget)
+        slide_settings_layout.addWidget(self.font_widget)
 
         background_widget = QWidget()
         background_layout = QVBoxLayout()
         background_widget.setLayout(background_layout)
-        format_layout.addWidget(background_widget)
+        slide_settings_layout.addWidget(background_widget)
 
         background_label = QLabel('Background')
-        background_label.setFont(self.gui.list_title_font)
+        background_label.setFont(self.gui.bold_font)
         background_layout.addWidget(background_label)
 
         background_default_radio_button = QRadioButton('Use Global Song Background')
-        background_default_radio_button.setFont(self.gui.list_font)
+        background_default_radio_button.setFont(self.gui.standard_font)
         background_default_radio_button.pressed.connect(
             lambda: self.background_line_edit.setText('Use Global Song Background'))
 
         background_bible_default_radio_button = QRadioButton('Use Global Bible Background')
-        background_bible_default_radio_button.setFont(self.gui.list_font)
+        background_bible_default_radio_button.setFont(self.gui.standard_font)
         background_bible_default_radio_button.pressed.connect(
             lambda: self.background_line_edit.setText('Use Global Bible Background'))
 
         background_color_radio_button = QRadioButton('Solid Color')
-        background_color_radio_button.setFont(self.gui.list_font)
+        background_color_radio_button.setFont(self.gui.standard_font)
         background_color_radio_button.pressed.connect(self.color_chooser)
 
         from widgets import ImageCombobox
@@ -246,7 +329,7 @@ class EditWidget(QDialog):
             lambda: self.background_line_edit.setText(background_combobox.currentData(Qt.ItemDataRole.UserRole)))
 
         self.background_image_radio_button = QRadioButton('Image')
-        self.background_image_radio_button.setFont(self.gui.list_font)
+        self.background_image_radio_button.setFont(self.gui.standard_font)
         self.background_image_radio_button.pressed.connect(background_combobox.show)
 
         self.background_button_group = QButtonGroup()
@@ -289,7 +372,7 @@ class EditWidget(QDialog):
         main_layout.addWidget(button_widget)
 
         save_button = QPushButton('Save')
-        save_button.setFont(self.gui.list_font)
+        save_button.setFont(self.gui.standard_font)
         if self.type == 'song':
             save_button.pressed.connect(self.save_song)
         elif self.type == 'custom':
@@ -299,8 +382,8 @@ class EditWidget(QDialog):
         button_layout.addSpacing(20)
 
         cancel_button = QPushButton('Cancel')
-        cancel_button.setFont(self.gui.list_font)
-        cancel_button.pressed.connect(lambda: self.done(1))
+        cancel_button.setFont(self.gui.standard_font)
+        cancel_button.pressed.connect(self.deleteLater)
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 
@@ -308,8 +391,10 @@ class EditWidget(QDialog):
             background_default_radio_button.setText('Use Global Song Background')
 
         self.main_widget.adjustSize()
+        self.adjustSize()
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidget(self.main_widget)
+        self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setMinimumWidth(self.main_widget.width() + self.scroll_area.verticalScrollBar().width())
         layout.addWidget(self.scroll_area)
 
@@ -326,9 +411,49 @@ class EditWidget(QDialog):
 
         lyrics = re.sub('<p.*?>', '<p>', song_data[4])
         lyrics = re.sub('\n', '<br />', lyrics)
+        tag_list = re.findall('\[.*?\]', lyrics)
+        for i in range(len(tag_list)):
+            if len(tag_list[i]) < 6:
+                if 'v' in tag_list[i]:
+                    new_tag = '[Verse ' + tag_list[i].replace('[', '').replace(']', '').replace('v', '') + ']'
+                    lyrics = lyrics.replace(tag_list[i], new_tag)
+                elif 'p' in tag_list[i]:
+                    new_tag = '[Pre-Chorus ' + tag_list[i].replace('[', '').replace(']', '').replace('p', '') + ']'
+                    lyrics = lyrics.replace(tag_list[i], new_tag)
+                elif 'c' in tag_list[i]:
+                    new_tag = '[Chorus ' + tag_list[i].replace('[', '').replace(']', '').replace('c', '') + ']'
+                    lyrics = lyrics.replace(tag_list[i], new_tag)
+                elif 'b' in tag_list[i]:
+                    new_tag = '[Bridge ' + tag_list[i].replace('[', '').replace(']', '').replace('b', '') + ']'
+                    lyrics = lyrics.replace(tag_list[i], new_tag)
+                elif 't' in tag_list[i]:
+                    new_tag = '[Tag ' + tag_list[i].replace('[', '').replace(']', '').replace('t', '') + ']'
+                    lyrics = lyrics.replace(tag_list[i], new_tag)
+                elif 'e' in tag_list[i]:
+                    new_tag = '[Ending ' + tag_list[i].replace('[', '').replace(']', '').replace('e', '') + ']'
+                    lyrics = lyrics.replace(tag_list[i], new_tag)
+                else:
+                    new_tag = '[' + tag_list[i][:1] + ' ' + tag_list[i][1:] + ']'
+                    lyrics = lyrics.replace(tag_list[i], new_tag)
         self.lyrics_edit.text_edit.setHtml(lyrics)
 
-        self.song_order_line_edit.setText(song_data[5])
+        #self.song_order_line_edit.setText(song_data[5])
+
+        order_items = song_data[5].split(' ')
+        for i in range(len(order_items)):
+            if 'v' in order_items[i]:
+                order_items[i] = 'Verse ' + order_items[i].replace('[', '').replace(']', '').replace('v', '')
+            elif 'p' in order_items[i]:
+                order_items[i] = 'Pre-Chorus ' + order_items[i].replace('[', '').replace(']', '').replace('p', '')
+            elif 'c' in order_items[i]:
+                order_items[i] = 'Chorus ' + order_items[i].replace('[', '').replace(']', '').replace('c', '')
+            elif 'b' in order_items[i]:
+                order_items[i] = 'Bridge ' + order_items[i].replace('[', '').replace(']', '').replace('b', '')
+            elif 't' in order_items[i]:
+                order_items[i] = 'Tag ' + order_items[i].replace('[', '').replace(']', '').replace('t', '')
+            elif 'e' in order_items[i]:
+                order_items[i] = 'Ending ' + order_items[i].replace('[', '').replace(']', '').replace('e', '')
+        self.song_order_list_widget.addItems(order_items)
 
         if song_data[6] == 'true':
             self.footer_checkbox.setChecked(True)
@@ -338,8 +463,11 @@ class EditWidget(QDialog):
         self.font_widget.blockSignals(True)
 
         if song_data[17] == 'True':
-            self.advanced_options_checkbox.setChecked(True)
-            self.show_hide_advanced_options()
+            self.override_global_checkbox.setChecked(True)
+            self.show_hide_advanced_options('show')
+        else:
+            self.override_global_checkbox.setChecked(False)
+            self.show_hide_advanced_options('hide')
 
         if song_data[7] == 'global':
             for i in range(self.font_widget.font_list_widget.count()):
@@ -429,6 +557,8 @@ class EditWidget(QDialog):
 
         self.font_widget.blockSignals(False)
 
+        self.populate_tag_list()
+
     def populate_custom_data(self, custom_data):
         """
         Use the provided data to set the proper widgets.py to match the saved data
@@ -502,17 +632,17 @@ class EditWidget(QDialog):
             self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['use_shadow'])
 
         if custom_data[7]:
-            self.font_widget.shadow_color_slider.color_slider.setValue(int(custom_data[12]))
+            self.font_widget.shadow_color_slider.color_slider.setValue(int(custom_data[7]))
         else:
             self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['shadow_color'])
 
         if custom_data[8]:
-            self.font_widget.shadow_offset_slider.offset_slider.setValue(int(custom_data[13]))
+            self.font_widget.shadow_offset_slider.offset_slider.setValue(int(custom_data[8]))
         else:
             self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
 
         if custom_data[9]:
-            if custom_data[14] == 'True':
+            if custom_data[9] == 'True':
                 self.font_widget.outline_checkbox.setChecked(True)
             else:
                 self.font_widget.outline_checkbox.setChecked(False)
@@ -520,33 +650,51 @@ class EditWidget(QDialog):
             self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['use_outline'])
 
         if custom_data[10]:
-            self.font_widget.outline_color_slider.color_slider.setValue(int(custom_data[15]))
+            self.font_widget.outline_color_slider.color_slider.setValue(int(custom_data[10]))
         else:
             self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
 
         if custom_data[11]:
-            self.font_widget.outline_width_slider.offset_slider.setValue(int(custom_data[16]))
+            self.font_widget.outline_width_slider.offset_slider.setValue(int(custom_data[11]))
         else:
             self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
 
+        if custom_data[12]:
+            self.override_global_checkbox.setChecked(True)
+            self.show_hide_advanced_options('show')
+        else:
+            self.override_global_checkbox.setChecked(False)
+            self.show_hide_advanced_options('hide')
+
         self.font_widget.blockSignals(False)
 
-    def show_hide_advanced_options(self):
+    def show_hide_advanced_options(self, action=None):
         """
         Method to show or hide advanced options the user may or may not want to change. Advanced options are contained
         in the format_widget QWidget.
         """
-        pos = self.gui.main_window.mapToGlobal(self.pos())
-        if self.advanced_options_checkbox.isChecked():
+        if action == 'show':
             self.format_widget.show()
-            self.main_widget.adjustSize()
-            self.scroll_area.setMinimumWidth(self.main_widget.width() + self.scroll_area.verticalScrollBar().width())
-            self.setGeometry(pos.x(), pos.y(), self.scroll_area.width(), self.height)
-        else:
+            self.advanced_options_button.setText('-')
+            self.format_widget.adjustSize()
+            width = self.format_widget.width()
+            if width > self.gui.main_window.width():
+                width = self.gui.main_window.width()
+            self.setMinimumWidth(width)
+        elif action == 'hide':
             self.format_widget.hide()
-            self.main_widget.adjustSize()
-            self.scroll_area.setMinimumWidth(self.main_widget.width() + self.scroll_area.verticalScrollBar().width())
-            self.setGeometry(pos.x(), pos.y(), self.scroll_area.width(), self.height)
+            self.advanced_options_button.setText('+')
+        elif self.format_widget.isHidden():
+            self.format_widget.show()
+            self.advanced_options_button.setText('-')
+            self.format_widget.adjustSize()
+            width = self.format_widget.width()
+            if width > self.gui.main_window.width():
+                width = self.gui.main_window.width()
+            self.setMinimumWidth(width)
+        elif not self.format_widget.isHidden():
+            self.format_widget.hide()
+            self.advanced_options_button.setText('+')
 
     def disambiguate_background_click(self, background_button_group):
         """
@@ -585,7 +733,7 @@ class EditWidget(QDialog):
             self.gui.main.copy_image(file[0])
         self.background_image_radio_button.setChecked(True)
 
-    def add_tag(self, type):
+    def add_tag(self):
         """
         Method to add tags to the song lyrics based on button push.
         :param str type: The tag type to be inserted
@@ -596,23 +744,36 @@ class EditWidget(QDialog):
 
         else:
             # search first for previous instances of this tag; append numbers to the tag for multiple instances
+            tag_name = self.sender().text()
             lyrics_text = self.lyrics_edit.text_edit.toHtml()
-            occurrences = re.findall('\[' + type + '.*?\]', lyrics_text)
+            occurrences = re.findall('\[' + tag_name + '.*?\]', lyrics_text)
 
             if len(occurrences) == 0:
-                self.lyrics_edit.text_edit.insertPlainText('\n[' + type + '1]\n')
+                self.lyrics_edit.text_edit.insertPlainText('\n[' + tag_name + ' 1]\n')
             else:
-                self.lyrics_edit.text_edit.insertPlainText('\n[' + type + type + ']\n')
+                self.lyrics_edit.text_edit.insertPlainText('\n[' + tag_name + tag_name + ']\n')
                 lyrics_text = self.lyrics_edit.text_edit.toHtml()
-                occurrences = re.findall('\[' + type + '.*?\]', lyrics_text)
+                occurrences = re.findall('\[' + tag_name + '.*?\]', lyrics_text)
 
                 count = 1
                 for item in occurrences:
-                    lyrics_text = lyrics_text.replace(item, '\n[' + type + str(count) + '\n]', 1)
+                    lyrics_text = lyrics_text.replace(item, '\n[' + tag_name + ' ' + str(count) + ']\n', 1)
                     count += 1
 
                 self.lyrics_edit.text_edit.setHtml(lyrics_text)
                 self.lyrics_edit.text_edit.setFocus()
+
+        self.populate_tag_list()
+
+    def populate_tag_list(self):
+        """
+        Method to find tags in the song's lyrics and add those tags to the "segements" QListWidget
+        """
+        self.song_section_list_widget.clear()
+        lyrics_text = self.lyrics_edit.text_edit.toPlainText()
+        tag_list = re.findall('\[.*?\]', lyrics_text)
+        for tag in tag_list:
+            self.song_section_list_widget.addItem(tag.replace('[', '').replace(']', ''))
 
     def save_song(self):
         """
@@ -628,7 +789,7 @@ class EditWidget(QDialog):
             )
             return
 
-        if self.advanced_options_checkbox.isChecked():
+        if self.override_global_checkbox.isChecked():
             override_global = 'True'
         else:
             override_global = 'False'
@@ -686,13 +847,21 @@ class EditWidget(QDialog):
 
         lyrics = lyrics.replace('<br />', '\n')
 
+        song_order = ''
+        for i in range(self.song_order_list_widget.count()):
+            tag = self.song_order_list_widget.item(i).text()
+            tag = tag.split(' ')[0][:1].lower() + tag.split(' ')[1]
+            song_order += tag + ' '
+        song_order = song_order.strip()
+
         song_data = [
             self.title_line_edit.text(),
             self.author_line_edit.text(),
             self.copyright_line_edit.text(),
             self.ccli_num_line_edit.text(),
             lyrics,
-            self.song_order_line_edit.text(),
+            #self.song_order_line_edit.text(),
+            song_order,
             footer,
             font,
             font_color,
@@ -759,7 +928,7 @@ class EditWidget(QDialog):
                     self.gui.media_widget.add_song_to_service(new_item, i)
                     break
 
-        self.done(0)
+        self.deleteLater()
         save_widget.widget.deleteLater()
         if self.gui.oos_widget.oos_list_widget.currentItem():
             self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
@@ -769,7 +938,7 @@ class EditWidget(QDialog):
         Method to save user's changes for the custom slide type editor.
         """
 
-        if self.advanced_options_checkbox.isChecked():
+        if self.override_global_checkbox.isChecked():
             override_global = 'True'
         else:
             override_global = 'False'
@@ -872,7 +1041,7 @@ class EditWidget(QDialog):
                         self.gui.oos_widget.oos_list_widget.item(i).setData(j, new_item.data(j))
                     self.change_thumbnail(self.gui.oos_widget.oos_list_widget.item(i))
 
-        self.done(0)
+        self.deleteLater()
         save_widget.widget.deleteLater()
         if self.gui.oos_widget.oos_list_widget.currentItem():
             self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
@@ -907,3 +1076,22 @@ class EditWidget(QDialog):
         item_widget = StandardItemWidget(item.data(20), '', pixmap)
         item.setSizeHint(item_widget.sizeHint())
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, item_widget)
+
+
+class CustomListWidget(QListWidget):
+    """
+    Implements QListWidget to provide the ability to press "Delete" in order to remove an item from the list
+    """
+    def __init__(self):
+        super().__init__()
+
+    def keyPressEvent(self, evt):
+        """
+        Overrides keyPressEvent to listen for a delete key press. Uses takeItem to remove the currently selected row
+        """
+        if evt.key() == Qt.Key.Key_Delete:
+            if self.currentRow() or self.currentRow() == 0:
+                self.takeItem(self.currentRow())
+            else:
+                super().keyPressEvent(evt)
+        

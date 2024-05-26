@@ -92,6 +92,7 @@ class MediaWidget(QTabWidget):
         search_layout.addWidget(search_label)
 
         self.search_line_edit = AutoSelectLineEdit()
+        self.search_line_edit.setFont(self.gui.standard_font)
         self.search_line_edit.textChanged.connect(self.song_search)
         search_layout.addWidget(self.search_line_edit)
 
@@ -502,6 +503,15 @@ class MediaWidget(QTabWidget):
         :return list of str segments: The song's individual segments
         """
         self.lyric_dictionary = item.data(24)
+        new_dict = {}
+        for key in self.lyric_dictionary:
+            if ' ' in key:
+                key_text = key.replace('[', '').replace(']', '')
+                new_key = key_text.split(' ')[0][0].lower() + key_text.split(' ')[1]
+                new_dict['[' + new_key + ']'] = self.lyric_dictionary[key]
+            else:
+                new_dict[key] = self.lyric_dictionary[key]
+        self.lyric_dictionary = new_dict
         segments = []
 
         if len(item.data(25)) > 0:
