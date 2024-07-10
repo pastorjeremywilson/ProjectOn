@@ -184,7 +184,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Display Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
+        #title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
         layout.addWidget(title_label, 0, 0, 1, index + 1)
 
         spacing_widget = QWidget()
@@ -209,7 +209,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Font Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
+        #title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
         layout.addWidget(title_label)
 
         font_widget = QWidget()
@@ -262,7 +262,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Background Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
+        #title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
         layout.addWidget(title_label)
 
         song_background_label = QLabel('Global Song Background:')

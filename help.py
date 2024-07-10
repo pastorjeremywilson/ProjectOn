@@ -31,17 +31,17 @@ class Help(QMainWindow):
 
         tab_widget = QTabWidget()
         tab_widget.setFont(QFont('Helvetica', 12, QFont.Weight.Bold))
-        tab_widget.setStyleSheet('''
+        '''tab_widget.setStyleSheet(
             QTabBar::tab {
-                background-color: #5555aa;
+                background-color: #6060c0;
                 color: white;
                 padding: 10px;
                 margin: 0px 5px 5px 0px;
                 border: 1px solid black;}
             QTabBar::tab:selected {
                 background-color: white;
-                color: #5555aa;}
-            ''')
+                color: #6060c0;}
+            )'''
         self.setCentralWidget(tab_widget)
 
         tab_widget.addTab(self.intro_widget(), 'Introduction')
@@ -58,7 +58,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -73,7 +73,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -88,7 +88,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -103,7 +103,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -118,7 +118,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -133,7 +133,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -148,7 +148,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -163,7 +163,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)
@@ -178,7 +178,7 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        widget.setStyleSheet('background: white; border: 3px solid #5555aa;')
+        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
         widget.layout().addWidget(web_view)

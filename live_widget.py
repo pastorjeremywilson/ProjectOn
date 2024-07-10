@@ -34,7 +34,7 @@ class LiveWidget(QWidget):
 
         container = QWidget()
         container.setObjectName('container')
-        container.setStyleSheet('#container { border: 2px solid black; }')
+        #container.setStyleSheet('#container { border: 2px solid black; }')
         layout.addWidget(container, 0, 0)
 
         container_layout = QGridLayout(container)
@@ -47,18 +47,18 @@ class LiveWidget(QWidget):
         title_label.setObjectName('title_label')
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet(
-            'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
+        #title_label.setStyleSheet(
+        #    'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
         container_layout.addWidget(title_label, 0, 0)
 
         self.slide_list = CustomListWidget(self.gui)
         self.slide_list.setObjectName('slide_list')
-        self.slide_list.setStyleSheet('#slide_list { border: none; }')
+        #self.slide_list.setStyleSheet('#slide_list { border: none; }')
         self.slide_list.setFont(self.gui.standard_font)
         container_layout.addWidget(self.slide_list, 1, 0)
 
         self.preview_label = QLabel()
-        self.preview_label.setStyleSheet('margin-top: 20px;')
+        #self.preview_label.setStyleSheet('margin-top: 20px;')
         layout.addWidget(self.preview_label, 1, 0, Qt.AlignmentFlag.AlignCenter)
 
         self.player_controls = QWidget()

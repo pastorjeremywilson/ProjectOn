@@ -58,18 +58,18 @@
      id="layer1">
     <path
        id="rect10"
-       style="fill:none;fill-opacity:1;stroke:#5555aa;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#6060c0;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        d="M 7.9374996 9.8572806 L 7.9374995 1.9843749 C 7.9374995 1.6179274 8.2325103 1.3229166 8.5989578 1.3229166 L 8.5989578 1.3229166 L 32.411455 1.3229166 C 32.777903 1.3229166 33.072914 1.6179274 33.072914 1.9843749 L 33.072914 32.411456 C 33.072914 32.777904 32.777903 33.072915 32.411455 33.072915 L 8.5989578 33.072915 C 8.2325103 33.072915 7.9374995 32.777904 7.9374995 32.411456 L 7.9374998 24.409362 " />
     <g
        id="g11"
        style="stroke-width:2.64583;stroke-dasharray:none">
       <path
-         style="fill:none;fill-opacity:1;stroke:#5555aa;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          d="M 1.6790524,17.197916 H 17.197916 l -5.291666,-3.96875"
          id="path10"
          sodipodi:nodetypes="ccc" />
       <path
-         style="fill:none;fill-opacity:1;stroke:#5555aa;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          d="m 17.197916,17.197916 -5.291666,3.96875"
          id="path11"
          sodipodi:nodetypes="cc" />

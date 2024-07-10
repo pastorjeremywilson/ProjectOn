@@ -1003,4 +1003,25 @@ Sat May 18 14:46:48 2024:
     UNHANDLED EXCEPTION
     'TypeError'
     invalid result from CustomSlider.mouseReleaseEvent()
-    unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+    unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Wed May 29 10:58:04 2024:
+    list index out of range on line 402 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Wed May 29 11:01:48 2024:
+    list index out of range on line 402 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Wed May 29 11:05:08 2024:
+    17 values for 18 columns on line 405 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Mon Jun  3 22:44:13 2024:
+    'shadow_offset' on line 819 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Mon Jun  3 22:44:49 2024:
+    'shadow_offset' on line 819 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Mon Jun  3 22:46:51 2024:
+    'shadow_offset' on line 819 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Mon Jun  3 22:47:06 2024:
+    'shadow_offset' on line 819 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Mon Jun  3 22:48:01 2024:
+    'shadow_offset' on line 821 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Wed Jun  5 22:12:31 2024:
+    UNHANDLED EXCEPTION
+    'AttributeError'
+    'NoneType' object has no attribute 'objectName'
+    file X:\Documents\Python Workspace\project_on\edit_widget.py, line 953 in save_customunknown server errorunknown server errorunknown server errorunknown server errorunknown server error

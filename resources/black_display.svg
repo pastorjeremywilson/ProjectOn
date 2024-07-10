@@ -64,15 +64,15 @@
        x="2.6458333"
        y="1.3229166" />
     <path
-       style="fill:#5555aa;stroke-width:0.529;stroke-linejoin:round;stroke:none;stroke-dasharray:none;fill-opacity:1"
+       style="fill:#6060c0;stroke-width:0.529;stroke-linejoin:round;stroke:none;stroke-dasharray:none;fill-opacity:1"
        d="M 1.3229166,33.072916 V 30.427083 H 33.072916 v 2.645833 z"
        id="path1" />
     <path
-       style="fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:0.529167;stroke-linejoin:round"
+       style="fill:#6060c0;fill-opacity:1;stroke:none;stroke-width:0.529167;stroke-linejoin:round"
        d="m 14.552083,30.427083 v -5.291667 h 5.291667 v 5.291667 z"
        id="path2" />
     <path
-       style="fill:none;stroke:#5555aa;stroke-width:2.64583333;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#6060c0;stroke-width:2.64583333;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        d="M 13.229166,25.135416 H 2.6028598 L 2.6458332,1.3229166 H 31.75 V 25.135416 Z"
        id="path3" />
   </g>

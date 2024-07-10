@@ -22,6 +22,7 @@ class SongselectImport(QWidget):
     LOGOUT_URL = BASE_URL + '/account/logout'
     SEARCH_URL = BASE_URL + '/search/results'
     SONG_PAGE = BASE_URL + '/Songs/'
+
     def __init__(self, gui, suppress_browser=False):
         super().__init__()
         self.gui = gui
@@ -231,7 +232,7 @@ class SongselectImport(QWidget):
         """
         Gets the ccli song number for a song from the url
 
-        :return: String containg ccli song number, None is returned if not found
+        :return: String containing ccli song number, None is returned if not found
         """
         ccli_number_regex = re.compile(r'.*?Songs\/([0-9]+).*', re.IGNORECASE)
         regex_matches = ccli_number_regex.match(url)
@@ -266,7 +267,7 @@ class SongselectImport(QWidget):
 
     def download_finished(self):
         """
-        Callback for when download has finished
+        Callback for when download has finished. Parses the downloaded file into song data to be saved to the database.
         """
         if self.current_download_item:
             if self.current_download_item.isFinished():
@@ -315,7 +316,14 @@ class SongselectImport(QWidget):
                     'global',
                     'global',
                     'global_song',
-                    'global'
+                    'global',
+                    'False',
+                    0,
+                    0,
+                    'False',
+                    0,
+                    0,
+                    'False'
                 ]
 
                 if song_title in self.gui.main.get_song_titles():
