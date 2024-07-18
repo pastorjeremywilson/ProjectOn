@@ -1,9 +1,9 @@
 import re
 
 from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QFontDatabase, QColor, QPixmap, QPainter, QBrush
+from PyQt6.QtGui import QColor, QPixmap, QPainter, QBrush
 from PyQt6.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
-    QMessageBox, QCheckBox, QComboBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget
+    QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget
 
 from formattable_text_edit import FormattableTextEdit
 from simple_splash import SimpleSplash
@@ -12,7 +12,7 @@ from widgets import StandardItemWidget, FontWidget
 
 class EditWidget(QWidget):
     """
-    Provides a QDialog containing the necessary widgets.py to edit a song or custom slide.
+    Provides a QDialog containing the necessary widgets to edit a song or custom slide.
     """
     def __init__(self, gui, type, data=None, item_text=None):
         """
@@ -234,7 +234,7 @@ class EditWidget(QWidget):
             toolbar_layout.addWidget(ending_button)
             toolbar_layout.addStretch()
 
-        advanced_options_expander = QWidget()
+        """advanced_options_expander = QWidget()
         advanced_options_layout = QHBoxLayout(advanced_options_expander)
         main_layout.addWidget(advanced_options_expander)
 
@@ -247,7 +247,16 @@ class EditWidget(QWidget):
         advanced_options_label = QLabel('Show/Hide Advanced Options')
         advanced_options_label.setFont(self.gui.bold_font)
         advanced_options_layout.addWidget(advanced_options_label)
-        advanced_options_layout.addStretch()
+        advanced_options_layout.addStretch()"""
+
+        self.override_global_checkbox = QCheckBox('Override Global Settings')
+        self.override_global_checkbox.setObjectName('override_global_checkbox')
+        self.override_global_checkbox.setToolTip(
+            'Checking this box will apply all of the below settings to this song/custom slide')
+        self.override_global_checkbox.setFont(self.gui.bold_font)
+        self.override_global_checkbox.stateChanged.connect(self.override_global_checkbox_changed)
+        main_layout.addWidget(self.override_global_checkbox)
+        self.override_global_checkbox.setChecked(False)
 
         advanced_options_widget = QWidget()
         advanced_options_layout = QHBoxLayout()
@@ -259,12 +268,6 @@ class EditWidget(QWidget):
         self.format_widget.setLayout(format_layout)
         main_layout.addWidget(self.format_widget)
         self.format_widget.hide()
-
-        self.override_global_checkbox = QCheckBox('Override Global Settings')
-        self.override_global_checkbox.setToolTip(
-            'Checking this box will apply all of the below settings to this song/custom slide')
-        self.override_global_checkbox.setFont(self.gui.bold_font)
-        format_layout.addWidget(self.override_global_checkbox)
 
         if self.type == 'song':
             self.footer_checkbox = QCheckBox('Use Footer for this song')
@@ -444,8 +447,6 @@ class EditWidget(QWidget):
                     new_tag = '[' + tag_list[i][:1] + ' ' + tag_list[i][1:] + ']'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
         self.lyrics_edit.text_edit.setHtml(lyrics)
-
-        #self.song_order_line_edit.setText(song_data[5])
 
         order_items = song_data[5].split(' ')
         for i in range(len(order_items)):
@@ -686,7 +687,6 @@ class EditWidget(QWidget):
         """
         if action == 'show':
             self.format_widget.show()
-            self.advanced_options_button.setText('-')
             self.format_widget.adjustSize()
             width = self.format_widget.width()
             if width > self.gui.main_window.width():
@@ -694,10 +694,8 @@ class EditWidget(QWidget):
             self.setMinimumWidth(width)
         elif action == 'hide':
             self.format_widget.hide()
-            self.advanced_options_button.setText('+')
         elif self.format_widget.isHidden():
             self.format_widget.show()
-            self.advanced_options_button.setText('-')
             self.format_widget.adjustSize()
             width = self.format_widget.width()
             if width > self.gui.main_window.width():
@@ -705,7 +703,12 @@ class EditWidget(QWidget):
             self.setMinimumWidth(width)
         elif not self.format_widget.isHidden():
             self.format_widget.hide()
-            self.advanced_options_button.setText('+')
+
+    def override_global_checkbox_changed(self):
+        if self.override_global_checkbox.isChecked():
+            self.show_hide_advanced_options('show')
+        else:
+            self.show_hide_advanced_options('hide')
 
     def disambiguate_background_click(self, background_button_group):
         """

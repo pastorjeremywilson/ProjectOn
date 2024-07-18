@@ -35,7 +35,7 @@ import requests
 from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
 from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QAction
 from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QStyle, QStyleFactory
+    QProgressBar
 
 from gui import GUI
 from simple_splash import SimpleSplash
@@ -72,8 +72,7 @@ class ProjectOn(QObject):
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         self.app = QApplication(sys.argv)
-        #print(QStyleFactory.keys())
-        #self.app.setStyle('Fusion')
+        self.app.setStyle('Fusion')
 
         self.thread_pool = QThreadPool()
         self.server_thread_pool = QThreadPool()
