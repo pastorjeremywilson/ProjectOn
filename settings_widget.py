@@ -1,10 +1,10 @@
 import os.path
 
 from PyQt6.QtCore import Qt, QRectF, QPointF, QEvent
-from PyQt6.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath
+from PyQt6.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath, QPalette
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, \
-    QSizePolicy, QCheckBox
+    QSizePolicy
 
 from simple_splash import SimpleSplash
 from widgets import FontWidget
@@ -50,10 +50,20 @@ class SettingsWidget(QWidget):
         settings_container_layout = QVBoxLayout()
         self.settings_container.setLayout(settings_container_layout)
 
+        ccli_container = QWidget()
+        ccli_container_layout = QVBoxLayout(ccli_container)
+        settings_container_layout.addWidget(ccli_container)
+
+        ccli_title_label = QLabel('CCLI Information')
+        ccli_title_label.setFont(self.gui.bold_font)
+        ccli_title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        ccli_title_label.setContentsMargins(5, 5, 5, 5)
+        ccli_container_layout.addWidget(ccli_title_label)
+
         ccli_widget = QWidget()
         ccli_layout = QHBoxLayout()
         ccli_widget.setLayout(ccli_layout)
-        settings_container_layout.addWidget(ccli_widget)
+        ccli_container_layout.addWidget(ccli_widget)
 
         ccli_label = QLabel('CCLI License #:')
         ccli_label.setFont(self.gui.standard_font)
@@ -106,7 +116,6 @@ class SettingsWidget(QWidget):
         if self.accept_font_changes:
             self.font_sample.setFont(
                 QFont(
-                    #self.font_settings_widget.font_combo_box.currentText(),
                     self.font_settings_widget.font_list_widget.currentItem().data(20),
                     self.font_settings_widget.font_size_spinbox.value(),
                     QFont.Weight.Bold))
@@ -184,7 +193,8 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Display Settings')
         title_label.setFont(self.gui.bold_font)
-        #title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
+        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label, 0, 0, 1, index + 1)
 
         spacing_widget = QWidget()
@@ -209,7 +219,8 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Font Settings')
         title_label.setFont(self.gui.bold_font)
-        #title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
+        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
         font_widget = QWidget()
@@ -262,7 +273,8 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Background Settings')
         title_label.setFont(self.gui.bold_font)
-        #title_label.setStyleSheet('background: white; padding: 10; border: 3px solid black;')
+        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
         song_background_label = QLabel('Global Song Background:')
@@ -488,7 +500,6 @@ class SettingsWidget(QWidget):
 
     def save(self):
         self.gui.main.settings['selected_screen_name'] = self.screen_button_group.checkedButton().objectName()
-        #self.gui.main.settings['font_face'] = self.font_settings_widget.font_combo_box.currentText()
         self.gui.main.settings['font_face'] = self.font_settings_widget.font_list_widget.currentItem().data(20)
         self.gui.main.settings['font_size'] = self.font_settings_widget.font_size_spinbox.value()
         self.gui.main.settings['font_color'] = (

@@ -270,7 +270,6 @@ class GUI(QObject):
 
         self.main_window = CustomMainWindow(self)
         self.main_window.setObjectName('main_window')
-        #self.main_window.setStyleSheet('#main_window { background: darkGrey; }')
         self.main_window.setWindowIcon(QIcon('resources/logo.ico'))
         self.main_window.setWindowTitle('ProjectOn')
 
@@ -286,8 +285,7 @@ class GUI(QObject):
         self.display_widget.setWindowIcon(QIcon('resources/logo.ico'))
         self.display_widget.setWindowTitle('ProjectOn Display Window')
         self.display_widget.setCursor(Qt.CursorShape.BlankCursor)
-        #self.display_widget.setStyleSheet('background: black;')
-        #self.display_widget.background_label.setStyleSheet('background: black')
+
         self.display_layout = QVBoxLayout()
         self.display_layout.setContentsMargins(0, 0, 0, 0)
         self.display_widget.setLayout(self.display_layout)
@@ -321,15 +319,6 @@ class GUI(QObject):
         tool_bar_divider.setStyleSheet('background: #6060c0')
         tool_bar_divider.setFixedHeight(2)
         tool_bar_layout.addWidget(tool_bar_divider)
-
-        '''toolbar_scroll_area = CustomScrollArea()
-        toolbar_scroll_area.setObjectName('toolbar_scroll_area')
-        toolbar_scroll_area.setWidget(self.tool_bar)
-        toolbar_scroll_area.setFixedHeight(self.tool_bar.height() + toolbar_scroll_area.horizontalScrollBar().height())
-        toolbar_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        toolbar_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        #toolbar_scroll_area.setStyleSheet('QScrollArea { background: white }')
-        self.central_layout.addWidget(toolbar_scroll_area, 0, 0, 1, 4)'''
 
         self.main.update_status_signal.emit('Creating GUI: Adding Media Widget', 'status')
         self.media_widget = MediaWidget(self)

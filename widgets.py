@@ -3,11 +3,10 @@ import sqlite3
 
 import requests
 from PyQt6.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal
-from PyQt6.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
-    QAction
+from PyQt6.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter
 from PyQt6.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
-    QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QToolTip, QStyle, QHBoxLayout, QSpinBox, \
-    QRadioButton, QButtonGroup, QCheckBox, QColorDialog
+                            QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
+                            QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog
 
 
 class FontFaceListWidget(QListWidget):
@@ -783,24 +782,7 @@ class FontWidget(QWidget):
         layout.addWidget(self.font_widget)
         font_widget_layout = QGridLayout(self.font_widget)
 
-        '''if self.draw_border:
-            self.font_widget.setStyleSheet('#font_widget { background: white; border: 1px solid #6060c0; }')
-        else:
-            self.font_widget.setStyleSheet('#font_widget { background: white;}')'''
-
         self.move(int(self.width() / 2), int(self.height() / 2))
-
-        """self.font_combo_box = QComboBox()
-        for i in range(self.gui.preloaded_font_combo_box.count()):
-            self.font_combo_box.addItem(self.gui.preloaded_font_combo_box.itemText(i))
-            self.font_combo_box.model().setData(
-                self.font_combo_box.model().index(i, 0),
-                self.gui.preloaded_font_combo_box.model().data(
-                    self.gui.preloaded_font_combo_box.model().index(i, 0), Qt.ItemDataRole.FontRole),
-                Qt.ItemDataRole.FontRole)
-        self.font_combo_box.setToolTip('Set a Font for All Slides')
-        self.font_combo_box.currentIndexChanged.connect(self.change_font)
-        global_font_layout.addWidget(self.font_combo_box)"""
 
         font_face_widget = QWidget()
         font_face_layout = QVBoxLayout(font_face_widget)
@@ -818,9 +800,8 @@ class FontWidget(QWidget):
 
         font_size_widget = QWidget()
         font_size_widget.setObjectName('font_size_widget')
-        #font_size_widget.setStyleSheet('#font_size_widget { border-bottom: 1px solid black; } ')
         font_size_layout = QHBoxLayout(font_size_widget)
-        font_size_layout.setContentsMargins(0, 10, 0, 20)
+        font_size_layout.setContentsMargins(0, 0, 0, 20)
         font_widget_layout.addWidget(font_size_widget, 0, 1)
 
         font_size_label = QLabel('Font Size:')
@@ -834,12 +815,14 @@ class FontWidget(QWidget):
         self.font_size_spinbox.valueChanged.connect(self.change_font)
         self.font_size_spinbox.installEventFilter(self)
         font_size_layout.addWidget(self.font_size_spinbox)
+        font_size_layout.addSpacing(20)
 
         font_color_widget = QWidget()
         font_color_layout = QHBoxLayout()
-        font_color_layout.setContentsMargins(0, 0, 0, 0)
+        font_color_layout.setContentsMargins(0, 0, 0, 20)
         font_color_widget.setLayout(font_color_layout)
-        font_size_layout.addWidget(font_color_widget)
+        font_widget_layout.addWidget(font_color_widget, 1, 1)
+        font_size_layout.addStretch()
 
         font_color_label = QLabel('Font Color:')
         font_color_label.setFont(self.gui.bold_font)
@@ -861,6 +844,7 @@ class FontWidget(QWidget):
         self.custom_font_color_radio_button.setObjectName('custom_font_color_radio_button')
         self.custom_font_color_radio_button.pressed.connect(self.color_chooser)
         font_color_layout.addWidget(self.custom_font_color_radio_button)
+        font_color_layout.addStretch()
 
         self.font_color_button_group = QButtonGroup()
         self.font_color_button_group.addButton(self.white_radio_button)
@@ -876,21 +860,18 @@ class FontWidget(QWidget):
 
         shadow_widget = QWidget()
         shadow_widget.setObjectName('shadow_widget')
-        #shadow_widget.setStyleSheet('#shadow_widget { border-bottom: 1px solid black; padding: 20px; } ')
         shadow_layout = QHBoxLayout()
-        shadow_layout.setContentsMargins(0, 10, 0, 20)
+        shadow_layout.setContentsMargins(0, 0, 0, 20)
         shadow_widget.setLayout(shadow_layout)
         font_widget_layout.addWidget(shadow_widget, 3, 1)
 
         self.shadow_color_slider = ShadowSlider(self.gui)
         self.shadow_color_slider.setObjectName('shadow_color_slider')
-        #self.shadow_color_slider.color_slider.valueChanged.connect(self.change_font)
         shadow_layout.addWidget(self.shadow_color_slider)
         shadow_layout.addSpacing(20)
 
         self.shadow_offset_slider = OffsetSlider(self.gui)
         self.shadow_offset_slider.setObjectName('shadow_offset_slider')
-        #self.shadow_offset_slider.offset_slider.valueChanged.connect(self.change_font)
         shadow_layout.addWidget(self.shadow_offset_slider)
         shadow_layout.addStretch()
 
@@ -902,15 +883,13 @@ class FontWidget(QWidget):
 
         outline_widget = QWidget()
         outline_widget.setObjectName('outline_widget')
-        #outline_widget.setStyleSheet('#outline_widget { border-bottom: 1px solid black; padding: 20px; } ')
         outline_layout = QHBoxLayout()
-        outline_layout.setContentsMargins(0, 10, 0, 20)
+        outline_layout.setContentsMargins(0, 0, 0, 20)
         outline_widget.setLayout(outline_layout)
         font_widget_layout.addWidget(outline_widget, 5, 1)
 
         self.outline_color_slider = ShadowSlider(self.gui)
         self.outline_color_slider.setObjectName('outline_color_slider')
-        #self.outline_color_slider.color_slider.valueChanged.connect(self.change_font)
         self.outline_color_slider.color_title.setText('Outline Color:')
         outline_layout.addWidget(self.outline_color_slider)
         outline_layout.addSpacing(20)
@@ -919,7 +898,6 @@ class FontWidget(QWidget):
         self.outline_width_slider.setObjectName('outline_width_slider')
         self.outline_width_slider.offset_slider.setRange(1, 10)
         self.outline_width_slider.max_label.setText('10px')
-        #self.outline_width_slider.offset_slider.valueChanged.connect(self.change_font)
         self.outline_width_slider.offset_title.setText('Outline Width:')
         outline_layout.addWidget(self.outline_width_slider)
         outline_layout.addStretch()
@@ -933,7 +911,6 @@ class FontWidget(QWidget):
         super().blockSignals(block)
 
         # also block all children widgets connected to functions
-        #self.font_combo_box.blockSignals(block)
         self.font_list_widget.blockSignals(block)
         self.font_size_spinbox.blockSignals(block)
         self.white_radio_button.blockSignals(block)
