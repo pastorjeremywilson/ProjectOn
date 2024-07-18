@@ -230,6 +230,7 @@
 		});
 
 		socket.on('update_slides', function(text) {
+			console.log(text)
 			document.getElementById("slide_form").innerHTML = text;
 		});
 
