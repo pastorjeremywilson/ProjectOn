@@ -14,6 +14,7 @@ class EditWidget(QWidget):
     """
     Provides a QDialog containing the necessary widgets to edit a song or custom slide.
     """
+
     def __init__(self, gui, type, data=None, item_text=None):
         """
         Provides a QDialog containing the necessary widgets.py to edit a song or custom slide.
@@ -887,7 +888,7 @@ class EditWidget(QWidget):
             self.copyright_line_edit.text(),
             self.ccli_num_line_edit.text(),
             lyrics,
-            #self.song_order_line_edit.text(),
+            # self.song_order_line_edit.text(),
             song_order,
             footer,
             font,
@@ -950,7 +951,8 @@ class EditWidget(QWidget):
         if self.old_title:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 if self.gui.oos_widget.oos_list_widget.item(i).data(20) == self.old_title:
-                    new_item = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)[0].clone()
+                    new_item = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)[
+                        0].clone()
                     new_item.setData(24, self.gui.media_widget.parse_song_data(new_item))
                     self.gui.oos_widget.oos_list_widget.takeItem(i)
                     self.gui.media_widget.add_song_to_service(new_item, i)
@@ -1089,10 +1091,12 @@ class EditWidget(QWidget):
         """
         if item.data(29) == 'global_song':
             pixmap = self.gui.global_song_background_pixmap
-            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                   Qt.TransformationMode.SmoothTransformation)
         elif item.data(29) == 'global_bible':
             pixmap = self.gui.global_bible_background_pixmap
-            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                   Qt.TransformationMode.SmoothTransformation)
         elif 'rgb(' in item.data(29):
             pixmap = QPixmap(50, 27)
             painter = QPainter(pixmap)
@@ -1106,7 +1110,8 @@ class EditWidget(QWidget):
             painter.end()
         else:
             pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
-            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                   Qt.TransformationMode.SmoothTransformation)
 
         item_widget = StandardItemWidget(self.gui, item.data(20), '', pixmap)
         item.setSizeHint(item_widget.sizeHint())
@@ -1117,6 +1122,7 @@ class CustomListWidget(QListWidget):
     """
     Implements QListWidget to provide the ability to press "Delete" in order to remove an item from the list
     """
+
     def __init__(self):
         super().__init__()
 
@@ -1129,4 +1135,3 @@ class CustomListWidget(QListWidget):
                 self.takeItem(self.currentRow())
             else:
                 super().keyPressEvent(evt)
-        
