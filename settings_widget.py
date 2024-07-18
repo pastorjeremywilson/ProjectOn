@@ -56,7 +56,7 @@ class SettingsWidget(QWidget):
 
         ccli_title_label = QLabel('CCLI Information')
         ccli_title_label.setFont(self.gui.bold_font)
-        ccli_title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        ccli_title_label.setStyleSheet('background: #5555aa; color: white')
         ccli_title_label.setContentsMargins(5, 5, 5, 5)
         ccli_container_layout.addWidget(ccli_title_label)
 
@@ -168,7 +168,7 @@ class SettingsWidget(QWidget):
             else:
                 primary = False
 
-            screen_pixmap = self.draw_screen_pixmap(name, primary)
+            screen_pixmap = self.draw_screen_pixmap(name, primary, screen.size())
             screen_icon_label = QLabel()
             screen_icon_label.setPixmap(screen_pixmap)
             layout.addWidget(screen_icon_label, 1, index)
@@ -193,7 +193,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Display Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label, 0, 0, 1, index + 1)
 
@@ -219,7 +219,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Font Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -273,7 +273,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Background Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -333,13 +333,17 @@ class SettingsWidget(QWidget):
         else:
             return super().eventFilter(obj, evt)
 
-    def draw_screen_pixmap(self, name, primary):
-        pixmap = QPixmap(100, 100)
+    def draw_screen_pixmap(self, name, primary, size):
+        ratio = size.width() / size.height()
+        height = 100
+        width = int(100 * ratio)
+
+        pixmap = QPixmap(width, height)
         pixmap.fill(QColor(0, 0, 0, 0))
 
         painter = QPainter(pixmap)
         pen = QPen()
-        pen.setColor(Qt.GlobalColor.black)
+        pen.setColor(Qt.GlobalColor.gray)
         pen.setWidth(10)
         brush = QBrush()
         brush.setColor(Qt.GlobalColor.blue)
@@ -347,11 +351,20 @@ class SettingsWidget(QWidget):
         painter.setPen(pen)
         painter.setBrush(brush)
 
-        painter.drawRoundedRect(QRectF(0, 0, 100, 100), 5, 5)
-        painter.drawText(20, 45, name)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(0, 0, width, height), 5, 5)
+        painter.fillPath(path, QColor(85, 85, 170))
+        painter.drawPath(path)
+
+        text_rect = painter.fontMetrics().boundingRect(name)
+        text_pos = QPointF((width / 2) - (text_rect.width() / 2), (height / 2) - (text_rect.height() / 2))
+        pen.setColor(Qt.GlobalColor.white)
+        painter.setPen(pen)
+        painter.drawText(text_pos, name)
 
         if primary:
-            painter.drawText(20, 60, '(primary)')
+            text_pos.setY(text_pos.y() + text_rect.height() + 5)
+            painter.drawText(text_pos, '(primary)')
 
         painter.end()
         return pixmap
