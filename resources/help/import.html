@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Import Options</title>
+    <link rel="stylesheet" href="./resources/help/styles.css">
+</head>
+<body>
+    <h1>Importing/Exporting Songs</h1>
+    <img class="wrap" src="resources/help/import.png">
+    <p>In addition to entering in songs by hand, ProjectOn can import a variety of song formats, accessed by choosing
+    <strong>Import</strong> under the <strong>File</strong> menu.</p>
+
+    <hr>
+
+    <p><strong>Import from OpenLP</strong></p>
+    <img class="wrap" src="resources/help/import_openlp.png">
+    <p>If you have used OpenLP in the past, you can import your whole song collection from OpenLP.</p>
+    <p>Start by locating your OpenLP song database file. This can be done in one of two ways:</p>
+    <ul>
+        <li>Open Windows File Explorer</li>
+        <li>Type "%appdata%" (without the quotes) at the top of explorer's window and press Enter</li>
+        <li>Find and double-click the "openlp" folder</li>
+        <li>Double-click the "data" folder</li>
+        <li>Double-click the "songs" folder</li>
+        <li>Here you will find the song database file, named "songs.sqlite"</li>
+    </ul>
+    <p><strong>or, if you were using the portable version of OpenLP</strong></p>
+    <ul>
+        <li>Locate your OpenLP folder</li>
+        <li>Double-click the "data" folder</li>
+        <li>Double-click the "songs" folder</li>
+        <li>Here you will find the song database file, named "songs.sqlite"</li>
+    </ul>
+    <p>To keep your song data safe, copy this file to somewhere it can be easily accessed, like your desktop.</p>
+    <p>Now, choose "Import Songs from OpenLP" from the File menu's Import sub-menu. In the window that shows, you
+    can choose the copy of the <strong>songs.sqlite</strong> file you had made and begin the import.</p>
+
+    <hr>
+
+    <p><strong>Import from CCLI SongSelect</strong></p>
+    <img class="wrap" src="resources/help/import_ccli.png">
+    <p>If you have an account for CCLI's SongSelect service, you can import songs from their website.</p>
+    <p>Start by choosing "Import Songs from CCLI SongSelect" from the File menu's Import sub-menu. If you haven't
+    yet done so, you will be prompted to enter the user name and password you use for SongSelect. Doing so will
+    encrypt and store your user name and password in order to automate the login process.</p>
+    <p>Once you are logged in, use the website like normal to find the song you want to import. In order to import
+    the song, click the "Download" icon under the "Lyrics" tab of SongSelect. ProjectOn will capture the download
+    and import that song into your collection.</p>
+    <p>Note: if you need to make any changes to your stored user name or password, choose "Save/Change CCLI SongSelect
+    Password" from the "Tools" menu.</p>
+
+    <hr>
+
+    <p><strong>Import ChordPro or OpenLyrics Files</strong></p>
+    <img class="wrap" src="resources/help/import_chordpro.svg">
+    <p>If you have songs saved in either the ChordPro (*.txt *.crd *.chopro *.pro) or OpenLyrics (*.xml) file formats, </p>
+    you can import them by choosing the appropriate action under the File menu's Import sub-menu.</p>
+    <p>A window will first pop up asking if you would like to import a single song or import all the songs in a folder.
+    Choose your desired action and click "OK". Then, a file browser will open where you can make your selection.</p>
+    <p>If any errors occur when importing your file(s), you will be shown a dialog indicating so. To find out what went
+    wrong, open the ChordPro or OpenLyrics file in a text editor (i.e. Notepad). Chances are that the error happened
+    either because the file isn't actually one of these formats, or that the file is missing the "title" field. To
+    check for the latter, examine the file contents and look to see if the title is missing:</p>
+    <ul>
+        <li>In <strong>ChordPro</strong>, the title field should look like
+        <pre>
+            {title: A Mighty Fortress}
+        </pre>
+        </li>
+        <li>
+            In <strong>OpenLyrics</strong>, the title field should look like<br />
+        <pre>
+            &lt;titles&gt;
+                &lt;title&gt;A Mighty Fortress&lt;/title&gt;
+            &lt;/titles&gt;
+        </pre>
+        </li>
+    </ul>
+    <p>If these title fields are missing, recreate them in the manner shown above and retry your import.</p>
+
+    <hr>
+
+    <p><strong>Export Songs as OpenLyrics Files</strong></p>
+    <img class="wrap" src="resources/help/export.png" style="width: 300px;">
+    <p>You can also export songs from your collection as OpenLyrics files. OpenLyrics is a standardized way of saving
+    song lyrics, creating files that can be used by a wide variety of programs.</p>
+    <p>To export songs, choose "Export" from the File menu. A window will show listing all the songs in your
+    library. Here, you can choose individual songs to export, or select all of them. Once your songs are chosen, click
+    "Export Songs". A file explorer window will open where you can choose the folder you want the songs to be saved
+    to.</p>
+</body>
+</html>

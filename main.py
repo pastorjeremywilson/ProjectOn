@@ -1,6 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
+Projecton v.1.1rc
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -31,14 +32,15 @@ from os.path import exists
 from xml.etree import ElementTree
 
 import requests
-from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, QSize, pyqtSignal, QObject, QPoint, \
-    QEvent
-from PyQt6.QtGui import QPixmap, QFontDatabase, QFont, QIcon, QPainter, QBrush, QColor, QPen
-from PyQt6.QtWidgets import QApplication, QListWidget, QLabel, QListWidgetItem, QComboBox, QWidget, QHBoxLayout, \
-    QVBoxLayout, QFileDialog, QMessageBox, QListView, QProgressBar, QSlider, QGridLayout
+from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
+from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QAction
+from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
+    QProgressBar
 
 from gui import GUI
+from simple_splash import SimpleSplash
 from web_remote import RemoteServer
+from widgets import StandardItemWidget
 
 
 class ProjectOn(QObject):
@@ -59,40 +61,18 @@ class ProjectOn(QObject):
     update_status_signal = pyqtSignal(str, str)
     info_label = None
     initial_startup = True
-    portable = True
-
+    image_items = None
+    logo_items = None
+    thread_pool = None
     status_update_count = 0
 
     def __init__(self):
         super().__init__()
 
-        #not currently implimented, but sets different directory locations for a portable or standard installment
-        if self.portable:
-            os.chdir(os.path.dirname(__file__))
-            self.data_dir = os.getcwd() + '/data'
-            self.config_file = self.data_dir + '/settings.json'
-            self.database = self.data_dir + '/projecton.db'
-            self.background_dir = self.data_dir + '/backgrounds'
-            self.image_dir = self.data_dir + '/images'
-            self.bible_dir = self.data_dir + '/bibles'
-            self.video_dir = self.data_dir + '/videos'
-        else:
-            self.data_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
-            self.config_file = self.data_dir + '/settings.json'
-            self.database = self.data_dir + '/projecton.db'
-            self.background_dir = self.data_dir + '/backgrounds'
-            self.image_dir = self.data_dir + '/images'
-            self.bible_dir = self.data_dir + '/bibles'
-            self.video_dir = self.data_dir + '/videos'
-
-        self.config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn') + '/settings.json'
-        if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
-            os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
-        if not exists(self.config_file):
-            if exists(self.data_dir + '/settings.json'):
-                shutil.copy(self.data_dir + '/settings.json', self.config_file)
-
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
+
+        self.app = QApplication(sys.argv)
+        self.app.setStyle('Fusion')
 
         self.thread_pool = QThreadPool()
         self.server_thread_pool = QThreadPool()
@@ -103,59 +83,13 @@ class ProjectOn(QObject):
         s.connect(('192.255.255.255', 1))
         self.ip = s.getsockname()[0]
 
-        self.app = QApplication(sys.argv)
-
-        # provide default settings should the settings file not exist
-        default_settings = {
-            'selected_screen_name': '',
-            'font_face': 'Helvetica',
-            'font_size': 60,
-            'font_color': 'white',
-            'global_song_background': '',
-            'global_bible_background': '',
-            'logo_image': '',
-            'last_save_dir': './saved services',
-            'last_status_count': 0,
-            'stage_font_size': 60
-        }
-
-        if exists(self.data_dir + '/settings.json'):
-            with open(self.data_dir + '/settings.json', 'r') as file:
-                try:
-                    self.settings = json.loads(file.read())
-                except json.decoder.JSONDecodeError:
-                    self.settings = {}
-        else:
-            self.settings = default_settings
-
-        for key in default_settings:
-            if not key in self.settings.keys():
-                self.settings[key] = default_settings[key]
-        self.get_song_titles()
-
-        self.make_splash_screen()
-
-        self.update_status_signal.emit('Checking Files', 'status')
-        self.app.processEvents()
-
-        # ensure all needed files exist; thread it and wait until done before moving on
-        cf = CheckFiles(self)
-        self.thread_pool.start(cf)
-        self.thread_pool.waitForDone()
-
-        self.status_label.setText('Indexing Images')
-        self.app.processEvents()
-
-        ii = IndexImages(self, 'backgrounds')
-        self.thread_pool.start(ii)
-        self.thread_pool.waitForDone()
-
-        ii = IndexImages(self, 'images')
-        self.thread_pool.start(ii)
-        self.thread_pool.waitForDone()
-
-        self.update_status_signal.emit('Creating GUI', 'status')
-        self.app.processEvents()
+        last_status_count = 100
+        if exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')):
+            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json'), 'r') as file:
+                contents = json.loads(file.read())
+            if 'last_status_count' in contents.keys():
+                last_status_count = contents['last_status_count']
+        self.make_splash_screen(last_status_count)
 
         self.gui = GUI(self)
 
@@ -176,9 +110,6 @@ class ProjectOn(QObject):
             if '.pro' in arg:
                 self.load_service(arg)
 
-        if len(self.settings) > 0:
-            self.gui.apply_settings()
-
         self.app.processEvents()
 
         self.app.exec()
@@ -198,49 +129,58 @@ class ProjectOn(QObject):
             self.progress_bar.setValue(self.progress_bar.value() + 1)
             self.app.processEvents()
             self.status_update_count += 1
+            self.splash_widget.setFocus()
 
-    def make_splash_screen(self):
+    def make_splash_screen(self, last_status_count):
         """
         Create the splash screen that will show progress as the program is loading
         """
         self.splash_widget = QWidget()
+        self.splash_widget.setObjectName('splash_widget')
         self.splash_widget.setMinimumWidth(450)
         self.splash_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.splash_widget.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop, True)
-        self.splash_widget.setStyleSheet('background: #5555aa')
-        splash_layout = QVBoxLayout()
-        self.splash_widget.setLayout(splash_layout)
+        self.splash_widget.setStyleSheet(
+            '#splash_widget { background: #6060c0; }')
+        splash_layout = QVBoxLayout(self.splash_widget)
+        splash_layout.setContentsMargins(20, 20, 20, 20)
+
+        container = QWidget()
+        container.setObjectName('container')
+        container.setStyleSheet('#container { background: #6060c0; border: 2px solid white; }')
+        container_layout = QVBoxLayout(container)
+        container_layout.setContentsMargins(20, 20, 20, 20)
+        splash_layout.addWidget(container)
 
         self.title_label = QLabel('Starting ProjectOn...')
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title_label.setStyleSheet('color: white')
         self.title_label.setFont(QFont('Helvetica', 16, QFont.Weight.Bold))
-        splash_layout.addWidget(self.title_label, Qt.AlignmentFlag.AlignCenter)
-        splash_layout.addSpacing(20)
+        container_layout.addWidget(self.title_label, Qt.AlignmentFlag.AlignCenter)
+        container_layout.addSpacing(20)
 
         self.status_label = QLabel()
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.status_label.setStyleSheet('color: white')
         self.status_label.setFont(QFont('Helvetica', 12))
-        splash_layout.addWidget(self.status_label, Qt.AlignmentFlag.AlignCenter)
-        splash_layout.addSpacing(20)
+        container_layout.addWidget(self.status_label, Qt.AlignmentFlag.AlignCenter)
+        container_layout.addSpacing(20)
 
         self.progress_bar = QProgressBar()
-        if self.settings['last_status_count']:
-            self.progress_bar.setRange(0, self.settings['last_status_count'])
+        self.progress_bar.setRange(0, last_status_count)
         self.progress_bar.setValue(0)
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setStyleSheet(
             'QProgressBar { border: 1px solid white; background: white; } '
-            'QProgressBar::chunk { background-color: #5555aa; }'
+            'QProgressBar::chunk { background-color: #6060c0; }'
         )
-        splash_layout.addWidget(self.progress_bar)
+        container_layout.addWidget(self.progress_bar)
 
         self.info_label = QLabel()
         self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.info_label.setStyleSheet('color: white')
         self.info_label.setFont(QFont('Helvetica', 10))
-        splash_layout.addWidget(self.info_label)
+        container_layout.addWidget(self.info_label)
 
         self.splash_widget.show()
 
@@ -343,30 +283,42 @@ class ProjectOn(QObject):
         try:
             for i in range(len(song_data)):
                 if song_data[i]:
-                    song_data[i] = song_data[i].replace('"', '""')
+                    song_data[i] = (str(song_data[i])).replace('"', '""')
                 else:
                     song_data[i] = ''
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
 
             if old_title:
-                sql = ('UPDATE songs SET '
-                       'title="' + song_data[0] + '", '
-                       'author="' + song_data[1] + '", '
-                       'copyright="' + song_data[2] + '", '
-                       'ccliNum="' + song_data[3] + '", '
-                       'lyrics="' + song_data[4] + '", '
-                       'vorder="' + song_data[5] + '", '
-                       'footer="' + song_data[6] + '", ' 
-                       'font="' + song_data[7] + '", ' 
-                       'fontColor="' + song_data[8] + '", ' 
-                       'background="' + song_data[9] + '", '
-                       'font_size="' + song_data[10] + '" WHERE title="' + old_title + '"')
+                sql = (
+                    'UPDATE songs SET '
+                    'title="' + song_data[0] + '", '
+                    'author="' + song_data[1] + '", '
+                    'copyright="' + song_data[2] + '", '
+                    'ccliNum="' + song_data[3] + '", '
+                    'lyrics="' + song_data[4] + '", '
+                    'vorder="' + song_data[5] + '", '
+                    'footer="' + song_data[6] + '", ' 
+                    'font="' + song_data[7] + '", ' 
+                    'fontColor="' + song_data[8] + '", ' 
+                    'background="' + song_data[9] + '", '
+                    'font_size="' + song_data[10] + '", '
+                    'use_shadow="' + song_data[11] + '", '
+                    'shadow_color="' + song_data[12] + '", '
+                    'shadow_offset="' + song_data[13] + '", '
+                    'use_outline="' + song_data[14] + '", '
+                    'outline_color="' + song_data[15] + '", '
+                    'outline_width="' + song_data[16] + '", '
+                    'override_global="' + song_data[17] + '" WHERE title="' + old_title + '"'
+                )
             else:
                 sql = ('INSERT INTO songs (title, author, copyright, ccliNum, lyrics, vorder, footer, font, fontColor, '
-                       'background) VALUES ("' + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
+                       'background, font_size, use_shadow, shadow_color, shadow_offset, use_outline, outline_color, '
+                       'outline_width, override_global) VALUES ("' + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
                        + song_data[3] + '","' + song_data[4] + '","' + song_data[5] + '","' + song_data[6]
-                       + '","' + song_data[7] + '","' + song_data[8] + '","' + song_data[9] + '")')
+                       + '","' + song_data[7] + '","' + song_data[8] + '","' + song_data[9] + '","' + song_data[10]
+                       + '","' + song_data[11] + '","' + song_data[12] + '","' + song_data[13] + '","' + song_data[14]
+                       + '","' + song_data[15] + '","' + song_data[16] + '","' + song_data[17] + '")')
 
             cursor.execute(sql)
             connection.commit()
@@ -383,7 +335,7 @@ class ProjectOn(QObject):
         """
         connection = sqlite3.connect(self.database)
         cursor = connection.cursor()
-        data = cursor.execute('SELECT title FROM songs').fetchall()
+        data = cursor.execute('SELECT title FROM songs ORDER BY title').fetchall()
         song_titles = []
         for item in data:
             song_titles.append(item[0])
@@ -413,9 +365,6 @@ class ProjectOn(QObject):
         """
         connection = None
         try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-
             if old_title:
                 sql = ('UPDATE customSlides SET '
                        'title="' + custom_data[0] + '", '
@@ -423,12 +372,24 @@ class ProjectOn(QObject):
                        'font="' + custom_data[2] + '", ' 
                        'fontColor="' + custom_data[3] + '", ' 
                        'background="' + custom_data[4] + '", '
-                       'font_size="' + custom_data[5] + '" WHERE title="' + old_title + '"')
+                       'font_size="' + custom_data[5] + '", '
+                       'use_shadow="' + custom_data[6] + '", '
+                       'shadow_color="' + custom_data[7] + '", '
+                       'shadow_offset="' + custom_data[8] + '", '
+                       'use_outline="' + custom_data[9] + '", '
+                       'outline_color="' + custom_data[10] + '", '
+                       'outline_width="' + custom_data[11] + '", '
+                       'override_global="' + custom_data[12] + '" WHERE title="' + old_title + '"')
             else:
-                sql = ('INSERT INTO customSlides (title, text, font, fontColor, background) VALUES '
-                       '("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2] + '","'
-                       + custom_data[3] + '","' + custom_data[4] + '")')
+                sql = ('INSERT INTO customSlides (title, text, font, fontColor, background, font_size, use_shadow, '
+                       'shadow_color, shadow_offset, use_outline, outline_color, outline_width, override_global)'
+                       ' VALUES ("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2] + '","'
+                       + custom_data[3] + '","' + custom_data[4] + '","' + custom_data[5] + '","' + custom_data[6]
+                       + '","' + custom_data[7] + '","' + custom_data[8] + '","' + custom_data[9]
+                       + '","' + custom_data[10] + '","' + custom_data[11] + '","' + custom_data[12] + '")')
 
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
             cursor.execute(sql)
             connection.commit()
             connection.close()
@@ -472,19 +433,19 @@ class ProjectOn(QObject):
         """
         connection = None
         try:
-            if item.data(30) == 'song':
+            if item.data(40) == 'song':
                 table = 'songs'
                 description = 'Song'
-            elif item.data(30) == 'custom':
+            elif item.data(40) == 'custom':
                 table = 'customSlides'
                 description = 'Custom Slide'
-            elif item.data(30) == 'video':
+            elif item.data(40) == 'video':
                 os.remove(self.video_dir + '/' + item.data(20))
                 filename_split = item.data(20).split('.')
                 thumbnail_filename = '.'.join(filename_split[:len(filename_split) - 1]) + '.jpg'
                 os.remove(self.video_dir + '/' + thumbnail_filename)
                 return
-            elif item.data(30) == 'web':
+            elif item.data(40) == 'web':
                 table = 'web'
                 description = 'Web Page'
             else:
@@ -558,6 +519,15 @@ class ProjectOn(QObject):
         try:
             with open(self.data_dir + '/settings.json', 'w') as file:
                 file.write(json.dumps(self.settings, indent=4))
+
+            device_specific_settings = {}
+            device_specific_settings['used_services'] = self.settings['used_services']
+            device_specific_settings['last_save_dir'] = self.settings['last_save_dir']
+            device_specific_settings['last_status_count'] = self.settings['last_status_count']
+            device_specific_settings['data_dir'] = self.data_dir
+            with open(self.device_specific_config_file, 'w') as file:
+                file.write(json.dumps(device_specific_settings, indent=4))
+
         except Exception:
             self.error_log()
 
@@ -565,29 +535,46 @@ class ProjectOn(QObject):
         """
         Saves the user's current order of service to a file chosen by the user.
         """
+        if self.gui.oos_widget.oos_list_widget.count() == 0:
+            QMessageBox.information(
+                self.gui.main_window,
+                'Nothing to do',
+                'There are no Order of Service items to save.',
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
         try:
-            if not self.gui.tool_bar.font_list_widget.currentText():
-                self.gui.tool_bar.font_list_widget.setCurrentText('Arial')
+            if not self.gui.tool_bar.font_widget.font_list_widget.currentItem().data(20):
+                self.gui.tool_bar.font_widget.font_list_widget.setCurrentRow(0)
 
             service_items = {
-                'global_song_background': self.gui.tool_bar.song_background_combobox.currentText(),
-                'global_bible_background': self.gui.tool_bar.bible_background_combobox.currentText(),
-                'global_font': self.gui.tool_bar.font_list_widget.currentText()
+                'global_song_background': self.settings['global_song_background'],
+                'global_bible_background': self.settings['global_bible_background'],
+                'font_face': self.settings['font_face'],
+                'font_size': self.settings['font_size'],
+                'font_color': self.settings['font_color'],
+                'use_shadow': self.settings['use_shadow'],
+                'shadow_color': self.settings['shadow_color'],
+                'shadow_offset': self.settings['shadow_offset'],
+                'use_outline': self.settings['use_outline'],
+                'outline_color': self.settings['outline_color'],
+                'outline_width': self.settings['outline_width'],
             }
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 service_items[i] = {
                     'title': self.gui.oos_widget.oos_list_widget.item(i).data(20),
-                    'type': self.gui.oos_widget.oos_list_widget.item(i).data(30)
+                    'type': self.gui.oos_widget.oos_list_widget.item(i).data(40)
                 }
             """for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 service_items[i] = {}
                 for j in range(20, 33):
-                    if j == 21 and self.gui.oos_widget.oos_list_widget.item(i).data(30) == 'bible':
+                    if j == 21 and self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'bible':
                         service_items[i][j] = self.gui.oos_widget.oos_list_widget.item(i).data(j)
                     elif j == 31:
                         service_items[i][j] = self.gui.oos_widget.oos_list_widget.item(i).data(j)
-                        if self.gui.oos_widget.oos_list_widget.item(i).data(30) == 'image':
+                        if self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'image':
                             service_items[i][j][2] = ''
                     else:
                         if type(self.gui.oos_widget.oos_list_widget.item(i).data(j)) == bytes:
@@ -597,6 +584,7 @@ class ProjectOn(QObject):
 
             dialog_needed = True
             if self.gui.current_file:
+                print(self.gui.current_file)
                 dialog_needed = False
             elif len(self.settings['last_save_dir']) > 0:
                 save_dir = self.settings['last_save_dir']
@@ -614,33 +602,37 @@ class ProjectOn(QObject):
             if len(result[0]) > 0:
                 try:
                     if result == 'saved':
-                        filename = self.gui.current_file
+                        file_loc = self.gui.current_file
                     else:
-                        filename = result[0]
+                        file_loc = result[0]
 
-                    with open(filename, 'w') as file:
+                    with open(file_loc, 'w') as file:
                         json.dump(service_items, file, indent=4)
 
-                    save_split = filename.split('/')
-                    directory = '/'.join(save_split[0:len(save_split) - 1])
+                    directory = os.path.dirname(file_loc)
+                    filename = file_loc.replace(directory, '').replace('/', '')
                     self.settings['last_save_dir'] = directory
                     self.save_settings()
 
                     QMessageBox.information(
                         self.gui.main_window,
                         'File Saved',
-                        'Service saved as\n' + filename.replace('/', '\\'),
+                        'Service saved as\n' + file_loc.replace('/', '\\'),
                         QMessageBox.StandardButton.Ok
                     )
 
-                    self.gui.current_file = filename
+                    # add this file to the recently used services menu
+                    self.add_to_recently_used(directory, filename)
+
+                    self.gui.current_file = file_loc
                     self.gui.changes = False
                     return 1
                 except Exception as ex:
                     QMessageBox.information(
                         self.gui.main_window,
                         'Save Error',
-                        'There was a problem saving the service:\n\n' + str(ex),
+                        'There was a problem saving the service: '
+                        + file_loc.replace('/', '\\') + '\n\n' + str(ex),
                         QMessageBox.StandardButton.Ok
                     )
                     return -1
@@ -675,6 +667,7 @@ class ProjectOn(QObject):
         if save_result == -1:
             return
 
+        # open a file dialog if flename was not provided
         if not filename:
             if len(self.settings['last_save_dir']) > 0:
                 open_dir = self.settings['last_save_dir']
@@ -693,18 +686,8 @@ class ProjectOn(QObject):
         # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
         # provide a splash
         if len(result[0]) > 0:
-            wait_widget = QWidget()
-            wait_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
-            wait_widget.setStyleSheet('background: #5555aa')
-            wait_layout = QHBoxLayout()
-            wait_layout.setContentsMargins(10, 10, 10, 10)
-            wait_widget.setLayout(wait_layout)
-            wait_label = QLabel('Loading service...')
-            wait_label.setFont(QFont('Helvetica', 16, QFont.Weight.Bold))
-            wait_label.setStyleSheet('color: white;')
-            wait_layout.addWidget(wait_label)
-            wait_widget.show()
-            self.app.processEvents()
+            wait_widget = SimpleSplash(self.gui, 'Loading service...')
+            service_dict = None
 
             try:
                 with open(result[0], 'r') as file:
@@ -714,14 +697,42 @@ class ProjectOn(QObject):
             except Exception:
                 logging.exception('')
 
-            self.settings['global_song_background'] = service_dict['global_song_background']
-            self.settings['global_bible_background'] = service_dict['global_bible_background']
-            self.settings['font_face'] = service_dict['global_font']
+            if not service_dict:
+                QMessageBox.information(
+                    self.gui.main_window,
+                    'Error Loading Service',
+                    'Unable to load service. Please check that the file has not moved.',
+                    QMessageBox.StandardButton.Ok
+                )
+                return
+
+            if 'global_song_background' in service_dict.keys():
+                self.settings['global_song_background'] = service_dict['global_song_background']
+            if 'global_bible_background' in service_dict.keys():
+                self.settings['global_bible_background'] = service_dict['global_bible_background']
+            if 'font_face' in service_dict.keys():
+                self.settings['font_face'] = service_dict['font_face']
+            if 'font_size' in service_dict.keys():
+                self.settings['font_size'] = service_dict['font_size']
+            if 'font_color' in service_dict.keys():
+                self.settings['font_color'] = service_dict['font_color']
+            if 'use_shadow' in service_dict.keys():
+                self.settings['use_shadow'] = service_dict['use_shadow']
+            if 'shadow_color' in service_dict.keys():
+                self.settings['shadow_color'] = service_dict['shadow_color']
+            if 'shadow_offset' in service_dict.keys():
+                self.settings['shadow_offset'] = service_dict['shadow_offset']
+            if 'use_outline' in service_dict.keys():
+                self.settings['use_outline'] = service_dict['use_outline']
+            if 'outline_color' in service_dict.keys():
+                self.settings['outline_color'] = service_dict['outline_color']
+            if 'outline_width' in service_dict.keys():
+                self.settings['outline_width'] = service_dict['outline_width']
+
             self.gui.apply_settings()
 
             # walk through the items saved in the file and load their QListWidgetItems into the order of service widget
             self.gui.oos_widget.oos_list_widget.clear()
-            from media_widget import OOSItemWidget
             for key in service_dict:
                 if key.isnumeric():
                     if service_dict[key]['type'] == 'song':
@@ -748,16 +759,20 @@ class ProjectOn(QObject):
                     elif service_dict[key]['type'] == 'bible':
                         if not self.gui.main.get_scripture:
                             from get_scripture import GetScripture
-                            self.gui.main.get_scripture = GetScripture(self.gui.main)
-                        passages = self.gui.main.get_scripture.get_passage(service_dict[key]['title'])
-                        scripture = ''
-                        for passage in passages[1]:
-                            scripture += passage + ' '
+                            self.get_scripture = GetScripture(self)
+                        passages = self.get_scripture.get_passage(service_dict[key]['title'])
 
-                        reference = service_dict[key]['title']
-                        text = scripture
-                        version = self.gui.media_widget.bible_selector_combobox.currentText()
-                        self.gui.add_scripture_item(reference, scripture, version)
+                        if passages[0] == -1:
+                            QMessageBox.information(
+                                self.gui.main_window,
+                                'Error Loading Scripture',
+                                'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
+                                QMessageBox.StandardButton.Ok
+                            )
+                        else:
+                            reference = service_dict[key]['title']
+                            version = self.gui.media_widget.bible_selector_combobox.currentText()
+                            self.gui.add_scripture_item(reference, passages[1], version)
 
                     elif service_dict[key]['type'] == 'custom':
                         try:
@@ -779,7 +794,7 @@ class ProjectOn(QObject):
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
                             widget_item = QListWidgetItem()
-                            for i in range(20, 33):
+                            for i in range(20, 41):
                                 widget_item.setData(i, custom_item.data(i))
 
                             if widget_item.data(29) == 'global_song':
@@ -798,7 +813,7 @@ class ProjectOn(QObject):
                                 pixmap = QPixmap(self.gui.main.background_dir + '/' + widget_item.data(29))
                                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-                            widget = OOSItemWidget(self.gui, pixmap, widget_item.data(20), 'Custom')
+                            widget = StandardItemWidget(self.gui, widget_item.data(20), 'Custom', pixmap)
 
                             widget_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(widget_item)
@@ -827,7 +842,7 @@ class ProjectOn(QObject):
                             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                                    Qt.TransformationMode.SmoothTransformation)
 
-                            widget = OOSItemWidget(self.gui, pixmap, image_item.data(20), 'Image')
+                            widget = StandardItemWidget(self.gui, image_item.data(20), 'Image', pixmap)
 
                             image_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(image_item)
@@ -857,7 +872,7 @@ class ProjectOn(QObject):
                             pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio,
                                                    Qt.TransformationMode.SmoothTransformation)
 
-                            widget = OOSItemWidget(self.gui, pixmap, video_item.data(20), 'Image')
+                            widget = StandardItemWidget(self.gui, video_item.data(20), 'Video', pixmap)
 
                             video_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(video_item)
@@ -884,8 +899,8 @@ class ProjectOn(QObject):
                             item = QListWidgetItem()
                             item.setData(20, web_item.data(20))
                             item.setData(21, web_item.data(21))
-                            item.setData(30, 'web')
-                            item.setData(31, ['', web_item.data(20),
+                            item.setData(40, 'web')
+                            item.setData(24, ['', web_item.data(20),
                                               web_item.data(21)])
 
                             pixmap = QPixmap(50, 27)
@@ -900,7 +915,7 @@ class ProjectOn(QObject):
                             painter.drawText(QPoint(2, 20), 'WWW')
                             painter.end()
 
-                            widget = OOSItemWidget(self.gui,pixmap, web_item.data(21), 'Web')
+                            widget = StandardItemWidget(self.gui, web_item.data(21), 'Web', pixmap)
 
                             item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(item)
@@ -912,43 +927,48 @@ class ProjectOn(QObject):
             self.gui.live_widget.slide_list.clear()
 
             # set the last used directory in settings
-            if '\\' in result[0]:
-                dir_split = result[0].split('\\')
-            elif '/' in result[0]:
-                dir_split = result[0].split('/')
-            file_dir = '/'.join(dir_split[:len(dir_split) - 1])
-            file_name = dir_split[len(dir_split) - 1]
+            file_dir = os.path.dirname(result[0])
+            file_name = result[0].replace(file_dir, '').replace('/', '')
             self.settings['last_save_dir'] = file_dir
 
             # add this file to the recently used services menu
-            if 'used_services' in self.settings.keys():
-                used_services = self.settings['used_services']
-            else:
-                used_services = []
-
-            add_file = True
-            for item in used_services:
-                if file_name == item[1]:
-                    add_file = False
-
-            if add_file:
-                if len(used_services) == 5:
-                    used_services.pop(0)
-
-                used_services.append([file_dir, file_name])
-                self.settings['used_services'] = used_services
-                self.save_settings()
-
-            for action in self.gui.open_recent_menu.actions():
-                self.gui.open_recent_menu.removeAction(action)
-
-            for item in used_services:
-                open_recent_action = self.gui.open_recent_menu.addAction(item[1])
-                open_recent_action.setData(item[0] + '/' + item[1])
-                open_recent_action.triggered.connect(lambda: self.load_service(open_recent_action.data()))
+            self.add_to_recently_used(file_dir, file_name)
 
             self.gui.changes = False
-            wait_widget.deleteLater()
+            wait_widget.widget.deleteLater()
+
+    def add_to_recently_used(self, directory, file_name):
+        """
+        Provides a method to add a file to the user's recently used file menu if this file doesn't already exist
+        there.
+        :param str directory: directory file is located in
+        :param str file_name: the name of the file
+        """
+        if 'used_services' in self.settings.keys():
+            used_services = self.settings['used_services']
+        else:
+            used_services = []
+
+        add_file = True
+        for item in used_services:
+            if file_name == item[1]:
+                add_file = False
+
+        if add_file:
+            # remove a recently used file if 5 already exist
+            if len(used_services) == 5:
+                name = used_services[0][1]
+                used_services.pop(0)
+                self.gui.open_recent_menu.removeAction(self.gui.open_recent_menu.findChild(QAction, name))
+
+            # add this file to the recently used services menu
+            action = self.gui.open_recent_menu.addAction(file_name)
+            action.setData(directory + '/' + file_name)
+            action.triggered.connect(lambda: self.load_service(action.data()))
+
+            used_services.append([directory, file_name])
+            self.settings['used_services'] = used_services
+            self.save_settings()
 
     def import_xml_bible(self):
         file = QFileDialog.getOpenFileName(
@@ -1005,9 +1025,9 @@ class ProjectOn(QObject):
                 f'in\n'
                 f'    {clss}.{method}'
             )
-            date_time = time.time()
-            log_text = (f'{date_time}:\n'
-                        f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}\n')
+            date_time = time.ctime(time.time())
+            log_text = (f'\n{date_time}:\n'
+                        f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
 
         with open('./error.log', 'a') as file:
             file.write(log_text)
@@ -1028,6 +1048,7 @@ class CheckFiles(QRunnable):
         self.main = main
 
     def run(self):
+        defaults_dir = os.path.dirname(os.path.abspath(__file__)).replace('\\\\', '/') + '/resources/defaults'
         try:
             if not exists(self.main.data_dir):
                 os.mkdir(self.main.data_dir)
@@ -1041,55 +1062,51 @@ class CheckFiles(QRunnable):
                     'global_song_background': '',
                     'global_bible_background': '',
                     'logo_image': '',
-                    'last_save_dir': ''
+                    'last_save_dir': '',
+                    'last_status_count': 1000,
+                    'stage_font_size': 60,
+                    'use_shadow': False,
+                    'shadow_color': 190,
+                    'use_outline': True,
+                    'outline_color': 0,
+                    'outline_width': 3,
+                    'ccli_num': '',
+                    'used_services': [],
+                    'default_bible': ''
                 }
                 with open(self.main.config_file, 'w') as file:
                     file.write(json.dumps(config, indent=4))
 
             if not exists(self.main.database):
-                connection = sqlite3.connect(self.main.database)
-                cursor = connection.cursor()
-                command = ('CREATE TABLE songs ('
-                           'title TEXT,'
-                           'author TEXT,'
-                           'copyright TEXT,'
-                           'ccliNum TEXT,'
-                           'lyrics TEXT,'
-                           'vorder TEXT,'
-                           'footer TEXT,'
-                           'font TEXT,'
-                           'fontColor TEXT,'
-                           'background TEXT)')
-                cursor.execute(command)
-
-                command = ('CREATE TABLE backgroundThumbnails (fileName TEXT, image BLOB)')
-                cursor.execute(command)
-                connection.commit()
-
-                command = ('CREATE TABLE imageThumbnails (fileName TEXT, image BLOB)')
-                cursor.execute(command)
-                connection.commit()
-
-                command = ('CREATE TABLE customSlides (title TEXT text TEXT font TEXT fontColor TEXT background TEXT)')
-                cursor.execute(command)
-                connection.commit()
-
-                command = ('CREATE TABLE web (title TEXT, url TEXT)')
-                cursor.execute(command)
-                connection.commit()
-                connection.close()
+                shutil.copy(defaults_dir + '/default_database.db', self.main.database)
 
             if not exists(self.main.background_dir):
                 os.mkdir(self.main.background_dir)
+                default_background_dir = defaults_dir + '/backgrounds'
+                image_files = os.listdir(default_background_dir)
+                for file in image_files:
+                    shutil.copy(default_background_dir + '/' + file, self.main.background_dir + '/' + file)
 
             if not exists(self.main.image_dir):
                 os.mkdir(self.main.image_dir)
+                default_image_dir = defaults_dir + '/images'
+                image_files = os.listdir(default_image_dir)
+                for file in image_files:
+                    shutil.copy(default_image_dir + '/' + file, self.main.image_dir + '/' + file)
 
             if not exists(self.main.bible_dir):
                 os.mkdir(self.main.bible_dir)
+                default_bible_dir = defaults_dir + '/bibles'
+                bible_files = os.listdir(default_bible_dir)
+                for file in bible_files:
+                    shutil.copy(default_bible_dir + '/' + file, self.main.bible_dir + '/' + file)
 
             if not exists(self.main.video_dir):
                 os.mkdir(self.main.video_dir)
+                default_video_dir = defaults_dir + '/videos'
+                video_files = os.listdir(default_video_dir)
+                for file in video_files:
+                    shutil.copy(default_video_dir + '/' + file, self.main.video_dir + '/' + file)
         except Exception:
             self.main.error_log()
 
@@ -1196,253 +1213,6 @@ class IndexImages(QRunnable):
         connection.close()
 
 
-class FontFaceListWidget(QListWidget):
-    """
-    Creates a custom QListWidget that displays all fonts on the system in their own style.
-    :param gui.GUI gui: The current instance of GUI
-    """
-    def __init__(self, gui):
-        """
-        :param gui.GUI gui: The current instance of GUI
-        """
-        super().__init__()
-        self.setMinimumHeight(60)
-        self.gui = gui
-
-        try:
-            for font in QFontDatabase.families():
-                if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
-                    self.gui.main.update_status_signal.emit(font, 'info')
-                list_label = QLabel(font)
-                list_label.setFont(QFont(font, 12))
-                item = QListWidgetItem()
-                item.setData(20, font)
-                self.addItem(item)
-                self.setItemWidget(item, list_label)
-
-            if self.gui.main.initial_startup:
-                self.gui.main.update_status_signal.emit('', 'info')
-        except Exception:
-            self.gui.main.error_log()
-
-
-class FontFaceComboBox(QComboBox):
-    """
-    Creates a custom QComboBox that displays all fonts on the system in their own style.
-    :param gui.GUI gui: The current instance of GUI
-    """
-    def __init__(self, gui):
-        """
-        :param gui.GUI gui: The current instance of GUI
-        """
-        super().__init__()
-        self.gui = gui
-
-        try:
-            row = 0
-            for font in QFontDatabase.families():
-                if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
-                    self.gui.main.update_status_signal.emit(font, 'info')
-                model = self.model()
-                self.addItem(font)
-                model.setData(model.index(row, 0), QFont(font, 14), Qt.ItemDataRole.FontRole)
-                row += 1
-
-        except Exception:
-            self.gui.main.error_log()
-
-    def wheelEvent(self, evt):
-        evt.ignore()
-
-
-class ImageCombobox(QComboBox):
-    """
-    Creates a custom QComboBox that displays a thumbnail of an image to be used.
-    """
-    def __init__(self, gui, type):
-        """
-        :param gui.GUI gui: The current instance of GUI
-        :param str type: Whether this is creating a combobox of 'logo' or 'background' images
-        """
-        super().__init__()
-        self.gui = gui
-        self.type = type
-        self.setView(QListView())
-        self.setObjectName(type)
-
-        self.setIconSize(QSize(96, 54))
-        self.setMaximumWidth(240)
-        self.setFont(self.gui.standard_font)
-
-        if type == 'logo':
-            self.addItem('Choose Logo Image', userData='choose_logo')
-            self.addItem('Import a Logo Image', userData='import_logo')
-            self.table = 'imageThumbnails'
-        if type == 'edit':
-            self.addItem('Choose Custom Background', userData='choose_global')
-            self.table = 'backgroundThumbnails'
-        else:
-            self.addItem('Choose Global ' + type + ' Background', userData='choose_global')
-            self.addItem('Import a Background Image', userData='import_global')
-            self.table = 'backgroundThumbnails'
-
-        if type == 'edit_background':
-            self.removeItem(0)
-        else:
-            self.currentIndexChanged.connect(self.gui.tool_bar.change_background)
-        self.refresh()
-
-    def refresh(self):
-        """
-        Method to refresh the combo box after changes to the image indices
-        """
-        self.clear()
-
-        if self.type == 'logo':
-            self.addItem('Choose Logo Image', userData='choose_logo')
-            self.addItem('Import a Logo Image', userData='import_logo')
-            self.table = 'imageThumbnails'
-        if self.type == 'edit':
-            self.addItem('Choose Custom Background', userData='choose_global')
-            self.table = 'backgroundThumbnails'
-        else:
-            self.addItem('Choose Global ' + self.type + ' Background', userData='choose_global')
-            self.addItem('Import a Background Image', userData='import_global')
-            self.table = 'backgroundThumbnails'
-        connection = None
-
-        try:
-            connection = sqlite3.connect(self.gui.main.database)
-            cursor = connection.cursor()
-            thumbnails = cursor.execute('SELECT * FROM ' + self.table).fetchall()
-
-            for record in thumbnails:
-                if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')
-                    self.gui.main.update_status_signal.emit(record[0], 'info')
-                pixmap = QPixmap()
-                pixmap.loadFromData(record[1], 'JPG')
-                icon = QIcon(pixmap)
-                self.addItem(icon, record[0].split('.')[0], userData=record[0])
-
-            if self.gui.main.initial_startup:
-                self.gui.main.update_status_signal.emit('', 'info')
-
-            connection.close()
-        except Exception:
-            self.gui.main.error_log()
-            if connection:
-                connection.close()
-
-    def wheelEvent(self, evt):
-        # prevent wheel scrolling, which is undesirable in the settings layout
-        evt.ignore()
-
-
-class ShadowSlider(QWidget):
-    """
-    Creates a widget containing a QSlider and Label which lets the user set the greyness of the display's shadow
-    :param gui.GUI gui: The current instance of GUI
-    """
-    def __init__(self, gui):
-        """
-        Creates a widget containing a QSlider and Label which lets the user set the greyness of the display's shadow
-        :param gui.GUI gui: The current instance of GUI
-        """
-        super().__init__()
-        self.gui = gui
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.setLayout(layout)
-
-        self.color_title = QLabel('Shadow Color:')
-        self.color_title.setStyleSheet('padding-bottom: 10px')
-        self.color_title.setFont(self.gui.list_font)
-        layout.addWidget(self.color_title)
-
-        slider_widget = QWidget()
-        slider_widget.setFixedWidth(300)
-        slider_layout = QGridLayout()
-        slider_layout.setContentsMargins(0, 0, 0, 0)
-        slider_layout.setVerticalSpacing(0)
-        slider_widget.setLayout(slider_layout)
-        layout.addWidget(slider_widget)
-
-        self.color_slider = QSlider()
-        self.color_slider.setObjectName('color_slider')
-        self.color_slider.setOrientation(Qt.Orientation.Horizontal)
-        self.color_slider.setFont(self.gui.list_font)
-        self.color_slider.setRange(0, 255)
-        self.color_slider.installEventFilter(self)
-        slider_layout.addWidget(self.color_slider, 0, 0, 1, 2)
-
-        min_label = QLabel('Black')
-        min_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(min_label, 1, 0, Qt.AlignmentFlag.AlignLeft)
-
-        max_label = QLabel('White')
-        max_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(max_label, 1, 1, Qt.AlignmentFlag.AlignRight)
-
-    def eventFilter(self, obj, evt):
-        if obj == self.color_slider and evt.type() == QEvent.Type.Wheel:
-            return True
-        else:
-            return super().eventFilter(obj, evt)
-
-
-class OffsetSlider(QWidget):
-    """
-    Creates a widget containing a QSlider and Label which lets the user set the distance of the display's shadow offset
-    :param gui.GUI gui: The current instance of GUI
-    """
-    def __init__(self, gui):
-        super().__init__()
-        self.gui = gui
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.setLayout(layout)
-
-        self.offset_title = QLabel('Shadow Offset:')
-        self.offset_title.setStyleSheet('padding-bottom: 10px')
-        self.offset_title.setFont(self.gui.list_font)
-        layout.addWidget(self.offset_title)
-
-        slider_widget = QWidget()
-        slider_widget.setFixedWidth(300)
-        slider_layout = QGridLayout()
-        slider_layout.setContentsMargins(0, 0, 0, 0)
-        slider_layout.setVerticalSpacing(0)
-        slider_widget.setLayout(slider_layout)
-        layout.addWidget(slider_widget)
-
-        self.offset_slider = QSlider()
-        self.offset_slider.setOrientation(Qt.Orientation.Horizontal)
-        self.offset_slider.setFont(self.gui.list_font)
-        self.offset_slider.setRange(0, 15)
-        self.offset_slider.setValue(self.gui.shadow_offset)
-        self.offset_slider.installEventFilter(self)
-        slider_layout.addWidget(self.offset_slider, 0, 0, 1, 2)
-
-        self.min_label = QLabel(str(self.offset_slider.minimum()) + 'px')
-        self.min_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(self.min_label, 1, 0, Qt.AlignmentFlag.AlignLeft)
-
-        self.max_label = QLabel(str(self.offset_slider.maximum()) + 'px')
-        self.max_label.setFont(self.gui.list_font)
-        slider_layout.addWidget(self.max_label, 1, 1, Qt.AlignmentFlag.AlignRight)
-
-    def eventFilter(self, obj, evt):
-        if obj == self.offset_slider and evt.type() == QEvent.Type.Wheel:
-            return True
-        else:
-            return super().eventFilter(obj, evt)
-
-
 class ServerCheck(QRunnable):
     """
     Creates a QRunnable that will periodically check that the three servers are up and running. Emits the GUI's
@@ -1513,8 +1283,8 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
         else:
             formatted_traceback += '    ' + full_traceback_split[i] + '\n'
 
-    date_time = time.time()
-    log_text = (f'{date_time}:\n'
+    date_time = time.ctime(time.time())
+    log_text = (f'\n{date_time}:\n'
                 f'    UNHANDLED EXCEPTION\n'
                 f'    {exc_type}\n'
                 f'    {exc_value}\n'

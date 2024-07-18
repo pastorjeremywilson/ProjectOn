@@ -745,4 +745,283 @@ unknown server errorunknown server errorunknown server error1713554510.9125838:
     [WinError 2] The system cannot find the file specified: 'C:\\Users\\pasto\\Nextcloud\\Documents\\Python Workspace\\project_on/data/videos/Video MP4_Lake - testfile.mp4' on line 483 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.delete_item
 1713554749.1445634:
     cannot access local variable 'table' where it is not associated with a value on line 495 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.delete_item
-unknown server error
+unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error1714509188.9451182:
+    'in <string>' requires string as left operand, not NoneType on line 533 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1714509296.1121643:
+    'in <string>' requires string as left operand, not NoneType on line 533 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+1715097541.4164364:
+    'GUI' object has no attribute 'gui' on line 682 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098082.7402565:
+    'GUI' object has no attribute 'gui' on line 682 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098105.6853573:
+    'GUI' object has no attribute 'settings' on line 684 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098181.796269:
+    'global_font' on line 684 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098300.7153544:
+    'global_font' on line 684 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098352.9935062:
+    'Toolbar' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098425.8597558:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098454.8957393:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098480.1773324:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098501.5913525:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098662.486738:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098699.6729674:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715098755.233859:
+    'FontWidget' object has no attribute 'font_list_widget' on line 688 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715115103.4516263:
+    can only concatenate str (not "NoneType") to str on line 541 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715115166.2765203:
+    can only concatenate str (not "NoneType") to str on line 541 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settingsunknown server errorunknown server errorunknown server errorunknown server error
+1715210284.0083852:
+    'Toolbar' object has no attribute 'song_background_combobox' on line 606 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715210332.496967:
+    'Toolbar' object has no attribute 'song_background_combobox' on line 606 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715210519.3354664:
+    'Toolbar' object has no attribute 'song_background_combobox' on line 609 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715210525.2049735:
+    'GUI' object has no attribute 'logo_label' on line 848 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.set_logo_image
+1715210599.4698033:
+    'NoneType' object has no attribute 'blockSignals' on line 609 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715210605.0095134:
+    'GUI' object has no attribute 'logo_label' on line 848 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.set_logo_image
+1715211209.2947981:
+    'NoneType' object has no attribute 'blockSignals' on line 609 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211215.0555403:
+    'GUI' object has no attribute 'logo_label' on line 848 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.set_logo_image
+1715211256.1545572:
+    'NoneType' object has no attribute 'blockSignals' on line 609 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211381.0258422:
+    'NoneType' object has no attribute 'blockSignals' on line 609 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211406.9025085:
+    'GUI' object has no attribute 'logo_label' on line 848 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.set_logo_image
+1715211544.218918:
+    'NoneType' object has no attribute 'blockSignals' on line 609 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211602.899057:
+    'NoneType' object has no attribute 'blockSignals' on line 610 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211646.519442:
+    'NoneType' object has no attribute 'blockSignals' on line 610 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211758.1562428:
+    'NoneType' object has no attribute 'blockSignals' on line 610 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211883.4039695:
+    'NoneType' object has no attribute 'blockSignals' on line 612 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211924.7450235:
+    'NoneType' object has no attribute 'blockSignals' on line 612 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715211988.6769419:
+    'NoneType' object has no attribute 'blockSignals' on line 610 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715212006.3882482:
+    'NoneType' object has no attribute 'blockSignals' on line 610 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715212024.5855243:
+    'NoneType' object has no attribute 'blockSignals' on line 610 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715212038.7749255:
+    'NoneType' object has no attribute 'blockSignals' on line 610 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715212188.549523:
+    'SettingsWidget' object has no attribute 'font_face_list' on line 34 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.__init__
+1715212290.1056635:
+    wrapped C/C++ object of type FontWidget has been deleted on line 796 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.blockSignals
+1715212374.020037:
+    'SettingsWidget' object has no attribute 'stage_font_spinbox' on line 37 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.__init__
+1715212468.3895812:
+    'SettingsWidget' object has no attribute 'stage_font_spinbox' on line 37 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.__init__unknown server error
+1715223735.447617:
+    invalid literal for int() with base 10: 'rgb(255' on line 558 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+1715265760.5251021:
+    'NoneType' object has no attribute 'append' on line 177 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715265764.3132977:
+    'NoneType' object has no attribute 'append' on line 177 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715265820.2718434:
+    arguments did not match any overloaded call:
+  addItem(self, text: Optional[str], userData: Any = None): argument 1 has unexpected type 'QListWidgetItem'
+  addItem(self, icon: QIcon, text: Optional[str], userData: Any = None): argument 1 has unexpected type 'QListWidgetItem' on line 181 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266127.8950894:
+    'NoneType' object has no attribute 'append' on line 180 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266130.6513157:
+    'NoneType' object has no attribute 'append' on line 180 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266155.078341:
+    arguments did not match any overloaded call:
+  addAction(self, icon: QIcon, text: Optional[str]): argument 1 has unexpected type 'list'
+  addAction(self, icon: QIcon, text: Optional[str], slot: PYQT_SLOT, type: Qt.ConnectionType = Qt.AutoConnection): argument 1 has unexpected type 'list'
+  addAction(self, icon: QIcon, text: Optional[str], shortcut: Union[QKeySequence, QKeySequence.StandardKey, Optional[str], int]): argument 1 has unexpected type 'list'
+  addAction(self, icon: QIcon, text: Optional[str], shortcut: Union[QKeySequence, QKeySequence.StandardKey, Optional[str], int], slot: PYQT_SLOT, type: Qt.ConnectionType = Qt.AutoConnection): argument 1 has unexpected type 'list'
+  addAction(self, text: Optional[str]): argument 1 has unexpected type 'list'
+  addAction(self, text: Optional[str], shortcut: Union[QKeySequence, QKeySequence.StandardKey, Optional[str], int]): argument 1 has unexpected type 'list'
+  addAction(self, text: Optional[str], slot: PYQT_SLOT, type: Qt.ConnectionType = Qt.AutoConnection): argument 1 has unexpected type 'list'
+  addAction(self, text: Optional[str], shortcut: Union[QKeySequence, QKeySequence.StandardKey, Optional[str], int], slot: PYQT_SLOT, type: Qt.ConnectionType = Qt.AutoConnection): argument 1 has unexpected type 'list'
+  addAction(self, action: Optional[QAction]): argument 1 has unexpected type 'list' on line 183 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266176.6573954:
+    arguments did not match any overloaded call:
+  addAction(self, icon: QIcon, text: Optional[str]): argument 1 has unexpected type 'list'
+  addAction(self, icon: QIcon, text: Optional[str], slot: PYQT_SLOT, type: Qt.ConnectionType = Qt.AutoConnection): argument 1 has unexpected type 'list'
+  addAction(self, icon: QIcon, text: Optional[str], shortcut: Union[QKeySequence, QKeySequence.StandardKey, Optional[str], int]): argument 1 has unexpected type 'list'
+  addAction(self, icon: QIcon, text: Optional[str], shortcut: Union[QKeySequence, QKeySequence.StandardKey, Optional[str], int], slot: PYQT_SLOT, type: Qt.ConnectionType = Qt.AutoConnection): argument 1 has unexpected type 'list'
+  addAction(self, text: Optional[str]): argument 1 has unexpected type 'list'
+  addAction(self, text: Optional[str], shortcut: Union[QKeySequence, QKeySequence.StandardKey, Optional[str], int]): argument 1 has unexpected type 'list'
+  addAction(self, text: Optional[str], slot: PYQT_SLOT, type: Qt.ConnectionType = Qt.AutoConnection): argument 1 has unexpected type 'list'
+  addAction(self, text: Optional[str], shortcut: Union[QKeySequence, QKeySequence.StandardKey, Optional[str], int], slot: PYQT_SLOT, type: Qt.ConnectionType = Qt.AutoConnection): argument 1 has unexpected type 'list'
+  addAction(self, action: Optional[QAction]): argument 1 has unexpected type 'list' on line 183 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266451.6949275:
+    'ProjectOn' object has no attribute 'image_items' on line 164 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266454.435154:
+    'ProjectOn' object has no attribute 'image_items' on line 164 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266473.7485545:
+    arguments did not match any overloaded call:
+  addItem(self, text: Optional[str], userData: Any = None): argument 1 has unexpected type 'QIcon'
+  addItem(self, icon: QIcon, text: Optional[str], userData: Any = None): argument 2 has unexpected type 'list' on line 180 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266502.919598:
+    arguments did not match any overloaded call:
+  addItem(self, text: Optional[str], userData: Any = None): argument 1 has unexpected type 'QIcon'
+  addItem(self, icon: QIcon, text: Optional[str], userData: Any = None): argument 2 has unexpected type 'list' on line 180 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refresh
+1715266571.8632169:
+    'NoneType' object has no attribute 'close' on line 185 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in ImageCombobox.refreshunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Wed May 15 14:25:09 2024:
+    'NoneType' object has no attribute 'isPlaying' on line 1151 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.change_display
+Wed May 15 14:25:42 2024:
+    'NoneType' object has no attribute 'isPlaying' on line 1151 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.change_display
+Wed May 15 14:42:52 2024:
+    'NoneType' object has no attribute 'deleteLater' on line 1147 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.change_displayunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Wed May 15 15:22:12 2024:
+    wrapped C/C++ object of type QVideoSink has been deleted on line 633 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Wed May 15 15:22:17 2024:
+    cannot access local variable 'pixmap' where it is not associated with a value on line 642 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Wed May 15 18:22:54 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 18:24:11 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 18:32:18 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 18:58:29 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 18:59:32 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 19:00:18 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 19:01:34 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 19:02:05 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 19:06:51 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 19:07:22 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 19:07:50 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:51:02 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:51:56 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:52:37 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:53:22 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:54:37 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:55:36 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:56:55 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 20:57:52 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 436 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server error
+Wed May 15 21:00:59 2024:
+    setStyleSheet(self, styleSheet: Optional[str]): not enough arguments on line 443 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:04:20 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 397 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:05:00 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 397 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:06:11 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 397 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:10:09 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 397 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:12:33 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 417 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_theme
+Wed May 15 21:18:53 2024:
+    'NoneType' object has no attribute 'set_style_sheet' on line 421 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_themeunknown server errorunknown server errorunknown server errorunknown server error
+Thu May 16 09:17:23 2024:
+    'FontFaceComboBox' object has no attribute 'apply_settings' on line 427 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.apply_settingsunknown server errorunknown server error
+Thu May 16 11:21:51 2024:
+    'int' object has no attribute 'replace' on line 366 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu May 16 11:23:39 2024:
+    'int' object has no attribute 'replace' on line 366 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu May 16 11:24:09 2024:
+    'int' object has no attribute 'replace' on line 366 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_songunknown server errorunknown server errorunknown server error
+Thu May 16 12:36:14 2024:
+    near ",": syntax error on line 403 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_songunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Thu May 16 14:46:03 2024:
+    'NoneType' object is not subscriptable on line 1096 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Thu May 16 14:48:24 2024:
+    'NoneType' object is not subscriptable on line 1115 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_liveunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Thu May 16 16:36:58 2024:
+    invalid literal for int() with base 10: 'rgb(0' on line 702 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Thu May 16 16:37:42 2024:
+    invalid literal for int() with base 10: 'rgb(0' on line 702 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Thu May 16 16:40:17 2024:
+    invalid literal for int() with base 10: 'rgb(0' on line 702 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Thu May 16 16:40:33 2024:
+    invalid literal for int() with base 10: 'rgb(0' on line 702 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settingsunknown server error
+Thu May 16 16:54:43 2024:
+    can only concatenate str (not "int") to str on line 452 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:56:13 2024:
+    can only concatenate str (not "bool") to str on line 452 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:57:30 2024:
+    can only concatenate str (not "bool") to str on line 452 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:58:26 2024:
+    can only concatenate str (not "bool") to str on line 452 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:59:12 2024:
+    'list' object cannot be interpreted as an integer on line 450 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 16:59:45 2024:
+    can only concatenate str (not "bool") to str on line 454 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_custom
+Thu May 16 17:01:37 2024:
+    'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 10:17:59 2024:
+    'NoneType' object has no attribute 'blockSignals' on line 894 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.blockSignals
+Fri May 17 10:18:36 2024:
+    'NoneType' object has no attribute 'blockSignals' on line 894 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.blockSignalsunknown server error
+Fri May 17 10:19:13 2024:
+    find(a0: PyQt6.sip.voidptr): argument 1 has unexpected type 'str' on line 916 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.apply_settingsunknown server errorunknown server errorunknown server error
+Fri May 17 12:57:54 2024:
+    'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 12:58:51 2024:
+    'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 13:01:09 2024:
+    'NoneType' object is not subscriptable on line 1117 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 13:02:04 2024:
+    'NoneType' object is not subscriptable on line 1123 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Fri May 17 13:02:42 2024:
+    'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_liveunknown server error
+Sat May 18 14:46:42 2024:
+    UNHANDLED EXCEPTION
+    'AttributeError'
+    'QWidget' object has no attribute 'mouse_release_signal'
+    file C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py, line 265 in eventFilter
+Sat May 18 14:46:48 2024:
+    UNHANDLED EXCEPTION
+    'TypeError'
+    invalid result from CustomSlider.mouseReleaseEvent()
+    unknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Wed May 29 10:58:04 2024:
+    list index out of range on line 402 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Wed May 29 11:01:48 2024:
+    list index out of range on line 402 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Wed May 29 11:05:08 2024:
+    17 values for 18 columns on line 405 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Mon Jun  3 22:44:13 2024:
+    'shadow_offset' on line 819 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Mon Jun  3 22:44:49 2024:
+    'shadow_offset' on line 819 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Mon Jun  3 22:46:51 2024:
+    'shadow_offset' on line 819 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Mon Jun  3 22:47:06 2024:
+    'shadow_offset' on line 819 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Mon Jun  3 22:48:01 2024:
+    'shadow_offset' on line 821 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Wed Jun  5 22:12:31 2024:
+    UNHANDLED EXCEPTION
+    'AttributeError'
+    'NoneType' object has no attribute 'objectName'
+    file X:\Documents\Python Workspace\project_on\edit_widget.py, line 953 in save_customunknown server errorunknown server errorunknown server errorunknown server errorunknown server error

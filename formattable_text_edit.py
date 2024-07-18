@@ -159,7 +159,7 @@ class FormattableTextEdit(QWidget):
 
     def keyPressEvent(self, event: QKeyEvent):
         """
-        Provide the standard CTRL-B, CTRL-I, and CTRL-U for changing formatting.
+        Override keyPressEvent to provide the standard CTRL-B, CTRL-I, and CTRL-U for changing formatting.
         :param QKeyEvent event: keyPressEvent
         """
         if event.key() == Qt.Key.Key_B and event.modifiers() == Qt.KeyboardModifier.ControlModifier:
@@ -204,3 +204,28 @@ class CustomTextEdit(QTextEdit):
         # In case not text.
         else:
             QTextEdit.insertFromMimeData(self, mime_data)
+            
+    def keyPressEvent(self, evt):
+        """
+        Override keyPressEvent to provide listeners for certain keystrokes that may indicate that the tag list
+        needs to be updated
+        """
+        super().keyPressEvent(evt)
+        if evt.key() == Qt.Key.Key_BracketRight and self.parent().parent().objectName() == 'lyrics_widget':
+            parent = self.parent()
+            while parent.parent():
+                if parent.objectName() == 'edit_widget':
+                    parent.populate_tag_list()
+                    break
+                else:
+                    parent = parent.parent()
+        elif ((evt.key() == Qt.Key.Key_Delete or evt.key() == Qt.Key.Key_Backspace)
+              and self.parent().parent().objectName() == 'lyrics_widget'):
+            parent = self.parent()
+            while parent.parent():
+                if parent.objectName() == 'edit_widget':
+                    parent.populate_tag_list()
+                    break
+                else:
+                    parent = parent.parent()
+            

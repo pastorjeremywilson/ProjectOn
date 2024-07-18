@@ -23,58 +23,63 @@ class OOSWidget(QWidget):
         """
         Method to create and lay out all of this widget's components.
         """
-        layout = QVBoxLayout()
+        self.setObjectName('oos_widget')
+
+        layout = QVBoxLayout(self)
         layout.setSpacing(0)
-        self.setLayout(layout)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        container = QWidget()
+        container.setObjectName('container')
+        #container.setStyleSheet('#container { border: 2px solid black; }')
+        layout.addWidget(container)
+
+        container_layout = QGridLayout(container)
+        container_layout.setSpacing(0)
+        container_layout.setContentsMargins(2, 2, 2, 2)
+        container_layout.setRowStretch(0, 1)
+        container_layout.setRowStretch(1, 20)
+        container_layout.setRowStretch(2, 20)
 
         title_label = QLabel('Order of Service')
+        title_label.setObjectName('title_label')
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setFont(self.gui.standard_font)
-        title_label.setStyleSheet(
-            'background: lightGrey; color: black; border: 2px solid black; border-bottom: 0;')
-        layout.addWidget(title_label)
-
-        list_widget = QWidget()
-        list_widget.setObjectName('list_widget')
-        list_widget.setStyleSheet('#list_widget { border: 2px solid black; padding: 2px; }')
-        list_layout = QGridLayout()
-        list_layout.setSpacing(0)
-        list_layout.setContentsMargins(2, 2, 2, 2)
-        list_layout.setColumnStretch(0, 50)
-        list_widget.setLayout(list_layout)
-        layout.addWidget(list_widget)
+        title_label.setFont(self.gui.bold_font)
+        #title_label.setStyleSheet(
+        #    'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
+        container_layout.addWidget(title_label, 0, 0, 1, 2)
 
         self.oos_list_widget = CustomListWidget(self.gui)
         self.oos_list_widget.setObjectName('oos_list_widget')
-        self.oos_list_widget.setStyleSheet('#oos_list_widget { margin: 0; }')
-        self.oos_list_widget.setFont(self.gui.standard_font)
-        list_layout.addWidget(self.oos_list_widget, 0, 0, 2, 1)
+        #self.oos_list_widget.setStyleSheet('#oos_list_widget { margin: 0; }')
+        self.oos_list_widget.setFont(self.gui.bold_font)
+        container_layout.addWidget(self.oos_list_widget, 1, 0, 2, 1)
 
         move_up_button = QPushButton()
         move_up_button.setIcon(QIcon('./resources/item_up.svg'))
         move_up_button.setIconSize(QSize(10, 30))
         move_up_button.setToolTip('Move Item Up')
         move_up_button.setFixedWidth(20)
-        move_up_button.setStyleSheet(
+        '''move_up_button.setStyleSheet(
             'QPushButton { border: square; background: white; margin-top: 1px; border-bottom: 1px solid black; } '
             'QPushButton:hover { background: lightGrey; }'
-        )
+        )'''
         move_up_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
         move_up_button.pressed.connect(self.move_item_up)
-        list_layout.addWidget(move_up_button, 0, 1)
+        container_layout.addWidget(move_up_button, 1, 1)
 
         move_down_button = QPushButton()
         move_down_button.setIcon(QIcon('./resources/item_down.svg'))
         move_down_button.setIconSize(QSize(10, 30))
         move_down_button.setToolTip('Move Item Down')
         move_down_button.setFixedWidth(20)
-        move_down_button.setStyleSheet(
+        '''move_down_button.setStyleSheet(
             'QPushButton { border: square; background: white; margin-bottom: 1px; } '
             'QPushButton:hover { background: lightGrey; }'
-        )
+        )'''
         move_down_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
         move_down_button.pressed.connect(self.move_item_down)
-        list_layout.addWidget(move_down_button, 1, 1)
+        container_layout.addWidget(move_down_button, 2, 1)
 
     def move_item_up(self):
         """
@@ -108,6 +113,7 @@ class CustomListWidget(QListWidget):
         """
         super().__init__()
         self.gui = gui
+        self.setObjectName('CustomListWidget')
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
@@ -154,25 +160,28 @@ class CustomListWidget(QListWidget):
 
     def dropEvent(self, evt):
         """
-        Overrides dropEvent to properly add a QListWidget item to this widget based on the type stored in data(30).
+        Overrides dropEvent to properly add a QListWidget item to this widget based on the type stored in data(40).
         :param QDropEvent evt: dropEvent
         :return:
         """
+        if evt.source() == self:
+            super().dropEvent(evt)
+            return
         item = evt.source().currentItem().clone()
         item.setText('')
         row = self.row(self.itemAt(QPoint(int(evt.position().x()), int(evt.position().y()))))
         if row == -1:
             row = self.count()
 
-        if evt.source().currentItem().data(30) == 'song':
+        if evt.source().currentItem().data(40) == 'song':
             self.gui.media_widget.add_song_to_service(item, row)
-        elif evt.source().currentItem().data(30) == 'custom':
+        elif evt.source().currentItem().data(40) == 'custom':
             self.gui.media_widget.add_custom_to_service(item, row)
-        elif evt.source().currentItem().data(30) == 'image':
+        elif evt.source().currentItem().data(40) == 'image':
             self.gui.media_widget.add_image_to_service(item, row)
-        elif evt.source().currentItem().data(30) == 'video':
+        elif evt.source().currentItem().data(40) == 'video':
             self.gui.media_widget.add_video_to_service(item, row)
-        elif evt.source().currentItem().data(30) == 'web':
+        elif evt.source().currentItem().data(40) == 'web':
             self.gui.media_widget.add_web_to_service(item, row)
 
         remote_oos_buttons = ''
@@ -199,9 +208,9 @@ class CustomListWidget(QListWidget):
 
         edit_text = None
         if self.itemAt(self.item_pos):
-            if self.itemAt(self.item_pos).data(30) == 'song':
+            if self.itemAt(self.item_pos).data(40) == 'song':
                 edit_text = 'Edit Song'
-            elif self.itemAt(self.item_pos).data(30) == 'custom':
+            elif self.itemAt(self.item_pos).data(40) == 'custom':
                 edit_text = 'Edit Custom Slide'
 
             if edit_text:
@@ -221,11 +230,11 @@ class CustomListWidget(QListWidget):
         :return:
         """
         if self.itemAt(self.item_pos):
-            if self.itemAt(self.item_pos).data(30) == 'song':
+            if self.itemAt(self.item_pos).data(40) == 'song':
                 item_text = self.itemAt(self.item_pos).data(20)
                 song_info = self.gui.main.get_song_data(item_text)
                 song_edit = EditWidget(self.gui, 'song', song_info, item_text)
-            elif self.itemAt(self.item_pos).data(30) == 'custom':
+            elif self.itemAt(self.item_pos).data(40) == 'custom':
                 item_text = self.itemAt(self.item_pos).data(20)
                 custom_info = self.gui.main.get_custom_data(item_text)
                 song_edit = EditWidget(self.gui, 'custom', custom_info, item_text)

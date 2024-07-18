@@ -193,7 +193,7 @@ class RemoteServer(QRunnable):
                 class_tag = ''
 
             remote_oos_buttons += f"""
-                <button id="{str(i)}" {class_tag}type="submit" name="oos_button" value="{str(i)}">
+                <button id="oos{str(i)}" {class_tag}type="submit" name="oos_button" value="{str(i)}">
                     <span class="title">
                         {title}
                     </span>
@@ -203,15 +203,15 @@ class RemoteServer(QRunnable):
         slide_buttons = ''
         current_row = self.gui.live_widget.slide_list.currentRow()
         for i in range(self.gui.live_widget.slide_list.count()):
-            if self.gui.live_widget.slide_list.item(i).data(30) == 'video':
+            if self.gui.live_widget.slide_list.item(i).data(40) == 'video':
                 title = self.gui.live_widget.slide_list.item(i).data(20)
                 text = 'Video'
             else:
-                title = self.gui.live_widget.slide_list.item(i).data(31)[1]
-                if type(self.gui.live_widget.slide_list.item(i).data(31)[2]) == bytes:
+                title = self.gui.live_widget.slide_list.item(i).data(24)[1]
+                if type(self.gui.live_widget.slide_list.item(i).data(24)[2]) == bytes:
                     text = ''
                 else:
-                    text = self.gui.live_widget.slide_list.item(i).data(31)[2]
+                    text = self.gui.live_widget.slide_list.item(i).data(24)[2]
 
             if i == current_row:
                 class_tag = 'class="current" '
@@ -219,7 +219,7 @@ class RemoteServer(QRunnable):
                 class_tag = ''
 
             slide_buttons += f"""
-                <button id="{str(i)}" {class_tag}type="submit" name="slide_button" value="{str(i)}">
+                <button id="slide{str(i)}" {class_tag}type="submit" name="slide_button" value="{str(i)}">
                     <span class="title">{title}</span>
                     <br>
                     <span class="text">{text}</span>

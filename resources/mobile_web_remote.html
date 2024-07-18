@@ -13,34 +13,6 @@
 				box-sizing: inherit;
 			}
 
-			#header {
-				flex: 5%;
-				display: flex;
-				flex-direction: column;
-				padding: 10px;
-				width: 100%;
-				position: fixed;
-				left: 0;
-				top: 0;
-				background-color: #aaaaff;
-			}
-
-			#title {
-				display: flex;
-				justify-content: center;
-				width: auto;
-				color: white;
-				font-family: 'Helvetica', sans-serif;
-				font-size: 3vh;
-				font-weight: bold;
-			}
-
-			#buttons {
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-			}
-
 			button {
 				padding-top: 30px;
 				padding-bottom: 30px;
@@ -52,6 +24,42 @@
 				font-size: 2.5vh;
 			}
 
+			#header {
+				flex: 5%;
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+				position: fixed;
+				left: 0;
+				top: 0;
+				background-color: #aaaaff;
+				padding: 20px 40px;
+			}
+
+			#title {
+				display: flex;
+				flex-direction: row;
+				width: 100%;
+				align-content: center;
+				justify-content: center;
+				color: white;
+				font-family: 'Helvetica', sans-serif;
+				font-size: 3vh;
+				font-weight: bold;
+				margin-bottom: 20px;
+			}
+
+			#buttons {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+			}
+
+			#screen-buttons, #nav-buttons {
+				display: flex;
+				flex-direction: row;
+			}
+
 			.nav {
 				border: 5px solid white;
 				border-radius: 10px;
@@ -61,6 +69,7 @@
 				width: 96px;
 				height: 96px;
 				padding: 10px;
+				background-color: #aaaaff;
 			}
 
 			.nav:hover {
@@ -84,21 +93,25 @@
 
 			#item_back {
 				background-image: url({{ url_for('static', filename='item_back.svg') }});
+				flex: 25%;
 				margin-right: 40px;
 			}
 
 			#slide_back {
 				background-image: url({{ url_for('static', filename='slide_back.svg') }});
+				flex: 25%;
 				margin-right: 40px;
 			}
 
 			#slide_forward {
 				background-image: url({{ url_for('static', filename='slide_forward.svg') }});
+				flex: 25%;
 				margin-right: 40px;
 			}
 
 			#item_forward {
 				background-image: url({{ url_for('static', filename='item_forward.svg') }});
+				flex: 25%;
 			}
 
 			#main {
@@ -145,18 +158,20 @@
 	</head>
 	
 	<body>
-		<div id="header">`
-			<div id="title">ProjectOn Remote</div>`
+		<div id="header">
+			<div id="title">ProjectOn Remote</div>
+
 			<div id="buttons">
-				<div id="header-left">
+				<div id="screen-buttons">
+					<button id="black_screen" class="nav" onclick="blackScreen()"></button>
+					<button id="logo_screen" class="nav" onclick="logoScreen()"></button>
+				</div>
+
+				<div id="nav-buttons">
 					<button id="item_back" class="nav" onclick="itemBack()"></button>
 					<button id="slide_back" class="nav" onclick="slideBack()"></button>
 					<button id="slide_forward" class="nav" onclick="slideForward()"></button>
 					<button id="item_forward" class="nav" onclick="itemForward()"></button>
-				</div>
-				<div id="header-right>">
-					<button id="black_screen" class="nav" onclick="blackScreen()"></button>
-					<button id="logo_screen" class="nav" onclick="logoScreen()"></button>
 				</div>
 			</div>
 		</div>
