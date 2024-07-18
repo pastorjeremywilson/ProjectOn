@@ -2,8 +2,8 @@ import os
 import shutil
 
 from PyQt6.QtCore import QSize, QPoint
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog
+from PyQt6.QtGui import QIcon, QPalette
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog, QStyle
 
 from openlp_import import OpenLPImport
 from settings_widget import SettingsWidget
@@ -23,10 +23,8 @@ class Toolbar(QWidget):
 
     def init_components(self):
         self.setObjectName('toolbar')
-        self.layout = QHBoxLayout()
+        self.layout = QHBoxLayout(self)
         self.setMaximumHeight(60)
-        self.setLayout(self.layout)
-        self.setStyleSheet('background: white')
 
         save_button = QPushButton()
         save_button.setIcon(QIcon('./resources/save.svg'))

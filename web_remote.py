@@ -193,7 +193,7 @@ class RemoteServer(QRunnable):
                 class_tag = ''
 
             remote_oos_buttons += f"""
-                <button id="{str(i)}" {class_tag}type="submit" name="oos_button" value="{str(i)}">
+                <button id="oos{str(i)}" {class_tag}type="submit" name="oos_button" value="{str(i)}">
                     <span class="title">
                         {title}
                     </span>
@@ -219,7 +219,7 @@ class RemoteServer(QRunnable):
                 class_tag = ''
 
             slide_buttons += f"""
-                <button id="{str(i)}" {class_tag}type="submit" name="slide_button" value="{str(i)}">
+                <button id="slide{str(i)}" {class_tag}type="submit" name="slide_button" value="{str(i)}">
                     <span class="title">{title}</span>
                     <br>
                     <span class="text">{text}</span>

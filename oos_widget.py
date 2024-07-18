@@ -31,7 +31,7 @@ class OOSWidget(QWidget):
 
         container = QWidget()
         container.setObjectName('container')
-        container.setStyleSheet('#container { border: 2px solid black; }')
+        #container.setStyleSheet('#container { border: 2px solid black; }')
         layout.addWidget(container)
 
         container_layout = QGridLayout(container)
@@ -45,13 +45,13 @@ class OOSWidget(QWidget):
         title_label.setObjectName('title_label')
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet(
-            'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
+        #title_label.setStyleSheet(
+        #    'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
         container_layout.addWidget(title_label, 0, 0, 1, 2)
 
         self.oos_list_widget = CustomListWidget(self.gui)
         self.oos_list_widget.setObjectName('oos_list_widget')
-        self.oos_list_widget.setStyleSheet('#oos_list_widget { margin: 0; }')
+        #self.oos_list_widget.setStyleSheet('#oos_list_widget { margin: 0; }')
         self.oos_list_widget.setFont(self.gui.bold_font)
         container_layout.addWidget(self.oos_list_widget, 1, 0, 2, 1)
 
@@ -60,10 +60,10 @@ class OOSWidget(QWidget):
         move_up_button.setIconSize(QSize(10, 30))
         move_up_button.setToolTip('Move Item Up')
         move_up_button.setFixedWidth(20)
-        move_up_button.setStyleSheet(
+        '''move_up_button.setStyleSheet(
             'QPushButton { border: square; background: white; margin-top: 1px; border-bottom: 1px solid black; } '
             'QPushButton:hover { background: lightGrey; }'
-        )
+        )'''
         move_up_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
         move_up_button.pressed.connect(self.move_item_up)
         container_layout.addWidget(move_up_button, 1, 1)
@@ -73,10 +73,10 @@ class OOSWidget(QWidget):
         move_down_button.setIconSize(QSize(10, 30))
         move_down_button.setToolTip('Move Item Down')
         move_down_button.setFixedWidth(20)
-        move_down_button.setStyleSheet(
+        '''move_down_button.setStyleSheet(
             'QPushButton { border: square; background: white; margin-bottom: 1px; } '
             'QPushButton:hover { background: lightGrey; }'
-        )
+        )'''
         move_down_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
         move_down_button.pressed.connect(self.move_item_down)
         container_layout.addWidget(move_down_button, 2, 1)

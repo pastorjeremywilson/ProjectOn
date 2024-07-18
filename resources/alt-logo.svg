@@ -97,7 +97,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:7.85062;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6060c0;fill-opacity:1;stroke:none;stroke-width:7.85062;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect6"
        width="137.58333"
        height="139.76506"
@@ -125,14 +125,14 @@
        id="g8"
        style="filter:url(#filter8)">
       <rect
-         style="fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:2.21973;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:#6060c0;fill-opacity:1;stroke:none;stroke-width:2.21973;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          id="rect7"
          width="96.837494"
          height="15.875001"
          x="19.314587"
          y="39.6875" />
       <rect
-         style="fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:2.66673;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:#6060c0;fill-opacity:1;stroke:none;stroke-width:2.66673;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
          id="rect8"
          width="139.76508"
          height="15.875001"
@@ -142,24 +142,24 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.9;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';letter-spacing:2.6355px;fill:#5555aa;fill-opacity:1;stroke:#ffffff;stroke-width:1.80691;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.9;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';letter-spacing:2.6355px;fill:#6060c0;fill-opacity:1;stroke:#ffffff;stroke-width:1.80691;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        x="166.94438"
        y="189.98863"
        id="text10"><tspan
          sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:25.4px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans Bold';fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:1.80691;stroke-opacity:1"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:25.4px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans Bold';fill:#6060c0;fill-opacity:1;stroke:none;stroke-width:1.80691;stroke-opacity:1"
          x="166.94438"
          y="189.98863"
          id="tspan10">PROJECT</tspan></text>
     <rect
-       style="fill:#5555aa;fill-opacity:1;stroke:#5555aa;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6060c0;fill-opacity:1;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect2"
        width="9.2349977"
        height="26.497761"
        x="215.75795"
        y="210.84082" />
     <rect
-       style="fill:#5555aa;fill-opacity:1;stroke:#5555aa;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6060c0;fill-opacity:1;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect3"
        width="37.041668"
        height="37.041668"
@@ -168,7 +168,7 @@
        rx="8.2312536"
        ry="8.2836666" />
     <path
-       style="fill:#5555aa;fill-opacity:1;stroke:#ffffff;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6060c0;fill-opacity:1;stroke:#ffffff;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        d="m 227.15578,210.30272 75.21765,-19.52837 v 71.25214 L 227.15578,236.6924 c -13.64837,-2.63897 -13.64837,-23.75071 0,-26.38968 z"
        id="path36"
        sodipodi:nodetypes="ccccc" />
@@ -184,14 +184,14 @@
          y="130.40935"
          id="tspan22">ON</tspan></text>
     <rect
-       style="fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6060c0;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect38"
        width="137.58333"
        height="15.875001"
        x="167.81462"
        y="146.41016" />
     <rect
-       style="fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6060c0;fill-opacity:1;stroke:none;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect39"
        width="137.58333"
        height="15.875001"
@@ -201,13 +201,13 @@
        id="g4"
        transform="matrix(1.1666667,0,0,1.1666667,-169.95069,56.885418)">
       <circle
-         style="fill:#5555aa;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round"
+         style="fill:#6060c0;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round"
          id="path1"
          cx="203.72916"
          cy="-7.9375005"
          r="23.8125" />
       <circle
-         style="fill:#aaaaff;fill-opacity:1;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round"
+         style="fill:#6060c0;fill-opacity:1;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round"
          id="path2"
          cx="203.72916"
          cy="-7.9375005"

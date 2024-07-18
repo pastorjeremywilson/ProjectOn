@@ -57,7 +57,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:none;stroke:#5555aa;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect344"
        width="27.78125"
        height="27.78125"
@@ -66,7 +66,7 @@
        rx="3"
        ry="3" />
     <rect
-       style="fill:#5555aa;fill-opacity:1;stroke:#5555aa;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6060c0;fill-opacity:1;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="rect1506"
        width="19.84375"
        height="5.2916665"
@@ -76,7 +76,7 @@
        ry="3" />
     <path
        id="path1640"
-       style="fill:#5555aa;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#6060c0;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 8.334375 20.240625 L 8.334375 30.823958 L 25.532292 30.823958 L 25.532292 20.240625 L 8.334375 20.240625 z M 17.594792 22.886458 L 22.886458 22.886458 L 22.886458 29.501042 L 17.594792 29.501042 L 17.594792 22.886458 z " />
   </g>
 </svg>

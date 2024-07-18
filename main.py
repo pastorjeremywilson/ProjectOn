@@ -1,6 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
+Projecton v.1.1rc
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -60,52 +61,20 @@ class ProjectOn(QObject):
     update_status_signal = pyqtSignal(str, str)
     info_label = None
     initial_startup = True
-    portable = True
     image_items = None
     logo_items = None
-
+    thread_pool = None
     status_update_count = 0
 
     def __init__(self):
         super().__init__()
 
-        #not currently implimented, but sets different directory locations for a portable or standard installment
-        if self.portable:
-            os.chdir(os.path.dirname(__file__))
-            self.data_dir = os.path.dirname(os.path.abspath(__file__)).replace('\\\\', '/') + '/data'
-            self.config_file = self.data_dir + '/settings.json'
-            self.device_specific_config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')
-            self.database = self.data_dir + '/projecton.db'
-            self.background_dir = self.data_dir + '/backgrounds'
-            self.image_dir = self.data_dir + '/images'
-            self.bible_dir = self.data_dir + '/bibles'
-            self.video_dir = self.data_dir + '/videos'
-        else:
-            self.data_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
-            self.config_file = self.data_dir + '/settings.json'
-            self.device_specific_config_file = self.data_dir + '/localConfig.json'
-            self.database = self.data_dir + '/projecton.db'
-            self.background_dir = self.data_dir + '/backgrounds'
-            self.image_dir = self.data_dir + '/images'
-            self.bible_dir = self.data_dir + '/bibles'
-            self.video_dir = self.data_dir + '/videos'
-
-        if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
-            os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
-        if not exists(self.config_file):
-            if exists(self.data_dir + '/settings.json'):
-                shutil.copy(self.data_dir + '/settings.json', self.config_file)
-        if not exists(self.device_specific_config_file):
-            device_specific_settings = {'used_services': '', 'last_save_dir': ''}
-
-        # ensure all needed files exist; thread it and wait until done before moving on
-        self.thread_pool = QThreadPool()
-        cf = CheckFiles(self)
-        self.thread_pool.start(cf)
-        self.thread_pool.waitForDone()
-
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
+        self.app = QApplication(sys.argv)
+        self.app.setStyle('Fusion')
+
+        self.thread_pool = QThreadPool()
         self.server_thread_pool = QThreadPool()
         self.update_status_signal.connect(self.update_status_label)
 
@@ -114,63 +83,13 @@ class ProjectOn(QObject):
         s.connect(('192.255.255.255', 1))
         self.ip = s.getsockname()[0]
 
-        self.app = QApplication(sys.argv)
-
-        # provide default settings should the settings file not exist
-        default_settings = {
-            'selected_screen_name': '',
-            'font_face': 'Helvetica',
-            'font_size': 60,
-            'font_color': 'white',
-            'global_song_background': '',
-            'global_bible_background': '',
-            'logo_image': '',
-            'last_save_dir': './saved services',
-            'last_status_count': 0,
-            'stage_font_size': 60
-        }
-
-        if exists(self.data_dir + '/settings.json'):
-            with open(self.data_dir + '/settings.json', 'r') as file:
-                try:
-                    self.settings = json.loads(file.read())
-                except json.decoder.JSONDecodeError:
-                    self.settings = {}
-        else:
-            self.settings = default_settings
-
-        if exists(self.device_specific_config_file):
-            with open(self.device_specific_config_file, 'r') as file:
-                device_specific_settings = json.loads(file.read())
-
-            self.settings['used_services'] = device_specific_settings['used_services']
-            self.settings['last_save_dir'] = device_specific_settings['last_save_dir']
-            if 'last_status_count' in device_specific_settings.keys():
-                self.settings['last_status_count'] = device_specific_settings['last_status_count']
-
-        for key in default_settings:
-            if not key in self.settings.keys():
-                self.settings[key] = default_settings[key]
-        self.get_song_titles()
-
-        self.make_splash_screen()
-
-        self.update_status_signal.emit('Checking Files', 'status')
-        self.app.processEvents()
-
-        self.status_label.setText('Indexing Images')
-        self.app.processEvents()
-
-        ii = IndexImages(self, 'backgrounds')
-        self.thread_pool.start(ii)
-        self.thread_pool.waitForDone()
-
-        ii = IndexImages(self, 'images')
-        self.thread_pool.start(ii)
-        self.thread_pool.waitForDone()
-
-        self.update_status_signal.emit('Creating GUI', 'status')
-        self.app.processEvents()
+        last_status_count = 100
+        if exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')):
+            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json'), 'r') as file:
+                contents = json.loads(file.read())
+            if 'last_status_count' in contents.keys():
+                last_status_count = contents['last_status_count']
+        self.make_splash_screen(last_status_count)
 
         self.gui = GUI(self)
 
@@ -212,7 +131,7 @@ class ProjectOn(QObject):
             self.status_update_count += 1
             self.splash_widget.setFocus()
 
-    def make_splash_screen(self):
+    def make_splash_screen(self, last_status_count):
         """
         Create the splash screen that will show progress as the program is loading
         """
@@ -222,13 +141,13 @@ class ProjectOn(QObject):
         self.splash_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.splash_widget.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop, True)
         self.splash_widget.setStyleSheet(
-            '#splash_widget { background: #5555aa; }')
+            '#splash_widget { background: #6060c0; }')
         splash_layout = QVBoxLayout(self.splash_widget)
         splash_layout.setContentsMargins(20, 20, 20, 20)
 
         container = QWidget()
         container.setObjectName('container')
-        container.setStyleSheet('#container { background: #5555aa; border: 2px solid white; }')
+        container.setStyleSheet('#container { background: #6060c0; border: 2px solid white; }')
         container_layout = QVBoxLayout(container)
         container_layout.setContentsMargins(20, 20, 20, 20)
         splash_layout.addWidget(container)
@@ -248,13 +167,12 @@ class ProjectOn(QObject):
         container_layout.addSpacing(20)
 
         self.progress_bar = QProgressBar()
-        if self.settings['last_status_count']:
-            self.progress_bar.setRange(0, self.settings['last_status_count'])
+        self.progress_bar.setRange(0, last_status_count)
         self.progress_bar.setValue(0)
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setStyleSheet(
             'QProgressBar { border: 1px solid white; background: white; } '
-            'QProgressBar::chunk { background-color: #5555aa; }'
+            'QProgressBar::chunk { background-color: #6060c0; }'
         )
         container_layout.addWidget(self.progress_bar)
 
@@ -400,7 +318,7 @@ class ProjectOn(QObject):
                        + song_data[3] + '","' + song_data[4] + '","' + song_data[5] + '","' + song_data[6]
                        + '","' + song_data[7] + '","' + song_data[8] + '","' + song_data[9] + '","' + song_data[10]
                        + '","' + song_data[11] + '","' + song_data[12] + '","' + song_data[13] + '","' + song_data[14]
-                       + '","' + song_data[15] + '","' + song_data[16] + '")')
+                       + '","' + song_data[15] + '","' + song_data[16] + '","' + song_data[17] + '")')
 
             cursor.execute(sql)
             connection.commit()
@@ -606,6 +524,7 @@ class ProjectOn(QObject):
             device_specific_settings['used_services'] = self.settings['used_services']
             device_specific_settings['last_save_dir'] = self.settings['last_save_dir']
             device_specific_settings['last_status_count'] = self.settings['last_status_count']
+            device_specific_settings['data_dir'] = self.data_dir
             with open(self.device_specific_config_file, 'w') as file:
                 file.write(json.dumps(device_specific_settings, indent=4))
 
@@ -665,6 +584,7 @@ class ProjectOn(QObject):
 
             dialog_needed = True
             if self.gui.current_file:
+                print(self.gui.current_file)
                 dialog_needed = False
             elif len(self.settings['last_save_dir']) > 0:
                 save_dir = self.settings['last_save_dir']
@@ -682,36 +602,37 @@ class ProjectOn(QObject):
             if len(result[0]) > 0:
                 try:
                     if result == 'saved':
-                        filename = self.gui.current_file
+                        file_loc = self.gui.current_file
                     else:
-                        filename = result[0]
+                        file_loc = result[0]
 
-                    with open(filename, 'w') as file:
+                    with open(file_loc, 'w') as file:
                         json.dump(service_items, file, indent=4)
 
-                    directory = os.path.dirname(filename)
-                    filename = filename.replace(directory, '').replace('/', '')
+                    directory = os.path.dirname(file_loc)
+                    filename = file_loc.replace(directory, '').replace('/', '')
                     self.settings['last_save_dir'] = directory
                     self.save_settings()
 
                     QMessageBox.information(
                         self.gui.main_window,
                         'File Saved',
-                        'Service saved as\n' + filename.replace('/', '\\'),
+                        'Service saved as\n' + file_loc.replace('/', '\\'),
                         QMessageBox.StandardButton.Ok
                     )
 
                     # add this file to the recently used services menu
                     self.add_to_recently_used(directory, filename)
 
-                    self.gui.current_file = filename
+                    self.gui.current_file = file_loc
                     self.gui.changes = False
                     return 1
                 except Exception as ex:
                     QMessageBox.information(
                         self.gui.main_window,
                         'Save Error',
-                        'There was a problem saving the service:\n\n' + str(ex),
+                        'There was a problem saving the service: '
+                        + file_loc.replace('/', '\\') + '\n\n' + str(ex),
                         QMessageBox.StandardButton.Ok
                     )
                     return -1

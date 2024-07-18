@@ -3,7 +3,7 @@ import subprocess
 import wmi as wmi
 from PyQt6.QtGui import QImage, QPixmap, QIcon
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QHBoxLayout, QComboBox, QDialog
-from fitz import fitz
+from pymupdf import pymupdf
 
 
 class PrintDialog(QDialog):
@@ -25,7 +25,7 @@ class PrintDialog(QDialog):
         self.landscape = landscape
         self.pdf_file = pdf_file
 
-        self.pdf = fitz.open(self.pdf_file)
+        self.pdf = pymupdf.open(self.pdf_file)
         self.num_pages = len(self.pdf)
         self.pages = []
         self.current_page = 0

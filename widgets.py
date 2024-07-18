@@ -218,7 +218,7 @@ class ShadowSlider(QWidget):
         self.setLayout(layout)
 
         self.color_title = QLabel('Shadow Color:')
-        self.color_title.setStyleSheet('padding-bottom: 10px')
+        #self.color_title.setStyleSheet('padding-bottom: 10px')
         self.color_title.setFont(self.gui.list_font)
         layout.addWidget(self.color_title)
 
@@ -288,7 +288,7 @@ class OffsetSlider(QWidget):
         self.setLayout(layout)
 
         self.offset_title = QLabel('Shadow Offset:')
-        self.offset_title.setStyleSheet('padding-bottom: 10px')
+        #self.offset_title.setStyleSheet('padding-bottom: 10px')
         self.offset_title.setFont(self.gui.list_font)
         layout.addWidget(self.offset_title)
 
@@ -719,10 +719,11 @@ class StandardItemWidget(QWidget):
             return False
 
     def set_style_sheet(self):
-        self.setStyleSheet('background: none;')
-        self.title.setStyleSheet('color: ' + self.gui.widget_item_font_color + ';')
-        if self.subtitle:
-            self.subtitle.setStyleSheet('color: ' + self.gui.widget_item_font_color + ';')
+        pass
+        #self.setStyleSheet('background: none;')
+        #self.title.setStyleSheet('color: ' + self.gui.widget_item_font_color + ';')
+        #if self.subtitle:
+            #self.subtitle.setStyleSheet('color: ' + self.gui.widget_item_font_color + ';')
 
 
 class AutoSelectLineEdit(QLineEdit):
@@ -782,10 +783,10 @@ class FontWidget(QWidget):
         layout.addWidget(self.font_widget)
         font_widget_layout = QGridLayout(self.font_widget)
 
-        if self.draw_border:
-            self.font_widget.setStyleSheet('#font_widget { background: white; border: 1px solid #5555aa; }')
+        '''if self.draw_border:
+            self.font_widget.setStyleSheet('#font_widget { background: white; border: 1px solid #6060c0; }')
         else:
-            self.font_widget.setStyleSheet('#font_widget { background: white;}')
+            self.font_widget.setStyleSheet('#font_widget { background: white;}')'''
 
         self.move(int(self.width() / 2), int(self.height() / 2))
 
@@ -817,7 +818,7 @@ class FontWidget(QWidget):
 
         font_size_widget = QWidget()
         font_size_widget.setObjectName('font_size_widget')
-        font_size_widget.setStyleSheet('#font_size_widget { border-bottom: 1px solid black; } ')
+        #font_size_widget.setStyleSheet('#font_size_widget { border-bottom: 1px solid black; } ')
         font_size_layout = QHBoxLayout(font_size_widget)
         font_size_layout.setContentsMargins(0, 10, 0, 20)
         font_widget_layout.addWidget(font_size_widget, 0, 1)
@@ -875,7 +876,7 @@ class FontWidget(QWidget):
 
         shadow_widget = QWidget()
         shadow_widget.setObjectName('shadow_widget')
-        shadow_widget.setStyleSheet('#shadow_widget { border-bottom: 1px solid black; padding: 20px; } ')
+        #shadow_widget.setStyleSheet('#shadow_widget { border-bottom: 1px solid black; padding: 20px; } ')
         shadow_layout = QHBoxLayout()
         shadow_layout.setContentsMargins(0, 10, 0, 20)
         shadow_widget.setLayout(shadow_layout)
@@ -901,7 +902,7 @@ class FontWidget(QWidget):
 
         outline_widget = QWidget()
         outline_widget.setObjectName('outline_widget')
-        outline_widget.setStyleSheet('#outline_widget { border-bottom: 1px solid black; padding: 20px; } ')
+        #outline_widget.setStyleSheet('#outline_widget { border-bottom: 1px solid black; padding: 20px; } ')
         outline_layout = QHBoxLayout()
         outline_layout.setContentsMargins(0, 10, 0, 20)
         outline_widget.setLayout(outline_layout)

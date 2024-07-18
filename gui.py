@@ -1,5 +1,11 @@
+import json
+import os
 import re
+import shutil
+import sys
+import tempfile
 import time
+from os.path import exists
 
 from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
 from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
@@ -7,7 +13,8 @@ from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QListWidget, QScrollArea, QComboBox, QLineEdit, QTextEdit
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QListWidget, QScrollArea, QComboBox, QLineEdit, QTextEdit, \
+    QFileDialog
 
 from help import Help
 from importers import Importers
@@ -18,7 +25,7 @@ from openlyrics_export import OpenlyricsExport
 from preview_widget import PreviewWidget
 from songselect_import import SongselectImport
 from toolbar import Toolbar
-from widgets import CustomMainWindow, CustomScrollArea, DisplayWidget, LyricDisplayWidget, StandardItemWidget, \
+from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, \
     FontFaceComboBox
 
 
@@ -83,12 +90,9 @@ class GUI(QObject):
         :param ProjectOn main: The current instance of ProjectOn
         """
         super().__init__()
+
         self.audio_output = None
         self.main = main
-
-        # if settings exist, set the secondary screen (the display screen) to the one in the settings
-        if len(self.main.settings) > 0:
-            self.secondary_screen = self.main.settings['selected_screen_name']
 
         self.live_from_remote_signal.connect(self.live_from_remote)
         self.live_slide_from_remote_signal.connect(self.live_slide_from_remote)
@@ -100,6 +104,25 @@ class GUI(QObject):
         self.shadow_offset = 6
         self.widget_item_background_color = 'white'
         self.widget_item_font_color = 'black'
+
+        self.check_files()
+
+        # if settings exist, set the secondary screen (the display screen) to the one in the settings
+        if len(self.main.settings) > 0:
+            self.secondary_screen = self.main.settings['selected_screen_name']
+
+        self.main.status_label.setText('Indexing Images')
+        self.main.app.processEvents()
+
+        from main import IndexImages
+
+        ii = IndexImages(self.main, 'backgrounds')
+        self.main.thread_pool.start(ii)
+        self.main.thread_pool.waitForDone()
+
+        ii = IndexImages(self.main, 'images')
+        self.main.thread_pool.start(ii)
+        self.main.thread_pool.waitForDone()
 
         self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
 
@@ -147,6 +170,97 @@ class GUI(QObject):
         else:
             self.tool_bar.show_display_button.setChecked(True)
 
+    def check_files(self):
+        os.chdir(os.path.dirname(__file__))
+        if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
+            os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
+        self.main.device_specific_config_file = os.path.expanduser('~/Appdata/Roaming/ProjectOn/localConfig.json')
+        if not exists(self.main.device_specific_config_file):
+            device_specific_settings = {
+                'used_services': '',
+                'last_save_dir': '',
+                'last_status_count': 100,
+                'data_dir': ''
+            }
+        else:
+            with open(self.main.device_specific_config_file, 'r') as file:
+                device_specific_settings = json.loads(file.read())
+
+        data_dir = False
+        if 'data_dir' in device_specific_settings.keys():
+            self.main.data_dir = device_specific_settings['data_dir']
+            if exists(self.main.data_dir):
+                data_dir = True
+
+        if not data_dir:
+            QMessageBox.question(
+                None,
+                'Locate Data Directory',
+                'Please locate the ProjectOn Data Directory that contains "projecton.db"',
+                QMessageBox.StandardButton.Ok
+            )
+
+            result = QFileDialog.getExistingDirectory(
+                None,
+                'Data Directory',
+                os.path.expanduser('~/Documents')
+            )
+            if len(result) == 0:
+                sys.exit(-1)
+            self.main.data_dir = result
+
+        self.main.config_file = self.main.data_dir + '/settings.json'
+        self.main.database = self.main.data_dir + '/projecton.db'
+        self.main.background_dir = self.main.data_dir + '/backgrounds'
+        self.main.image_dir = self.main.data_dir + '/images'
+        self.main.bible_dir = self.main.data_dir + '/bibles'
+        self.main.video_dir = self.main.data_dir + '/videos'
+
+        # provide default settings should the settings file not exist
+        default_settings = {
+            'selected_screen_name': '',
+            'font_face': 'Helvetica',
+            'font_size': 60,
+            'font_color': 'white',
+            'global_song_background': '',
+            'global_bible_background': '',
+            'logo_image': '',
+            'last_save_dir': './saved services',
+            'last_status_count': 0,
+            'stage_font_size': 60
+        }
+
+        if exists(self.main.data_dir + '/settings.json'):
+            with open(self.main.data_dir + '/settings.json', 'r') as file:
+                try:
+                    self.main.settings = json.loads(file.read())
+                except json.decoder.JSONDecodeError:
+                    self.main.settings = {}
+        else:
+            self.main.settings = default_settings
+
+        for key in default_settings:
+            if key not in self.main.settings.keys():
+                self.main.settings[key] = default_settings[key]
+
+        self.main.settings['used_services'] = device_specific_settings['used_services']
+        self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']
+        self.main.settings['data_dir'] = self.main.data_dir
+        if 'last_status_count' in device_specific_settings.keys():
+            self.main.settings['last_status_count'] = device_specific_settings['last_status_count']
+
+        if not exists(self.main.config_file):
+            if exists(self.main.data_dir + '/settings.json'):
+                shutil.copy(self.main.data_dir + '/settings.json', self.main.config_file)
+
+        # ensure all needed files exist; thread it and wait until done before moving on
+        from main import CheckFiles
+        cf = CheckFiles(self.main)
+        self.main.thread_pool.start(cf)
+        self.main.thread_pool.waitForDone()
+
+        self.main.get_song_titles()
+
     def init_components(self):
         """
         Creates and positions the main window, the display widget, and the hidden sample_widget needed for properly
@@ -155,7 +269,7 @@ class GUI(QObject):
 
         self.main_window = CustomMainWindow(self)
         self.main_window.setObjectName('main_window')
-        self.main_window.setStyleSheet('#main_window { background: darkGrey; }')
+        #self.main_window.setStyleSheet('#main_window { background: darkGrey; }')
         self.main_window.setWindowIcon(QIcon('resources/logo.ico'))
         self.main_window.setWindowTitle('ProjectOn')
 
@@ -171,8 +285,8 @@ class GUI(QObject):
         self.display_widget.setWindowIcon(QIcon('resources/logo.ico'))
         self.display_widget.setWindowTitle('ProjectOn Display Window')
         self.display_widget.setCursor(Qt.CursorShape.BlankCursor)
-        self.display_widget.setStyleSheet('background: black;')
-        self.display_widget.background_label.setStyleSheet('background: black')
+        #self.display_widget.setStyleSheet('background: black;')
+        #self.display_widget.background_label.setStyleSheet('background: black')
         self.display_layout = QVBoxLayout()
         self.display_layout.setContentsMargins(0, 0, 0, 0)
         self.display_widget.setLayout(self.display_layout)
@@ -189,20 +303,32 @@ class GUI(QObject):
 
     def add_widgets(self):
         """
-        Adds all of the necessary widgets.py to the main window, display screen, and sample widget
+        Adds all the necessary widgets.py to the main window, display screen, and sample widget
         """
         self.main.update_status_signal.emit('Creating GUI: Adding Tool Bar', 'status')
+        tool_bar_container = QWidget()
+        tool_bar_layout = QVBoxLayout(tool_bar_container)
+        tool_bar_layout.setContentsMargins(0, 0, 0, 0)
+        self.central_layout.addWidget(tool_bar_container, 0, 0, 1, 4)
+
         self.tool_bar = Toolbar(self)
         self.tool_bar.init_components()
+        tool_bar_layout.addWidget(self.tool_bar)
 
-        toolbar_scroll_area = CustomScrollArea()
+        tool_bar_divider = QWidget()
+        tool_bar_divider.setContentsMargins(0, 0, 0, 0)
+        tool_bar_divider.setStyleSheet('background: #6060c0')
+        tool_bar_divider.setFixedHeight(2)
+        tool_bar_layout.addWidget(tool_bar_divider)
+
+        '''toolbar_scroll_area = CustomScrollArea()
         toolbar_scroll_area.setObjectName('toolbar_scroll_area')
         toolbar_scroll_area.setWidget(self.tool_bar)
         toolbar_scroll_area.setFixedHeight(self.tool_bar.height() + toolbar_scroll_area.horizontalScrollBar().height())
         toolbar_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        toolbar_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        toolbar_scroll_area.setStyleSheet('QScrollArea { background: white }')
-        self.central_layout.addWidget(toolbar_scroll_area, 0, 0, 1, 4)
+        toolbar_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        #toolbar_scroll_area.setStyleSheet('QScrollArea { background: white }')
+        self.central_layout.addWidget(toolbar_scroll_area, 0, 0, 1, 4)'''
 
         self.main.update_status_signal.emit('Creating GUI: Adding Media Widget', 'status')
         self.media_widget = MediaWidget(self)
@@ -299,7 +425,7 @@ class GUI(QObject):
         block_remote_action.setChecked(False)
         block_remote_action.triggered.connect(self.block_unblock_remote)
 
-        tool_menu.addSeparator()
+        '''tool_menu.addSeparator()
 
         theme_menu = tool_menu.addMenu('Theme')
 
@@ -307,7 +433,7 @@ class GUI(QObject):
         light_action.triggered.connect(lambda: self.apply_theme('light'))
 
         dark_action = theme_menu.addAction('Dark')
-        dark_action.triggered.connect(lambda: self.apply_theme('dark'))
+        dark_action.triggered.connect(lambda: self.apply_theme('dark'))'''
 
         settings_action = tool_menu.addAction('Settings')
         settings_action.setShortcut(QKeySequence('Ctrl+Alt+S'))
@@ -335,6 +461,7 @@ class GUI(QObject):
         about_action.triggered.connect(self.show_about)
 
     def apply_theme(self, theme):
+        return
         """
         Method to apply color changes to the GUI's widgets
         :param str theme: "light" or "dark" theme
@@ -373,7 +500,7 @@ class GUI(QObject):
             font_color = 'black'
             self.widget_item_font_color = 'black'
             hover_color = '#ddddff'
-            selected_color = '#aaaaff'
+            selected_color = '#6060c0'
             tab_color = 'lightGrey'
 
             self.central_widget.setStyleSheet('#central_widget { background: darkgrey; }')
@@ -479,7 +606,7 @@ class GUI(QObject):
         from PIL import Image
         from print_dialog import PrintDialog
 
-        print_file_loc = './print.pdf'
+        print_file_loc = tempfile.gettempdir() + '/print.pdf'
         marginH = 80
         marginV = 80
         font_size = 12
@@ -492,7 +619,6 @@ class GUI(QObject):
         lineStart = marginH
         lineEnd = 612 - marginH
 
-        print_file_loc = 'print.pdf'
         canvas = canvas.Canvas(print_file_loc, pagesize=letter)
         canvas.setFont('Helvetica', font_size)
 
@@ -561,7 +687,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.0b')
+        title_label = QLabel('ProjectOn v.1.1rc')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -600,7 +726,7 @@ class GUI(QObject):
         remote_layout.addWidget(stage_url_label, 3, 1)
 
         about_text = QTextBrowser()
-        about_text.setStyleSheet('border: 0;')
+        #about_text.setStyleSheet('border: 0;')
         about_text.setOpenExternalLinks(True)
         about_text.setHtml('''
                     <p>ProjectOn is free software: you can redistribute it and/or
@@ -626,8 +752,8 @@ class GUI(QObject):
         ok_button = QPushButton('OK')
         ok_button.setFont(self.standard_font)
         ok_button.setObjectName('ok_button')
-        ok_button.setStyleSheet('#ok_button { background: #5555aa; color: white; }'
-                                '#ok_button:hover { background: white; color: black; }')
+        #ok_button.setStyleSheet('#ok_button { background: #6060c0; color: white; }'
+        #                        '#ok_button:hover { background: white; color: black; }')
         ok_button.setMaximumWidth(60)
         ok_button.pressed.connect(widget.deleteLater)
         widget.layout().addWidget(ok_button, Qt.AlignmentFlag.AlignCenter)
@@ -651,7 +777,7 @@ class GUI(QObject):
                 block_label = QLabel('REMOTE INPUT IS BLOCKED')
                 block_label.setParent(self.main_window.menuBar())
                 block_label.setObjectName('block_label')
-                block_label.setStyleSheet('color: red')
+                block_label.setStyleSheet('background: white; color: red;')
                 block_label.setFont(self.bold_font)
                 block_label.adjustSize()
                 block_label.move(int(self.main_window.menuBar().width() / 2) - int(block_label.width() / 2),
@@ -1140,7 +1266,7 @@ class GUI(QObject):
                     class_tag = ''
 
                 slide_buttons += f"""
-                    <button id="{str(i)}" {class_tag} type="submit" name="slide_button" value="{str(i)}">
+                    <button id="slide{str(i)}" {class_tag} type="submit" name="slide_button" value="{str(i)}">
                         <span class="title">{title}</span>
                         <br>
                         <div class="text">{text}</div>

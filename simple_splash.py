@@ -17,7 +17,7 @@ class SimpleSplash:
         self.text = text
 
         self.widget = QWidget()
-        self.widget.setStyleSheet('background: #5555aa;')
+        self.widget.setStyleSheet('background: #6060c0;')
         self.widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.widget.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
         main_layout = QVBoxLayout(self.widget)

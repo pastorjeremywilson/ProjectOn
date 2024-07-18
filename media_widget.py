@@ -32,13 +32,13 @@ class MediaWidget(QTabWidget):
         self.gui = gui
         self.setFont(self.gui.standard_font)
         self.setObjectName('media_widget')
-        self.setStyleSheet(
+        '''self.setStyleSheet(
             'QTabBar:tab { background: lightGrey; border: 1px solid black; border-top-left-radius: 5px; '
             'border-top-right-radius: 5px; padding: 5px; }'
             'QTabBar:tab:selected { background: white; border: 1px solid black; padding: 5px; }'
             'QTabBar:tab:hover { background: white; border: 1px solid black; padding: 5px; }'
             '#media_widget::pane { border: 2px solid black; }'
-        )
+        )'''
         self.setTabShape(QTabWidget.TabShape.Rounded)
 
         self.formatted_reference = None
@@ -216,8 +216,8 @@ class MediaWidget(QTabWidget):
         self.bible_search_status_label.setFont(QFont('Helvetica', 8))
         fm = bible_search_label.fontMetrics()
         label_width = fm.boundingRect('Enter Passage:').width()
-        self.bible_search_status_label.setStyleSheet(
-            'color: white; padding-left: ' + str(label_width + (bible_search_layout.spacing() * 2)) + 'px;')
+        #self.bible_search_status_label.setStyleSheet(
+        #    'color: white; padding-left: ' + str(label_width + (bible_search_layout.spacing() * 2)) + 'px;')
         scripture_layout.addWidget(self.bible_search_status_label)
 
         button_widget = QWidget()
