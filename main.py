@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-Projecton v.1.1rc
+ProjectOn v.1.1rc2
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -32,10 +32,10 @@ from os.path import exists
 from xml.etree import ElementTree
 
 import requests
-from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
-from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QAction
-from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout
+from PyQt5.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
+from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen
+from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
+    QProgressBar, QHBoxLayout, QAction
 
 from gui import GUI
 from simple_splash import SimpleSplash

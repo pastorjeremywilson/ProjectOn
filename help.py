@@ -1,10 +1,10 @@
 import os
 from os.path import exists
 
-from PyQt6.QtCore import Qt, QUrl
-from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QMainWindow, QApplication
-from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QMainWindow, QApplication
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 
 class Help(QMainWindow):

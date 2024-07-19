@@ -5,11 +5,11 @@ import sqlite3
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt6.QtCore import Qt, QSize, QPoint, QEvent
-from PyQt6.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen, QAction
-from PyQt6.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
+from PyQt5.QtCore import Qt, QSize, QPoint, QEvent
+from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
+from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, \
-    QGridLayout, QStyleOption, QStyle
+    QGridLayout, QStyleOption, QStyle, QAction
 
 from edit_widget import EditWidget
 from get_scripture import GetScripture

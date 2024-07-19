@@ -1,8 +1,8 @@
 import re
 
-from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QColor, QPixmap, QPainter, QBrush
-from PyQt6.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush
+from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget
 
 from formattable_text_edit import FormattableTextEdit

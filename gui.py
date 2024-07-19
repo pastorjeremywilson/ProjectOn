@@ -8,12 +8,12 @@ import tempfile
 import time
 from os.path import exists
 
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
-from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
-from PyQt6.QtMultimediaWidgets import QVideoWidget
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QListWidget, QScrollArea, QComboBox, QLineEdit, QTextEdit, \
     QFileDialog
 
@@ -77,7 +77,6 @@ class GUI(QObject):
     black_display = False
     current_display_background_color = None
     changes = False
-    sink = None
 
     live_from_remote_signal = pyqtSignal(int)
     live_slide_from_remote_signal = pyqtSignal(int)
@@ -676,7 +675,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.1rc')
+        title_label = QLabel('ProjectOn v.1.1rc2')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -779,8 +778,7 @@ class GUI(QObject):
         """
         if self.video_widget:
             try:
-                frame = self.sink.videoFrame()
-                image = frame.toImage()
+                image = self.video_widget.grab(self.video_widget.rect())
                 pixmap = QPixmap(image)
             except Exception as ex:
                 self.main.error_log()
@@ -1295,17 +1293,16 @@ class GUI(QObject):
         if widget == 'live':
             # handle stopping the media player carefully to avoid an Access Violation
             if self.media_player:
-                if self.media_player.isPlaying():
+                if self.media_player.state() == QMediaPlayer.State.PlayingState:
                     self.media_player.stop()
                     if self.timed_update:
                         self.timed_update.stop = True
-                self.media_player.source().clear()
+                #self.media_player.media().clear()
                 self.media_player.deleteLater()
                 self.video_widget.deleteLater()
                 self.media_player = None
                 self.video_widget = None
                 self.audio_output = None
-                self.sink = None
                 self.timed_update = None
 
             display_widget = self.display_widget
@@ -1501,7 +1498,8 @@ class GUI(QObject):
                 elif current_item.data(40) == 'video':
                     self.make_video_widget()
                     self.video_widget.show()
-                    self.media_player.setSource(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
+                    media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
+                    self.media_player.setMedia(media_content)
                     self.media_player.play()
                     self.timed_update = TimedPreviewUpdate(self)
                     self.main.thread_pool.start(self.timed_update)
@@ -1598,19 +1596,12 @@ class GUI(QObject):
         self.display_layout.addWidget(self.video_widget)
 
         self.media_player = QMediaPlayer()
-        self.media_player.playingChanged.connect(self.media_playing_change)
-        self.media_player.errorOccurred.connect(self.media_error)
+        self.media_player.stateChanged.connect(self.media_playing_change)
+        self.media_player.error.connect(self.media_error)
         self.media_player.setVideoOutput(self.video_widget)
-        devices = QMediaDevices.audioOutputs()
-        for device in devices:
-            if device.isDefault():
-                self.audio_output = QAudioOutput(device)
-                self.audio_output.setVolume(1.0)
-                self.media_player.setAudioOutput(self.audio_output)
-        self.sink = self.media_player.videoSink()
 
     def media_playing_change(self):
-        if self.media_player.playbackState() == QMediaPlayer.PlaybackState.StoppedState:
+        if self.media_player.state() == QMediaPlayer.State.StoppedState:
             self.media_player.setPosition(0)
 
     def media_error(self):

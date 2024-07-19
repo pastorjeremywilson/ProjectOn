@@ -1,7 +1,7 @@
-from PyQt6.QtCore import Qt, QSize, QPoint
-from PyQt6.QtGui import QCursor, QIcon, QAction
-from PyQt6.QtWidgets import QWidget, QListWidget, QVBoxLayout, QLabel, QMenu, QGridLayout, \
-    QPushButton, QSizePolicy, QMessageBox
+from PyQt5.QtCore import Qt, QSize, QPoint
+from PyQt5.QtGui import QCursor, QIcon
+from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QLabel, QMenu, QGridLayout, \
+    QPushButton, QSizePolicy, QMessageBox, QAction
 
 from edit_widget import EditWidget
 
