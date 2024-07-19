@@ -35,7 +35,7 @@ import requests
 from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
 from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QAction
 from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar
+    QProgressBar, QHBoxLayout
 
 from gui import GUI
 from simple_splash import SimpleSplash
@@ -69,6 +69,8 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
 
+        os.chdir(os.path.dirname(__file__))
+        os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         self.app = QApplication(sys.argv)
@@ -78,11 +80,6 @@ class ProjectOn(QObject):
         self.server_thread_pool = QThreadPool()
         self.update_status_signal.connect(self.update_status_label)
 
-        # create a web socket to be used for sending data to/from the remote and stage view servers
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('192.255.255.255', 1))
-        self.ip = s.getsockname()[0]
-
         last_status_count = 100
         if exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')):
             with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json'), 'r') as file:
@@ -90,6 +87,17 @@ class ProjectOn(QObject):
             if 'last_status_count' in contents.keys():
                 last_status_count = contents['last_status_count']
         self.make_splash_screen(last_status_count)
+
+        self.update_status_signal.emit('Creating Socket', 'status')
+        self.app.processEvents()
+
+        # create a web socket to be used for sending data to/from the remote and stage view servers
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('192.255.255.255', 1))
+        self.ip = s.getsockname()[0]
+
+        self.update_status_signal.emit('Creating GUI', 'status')
+        self.app.processEvents()
 
         self.gui = GUI(self)
 
@@ -137,17 +145,22 @@ class ProjectOn(QObject):
         """
         self.splash_widget = QWidget()
         self.splash_widget.setObjectName('splash_widget')
-        self.splash_widget.setMinimumWidth(450)
+        self.splash_widget.setMinimumWidth(610)
         self.splash_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.splash_widget.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop, True)
         self.splash_widget.setStyleSheet(
             '#splash_widget { background: #6060c0; }')
-        splash_layout = QVBoxLayout(self.splash_widget)
+        splash_layout = QHBoxLayout(self.splash_widget)
         splash_layout.setContentsMargins(20, 20, 20, 20)
+
+        icon_label = QLabel()
+        icon_label.setPixmap(
+            QPixmap('resources/alt-logo2.svg').scaled(
+                160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        splash_layout.addWidget(icon_label)
 
         container = QWidget()
         container.setObjectName('container')
-        container.setStyleSheet('#container { background: #6060c0; border: 2px solid white; }')
         container_layout = QVBoxLayout(container)
         container_layout.setContentsMargins(20, 20, 20, 20)
         splash_layout.addWidget(container)

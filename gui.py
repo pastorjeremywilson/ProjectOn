@@ -172,7 +172,6 @@ class GUI(QObject):
             self.tool_bar.show_display_button.setChecked(True)
 
     def check_files(self):
-        os.chdir(os.path.dirname(__file__))
         if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
             os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
         self.main.device_specific_config_file = os.path.expanduser('~/Appdata/Roaming/ProjectOn/localConfig.json')
@@ -270,7 +269,7 @@ class GUI(QObject):
 
         self.main_window = CustomMainWindow(self)
         self.main_window.setObjectName('main_window')
-        self.main_window.setWindowIcon(QIcon('resources/logo.ico'))
+        self.main_window.setWindowIcon(QIcon('resources/alt-logo2.svg'))
         self.main_window.setWindowTitle('ProjectOn')
 
         self.central_widget = QWidget()
@@ -282,7 +281,7 @@ class GUI(QObject):
 
         self.main.update_status_signal.emit('Creating GUI: Building Display Widget', 'status')
         self.display_widget = DisplayWidget(self)
-        self.display_widget.setWindowIcon(QIcon('resources/logo.ico'))
+        self.display_widget.setWindowIcon(QIcon('resources/alt-logo2.svg'))
         self.display_widget.setWindowTitle('ProjectOn Display Window')
         self.display_widget.setCursor(Qt.CursorShape.BlankCursor)
 
