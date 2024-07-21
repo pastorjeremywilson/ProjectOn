@@ -3,11 +3,11 @@ import re
 from asyncio import wait_for
 from os.path import exists
 
-from PyQt6 import QtCore
-from PyQt6.QtCore import QUrl, Qt
-from PyQt6.QtGui import QFont, QIcon
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
+from PyQt5 import QtCore
+from PyQt5.QtCore import QUrl, Qt
+from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
     QMessageBox, QDialog
 from cryptography.fernet import Fernet
 

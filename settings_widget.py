@@ -1,8 +1,8 @@
 import os.path
 
-from PyQt6.QtCore import Qt, QRectF, QPointF, QEvent
-from PyQt6.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath, QPalette
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
+from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath, QPalette
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, \
     QSizePolicy
 

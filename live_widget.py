@@ -1,7 +1,7 @@
-from PyQt6.QtCore import Qt, QSize, pyqtSignal, QTimer
-from PyQt6.QtGui import QIcon
-from PyQt6.QtMultimedia import QMediaPlayer
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout
+from PyQt5.QtCore import Qt, QSize, pyqtSignal, QTimer
+from PyQt5.QtGui import QIcon
+from PyQt5.QtMultimedia import QMediaPlayer
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout
 
 
 class LiveWidget(QWidget):
@@ -103,7 +103,7 @@ class LiveWidget(QWidget):
             self.gui.media_player.setPosition(0)
         elif sender.objectName() == 'play':
             # pause or play depending on the current mediaStatus
-            if self.gui.media_player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
+            if self.gui.media_player.state() == QMediaPlayer.State.PlayingState:
                 self.gui.media_player.pause()
             else:
                 self.gui.media_player.play()

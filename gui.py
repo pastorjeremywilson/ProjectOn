@@ -8,14 +8,13 @@ import tempfile
 import time
 from os.path import exists
 
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
-from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput, QMediaDevices
-from PyQt6.QtMultimediaWidgets import QVideoWidget
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QListWidget, QScrollArea, QComboBox, QLineEdit, QTextEdit, \
-    QFileDialog
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QPalette
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog
 
 from help import Help
 from importers import Importers
@@ -24,6 +23,7 @@ from media_widget import MediaWidget
 from oos_widget import OOSWidget
 from openlyrics_export import OpenlyricsExport
 from preview_widget import PreviewWidget
+from simple_splash import SimpleSplash
 from songselect_import import SongselectImport
 from toolbar import Toolbar
 from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, \
@@ -77,7 +77,6 @@ class GUI(QObject):
     black_display = False
     current_display_background_color = None
     changes = False
-    sink = None
 
     live_from_remote_signal = pyqtSignal(int)
     live_slide_from_remote_signal = pyqtSignal(int)
@@ -91,6 +90,7 @@ class GUI(QObject):
         :param ProjectOn main: The current instance of ProjectOn
         """
         super().__init__()
+        palette = QPalette()
 
         self.audio_output = None
         self.main = main
@@ -305,6 +305,8 @@ class GUI(QObject):
         """
         self.main.update_status_signal.emit('Creating GUI: Adding Tool Bar', 'status')
         tool_bar_container = QWidget()
+        tool_bar_container.setObjectName('tool_bar_container')
+        tool_bar_container.setAutoFillBackground(True)
         tool_bar_layout = QVBoxLayout(tool_bar_container)
         tool_bar_layout.setContentsMargins(0, 0, 0, 0)
         self.central_layout.addWidget(tool_bar_container, 0, 0, 1, 4)
@@ -414,19 +416,19 @@ class GUI(QObject):
         block_remote_action.setChecked(False)
         block_remote_action.triggered.connect(self.block_unblock_remote)
 
-        '''tool_menu.addSeparator()
-
-        theme_menu = tool_menu.addMenu('Theme')
-
-        light_action = theme_menu.addAction('Light')
-        light_action.triggered.connect(lambda: self.apply_theme('light'))
-
-        dark_action = theme_menu.addAction('Dark')
-        dark_action.triggered.connect(lambda: self.apply_theme('dark'))'''
+        tool_menu.addSeparator()
 
         settings_action = tool_menu.addAction('Settings')
         settings_action.setShortcut(QKeySequence('Ctrl+Alt+S'))
         settings_action.triggered.connect(self.tool_bar.open_settings)
+
+        theme_menu = tool_menu.addMenu('Theme')
+
+        light_action = theme_menu.addAction('Light')
+        light_action.triggered.connect(self.set_theme)
+
+        dark_action = theme_menu.addAction('Dark')
+        dark_action.triggered.connect(self.set_theme)
 
         tool_menu.addSeparator()
 
@@ -449,132 +451,14 @@ class GUI(QObject):
         about_action.setShortcut(QKeySequence('Ctrl+A'))
         about_action.triggered.connect(self.show_about)
 
-    def apply_theme(self, theme):
-        return
-        """
-        Method to apply color changes to the GUI's widgets
-        :param str theme: "light" or "dark" theme
-        """
-        # Walk through the different types of widgets in different areas of the GUI, storing them in a list
-        widgets = []
-        media_widgets = []
-        for widget in self.central_widget.findChildren(QListWidget):
-            widgets.append(widget)
-        for widget in self.tool_bar.findChildren(QLabel):
-            widgets.append(widget)
-        for widget in self.tool_bar.findChildren(QPushButton):
-            widgets.append(widget)
-        for widget in self.tool_bar.findChildren(QComboBox):
-            widgets.append(widget)
-        for i in range(self.media_widget.count()):
-            media_widgets.append(self.media_widget.widget(i))
-            for line_edit in self.media_widget.widget(i).findChildren(QLineEdit):
-                widgets.append(line_edit)
-            for text_edit in self.media_widget.widget(i).findChildren(QTextEdit):
-                widgets.append(text_edit)
-            for combobox in self.media_widget.widget(i).findChildren(QComboBox):
-                widgets.append(combobox)
-            for button in self.media_widget.widget(i).findChildren(QPushButton):
-                widgets.append(button)
-        widgets.append(self.central_widget.findChild(QScrollArea))
-        widgets.append(self.tool_bar.parent())
-
-        # Set the variety of colors that will be used in each theme
-        if theme == 'light':
-            self.main.settings['theme'] = 'light'
-            self.main.save_settings()
-
-            background_color = 'white'
-            border_color = 'black'
-            font_color = 'black'
-            self.widget_item_font_color = 'black'
-            hover_color = '#ddddff'
-            selected_color = '#6060c0'
-            tab_color = 'lightGrey'
-
-            self.central_widget.setStyleSheet('#central_widget { background: darkgrey; }')
+    def set_theme(self):
+        sender = self.sender()
+        wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
+        if sender.text() == 'Light':
+            self.main.app.setStyleSheet(open('resources/projecton-light.qss', 'r').read())
         else:
-            self.main.settings['theme'] = 'dark'
-            self.main.save_settings()
-
-            background_color = '#303030'
-            border_color = '#505050'
-            font_color = '#bfbfbf'
-            self.widget_item_font_color = '#bfbfbf'
-            hover_color = '#404040'
-            selected_color = '#505050'
-            tab_color = '#404040'
-
-            self.central_widget.setStyleSheet('#central_widget { background: black; }')
-
-        # walk through the stored widgets and apply the theme colors accordingly
-        for widget in widgets:
-            if isinstance(widget, QListWidget):
-                widget.setStyleSheet(
-                    'QListWidget { background: ' + background_color
-                    + '; color: ' + font_color + '; } '
-                    'QListWidget::item { background: ' + background_color
-                    + '; color: ' + font_color + '; } '
-                    + 'QListWidget::item:selected { background: ' + selected_color + '; '
-                      'color: ' + font_color + '; }'
-                    + 'QListWidget::item:hover { background: ' + hover_color + '; }')
-                for i in range(widget.count()):
-                    if widget.itemWidget(widget.item(i)):
-                        widget.itemWidget(widget.item(i)).set_style_sheet()
-            elif isinstance(widget, QPushButton):
-                widget.setStyleSheet(
-                    'QPushButton { background: ' + background_color
-                    + '; border-right: 1px solid ' + border_color + '; } '
-                    'QPushButton:hover { background: ' + selected_color
-                    + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; } '
-                    'QPushButton:pressed { background: ' + background_color
-                    + '; border-right: 1px solid ' + border_color + '; border-bottom: 1px solid ' + font_color + '; } '
-                    'QPushButton:checked { background: ' + selected_color + '; }'
-                    + 'QPushButton:hover { background: ' + hover_color + '; }'
-                )
-            else:
-                if 'background' in widget.styleSheet():
-                    widget.setStyleSheet(
-                        re.sub('background:.*?;', 'background: ' + background_color + ';', widget.styleSheet()))
-                elif '}' in widget.styleSheet():
-                    widget.setStyleSheet(
-                        widget.styleSheet().replace(' }', ' background: ' + background_color + '; }'))
-                else:
-                    widget.setStyleSheet(widget.styleSheet() + ' background: ' + background_color + ';')
-                if 'border' in widget.styleSheet() and 'border: none' not in widget.styleSheet():
-                    color_info = re.findall('solid .*?;', widget.styleSheet())
-                    widget.setStyleSheet(widget.styleSheet().replace(color_info[0], 'solid ' + border_color + ';'))
-                if 'color' in widget.styleSheet():
-                    widget.setStyleSheet(
-                        re.sub('color:.*?;', 'color: ' + font_color + ';', widget.styleSheet()))
-                elif '}' in widget.styleSheet():
-                    widget.setStyleSheet(
-                        widget.styleSheet().replace(' }', ' color: ' + font_color + '; }'))
-                else:
-                    widget.setStyleSheet(widget.styleSheet() + ' color: ' + font_color + ';')
-
-        # handle the widgets in the media widget differently to provide a better appearance
-        self.media_widget.setStyleSheet(
-            'QTabWidget { background: ' + tab_color + '; } '
-            'QTabBar::tab { background: ' + tab_color + '; color: ' + font_color + '; padding: 5px 10px; }'
-            'QTabBar::tab:selected { background: ' + selected_color + '; } '
-            'QTabBar::tab:hover { background: ' + hover_color + '; }'
-        )
-        for widget in media_widgets:
-            widget.setStyleSheet('background: ' + tab_color + ';')
-            for button in widget.findChildren(QPushButton):
-                button.setStyleSheet(
-                    'QPushButton { background: ' + background_color + '; color: ' + font_color + '; }'
-                    'QPushButton:hover { background: ' + hover_color + '; }'
-                    'QPushButton:pressed { background: ' + selected_color + '; }'
-                )
-            for line_edit in widget.findChildren(QLineEdit):
-                line_edit.setStyleSheet(
-                    'background: ' + background_color
-                    + '; color: ' + font_color
-                    + '; border: 1px solid ' + border_color + ';')
-            for label in widget.findChildren(QLabel):
-                label.setStyleSheet('color: ' + font_color + ';')
+            self.main.app.setStyleSheet(open('resources/projecton-dark.qss', 'r').read())
+        wait_widget.widget.deleteLater()
 
     def print_oos(self):
         """
@@ -616,6 +500,7 @@ class GUI(QObject):
         for i in range(self.oos_widget.oos_list_widget.count()):
             item = self.oos_widget.oos_list_widget.item(i)
             widget = self.oos_widget.oos_list_widget.itemWidget(item)
+            widget.setObjectName('item_widget')
             if widget:
                 pixmap = widget.icon.pixmap()
                 type = widget.subtitle.text()
@@ -676,7 +561,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.1rc')
+        title_label = QLabel('ProjectOn v.1.1rc2')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -779,8 +664,7 @@ class GUI(QObject):
         """
         if self.video_widget:
             try:
-                frame = self.sink.videoFrame()
-                image = frame.toImage()
+                image = self.video_widget.grab(self.video_widget.rect())
                 pixmap = QPixmap(image)
             except Exception as ex:
                 self.main.error_log()
@@ -808,10 +692,10 @@ class GUI(QObject):
             if 'global_bible_background' in self.main.settings.keys():
                 self.global_bible_background_pixmap = QPixmap(
                     self.main.image_dir + '/' + self.main.settings['global_bible_background'])
-            if 'theme' in self.main.settings.keys():
+            """if 'theme' in self.main.settings.keys():
                 self.apply_theme(self.main.settings['theme'])
             else:
-                self.apply_theme('light')
+                self.apply_theme('light')"""
 
             # apply the font, shadow, and outline settings to main and sample lyric widgets.py
             for lyric_widget in [self.lyric_widget, self.sample_lyric_widget]:
@@ -1295,17 +1179,16 @@ class GUI(QObject):
         if widget == 'live':
             # handle stopping the media player carefully to avoid an Access Violation
             if self.media_player:
-                if self.media_player.isPlaying():
+                if self.media_player.state() == QMediaPlayer.State.PlayingState:
                     self.media_player.stop()
                     if self.timed_update:
                         self.timed_update.stop = True
-                self.media_player.source().clear()
+                #self.media_player.media().clear()
                 self.media_player.deleteLater()
                 self.video_widget.deleteLater()
                 self.media_player = None
                 self.video_widget = None
                 self.audio_output = None
-                self.sink = None
                 self.timed_update = None
 
             display_widget = self.display_widget
@@ -1482,6 +1365,16 @@ class GUI(QObject):
             else:
                 lyric_widget.footer_label.clear()
 
+            if not font_color == 'global':
+                lyric_widget.footer_label.setStyleSheet(f'color: {font_color}')
+            else:
+                if self.main.settings['font_color'] == 'black':
+                    lyric_widget.footer_label.setStyleSheet('color: black;')
+                elif self.main.settings['font_color'] == 'white':
+                    lyric_widget.footer_label.setStyleSheet('color: white;')
+                else:
+                    lyric_widget.footer_label.setStyleSheet(f'color: rgb({self.main.settings["font_color"]});')
+
             if lyric_widget.footer_label.text() == '':
                 lyric_widget.footer_label.hide()
 
@@ -1501,7 +1394,8 @@ class GUI(QObject):
                 elif current_item.data(40) == 'video':
                     self.make_video_widget()
                     self.video_widget.show()
-                    self.media_player.setSource(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
+                    media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
+                    self.media_player.setMedia(media_content)
                     self.media_player.play()
                     self.timed_update = TimedPreviewUpdate(self)
                     self.main.thread_pool.start(self.timed_update)
@@ -1598,19 +1492,12 @@ class GUI(QObject):
         self.display_layout.addWidget(self.video_widget)
 
         self.media_player = QMediaPlayer()
-        self.media_player.playingChanged.connect(self.media_playing_change)
-        self.media_player.errorOccurred.connect(self.media_error)
+        self.media_player.stateChanged.connect(self.media_playing_change)
+        self.media_player.error.connect(self.media_error)
         self.media_player.setVideoOutput(self.video_widget)
-        devices = QMediaDevices.audioOutputs()
-        for device in devices:
-            if device.isDefault():
-                self.audio_output = QAudioOutput(device)
-                self.audio_output.setVolume(1.0)
-                self.media_player.setAudioOutput(self.audio_output)
-        self.sink = self.media_player.videoSink()
 
     def media_playing_change(self):
-        if self.media_player.playbackState() == QMediaPlayer.PlaybackState.StoppedState:
+        if self.media_player.state() == QMediaPlayer.State.StoppedState:
             self.media_player.setPosition(0)
 
     def media_error(self):
