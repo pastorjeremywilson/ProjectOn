@@ -128,7 +128,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721430071819</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Added light/dark themes through the use of qss stylesheets">
+      <option name="closed" value="true" />
+      <created>1721520394281</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1721520394281</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -140,6 +148,7 @@
     <MESSAGE value="Changed logo" />
     <MESSAGE value="Fixed help pages not loading" />
     <MESSAGE value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
+    <MESSAGE value="Added light/dark themes through the use of qss stylesheets" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added light/dark themes through the use of qss stylesheets" />
   </component>
 </project>
