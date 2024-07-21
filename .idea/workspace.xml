@@ -5,36 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/ProjectOnDebug.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/ProjectOnDebug.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/compile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/compile.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/main.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton-console.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton-console.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton-console.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton-console.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/error.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/get_scripture.py" beforeDir="false" afterPath="$PROJECT_DIR$/get_scripture.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/help.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/importers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/live_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/live_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/openlp_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlp_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/openlyrics_export.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlyrics_export.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/preview_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/preview_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/print_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/print_dialog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple_splash.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_splash.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/toolbar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -64,15 +42,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "qt5-sandbox",
-    "last_opened_file_path": "X:/Documents/Python Workspace/project_on/main.py",
-    "settings.editor.selected.configurable": "reference.idesettings.debugger.python"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;qt5-sandbox&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/project_on/main.py&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySupportGeventDebugging" value="true" />
   </component>
@@ -141,14 +120,26 @@
       <option name="project" value="LOCAL" />
       <updated>1721422714998</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Switched from Qt6 to Qt5 to alleviate a couple of video bugs">
+      <option name="closed" value="true" />
+      <created>1721430071819</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1721430071819</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.qss" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Improved layout of the settings and font widgets." />
     <MESSAGE value="Made screen icon dimensions match ratio of screens they represent and improved their coloring" />
     <MESSAGE value="Changed logo" />
     <MESSAGE value="Fixed help pages not loading" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed help pages not loading" />
+    <MESSAGE value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
   </component>
 </project>

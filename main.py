@@ -74,7 +74,8 @@ class ProjectOn(QObject):
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         self.app = QApplication(sys.argv)
-        self.app.setStyle('Fusion')
+        #self.app.setStyle('Fusion')
+        self.app.setStyleSheet(open('resources/projecton-light.qss', 'r').read())
 
         self.thread_pool = QThreadPool()
         self.server_thread_pool = QThreadPool()
@@ -154,6 +155,7 @@ class ProjectOn(QObject):
         splash_layout.setContentsMargins(20, 20, 20, 20)
 
         icon_label = QLabel()
+        icon_label.setStyleSheet('background: #6060c0')
         icon_label.setPixmap(
             QPixmap('resources/alt-logo2.svg').scaled(
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
@@ -161,6 +163,7 @@ class ProjectOn(QObject):
 
         container = QWidget()
         container.setObjectName('container')
+        container.setStyleSheet('background: #6060c0')
         container_layout = QVBoxLayout(container)
         container_layout.setContentsMargins(20, 20, 20, 20)
         splash_layout.addWidget(container)

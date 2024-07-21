@@ -670,7 +670,7 @@ class StandardItemWidget(QWidget):
     def __init__(self, gui, title, subtitle=None, icon=None, wrap_subtitle=False):
         super().__init__()
         self.gui = gui
-        self.setObjectName('lyric_item_widget')
+        self.setObjectName('item_widget')
         layout = QHBoxLayout(self)
 
         self.subtitle = None

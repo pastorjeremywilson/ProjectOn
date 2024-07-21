@@ -1183,3 +1183,5 @@ Fri Jul 19 16:47:13 2024:
     families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
 Fri Jul 19 16:48:27 2024:
     families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Sat Jul 20 10:48:58 2024:
+    'GUI' object has no attribute 'apply_theme' on line 696 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
