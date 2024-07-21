@@ -13,6 +13,12 @@
 				box-sizing: inherit;
 			}
 
+			body {
+				display: flex;
+				flex-direction: column;
+				align-content: start;
+			}
+
 			button {
 				padding-top: 30px;
 				padding-bottom: 30px;
@@ -25,28 +31,25 @@
 			}
 
 			#header {
-				flex: 5%;
+				flex: 6%;
 				display: flex;
-				flex-direction: column;
-				width: 100%;
+				flex-direction: row;
+				justify-content: space-between;
 				position: fixed;
-				left: 0;
-				top: 0;
-				background-color: #aaaaff;
+				width: 100%;
 				padding: 20px 40px;
+				margin-bottom: 0px;
+				background-color: #aaaaff;
 			}
 
 			#title {
 				display: flex;
-				flex-direction: row;
-				width: 100%;
-				align-content: center;
 				justify-content: center;
+				align-items: center;
 				color: white;
 				font-family: 'Helvetica', sans-serif;
 				font-size: 3vh;
 				font-weight: bold;
-				margin-bottom: 20px;
 			}
 
 			#buttons {
@@ -55,12 +58,14 @@
 				justify-content: space-between;
 			}
 
-			#screen-buttons, #nav-buttons {
-				display: flex;
-				flex-direction: row;
+			.screen:hover {
+				background-repeat: no-repeat;
+				background-position: center;
+				background-color: darkgrey;
 			}
 
 			.nav {
+				flex: 30%;
 				border: 5px solid white;
 				border-radius: 10px;
 				background-size: 60px;
@@ -93,39 +98,54 @@
 
 			#item_back {
 				background-image: url({{ url_for('static', filename='item_back.svg') }});
-				flex: 25%;
-				margin-right: 40px;
+				margin-bottom: 20px;
 			}
 
 			#slide_back {
 				background-image: url({{ url_for('static', filename='slide_back.svg') }});
-				flex: 25%;
-				margin-right: 40px;
+				margin-bottom: 20px;
 			}
 
 			#slide_forward {
 				background-image: url({{ url_for('static', filename='slide_forward.svg') }});
-				flex: 25%;
-				margin-right: 40px;
+				margin-bottom: 20px;
 			}
 
 			#item_forward {
 				background-image: url({{ url_for('static', filename='item_forward.svg') }});
-				flex: 25%;
 			}
 
 			#main {
+				flex: 92%;
 				display: flex;
 				flex-direction: row;
+				padding: 0px;
+				margin: 0px;
 			}
 
 			#oos, #slides {
 				flex: 50%;
 				layout: block;
 				border: 3px solid #aaaaff;
-				margin: 10px;
 				padding: 20px;
-				overflow-y: auto;
+				overflow-y: scroll;
+			}
+
+			#oos {
+				margin-right: 5px;
+			}
+
+			#slides {
+				margin-left: 5px;
+			}
+
+			#nav-buttons {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				background-color: #aaaaff;
+				padding: 0px;
+				margin: 0px;
 			}
 
 			.subtitle {
@@ -148,6 +168,12 @@
 				background: lightGrey;
 			}
 
+			.title {
+				font-family: 'Helvetica', sans-serif;
+				font-size: 2vh;
+				font-weight: bold;
+			}
+
 			.text {
 				font-family: 'Helvetica', sans-serif;
 				font-size: 2vh;
@@ -160,35 +186,32 @@
 	<body>
 		<div id="header">
 			<div id="title">ProjectOn Remote</div>
-
-			<div id="buttons">
-				<div id="screen-buttons">
-					<button id="black_screen" class="nav" onclick="blackScreen()"></button>
-					<button id="logo_screen" class="nav" onclick="logoScreen()"></button>
-				</div>
-
-				<div id="nav-buttons">
-					<button id="item_back" class="nav" onclick="itemBack()"></button>
-					<button id="slide_back" class="nav" onclick="slideBack()"></button>
-					<button id="slide_forward" class="nav" onclick="slideForward()"></button>
-					<button id="item_forward" class="nav" onclick="itemForward()"></button>
-				</div>
+			<div id="screen-buttons">
+				<button id="black_screen" class="nav" onclick="blackScreen()"></button>
+				<button id="logo_screen" class="nav" onclick="logoScreen()"></button>
 			</div>
 		</div>
 
 		<div id="main">
 			<div id="oos">
-				<div class="subtitle">
+				<div id="oosSubtitle" class="subtitle">
 					Order of Service
 				</div>
 				<form id="oos_form" method="POST">{{ oos | safe}}</form>
 			</div>
 
 			<div id="slides">
-				<div class="subtitle">
+				<div id="slidesSubtitle" class="subtitle">
 					Slides
 				</div>
 				<form id="slide_form" method="POST">{{ slides | safe}}</form>
+			</div>
+
+			<div id="nav-buttons">
+				<button id="item_back" class="nav" onclick="itemBack()"></button>
+				<button id="slide_back" class="nav" onclick="slideBack()"></button>
+				<button id="slide_forward" class="nav" onclick="slideForward()"></button>
+				<button id="item_forward" class="nav" onclick="itemForward()"></button>
 			</div>
 		</div>
 	</body>

@@ -425,10 +425,10 @@ class GUI(QObject):
         theme_menu = tool_menu.addMenu('Theme')
 
         light_action = theme_menu.addAction('Light')
-        light_action.triggered.connect(self.set_theme)
+        light_action.triggered.connect(lambda: self.set_theme('light'))
 
         dark_action = theme_menu.addAction('Dark')
-        dark_action.triggered.connect(self.set_theme)
+        dark_action.triggered.connect(lambda: self.set_theme('dark'))
 
         tool_menu.addSeparator()
 
@@ -451,14 +451,18 @@ class GUI(QObject):
         about_action.setShortcut(QKeySequence('Ctrl+A'))
         about_action.triggered.connect(self.show_about)
 
-    def set_theme(self):
-        sender = self.sender()
-        wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
-        if sender.text() == 'Light':
+    def set_theme(self, theme):
+        wait_widget = None
+        if not self.main.initial_startup:
+            wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
+        if theme == 'light':
+            self.main.settings['theme'] = 'light'
             self.main.app.setStyleSheet(open('resources/projecton-light.qss', 'r').read())
         else:
+            self.main.settings['theme'] = 'dark'
             self.main.app.setStyleSheet(open('resources/projecton-dark.qss', 'r').read())
-        wait_widget.widget.deleteLater()
+        if wait_widget:
+            wait_widget.widget.deleteLater()
 
     def print_oos(self):
         """
@@ -626,8 +630,6 @@ class GUI(QObject):
         ok_button = QPushButton('OK')
         ok_button.setFont(self.standard_font)
         ok_button.setObjectName('ok_button')
-        #ok_button.setStyleSheet('#ok_button { background: #6060c0; color: white; }'
-        #                        '#ok_button:hover { background: white; color: black; }')
         ok_button.setMaximumWidth(60)
         ok_button.pressed.connect(widget.deleteLater)
         widget.layout().addWidget(ok_button, Qt.AlignmentFlag.AlignCenter)
@@ -692,10 +694,13 @@ class GUI(QObject):
             if 'global_bible_background' in self.main.settings.keys():
                 self.global_bible_background_pixmap = QPixmap(
                     self.main.image_dir + '/' + self.main.settings['global_bible_background'])
-            """if 'theme' in self.main.settings.keys():
-                self.apply_theme(self.main.settings['theme'])
+            if 'theme' in self.main.settings.keys():
+                if self.main.settings['theme'] == 'light':
+                    self.set_theme('light')
+                else:
+                    self.set_theme('dark')
             else:
-                self.apply_theme('light')"""
+                self.set_theme('dark')
 
             # apply the font, shadow, and outline settings to main and sample lyric widgets.py
             for lyric_widget in [self.lyric_widget, self.sample_lyric_widget]:
