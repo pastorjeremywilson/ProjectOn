@@ -30,6 +30,10 @@
 				font-size: 2.5vh;
 			}
 
+			button:hover {
+				background: lightGrey;
+			}
+
 			#header {
 				flex: 10%;
 				display: flex;
@@ -162,10 +166,6 @@
 				background: #aaaaff;
 				border: none;
 			}
-			
-			button:hover {
-				background: lightGrey;
-			}
 
 			.title {
 				font-family: 'Helvetica', sans-serif;
@@ -232,7 +232,6 @@
 		});
 
 		socket.on('update_slides', function(text) {
-			console.log(text)
 			document.getElementById("slide_form").innerHTML = text;
 		});
 

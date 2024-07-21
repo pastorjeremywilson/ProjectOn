@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added light/dark themes through the use of qss stylesheets">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/mobile_web_remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/mobile_web_remote.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/web_remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/web_remote.html" afterDir="false" />
     </list>
@@ -147,7 +146,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721528417750</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Fixed mobile remote html and changed layout to nav buttons on the right.">
+      <option name="closed" value="true" />
+      <created>1721596608883</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1721596608883</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -160,6 +167,7 @@
     <MESSAGE value="Fixed help pages not loading" />
     <MESSAGE value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
     <MESSAGE value="Added light/dark themes through the use of qss stylesheets" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added light/dark themes through the use of qss stylesheets" />
+    <MESSAGE value="Fixed mobile remote html and changed layout to nav buttons on the right." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed mobile remote html and changed layout to nav buttons on the right." />
   </component>
 </project>
