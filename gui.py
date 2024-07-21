@@ -416,15 +416,7 @@ class GUI(QObject):
         block_remote_action.setChecked(False)
         block_remote_action.triggered.connect(self.block_unblock_remote)
 
-        '''tool_menu.addSeparator()
-
-        theme_menu = tool_menu.addMenu('Theme')
-
-        light_action = theme_menu.addAction('Light')
-        light_action.triggered.connect(lambda: self.apply_theme('light'))
-
-        dark_action = theme_menu.addAction('Dark')
-        dark_action.triggered.connect(lambda: self.apply_theme('dark'))'''
+        tool_menu.addSeparator()
 
         settings_action = tool_menu.addAction('Settings')
         settings_action.setShortcut(QKeySequence('Ctrl+Alt+S'))
