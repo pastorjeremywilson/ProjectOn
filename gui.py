@@ -89,7 +89,6 @@ class GUI(QObject):
         :param ProjectOn main: The current instance of ProjectOn
         """
         super().__init__()
-        palette = QPalette()
 
         self.audio_output = None
         self.main = main
@@ -107,10 +106,6 @@ class GUI(QObject):
 
         self.check_files()
 
-        # if settings exist, set the secondary screen (the display screen) to the one in the settings
-        if len(self.main.settings) > 0:
-            self.secondary_screen = self.main.settings['selected_screen_name']
-
         self.main.status_label.setText('Indexing Images')
         self.main.app.processEvents()
 
@@ -125,6 +120,10 @@ class GUI(QObject):
         self.main.thread_pool.waitForDone()
 
         self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
+
+        # if settings exist, set the secondary screen (the display screen) to the one in the settings
+        if len(self.main.settings) > 0:
+            self.secondary_screen = self.main.settings['selected_screen_name']
 
         self.screens = self.main.app.screens()
         screen_found = False
@@ -179,7 +178,8 @@ class GUI(QObject):
                 'used_services': '',
                 'last_save_dir': '',
                 'last_status_count': 100,
-                'data_dir': ''
+                'data_dir': '',
+                'selected_screen_name' : ''
             }
         else:
             with open(self.main.device_specific_config_file, 'r') as file:
@@ -244,9 +244,13 @@ class GUI(QObject):
 
         self.main.settings['used_services'] = device_specific_settings['used_services']
         self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']
-        self.main.settings['data_dir'] = self.main.data_dir
+        if 'selected_screen_name' in device_specific_settings.keys():
+            self.main.settings['selected_screen_name'] = device_specific_settings['selected_screen_name']
+        else:
+            self.main.settings['selected_screen_name'] = ''
         if 'last_status_count' in device_specific_settings.keys():
             self.main.settings['last_status_count'] = device_specific_settings['last_status_count']
+        self.main.settings['data_dir'] = self.main.data_dir
 
         if not exists(self.main.config_file):
             if exists(self.main.data_dir + '/settings.json'):
@@ -1088,9 +1092,6 @@ class GUI(QObject):
             self.live_widget.blockSignals(True)
             self.live_widget.slide_list.clear()
 
-            for i in range(self.oos_widget.oos_list_widget.count()):
-                widget = self.oos_widget.oos_list_widget.itemWidget(self.oos_widget.oos_list_widget.item(i))
-
             item_index = self.preview_widget.slide_list.currentRow()
             for i in range(self.preview_widget.slide_list.count()):
                 original_item = self.preview_widget.slide_list.item(i)
@@ -1104,9 +1105,9 @@ class GUI(QObject):
                 elif item.data(40) == 'video':
                     lyric_widget = StandardItemWidget(self, item.data(20), '')
                 elif item.data(40) == 'song':
-                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2])
+                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2], wrap_subtitle=True)
                 else:
-                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2])
+                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2], wrap_subtitle=True)
 
                 self.live_widget.slide_list.addItem(item)
                 self.live_widget.slide_list.setItemWidget(item, lyric_widget)
@@ -1438,13 +1439,16 @@ class GUI(QObject):
 
                     stage_html = re.sub('<p.*?>', '', lyrics_html)
                     stage_html = stage_html.replace('</p>', '')
-                    self.main.remote_server.socketio.emit('update_stage', [stage_html, self.stage_font_size])
+                    self.main.remote_server.socketio.emit(
+                        'update_stage', [stage_html, self.main.settings['stage_font_size']])
                 elif current_item.data(40) == 'web':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
-                    self.main.remote_server.socketio.emit('update_stage', [lyrics_html, self.stage_font_size])
+                    self.main.remote_server.socketio.emit(
+                        'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
                 elif current_item.data(40) == 'video':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
-                    self.main.remote_server.socketio.emit('update_stage', [lyrics_html, self.stage_font_size])
+                    self.main.remote_server.socketio.emit(
+                        'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
             elif widget == 'sample':
                 pixmap = display_widget.grab(display_widget.rect())
                 pixmap = pixmap.scaled(

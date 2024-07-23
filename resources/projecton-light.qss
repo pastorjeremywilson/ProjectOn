@@ -133,6 +133,11 @@ QTabBar::tab:last {
     margin-right: 0px;
 }
 
+/*----- QRadioButton -----*/
+QRadioButton {
+    color: #000000;
+}
+
 /*----- QSlider -----*/
 QSlider::handle {
     background-color: #aaaaff;

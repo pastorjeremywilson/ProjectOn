@@ -710,22 +710,6 @@ class StandardItemWidget(QWidget):
         if not wrap_subtitle:
             layout.addStretch()
 
-        self.installEventFilter(self)
-
-    def eventFilter(self, object, event):
-        if event.type() == QEvent.Type.ParentChange:
-            self.set_style_sheet()
-            return True
-        else:
-            return False
-
-    def set_style_sheet(self):
-        pass
-        #self.setStyleSheet('background: none;')
-        #self.title.setStyleSheet('color: ' + self.gui.widget_item_font_color + ';')
-        #if self.subtitle:
-            #self.subtitle.setStyleSheet('color: ' + self.gui.widget_item_font_color + ';')
-
 
 class AutoSelectLineEdit(QLineEdit):
     """

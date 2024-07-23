@@ -482,9 +482,17 @@ class SettingsWidget(QWidget):
             try:
                 if 'ccli_num' in self.gui.main.settings.keys():
                     self.ccli_line_edit.setText(self.gui.main.settings['ccli_num'])
+
+                screen_found = False
                 for button in self.screen_button_group.buttons():
                     if button.objectName() == self.gui.main.settings['selected_screen_name']:
                         button.setChecked(True)
+                        screen_fount = True
+
+                if not screen_found:
+                    for button in self.screen_button_group.buttons():
+                        if 'primary' not in button.text():
+                            button.setChecked(True)
 
                 self.font_settings_widget.apply_settings()
 
