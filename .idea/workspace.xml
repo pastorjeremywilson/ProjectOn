@@ -6,23 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/importers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/live_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/live_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/openlp_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlp_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/openlyrics_export.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlyrics_export.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/preview_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/preview_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/print_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/print_dialog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/toolbar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/logo24.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,7 +169,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721754151564</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Changed most &quot;pressed&quot; signals to &quot;clicked&quot; to avoid duplicate calls.&#10;Fixed font widget background color.&#10;Changed version to release candidate 3.">
+      <option name="closed" value="true" />
+      <created>1721757334701</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1721757334701</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -200,6 +192,7 @@
     <MESSAGE value="Added light/dark themes through the use of qss stylesheets" />
     <MESSAGE value="Fixed mobile remote html and changed layout to nav buttons on the right." />
     <MESSAGE value="Merged sandbox into development" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merged sandbox into development" />
+    <MESSAGE value="Changed most &quot;pressed&quot; signals to &quot;clicked&quot; to avoid duplicate calls.&#10;Fixed font widget background color.&#10;Changed version to release candidate 3." />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed most &quot;pressed&quot; signals to &quot;clicked&quot; to avoid duplicate calls.&#10;Fixed font widget background color.&#10;Changed version to release candidate 3." />
   </component>
 </project>
