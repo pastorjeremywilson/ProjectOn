@@ -1,7 +1,7 @@
 import os.path
 
 from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath, QPalette
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, \
     QSizePolicy
@@ -103,14 +103,14 @@ class SettingsWidget(QWidget):
 
         save_button = QPushButton('Save')
         save_button.setFont(self.gui.standard_font)
-        save_button.pressed.connect(self.save)
+        save_button.clicked.connect(self.save)
         button_layout.addStretch()
         button_layout.addWidget(save_button)
         button_layout.addSpacing(20)
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(self.cancel)
+        cancel_button.clicked.connect(self.cancel)
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 
@@ -294,7 +294,7 @@ class SettingsWidget(QWidget):
 
         add_song_button = QPushButton('Import a Background')
         add_song_button.setFont(self.gui.standard_font)
-        add_song_button.pressed.connect(self.gui.tool_bar.import_background)
+        add_song_button.clicked.connect(self.gui.tool_bar.import_background)
         song_background_layout.addWidget(add_song_button)
         song_background_layout.addStretch()
 
@@ -327,7 +327,7 @@ class SettingsWidget(QWidget):
 
         logo_background_button = QPushButton('Add an Image')
         logo_background_button.setFont(self.gui.standard_font)
-        logo_background_button.pressed.connect(self.gui.media_widget.add_image)
+        logo_background_button.clicked.connect(self.gui.media_widget.add_image)
         logo_background_layout.addWidget(logo_background_button)
         logo_background_layout.addStretch()
 
@@ -338,13 +338,13 @@ class SettingsWidget(QWidget):
 
         delete_background_button = QPushButton('Delete a Background')
         delete_background_button.setFont(self.gui.standard_font)
-        delete_background_button.pressed.connect(self.delete_background)
+        delete_background_button.clicked.connect(self.delete_background)
         delete_layout.addWidget(delete_background_button)
         delete_layout.addSpacing(20)
 
         delete_image_button = QPushButton('Delete an Image')
         delete_image_button.setFont(self.gui.standard_font)
-        delete_image_button.pressed.connect(self.gui.media_widget.delete_image)
+        delete_image_button.clicked.connect(self.gui.media_widget.delete_image)
         delete_layout.addWidget(delete_image_button)
         delete_layout.addStretch()
 
@@ -437,12 +437,12 @@ class SettingsWidget(QWidget):
 
         remove_button = QPushButton('Remove')
         remove_button.setFont(self.gui.standard_font)
-        remove_button.pressed.connect(lambda: dialog.done(0))
+        remove_button.clicked.connect(lambda: dialog.done(0))
         button_layout.addWidget(remove_button)
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(lambda: dialog.done(1))
+        cancel_button.clicked.connect(lambda: dialog.done(1))
         button_layout.addWidget(cancel_button)
 
         response = dialog.exec()

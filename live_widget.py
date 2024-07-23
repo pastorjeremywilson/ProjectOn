@@ -1,7 +1,7 @@
-from PyQt5.QtCore import Qt, QSize, pyqtSignal, QTimer
+from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtMultimedia import QMediaPlayer
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout
 
 
 class LiveWidget(QWidget):
@@ -70,7 +70,7 @@ class LiveWidget(QWidget):
         to_beginning_button.setIconSize(QSize(30, 30))
         to_beginning_button.setFixedSize(50, 50)
         to_beginning_button.setObjectName('to_beginning')
-        to_beginning_button.pressed.connect(self.video_control)
+        to_beginning_button.clicked.connect(self.video_control)
         player_layout.addStretch()
         player_layout.addWidget(to_beginning_button)
 
@@ -79,7 +79,7 @@ class LiveWidget(QWidget):
         play_button.setIconSize(QSize(30, 30))
         play_button.setFixedSize(50, 50)
         play_button.setObjectName('play')
-        play_button.pressed.connect(self.video_control)
+        play_button.clicked.connect(self.video_control)
         player_layout.addWidget(play_button)
 
         stop_button = QPushButton()
@@ -87,7 +87,7 @@ class LiveWidget(QWidget):
         stop_button.setIconSize(QSize(30, 30))
         stop_button.setFixedSize(50, 50)
         stop_button.setObjectName('stop')
-        stop_button.pressed.connect(self.video_control)
+        stop_button.clicked.connect(self.video_control)
         player_layout.addWidget(stop_button)
         player_layout.addStretch()
 

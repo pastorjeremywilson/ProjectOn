@@ -844,7 +844,7 @@ class FontWidget(QWidget):
         self.custom_font_color_radio_button.setObjectName('custom')
         self.custom_font_color_radio_button.setFont(self.gui.standard_font)
         self.custom_font_color_radio_button.setObjectName('custom_font_color_radio_button')
-        self.custom_font_color_radio_button.pressed.connect(self.color_chooser)
+        self.custom_font_color_radio_button.clicked.connect(self.color_chooser)
         font_color_layout.addWidget(self.custom_font_color_radio_button)
         font_color_layout.addStretch()
 

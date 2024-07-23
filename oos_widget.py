@@ -65,7 +65,7 @@ class OOSWidget(QWidget):
             'QPushButton:hover { background: lightGrey; }'
         )'''
         move_up_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
-        move_up_button.pressed.connect(self.move_item_up)
+        move_up_button.clicked.connect(self.move_item_up)
         container_layout.addWidget(move_up_button, 1, 1)
 
         move_down_button = QPushButton()
@@ -78,7 +78,7 @@ class OOSWidget(QWidget):
             'QPushButton:hover { background: lightGrey; }'
         )'''
         move_down_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
-        move_down_button.pressed.connect(self.move_item_down)
+        move_down_button.clicked.connect(self.move_item_down)
         container_layout.addWidget(move_down_button, 2, 1)
 
     def move_item_up(self):

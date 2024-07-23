@@ -43,7 +43,7 @@ class OpenLPImport:
         file_layout.addWidget(self.file_line_edit)
 
         load_button = QPushButton('load file')
-        load_button.pressed.connect(self.load_file)
+        load_button.clicked.connect(self.load_file)
         file_layout.addWidget(load_button)
 
         self.song_label = QLabel()
@@ -53,7 +53,7 @@ class OpenLPImport:
         layout.addWidget(self.progress_bar)
 
         self.start_button = QPushButton('Start Import')
-        self.start_button.pressed.connect(self.start_import)
+        self.start_button.clicked.connect(self.start_import)
         layout.addWidget(self.start_button)
         self.start_button.setEnabled(False)
 

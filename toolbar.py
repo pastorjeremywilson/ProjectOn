@@ -2,8 +2,8 @@ import os
 import shutil
 
 from PyQt5.QtCore import QSize, QPoint
-from PyQt5.QtGui import QIcon, QPalette
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog, QStyle
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog
 
 from openlp_import import OpenLPImport
 from settings_widget import SettingsWidget
@@ -30,28 +30,28 @@ class Toolbar(QWidget):
         save_button.setIcon(QIcon('./resources/save.svg'))
         save_button.setToolTip('Save this Order of Service')
         save_button.setIconSize(QSize(36, 36))
-        save_button.pressed.connect(self.gui.main.save_service)
+        save_button.clicked.connect(self.gui.main.save_service)
         self.layout.addWidget(save_button)
 
         load_button = QPushButton()
         load_button.setIcon(QIcon('./resources/open.svg'))
         load_button.setToolTip('Load a Service')
         load_button.setIconSize(QSize(36, 36))
-        load_button.pressed.connect(self.gui.main.load_service)
+        load_button.clicked.connect(self.gui.main.load_service)
         self.layout.addWidget(load_button)
 
         new_button = QPushButton()
         new_button.setIcon(QIcon('./resources/new.svg'))
         new_button.setToolTip('Create a New Service')
         new_button.setIconSize(QSize(36, 36))
-        new_button.pressed.connect(self.gui.new_service)
+        new_button.clicked.connect(self.gui.new_service)
         self.layout.addWidget(new_button)
 
         settings_button = QPushButton()
         settings_button.setIcon(QIcon('./resources/settings.svg'))
         settings_button.setToolTip('Open Program Settings')
         settings_button.setIconSize(QSize(36, 36))
-        settings_button.pressed.connect(self.open_settings)
+        settings_button.clicked.connect(self.open_settings)
         self.layout.addWidget(settings_button)
 
         self.layout.addStretch()
@@ -63,7 +63,7 @@ class Toolbar(QWidget):
         self.font_button.setIconSize(QSize(36, 36))
         self.font_button.setToolTip('Change Font Settings')
         self.font_button.setFont(self.gui.standard_font)
-        self.font_button.pressed.connect(self.font_widget.show)
+        self.font_button.clicked.connect(self.font_widget.show)
         self.font_widget.hide()
         self.layout.addWidget(self.font_button)
 

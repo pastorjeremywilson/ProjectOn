@@ -242,3 +242,9 @@ QWidget[objectName="settings_container"] {
     background: #303030;
     color: #e0e0e0;
 }
+
+/*----- Font Widget -----*/
+QWidget[objectName="font_widget"] {
+    background: #303030;
+    color: #e0e0e0;
+}
