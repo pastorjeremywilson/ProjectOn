@@ -1,8 +1,8 @@
 import os.path
 
-from PyQt6.QtCore import Qt, QRectF, QPointF, QEvent
-from PyQt6.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath, QPalette
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
+from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath, QPalette
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, \
     QSizePolicy
 
@@ -16,6 +16,7 @@ class SettingsWidget(QWidget):
     def __init__(self, gui):
         super().__init__()
         self.accept_font_changes = False
+        self.setObjectName('settings_widget')
         self.gui = gui
         self.min_width = 1000
 
@@ -47,6 +48,7 @@ class SettingsWidget(QWidget):
         self.setLayout(layout)
 
         self.settings_container = QWidget()
+        self.settings_container.setObjectName('settings_container')
         settings_container_layout = QVBoxLayout()
         self.settings_container.setLayout(settings_container_layout)
 
@@ -56,7 +58,7 @@ class SettingsWidget(QWidget):
 
         ccli_title_label = QLabel('CCLI Information')
         ccli_title_label.setFont(self.gui.bold_font)
-        ccli_title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        ccli_title_label.setStyleSheet('background: #5555aa; color: white')
         ccli_title_label.setContentsMargins(5, 5, 5, 5)
         ccli_container_layout.addWidget(ccli_title_label)
 
@@ -168,7 +170,7 @@ class SettingsWidget(QWidget):
             else:
                 primary = False
 
-            screen_pixmap = self.draw_screen_pixmap(name, primary)
+            screen_pixmap = self.draw_screen_pixmap(name, primary, screen.size())
             screen_icon_label = QLabel()
             screen_icon_label.setPixmap(screen_pixmap)
             layout.addWidget(screen_icon_label, 1, index)
@@ -193,7 +195,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Display Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label, 0, 0, 1, index + 1)
 
@@ -219,7 +221,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Font Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -273,7 +275,7 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Background Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('border: 2px solid #5555aa; background: white;')
+        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -281,28 +283,53 @@ class SettingsWidget(QWidget):
         song_background_label.setFont(self.gui.standard_font)
         layout.addWidget(song_background_label)
 
+        song_background_widget = QWidget()
+        song_background_layout = QHBoxLayout(song_background_widget)
+        layout.addWidget(song_background_widget)
+        layout.addSpacing(20)
+
         self.song_background_combobox = ImageCombobox(self.gui, 'song', suppress_autosave=True)
         self.song_background_combobox.setMaximumWidth(500)
-        layout.addWidget(self.song_background_combobox)
-        layout.addSpacing(20)
+        song_background_layout.addWidget(self.song_background_combobox)
+
+        add_song_button = QPushButton('Import a Background')
+        add_song_button.setFont(self.gui.standard_font)
+        add_song_button.pressed.connect(self.gui.tool_bar.import_background)
+        song_background_layout.addWidget(add_song_button)
+        song_background_layout.addStretch()
 
         bible_background_label = QLabel('Global Bible Background:')
         bible_background_label.setFont(self.gui.standard_font)
         layout.addWidget(bible_background_label)
 
+        bible_background_widget = QWidget()
+        bible_background_layout = QHBoxLayout(bible_background_widget)
+        layout.addWidget(bible_background_widget)
+        layout.addSpacing(20)
+
         self.bible_background_combobox = ImageCombobox(self.gui, 'bible', suppress_autosave=True)
         self.bible_background_combobox.setMaximumWidth(500)
-        layout.addWidget(self.bible_background_combobox)
-        layout.addSpacing(20)
+        bible_background_layout.addWidget(self.bible_background_combobox)
+        bible_background_layout.addStretch()
 
         logo_background_label = QLabel('Set Logo Image:')
         logo_background_label.setFont(self.gui.standard_font)
         layout.addWidget(logo_background_label)
 
+        logo_background_widget = QWidget()
+        logo_background_layout = QHBoxLayout(logo_background_widget)
+        layout.addWidget(logo_background_widget)
+        layout.addSpacing(20)
+
         self.logo_background_combobox = ImageCombobox(self.gui, 'logo', suppress_autosave=True)
         self.logo_background_combobox.setMaximumWidth(500)
-        layout.addWidget(self.logo_background_combobox)
-        layout.addSpacing(20)
+        logo_background_layout.addWidget(self.logo_background_combobox)
+
+        logo_background_button = QPushButton('Add an Image')
+        logo_background_button.setFont(self.gui.standard_font)
+        logo_background_button.pressed.connect(self.gui.media_widget.add_image)
+        logo_background_layout.addWidget(logo_background_button)
+        logo_background_layout.addStretch()
 
         delete_widget = QWidget()
         delete_layout = QHBoxLayout()
@@ -333,13 +360,17 @@ class SettingsWidget(QWidget):
         else:
             return super().eventFilter(obj, evt)
 
-    def draw_screen_pixmap(self, name, primary):
-        pixmap = QPixmap(100, 100)
+    def draw_screen_pixmap(self, name, primary, size):
+        ratio = size.width() / size.height()
+        height = 100
+        width = int(100 * ratio)
+
+        pixmap = QPixmap(width, height)
         pixmap.fill(QColor(0, 0, 0, 0))
 
         painter = QPainter(pixmap)
         pen = QPen()
-        pen.setColor(Qt.GlobalColor.black)
+        pen.setColor(Qt.GlobalColor.gray)
         pen.setWidth(10)
         brush = QBrush()
         brush.setColor(Qt.GlobalColor.blue)
@@ -347,11 +378,20 @@ class SettingsWidget(QWidget):
         painter.setPen(pen)
         painter.setBrush(brush)
 
-        painter.drawRoundedRect(QRectF(0, 0, 100, 100), 5, 5)
-        painter.drawText(20, 45, name)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(0, 0, width, height), 5, 5)
+        painter.fillPath(path, QColor(85, 85, 170))
+        painter.drawPath(path)
+
+        text_rect = painter.fontMetrics().boundingRect(name)
+        text_pos = QPointF((width / 2) - (text_rect.width() / 2), (height / 2) - (text_rect.height() / 2))
+        pen.setColor(Qt.GlobalColor.white)
+        painter.setPen(pen)
+        painter.drawText(text_pos, name)
 
         if primary:
-            painter.drawText(20, 60, '(primary)')
+            text_pos.setY(text_pos.y() + text_rect.height() + 5)
+            painter.drawText(text_pos, '(primary)')
 
         painter.end()
         return pixmap

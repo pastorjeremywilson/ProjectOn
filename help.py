@@ -1,10 +1,10 @@
 import os
 from os.path import exists
 
-from PyQt6.QtCore import Qt, QUrl
-from PyQt6.QtGui import QFont, QPalette, QColor
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QLabel, QTextBrowser, QMainWindow
-from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QMainWindow, QApplication
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 
 class Help(QMainWindow):
@@ -30,18 +30,8 @@ class Help(QMainWindow):
         self.setWindowTitle('Help Contents')
 
         tab_widget = QTabWidget()
+        tab_widget.currentChanged.connect(lambda: self.refresh_html(tab_widget))
         tab_widget.setFont(QFont('Helvetica', 12, QFont.Weight.Bold))
-        '''tab_widget.setStyleSheet(
-            QTabBar::tab {
-                background-color: #6060c0;
-                color: white;
-                padding: 10px;
-                margin: 0px 5px 5px 0px;
-                border: 1px solid black;}
-            QTabBar::tab:selected {
-                background-color: white;
-                color: #6060c0;}
-            )'''
         self.setCentralWidget(tab_widget)
 
         tab_widget.addTab(self.intro_widget(), 'Introduction')
@@ -54,13 +44,16 @@ class Help(QMainWindow):
         tab_widget.addTab(self.import_widget(), 'Importing Songs')
         tab_widget.addTab(self.file_widget(), 'File Locations')
 
+    def refresh_html(self, tab_widget):
+        QApplication.processEvents()
+
     def intro_widget(self):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         intro_file = 'resources/help/intro.html'
         if exists(intro_file):
@@ -73,9 +66,9 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         main_screen_file = 'resources/help/main_screen.html'
         if exists(main_screen_file):
@@ -88,9 +81,9 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         media_file = 'resources/help/media_box.html'
         if exists(media_file):
@@ -103,9 +96,9 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         edit_file = 'resources/help/edit.html'
         if exists(edit_file):
@@ -118,9 +111,9 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         settings_file = 'resources/help/settings.html'
         if exists(settings_file):
@@ -133,9 +126,9 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         remote_file = 'resources/help/remote.html'
         if exists(remote_file):
@@ -148,9 +141,9 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         import_file = 'resources/help/import.html'
         if exists(import_file):
@@ -163,9 +156,9 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         menu_file = 'resources/help/menu_bar.html'
         if exists(menu_file):
@@ -178,9 +171,9 @@ class Help(QMainWindow):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
         widget.layout().setContentsMargins(40, 20, 40, 20)
-        #widget.setStyleSheet('background: white; border: 3px solid #6060c0;')
 
         web_view = QWebEngineView()
+        web_view.setObjectName('web_view')
         widget.layout().addWidget(web_view)
         file_file = 'resources/help/file_locations.html'
         if exists(file_file):

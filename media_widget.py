@@ -5,11 +5,11 @@ import sqlite3
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt6.QtCore import Qt, QSize, QPoint, QEvent
-from PyQt6.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen, QAction
-from PyQt6.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
+from PyQt5.QtCore import Qt, QSize, QPoint, QEvent
+from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
+from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, \
-    QGridLayout, QStyleOption, QStyle
+    QGridLayout, QStyleOption, QStyle, QAction
 
 from edit_widget import EditWidget
 from get_scripture import GetScripture
@@ -70,7 +70,8 @@ class MediaWidget(QTabWidget):
         :return QWidget: The song widget
         """
         song_widget = QWidget()
-        song_widget.setObjectName('song_widget')
+        song_widget.setObjectName('tab_widget')
+        song_widget.setAutoFillBackground(True)
         song_layout = QVBoxLayout()
         song_widget.setLayout(song_layout)
 
@@ -139,7 +140,8 @@ class MediaWidget(QTabWidget):
         :return QWidget: The scripture widget
         """
         scripture_widget = QWidget()
-        scripture_widget.setObjectName('scripture_widget')
+        scripture_widget.setObjectName('tab_widget')
+        scripture_widget.setAutoFillBackground(True)
         scripture_layout = QVBoxLayout()
         scripture_layout.setSpacing(0)
         scripture_layout.setContentsMargins(10, 0, 10, 10)
@@ -254,7 +256,8 @@ class MediaWidget(QTabWidget):
         :return QWidget: The custom slide widget
         """
         custom_widget = QWidget()
-        custom_widget.setObjectName('custom_widget')
+        custom_widget.setObjectName('tab_widget')
+        custom_widget.setAutoFillBackground(True)
         custom_layout = QVBoxLayout()
         custom_widget.setLayout(custom_layout)
 
@@ -302,7 +305,8 @@ class MediaWidget(QTabWidget):
         :return QWidget: The image widget
         """
         image_widget = QWidget()
-        image_widget.setObjectName('image_widget')
+        image_widget.setObjectName('tab_widget')
+        image_widget.setAutoFillBackground(True)
         image_layout = QVBoxLayout()
         image_widget.setLayout(image_layout)
 
@@ -351,7 +355,8 @@ class MediaWidget(QTabWidget):
         :return QWidget: The video widget
         """
         video_widget = QWidget()
-        video_widget.setObjectName('video_widget')
+        video_widget.setObjectName('tab_widget')
+        video_widget.setAutoFillBackground(True)
         video_layout = QVBoxLayout()
         video_widget.setLayout(video_layout)
 
@@ -399,7 +404,8 @@ class MediaWidget(QTabWidget):
         :return QWidget: The web widget
         """
         web_widget = QWidget()
-        web_widget.setObjectName('web_widget')
+        web_widget.setObjectName('tab_widget')
+        web_widget.setAutoFillBackground(True)
         web_layout = QVBoxLayout()
         web_widget.setLayout(web_layout)
 

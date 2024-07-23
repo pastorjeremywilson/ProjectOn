@@ -1,3 +1,1 @@
-Figure out why crash happens if video is played first followed by web view
-
 Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?

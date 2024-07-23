@@ -6,7 +6,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[('../static', 'static/'), ('../resources', 'resources/'), ('../ghostscript', 'ghostscript')],
-    hiddenimports=['PyQt6.sip'],
+    hiddenimports=['PyQt5.sip'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -32,7 +32,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['..\\resources\\logo.ico'],
+    icon=['..\\resources\\alt-icon2.ico'],
 )
 coll = COLLECT(
     exe,

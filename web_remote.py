@@ -8,7 +8,7 @@ import logging
 from http.server import BaseHTTPRequestHandler
 from flask import Flask, render_template, request
 
-from PyQt6.QtCore import QRunnable
+from PyQt5.QtCore import QRunnable
 from flask_socketio import SocketIO
 
 

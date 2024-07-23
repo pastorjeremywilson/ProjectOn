@@ -4,21 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
-    </list>
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="qt5-sandbox" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -31,15 +32,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;development&quot;,
-    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/project_on/main.py&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.idesettings.debugger.python&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "development",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "X:/Documents/Python Workspace/project_on/main.py",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySupportGeventDebugging" value="true" />
   </component>
@@ -76,6 +78,100 @@
       <option name="presentableId" value="Default" />
       <updated>1721321664836</updated>
     </task>
+    <task id="LOCAL-00001" summary="Improved layout of the settings and font widgets.">
+      <option name="closed" value="true" />
+      <created>1721330053318</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1721330053318</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Made screen icon dimensions match ratio of screens they represent and improved their coloring">
+      <option name="closed" value="true" />
+      <created>1721337555101</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1721337555101</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Changed logo">
+      <option name="closed" value="true" />
+      <created>1721419699708</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1721419699708</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Fixed help pages not loading">
+      <option name="closed" value="true" />
+      <created>1721422714998</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1721422714998</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Switched from Qt6 to Qt5 to alleviate a couple of video bugs">
+      <option name="closed" value="true" />
+      <created>1721430071819</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1721430071819</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added light/dark themes through the use of qss stylesheets">
+      <option name="closed" value="true" />
+      <created>1721520394281</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1721520394281</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Added light/dark themes through the use of qss stylesheets">
+      <option name="closed" value="true" />
+      <created>1721528348270</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1721528348270</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added light/dark themes through the use of qss stylesheets">
+      <option name="closed" value="true" />
+      <created>1721528417750</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1721528417750</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Fixed mobile remote html and changed layout to nav buttons on the right.">
+      <option name="closed" value="true" />
+      <created>1721596608883</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1721596608883</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Fixed mobile remote html and changed layout to nav buttons on the right.">
+      <option name="closed" value="true" />
+      <created>1721599860611</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1721599860611</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.qss" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Improved layout of the settings and font widgets." />
+    <MESSAGE value="Made screen icon dimensions match ratio of screens they represent and improved their coloring" />
+    <MESSAGE value="Changed logo" />
+    <MESSAGE value="Fixed help pages not loading" />
+    <MESSAGE value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
+    <MESSAGE value="Added light/dark themes through the use of qss stylesheets" />
+    <MESSAGE value="Fixed mobile remote html and changed layout to nav buttons on the right." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed mobile remote html and changed layout to nav buttons on the right." />
   </component>
 </project>

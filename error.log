@@ -983,7 +983,7 @@ Fri May 17 10:17:59 2024:
 Fri May 17 10:18:36 2024:
     'NoneType' object has no attribute 'blockSignals' on line 894 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.blockSignalsunknown server error
 Fri May 17 10:19:13 2024:
-    find(a0: PyQt6.sip.voidptr): argument 1 has unexpected type 'str' on line 916 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.apply_settingsunknown server errorunknown server errorunknown server error
+    find(a0: PyQt5.sip.voidptr): argument 1 has unexpected type 'str' on line 916 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\widgets.py in FontWidget.apply_settingsunknown server errorunknown server errorunknown server error
 Fri May 17 12:57:54 2024:
     'NoneType' object is not subscriptable on line 1098 of C:\Users\pasto\Nextcloud\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
 Fri May 17 12:58:51 2024:
@@ -1025,3 +1025,163 @@ Wed Jun  5 22:12:31 2024:
     'AttributeError'
     'NoneType' object has no attribute 'objectName'
     file X:\Documents\Python Workspace\project_on\edit_widget.py, line 953 in save_customunknown server errorunknown server errorunknown server errorunknown server errorunknown server error
+Fri Jul 19 16:25:18 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 65 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceComboBox.populate_widget
+Fri Jul 19 16:25:28 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Fri Jul 19 16:27:58 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Fri Jul 19 16:29:50 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Fri Jul 19 16:32:16 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Fri Jul 19 16:33:23 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:33 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:34 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:35 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:36 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:37 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:38 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:33:39 2024:
+    'NoneType' object has no attribute 'videoFrame' on line 782 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Fri Jul 19 16:41:18 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Fri Jul 19 16:42:56 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Fri Jul 19 16:47:13 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Fri Jul 19 16:48:27 2024:
+    families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
+Sat Jul 20 10:48:58 2024:
+    'GUI' object has no attribute 'apply_theme' on line 696 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
