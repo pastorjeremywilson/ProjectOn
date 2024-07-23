@@ -1,5 +1,14 @@
 /*----- Light Stylesheet for ProjectOn -----
-Note: Qt default background for widgets is #f0f0f0 or 240, 240, 240*/
+Note: Qt default background for widgets is #f0f0f0 or 240, 240, 240
+
+General Theme Colors:
+Background, usable widget: #ffffff
+Background, widget: #f0f0f0
+Font color: #000000
+Hover: #aaaaff
+Selected/Pressed: #5555aa
+Disabled: #505050
+*/
 
 /*----- QListWidget -----*/
 QListWidget {
@@ -184,4 +193,15 @@ QWidget[objectName="tool_bar_container"] {
 /*----- tab_widget -----*/
 QWidget[objectName="tab_widget"] {
     background: #c0c0c0;
+}
+
+/*----- settings_widget -----*/
+QWidget[objectName="settings_widget"] {
+    background: #c0c0c0;
+}
+
+/*----- settings_container -----*/
+QWidget[objectName="settings_container"] {
+    background: #ffffff;
+    color: #000000;
 }

@@ -16,6 +16,7 @@ class SettingsWidget(QWidget):
     def __init__(self, gui):
         super().__init__()
         self.accept_font_changes = False
+        self.setObjectName('settings_widget')
         self.gui = gui
         self.min_width = 1000
 
@@ -47,6 +48,7 @@ class SettingsWidget(QWidget):
         self.setLayout(layout)
 
         self.settings_container = QWidget()
+        self.settings_container.setObjectName('settings_container')
         settings_container_layout = QVBoxLayout()
         self.settings_container.setLayout(settings_container_layout)
 
@@ -281,28 +283,53 @@ class SettingsWidget(QWidget):
         song_background_label.setFont(self.gui.standard_font)
         layout.addWidget(song_background_label)
 
+        song_background_widget = QWidget()
+        song_background_layout = QHBoxLayout(song_background_widget)
+        layout.addWidget(song_background_widget)
+        layout.addSpacing(20)
+
         self.song_background_combobox = ImageCombobox(self.gui, 'song', suppress_autosave=True)
         self.song_background_combobox.setMaximumWidth(500)
-        layout.addWidget(self.song_background_combobox)
-        layout.addSpacing(20)
+        song_background_layout.addWidget(self.song_background_combobox)
+
+        add_song_button = QPushButton('Import a Background')
+        add_song_button.setFont(self.gui.standard_font)
+        add_song_button.pressed.connect(self.gui.tool_bar.import_background)
+        song_background_layout.addWidget(add_song_button)
+        song_background_layout.addStretch()
 
         bible_background_label = QLabel('Global Bible Background:')
         bible_background_label.setFont(self.gui.standard_font)
         layout.addWidget(bible_background_label)
 
+        bible_background_widget = QWidget()
+        bible_background_layout = QHBoxLayout(bible_background_widget)
+        layout.addWidget(bible_background_widget)
+        layout.addSpacing(20)
+
         self.bible_background_combobox = ImageCombobox(self.gui, 'bible', suppress_autosave=True)
         self.bible_background_combobox.setMaximumWidth(500)
-        layout.addWidget(self.bible_background_combobox)
-        layout.addSpacing(20)
+        bible_background_layout.addWidget(self.bible_background_combobox)
+        bible_background_layout.addStretch()
 
         logo_background_label = QLabel('Set Logo Image:')
         logo_background_label.setFont(self.gui.standard_font)
         layout.addWidget(logo_background_label)
 
+        logo_background_widget = QWidget()
+        logo_background_layout = QHBoxLayout(logo_background_widget)
+        layout.addWidget(logo_background_widget)
+        layout.addSpacing(20)
+
         self.logo_background_combobox = ImageCombobox(self.gui, 'logo', suppress_autosave=True)
         self.logo_background_combobox.setMaximumWidth(500)
-        layout.addWidget(self.logo_background_combobox)
-        layout.addSpacing(20)
+        logo_background_layout.addWidget(self.logo_background_combobox)
+
+        logo_background_button = QPushButton('Add an Image')
+        logo_background_button.setFont(self.gui.standard_font)
+        logo_background_button.pressed.connect(self.gui.media_widget.add_image)
+        logo_background_layout.addWidget(logo_background_button)
+        logo_background_layout.addStretch()
 
         delete_widget = QWidget()
         delete_layout = QHBoxLayout()

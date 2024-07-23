@@ -325,6 +325,7 @@ class GUI(QObject):
         self.media_widget = MediaWidget(self)
         self.media_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.media_widget, 2, 0)
+        self.main.update_status_signal.emit('', 'info')
 
         self.main.update_status_signal.emit('Creating GUI: Adding OOS Widget', 'status')
         self.oos_widget = OOSWidget(self)
@@ -604,7 +605,6 @@ class GUI(QObject):
         remote_layout.addWidget(stage_url_label, 3, 1)
 
         about_text = QTextBrowser()
-        #about_text.setStyleSheet('border: 0;')
         about_text.setOpenExternalLinks(True)
         about_text.setHtml('''
                     <p>ProjectOn is free software: you can redistribute it and/or
