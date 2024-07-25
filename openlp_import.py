@@ -5,7 +5,7 @@ import sqlite3
 from xml.etree import ElementTree as ET
 
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QLineEdit, QPushButton, QProgressBar, \
-    QFileDialog, QMessageBox
+    QFileDialog, QMessageBox, QDialog
 
 
 class OpenLPImport:
@@ -25,7 +25,7 @@ class OpenLPImport:
         Creates and lays out the widget prompting the user to import their database and shows a progress bar when
         importing.
         """
-        self.widget = QWidget()
+        self.widget = QDialog()
         layout = QVBoxLayout()
         self.widget.setLayout(layout)
 
@@ -37,22 +37,31 @@ class OpenLPImport:
         layout.addWidget(file_widget)
 
         file_label = QLabel('OpenLP Database:')
+        file_label.setFont(self.gui.standard_font)
         file_layout.addWidget(file_label)
 
         self.file_line_edit = QLineEdit()
+        self.file_line_edit.setFont(self.gui.standard_font)
         file_layout.addWidget(self.file_line_edit)
 
-        load_button = QPushButton('load file')
+        load_button = QPushButton('Load File')
+        load_button.setFont(self.gui.standard_font)
         load_button.clicked.connect(self.load_file)
         file_layout.addWidget(load_button)
 
+        cancel_button = QPushButton('Cancel')
+        cancel_button.setFont(self.gui.standard_font)
+        cancel_button.clicked.connect(lambda: self.widget.done(0))
+
         self.song_label = QLabel()
+        self.song_label.setFont(self.gui.standard_font)
         layout.addWidget(self.song_label)
 
         self.progress_bar = QProgressBar()
         layout.addWidget(self.progress_bar)
 
         self.start_button = QPushButton('Start Import')
+        self.start_button.setFont(self.gui.standard_font)
         self.start_button.clicked.connect(self.start_import)
         layout.addWidget(self.start_button)
         self.start_button.setEnabled(False)
@@ -119,7 +128,7 @@ class OpenLPImport:
                 )
                 self.progress_bar.setValue(self.progress_bar.value() + 1)
             self.gui.media_widget.populate_song_list()
-            self.widget.deleteLater()
+            self.widget.done(0)
 
         except Exception as ex:
             self.gui.main.error_log()

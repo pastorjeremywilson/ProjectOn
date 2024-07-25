@@ -74,8 +74,7 @@ class ProjectOn(QObject):
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         self.app = QApplication(sys.argv)
-        #self.app.setStyle('Fusion')
-        self.app.setStyleSheet(open('resources/projecton-light.qss', 'r').read())
+        self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
 
         self.thread_pool = QThreadPool()
         self.server_thread_pool = QThreadPool()
@@ -1309,15 +1308,16 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
     with open('./error.log', 'a') as file:
         file.write(log_text)
 
-    QMessageBox.critical(
-        None,
-        'Unhandled Exception',
-        'An unhandled exception occurred:\n\n'
-        f'{exc_type}\n'
-        f'{exc_value}\n'
-        f'{full_traceback}',
-        QMessageBox.StandardButton.Close
-    )
+    message_box = QMessageBox()
+    message_box.setIconPixmap(QPixmap('resources/face-palm.png'))
+    message_box.setWindowTitle('Unhandled Exception')
+    message_box.setText(
+        '<strong>Well, that wasn\'t supposed to happen!</strong><br><br>An unhandled exception occurred:<br>'
+        f'{exc_type}<br>'
+        f'{exc_value}<br>'
+        f'{full_traceback}')
+    message_box.setStandardButtons(QMessageBox.StandardButton.Close)
+    message_box.exec()
 
 if __name__ == '__main__':
     sys.excepthook = log_unhandled_exception

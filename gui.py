@@ -13,7 +13,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QStyle
 
 from help import Help
 from importers import Importers
@@ -103,6 +103,9 @@ class GUI(QObject):
         self.shadow_offset = 6
         self.widget_item_background_color = 'white'
         self.widget_item_font_color = 'black'
+
+        self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
+        self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
         self.check_files()
 
@@ -461,10 +464,10 @@ class GUI(QObject):
             wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
         if theme == 'light':
             self.main.settings['theme'] = 'light'
-            self.main.app.setStyleSheet(open('resources/projecton-light.qss', 'r').read())
+            self.main_window.setStyleSheet(self.light_style_sheet)
         else:
             self.main.settings['theme'] = 'dark'
-            self.main.app.setStyleSheet(open('resources/projecton-dark.qss', 'r').read())
+            self.main_window.setStyleSheet(self.dark_style_sheet)
         if wait_widget:
             wait_widget.widget.deleteLater()
 
@@ -552,17 +555,16 @@ class GUI(QObject):
         self.help = Help(self)
 
     def show_about(self):
-        widget = QWidget()
+        widget = QDialog()
         widget.setObjectName('widget')
         widget.setParent(self.main_window)
-        widget.setStyleSheet('#widget { border: 3px solid black; background: white; }')
         widget.setLayout(QVBoxLayout())
 
         title_widget = QWidget()
         title_widget.setLayout(QHBoxLayout())
         widget.layout().addWidget(title_widget)
 
-        title_pixmap = QPixmap('resources/logo.svg')
+        title_pixmap = QPixmap('resources/alt-logo2.svg')
         title_pixmap = title_pixmap.scaled(
             36, 36, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
         title_pixmap_label = QLabel()
@@ -634,7 +636,7 @@ class GUI(QObject):
         ok_button.setFont(self.standard_font)
         ok_button.setObjectName('ok_button')
         ok_button.setMaximumWidth(60)
-        ok_button.clicked.connect(widget.deleteLater)
+        ok_button.clicked.connect(lambda: widget.done(0))
         widget.layout().addWidget(ok_button, Qt.AlignmentFlag.AlignCenter)
 
         widget.show()
@@ -685,7 +687,7 @@ class GUI(QObject):
         except Exception:
             self.main.error_log()
 
-    def apply_settings(self):
+    def apply_settings(self, theme_too=True):
         """
         Provides a method to apply all of the settings obtained from the settings json file.
         """
@@ -697,13 +699,15 @@ class GUI(QObject):
             if 'global_bible_background' in self.main.settings.keys():
                 self.global_bible_background_pixmap = QPixmap(
                     self.main.image_dir + '/' + self.main.settings['global_bible_background'])
-            if 'theme' in self.main.settings.keys():
-                if self.main.settings['theme'] == 'light':
-                    self.set_theme('light')
+
+            if theme_too:
+                if 'theme' in self.main.settings.keys():
+                    if self.main.settings['theme'] == 'light':
+                        self.set_theme('light')
+                    else:
+                        self.set_theme('dark')
                 else:
                     self.set_theme('dark')
-            else:
-                self.set_theme('dark')
 
             # apply the font, shadow, and outline settings to main and sample lyric widgets.py
             for lyric_widget in [self.lyric_widget, self.sample_lyric_widget]:

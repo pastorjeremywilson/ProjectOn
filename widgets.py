@@ -183,8 +183,8 @@ class ImageCombobox(QComboBox):
                     image_list.append([icon, record[0].split('.')[0], record[0]])
                 connection.close()
             else:
-                for item in image_list:
-                    self.addItem(item[0], item[1], userData=item[2])
+                for image in image_list:
+                    self.addItem(image[0], image[1], userData=image[2])
 
             if self.gui.main.initial_startup:
                 self.gui.main.update_status_signal.emit('', 'info')
@@ -728,6 +728,7 @@ class FontWidget(QWidget):
     Implements QWidget that contains all of the settings that can be applied to the display font
     """
     mouse_release_signal = pyqtSignal(int)
+
     def __init__(self, gui, draw_border=True, auto_update=True):
         """
         Implements QWidget that contains all of the settings that can be applied to the display font
@@ -756,7 +757,6 @@ class FontWidget(QWidget):
 
         self.setParent(self.gui.main_window)
         self.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
-        self.setWindowFlag(Qt.WindowType.Popup)
         self.init_components()
 
     def init_components(self):
@@ -972,7 +972,6 @@ class FontWidget(QWidget):
             self.gui.global_font_face = new_font_face
             self.gui.global_footer_font_face = new_font_face
 
-            #self.gui.main.settings['font_face'] = new_font_face
             self.gui.main.settings['font_face'] = self.font_list_widget.currentItem().data(20)
             self.gui.main.settings['font_size'] = self.font_size_spinbox.value()
             if self.font_color_button_group.checkedButton():
@@ -996,7 +995,7 @@ class FontWidget(QWidget):
             else:
                 self.gui.main.settings['outline_width'] = self.outline_width_slider.offset_slider.value()
 
-            self.gui.apply_settings()
+            self.gui.apply_settings(theme_too=False)
 
     def color_chooser(self):
         """

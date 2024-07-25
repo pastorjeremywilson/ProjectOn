@@ -63,7 +63,8 @@ class Toolbar(QWidget):
         self.font_button.setIconSize(QSize(36, 36))
         self.font_button.setToolTip('Change Font Settings')
         self.font_button.setFont(self.gui.standard_font)
-        self.font_button.clicked.connect(self.font_widget.show)
+        self.font_button.setCheckable(True)
+        self.font_button.clicked.connect(self.show_hide_font_widget)
         self.font_widget.hide()
         self.layout.addWidget(self.font_button)
 
@@ -119,6 +120,12 @@ class Toolbar(QWidget):
 
     def open_settings(self):
         self.sw = SettingsWidget(self.gui)
+
+    def show_hide_font_widget(self):
+        if self.font_widget.isHidden():
+            self.font_widget.show()
+        else:
+            self.font_widget.hide()
 
     def import_background(self):
         result = QFileDialog.getOpenFileName(

@@ -14,7 +14,7 @@ from cryptography.fernet import Fernet
 from simple_splash import SimpleSplash
 
 
-class SongselectImport(QWidget):
+class SongselectImport(QDialog):
     BASE_URL = 'https://songselect.ccli.com'
     LOGIN_PAGE = ('https://profile.ccli.com/Account/Signin?'
                   'appContext=SongSelect&returnUrl=https%3A%2F%2Fsongselect.ccli.com%2F')
@@ -108,6 +108,7 @@ class SongselectImport(QWidget):
 
     def store_credentials(self):
         dialog = QDialog()
+        dialog.setObjectName('ccli_credentials_dialog')
         dialog_layout = QVBoxLayout(dialog)
         dialog.setWindowTitle('CCLI Credentials')
 
@@ -373,4 +374,4 @@ class SongselectImport(QWidget):
                     self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
 
                 save_widget.widget.deleteLater()
-                self.deleteLater()
+                self.done(0)
