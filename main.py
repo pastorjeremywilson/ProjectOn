@@ -156,7 +156,7 @@ class ProjectOn(QObject):
         icon_label = QLabel()
         icon_label.setStyleSheet('background: #6060c0')
         icon_label.setPixmap(
-            QPixmap('resources/branding/alt-logo2.svg').scaled(
+            QPixmap('resources/branding/logo.svg').scaled(
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         splash_layout.addWidget(icon_label)
 
@@ -1309,7 +1309,7 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
         file.write(log_text)
 
     message_box = QMessageBox()
-    message_box.setIconPixmap(QPixmap('resources/face-palm.png'))
+    message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
     message_box.setWindowTitle('Unhandled Exception')
     message_box.setText(
         '<strong>Well, that wasn\'t supposed to happen!</strong><br><br>An unhandled exception occurred:<br>'

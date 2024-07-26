@@ -5,57 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/resources/images/Qt-logo-neon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/images/gnu-4.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/images/python-logo-only.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/images/sqlite370.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/live_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/live_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/print_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/print_dialog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/add_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/add_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/add_to_service_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/add_to_service_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/alt-background2.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/alt-background2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/alt-background2.xcf" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/alt-background2.xcf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/alt-icon2.ico" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/alt-icon2.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/alt-logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/alt-logo.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/alt-logo2.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/alt-logo2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/alt-logo2.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/alt-logo2.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/black_display.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/black_display.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/black_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/black_display.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/boldIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/boldIcon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/browser_back.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/browser_back.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/font_settings.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/font_settings.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/import.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/import.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/italicIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/italicIcon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/item_down.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/item_down.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/item_up.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/item_up.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/logo.ico" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/logo.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/logo.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/logo_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/logo_display.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/new.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/new.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/next.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/next.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/no_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/no_display.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/open.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/open.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/play_pause.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/play_pause.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/previous.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/previous.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-banner.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/projecton-banner.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/readme.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/save.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/save.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/scroll_down_arrow.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/scroll_down_arrow.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/scroll_up_arrow.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/scroll_up_arrow.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/send_to_live_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/send_to_live_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/settings.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/settings.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/stop.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/stop.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/to_beginning.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/to_beginning.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/underlineIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/underlineIcon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/x_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/x_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/toolbar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/background.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/alt-background2.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/background.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/alt-background2.xcf" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/background.xcf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/alt-icon2.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/alt-logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/alt-logo2.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/alt-logo2.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/logo.ico" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/logo.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/default_logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/face-palm.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/face-palm.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/face-palm.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/face-palm.svg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,8 +74,8 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="X:\Documents\Python Workspace\project_on\resources\branding" />
       <recent name="X:\Documents\Python Workspace\project_on\resources\gui_icons" />
+      <recent name="X:\Documents\Python Workspace\project_on\resources\branding" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
@@ -313,7 +281,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722026109435</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md">
+      <option name="closed" value="true" />
+      <created>1722027375510</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1722027375510</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -335,6 +311,7 @@
     <MESSAGE value="Futher refined the light and dark themes.&#10;Fixed theming on buttons and combo boxes in settings widget.&#10;Changed modal widgets to QDialogs.&#10;Made setting theme along with applying settings changes optional." />
     <MESSAGE value="Added custom QMessageBox icon" />
     <MESSAGE value="Added readme&#10;Refined the logo" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added readme&#10;Refined the logo" />
+    <MESSAGE value="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md" />
   </component>
 </project>

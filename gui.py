@@ -275,7 +275,7 @@ class GUI(QObject):
 
         self.main_window = CustomMainWindow(self)
         self.main_window.setObjectName('main_window')
-        self.main_window.setWindowIcon(QIcon('resources/branding/alt-logo2.svg'))
+        self.main_window.setWindowIcon(QIcon('resources/branding/logo.svg'))
         self.main_window.setWindowTitle('ProjectOn')
 
         self.central_widget = QWidget()
@@ -287,7 +287,7 @@ class GUI(QObject):
 
         self.main.update_status_signal.emit('Creating GUI: Building Display Widget', 'status')
         self.display_widget = DisplayWidget(self)
-        self.display_widget.setWindowIcon(QIcon('resources/branding/alt-logo2.svg'))
+        self.display_widget.setWindowIcon(QIcon('resources/branding/logo.svg'))
         self.display_widget.setWindowTitle('ProjectOn Display Window')
         self.display_widget.setCursor(Qt.CursorShape.BlankCursor)
 
@@ -564,7 +564,7 @@ class GUI(QObject):
         title_widget.setLayout(QHBoxLayout())
         widget.layout().addWidget(title_widget)
 
-        title_pixmap = QPixmap('resources/branding/alt-logo2.svg')
+        title_pixmap = QPixmap('resources/branding/logo.svg')
         title_pixmap = title_pixmap.scaled(
             36, 36, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
         title_pixmap_label = QLabel()
