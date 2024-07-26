@@ -2,6 +2,7 @@
 <span style="font-size: 60px; font-weight: bold; align: top;">ProjectOn</span>
 <br>
 Open Source Projection Software
+<hr>
 <p>&nbsp;</p>
 
 ### What Am I?
