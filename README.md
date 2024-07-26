@@ -1,4 +1,4 @@
-<img src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=120px style="float: left" />
+<img align='left' src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=120px style="float: left" />
 <span style="font-size: 60px; font-weight: bold; align: top;">ProjectOn</span>
 <br>
 Open Source Projection Software
