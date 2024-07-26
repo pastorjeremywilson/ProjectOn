@@ -1,4 +1,4 @@
-[![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=flat)](https://github.com/ProjectOn/ledger/pulse/monthly)
+[![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=flat)](https://github.com/pastorjeremywilson/ProjectOn/pulse/monthly)
 [![License](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 <img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width='300px' />
