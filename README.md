@@ -14,7 +14,7 @@ ProjectOn is an open-source multimedia projection program geared towards
 producing and running church services.
 <p>&nbsp;</p>
 
-### Why ProjectOn?
+#### Why ProjectOn?
 
 Working in a smaller church, I was limited by a small budget, the small
 number of open-source church projection programs available, and few
@@ -23,14 +23,14 @@ intuitive, and responsive experience when building and running the
 projection needs of a church service.
 <p>&nbsp;</p>
 
-### Installation
+#### Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
 system only. Download the current ProjectOn installer (v.1.1rc3) and run
 it on your computer.
 <p>&nbsp;</p>
 
-### Using ProjectOn
+#### Using ProjectOn
 
 This information will get you started, but for more in-depth information
 on using ProjectOn, please click “Help” and “Help Contents” in the menu.
@@ -234,7 +234,7 @@ black)</p></td>
 </table>
 <p>&nbsp;</p>
 
-### Technologies and Credits
+#### Technologies and Credits
 
 <br>
 <div>
@@ -263,7 +263,7 @@ while this program was being developed.
 All trademarks (c) their respective owners.
 <p>&nbsp;</p>
 
-### Licensing
+#### Licensing
 <br>
 
 <img src='https://github.com/pastorjeremywilson/public/blob/main/gnu-4.svg?raw=true' height=120px align='left' />
