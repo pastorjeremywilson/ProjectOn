@@ -1,4 +1,4 @@
-<img src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=120px align='left' />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=80px align='left' />
 
 ### ProjectOn
 
@@ -8,7 +8,7 @@ Open Source Projection Software
 
 <hr>
 
-### What Am I?
+#### What Am I?
 
 ProjectOn is an open-source multimedia projection program geared towards
 producing and running church services.
