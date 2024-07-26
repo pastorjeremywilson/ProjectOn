@@ -1,9 +1,11 @@
-<img align='left' src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=120px style="float: left" />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=120px style="float: left" />
 <span style="font-size: 60px; font-weight: bold; align: top;">ProjectOn</span>
 <br>
 Open Source Projection Software
-<hr>
+
 <p>&nbsp;</p>
+
+<hr>
 
 ### What Am I?
 
@@ -256,6 +258,8 @@ black)</p></td>
 
 Many thanks to my wife, who dealt with innumerable crashes and updates
 while this program was being developed.
+
+All trademarks (c) their respective owners.
 <p>&nbsp;</p>
 
 ### Licensing
