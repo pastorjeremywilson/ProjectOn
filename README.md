@@ -1,4 +1,4 @@
-<img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width=120px align='left' />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' />
 
 # What Am I?
 
