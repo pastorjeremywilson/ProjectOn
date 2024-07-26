@@ -252,6 +252,12 @@ black)</p></td>
 </div>
 <br>
 
+<div>
+    <img src='./resources/images/ghostscript-plus-text.png?raw=true' height=40px align='right' />
+    Printing made possible with the help of Artifex Software's <a href="https://www.ghostscript.com" target="_blank">Ghostscript</a>.
+</div>
+<br>
+
 Many thanks to my wife, who dealt with innumerable crashes and updates
 while this program was being developed.
 
