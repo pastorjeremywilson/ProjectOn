@@ -1,5 +1,5 @@
-![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=flat)](https://github.com/ProjectOn/ledger/pulse/monthly)
-![License](https://img.shields.io/badge/license-BSD-blue.svg?style=flat)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=flat)](https://github.com/ProjectOn/ledger/pulse/monthly)
+[![License](https://img.shields.io/badge/license-BSD-blue.svg?style=flat)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 ```[![GitHub release](https://img.shields.io/github/release/ledger/ledger.svg?style=flat)](https://github.com/ledger/ledger/releases)
 
 <img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width='300px' />
