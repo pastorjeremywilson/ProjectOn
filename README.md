@@ -252,7 +252,7 @@ black)</p></td>
 
 <div>
     <img src='https://github.com/pastorjeremywilson/public/blob/main/Qt-logo-neon.png?raw=true' height=40px style="float: right; margin-right: 10px;" />
-    ProjectOn uses <a href="https://www.qt.io" target="_blank">Qt</a> (PyQt5) for the user interface.
+    ProjectOn uses <a href="https://www.qt.io/product/framework" target="_blank">Qt</a> (PyQt5) for the user interface.
 </div>
 <br>
 
