@@ -8,6 +8,7 @@
 #define MyAppAssocName MyAppName + " File"
 #define MyAppAssocExt ".pro"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
+#define ResourceLocation "C:\Users\pasto\Desktop\output\ProjectOn\_internal"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -26,10 +27,13 @@ LicenseFile=C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\gpl-3.0.
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\Users\pasto\Desktop\output
 OutputBaseFilename=Setup Projecton v.{#MyAppVersion}
-SetupIconFile=C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\alt-icon2.ico
+SetupIconFile={#ResourceLocation}\resources\branding\logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+
+WizardImageFile={#ResourceLocation}\install_image_large.bmp
+WizardSmallImageFile = {#ResourceLocation}\install_image_small.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
