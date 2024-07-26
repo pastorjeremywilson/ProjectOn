@@ -59,7 +59,7 @@ class SongselectImport(QDialog):
         import_layout.addWidget(nav_widget)
 
         self.back_button = QPushButton(self)
-        self.back_button.setIcon(QIcon('resources/browser_back.svg'))
+        self.back_button.setIcon(QIcon('resources/gui_icons/browser_back.svg'))
         nav_layout.addWidget(self.back_button)
 
         self.url_bar = QLineEdit(self)

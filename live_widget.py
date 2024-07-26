@@ -66,7 +66,7 @@ class LiveWidget(QWidget):
         self.player_controls.setLayout(player_layout)
 
         to_beginning_button = QPushButton()
-        to_beginning_button.setIcon(QIcon('./resources/to_beginning.svg'))
+        to_beginning_button.setIcon(QIcon('resources/gui_icons/to_beginning.svg'))
         to_beginning_button.setIconSize(QSize(30, 30))
         to_beginning_button.setFixedSize(50, 50)
         to_beginning_button.setObjectName('to_beginning')
@@ -75,7 +75,7 @@ class LiveWidget(QWidget):
         player_layout.addWidget(to_beginning_button)
 
         play_button = QPushButton()
-        play_button.setIcon(QIcon('./resources/play_pause.svg'))
+        play_button.setIcon(QIcon('resources/gui_icons/play_pause.svg'))
         play_button.setIconSize(QSize(30, 30))
         play_button.setFixedSize(50, 50)
         play_button.setObjectName('play')
@@ -83,7 +83,7 @@ class LiveWidget(QWidget):
         player_layout.addWidget(play_button)
 
         stop_button = QPushButton()
-        stop_button.setIcon(QIcon('./resources/stop.svg'))
+        stop_button.setIcon(QIcon('resources/gui_icons/stop.svg'))
         stop_button.setIconSize(QSize(30, 30))
         stop_button.setFixedSize(50, 50)
         stop_button.setObjectName('stop')

@@ -1,7 +1,7 @@
 [![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=plastic)](https://github.com/pastorjeremywilson/ProjectOn/pulse/monthly)
 [![License](https://img.shields.io/badge/license-GPL-blue.svg?style=plastic)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-<img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width='300px' />
+<img src='./resources/branding/projecton-banner.svg?raw=true' width='300px' />
 
 # What Am I?
 
@@ -233,21 +233,21 @@ black)</p></td>
 
 <br>
 <div>
-    <img src='https://github.com/pastorjeremywilson/public/blob/main/python-logo-only.svg?raw=true' width=40px align='right' />
+    <img src='./resources/images/python-logo-only.svg?raw=true' width=40px align='right' />
     ProjectOn is written primarily in <a href="https://www.python.org" target="_blank">Python</a>, compiled through <a href="https://www.pyinstaller.org" target="_blank">PyInstaller</a>,
     and packaged into an installation executable with <a href="https://jrsoftware.org/isinfo.php" target="_blank">Inno Setup Compiler</a>.
 </div>
 <br>
 
 <div>
-    <img src='https://github.com/pastorjeremywilson/public/blob/main/sqlite370.jpg?raw=true' height=40px align='right' />
+    <img src='./resources/images/sqlite370.jpg?raw=true' height=40px align='right' />
     ProjectOn’s main database is <a href="https://www.sqlite.org" target="_blank">SQLite</a> and the remaining data files are
     stored in the <a href="https://www.json.org/json-en.html" target="_blank">JSON</a> format.
 </div>
 <br>
 
 <div>
-    <img src='https://github.com/pastorjeremywilson/public/blob/main/Qt-logo-neon.png?raw=true' height=40px align='right' />
+    <img src='./resources/images/Qt-logo-neon.png?raw=true' height=40px align='right' />
     ProjectOn uses <a href="https://www.qt.io/product/framework" target="_blank">Qt</a> (PyQt5) for the user interface.
 </div>
 <br>
@@ -261,7 +261,7 @@ All trademarks (c) their respective owners.
 # Licensing
 <br>
 
-<img src='https://github.com/pastorjeremywilson/public/blob/main/gnu-4.svg?raw=true' height=120px align='left' />
+<img src='./resources/images/gnu-4.svg?raw=true' height=120px align='left' />
 ProjectOn is licensed under the GNU General Public License (GNU GPL)
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version. See

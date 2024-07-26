@@ -56,7 +56,7 @@ class OOSWidget(QWidget):
         container_layout.addWidget(self.oos_list_widget, 1, 0, 2, 1)
 
         move_up_button = QPushButton()
-        move_up_button.setIcon(QIcon('./resources/item_up.svg'))
+        move_up_button.setIcon(QIcon('resources/gui_icons/item_up.svg'))
         move_up_button.setIconSize(QSize(10, 30))
         move_up_button.setToolTip('Move Item Up')
         move_up_button.setFixedWidth(20)
@@ -69,7 +69,7 @@ class OOSWidget(QWidget):
         container_layout.addWidget(move_up_button, 1, 1)
 
         move_down_button = QPushButton()
-        move_down_button.setIcon(QIcon('./resources/item_down.svg'))
+        move_down_button.setIcon(QIcon('resources/gui_icons/item_down.svg'))
         move_down_button.setIconSize(QSize(10, 30))
         move_down_button.setToolTip('Move Item Down')
         move_down_button.setFixedWidth(20)

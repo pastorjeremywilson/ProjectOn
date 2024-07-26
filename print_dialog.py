@@ -61,7 +61,7 @@ class PrintDialog(QDialog):
         nav_button_widget.setLayout(nav_button_layout)
 
         previous_button = QPushButton()
-        previous_button.setIcon(QIcon('resources/previous.svg'))
+        previous_button.setIcon(QIcon('resources/gui_icons/previous.svg'))
         previous_button.setAutoFillBackground(False)
         previous_button.setStyleSheet('border: none')
         previous_button.clicked.connect(self.previous_page)
@@ -75,7 +75,7 @@ class PrintDialog(QDialog):
         nav_button_layout.addSpacing(20)
 
         next_button = QPushButton()
-        next_button.setIcon(QIcon('resources/next.svg'))
+        next_button.setIcon(QIcon('resources/gui_icons/next.svg'))
         next_button.setAutoFillBackground(False)
         next_button.setStyleSheet('border: none')
         next_button.clicked.connect(self.next_page)

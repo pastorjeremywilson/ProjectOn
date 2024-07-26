@@ -156,7 +156,7 @@ class ProjectOn(QObject):
         icon_label = QLabel()
         icon_label.setStyleSheet('background: #6060c0')
         icon_label.setPixmap(
-            QPixmap('resources/alt-logo2.svg').scaled(
+            QPixmap('resources/branding/alt-logo2.svg').scaled(
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         splash_layout.addWidget(icon_label)
 

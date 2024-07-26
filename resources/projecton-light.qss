@@ -85,7 +85,7 @@ QComboBox::item:hover {
 }
 QComboBox::down-arrow {
     background: #f0f0f0;
-    image: url('resources/scroll_down_arrow.svg');
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
 }
 
 /*-------------------- QSpinBox --------------------*/
@@ -105,10 +105,10 @@ QSpinBox::up-button:hover, QSpinBox::down-button:hover {
     background: #aaaaff
 }
 QSpinBox::up-button {
-    image: url('resources/scroll_up_arrow.svg');
+    image: url('resources/gui_icons/scroll_up_arrow.svg');
 }
 QSpinBox::down-button {
-    image: url('resources/scroll_down_arrow.svg');
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
 }
 
 /*-------------------- QScrollBar --------------------*/
