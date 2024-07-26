@@ -1,6 +1,6 @@
 <img src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=120px align='left' />
 
-# ProjectOn
+### ProjectOn
 
 Open Source Projection Software
 
