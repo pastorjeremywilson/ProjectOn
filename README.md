@@ -238,21 +238,21 @@ black)</p></td>
 <br>
 <div>
     <img src='https://github.com/pastorjeremywilson/public/blob/main/python-logo-only.svg?raw=true' width=40px style="float: right; margin-right: 10px;" />
-    ProjectOn is written primarily in Python, compiled through PyInstaller,
-    and packaged into an installation executable with Inno Setup Compiler.
+    ProjectOn is written primarily in <a href="https://www.python.org" target="_blank">Python</a>, compiled through <a href="https://www.pyinstaller.org" target="_blank">PyInstaller</a>,
+    and packaged into an installation executable with <a href="https://jrsoftware.org/isinfo.php" target="_blank">Inno Setup Compiler</a>.
 </div>
 <br>
 
 <div>
     <img src='https://github.com/pastorjeremywilson/public/blob/main/sqlite370.jpg?raw=true' height=40px style="float: right; margin-right: 10px;" />
-    ProjectOn’s main database is SQLite and the remaining data files are
-    stored in the JSON format.
+    ProjectOn’s main database is <a href="https://www.sqlite.org" target="_blank">SQLite</a> and the remaining data files are
+    stored in the <a href="https://www.json.org/json-en.html" target="_blank">JSON</a> format.
 </div>
 <br>
 
 <div>
     <img src='https://github.com/pastorjeremywilson/public/blob/main/Qt-logo-neon.png?raw=true' height=40px style="float: right; margin-right: 10px;" />
-    ProjectOn uses Qt (version 5) for the user interface.
+    ProjectOn uses <a href="https://www.qt.io" target="_blank">Qt</a> (PyQt5) for the user interface.
 </div>
 <br>
 
@@ -269,4 +269,4 @@ All trademarks (c) their respective owners.
 ProjectOn is licensed under the GNU General Public License (GNU GPL)
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version. See
-http://www.gnu.org/licenses/.
+<a href="http://www.gnu.org/licenses/" target="_blank">http://www.gnu.org/licenses/</a>.
