@@ -38,6 +38,12 @@ QWidget[objectName="settings_container"] {
     color: #000000;
 }
 
+/*-------------------- edit_main_widget --------------------*/
+QWidget[objectName="edit_main_widget"] {
+    background: #ffffff;
+    color: #000000;
+}
+
 /*-------------------- QPushButton --------------------*/
 QPushButton {
 	background: #ffffff;

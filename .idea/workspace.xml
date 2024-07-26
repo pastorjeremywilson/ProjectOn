@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,6 +47,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
@@ -293,7 +300,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722028520417</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Forgot ghostscript icon">
+      <option name="closed" value="true" />
+      <created>1722031577724</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1722031577724</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -317,6 +332,7 @@
     <MESSAGE value="Added readme&#10;Refined the logo" />
     <MESSAGE value="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md" />
     <MESSAGE value="Added GhostScript to the credits section of README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added GhostScript to the credits section of README.md" />
+    <MESSAGE value="Forgot ghostscript icon" />
+    <option name="LAST_COMMIT_MESSAGE" value="Forgot ghostscript icon" />
   </component>
 </project>

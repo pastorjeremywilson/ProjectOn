@@ -38,6 +38,12 @@ QWidget[objectName="settings_container"] {
     color: #e0e0e0;
 }
 
+/*-------------------- edit_main_widget --------------------*/
+QWidget[objectName="edit_main_widget"] {
+    background: #303030;
+    color: #e0e0e0;
+}
+
 /*-------------------- QSpinBox --------------------*/
 QSpinBox {
     background: #303030;

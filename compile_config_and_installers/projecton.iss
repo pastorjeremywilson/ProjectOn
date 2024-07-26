@@ -32,8 +32,8 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 
-WizardImageFile={#ResourceLocation}\install_image_large.bmp
-WizardSmallImageFile = {#ResourceLocation}\install_image_small.bmp
+WizardImageFile={#ResourceLocation}\resources\branding\install_image_large.bmp
+WizardSmallImageFile = {#ResourceLocation}\resources\branding\install_image_small.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

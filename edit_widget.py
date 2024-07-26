@@ -10,7 +10,7 @@ from simple_splash import SimpleSplash
 from widgets import StandardItemWidget, FontWidget
 
 
-class EditWidget(QWidget):
+class EditWidget(QDialog):
     """
     Provides a QDialog containing the necessary widgets to edit a song or custom slide.
     """
@@ -68,6 +68,7 @@ class EditWidget(QWidget):
         self.setLayout(layout)
 
         self.main_widget = QWidget()
+        self.main_widget.setObjectName('edit_main_widget')
         main_layout = QVBoxLayout()
         main_layout.setSpacing(0)
         self.main_widget.setLayout(main_layout)
@@ -234,21 +235,6 @@ class EditWidget(QWidget):
             ending_button.clicked.connect(self.add_tag)
             toolbar_layout.addWidget(ending_button)
             toolbar_layout.addStretch()
-
-        """advanced_options_expander = QWidget()
-        advanced_options_layout = QHBoxLayout(advanced_options_expander)
-        main_layout.addWidget(advanced_options_expander)
-
-        self.advanced_options_button = QPushButton('+')
-        self.advanced_options_button.setFixedSize(QSize(20, 20))
-        self.advanced_options_button.setFont(self.gui.bold_font)
-        self.advanced_options_button.clicked.connect(self.show_hide_advanced_options)
-        advanced_options_layout.addWidget(self.advanced_options_button)
-
-        advanced_options_label = QLabel('Show/Hide Advanced Options')
-        advanced_options_label.setFont(self.gui.bold_font)
-        advanced_options_layout.addWidget(advanced_options_label)
-        advanced_options_layout.addStretch()"""
 
         self.override_global_checkbox = QCheckBox('Override Global Settings')
         self.override_global_checkbox.setObjectName('override_global_checkbox')
