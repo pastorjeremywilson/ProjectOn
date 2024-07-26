@@ -1,4 +1,4 @@
-<img src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=80px align='left' />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=120px align='left' />
 
 ### ProjectOn
 
