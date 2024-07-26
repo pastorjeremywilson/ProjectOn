@@ -1,20 +1,12 @@
-<img src='https://github.com/pastorjeremywilson/public/blob/main/alt-logo2.svg?raw=true' width=120px align='left' />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width=120px align='left' />
 
-### ProjectOn
-
-Open Source Projection Software
-
-<p>&nbsp;</p>
-
-<hr>
-
-#### What Am I?
+# What Am I?
 
 ProjectOn is an open-source multimedia projection program geared towards
 producing and running church services.
 <p>&nbsp;</p>
 
-#### Why ProjectOn?
+# Why ProjectOn?
 
 Working in a smaller church, I was limited by a small budget, the small
 number of open-source church projection programs available, and few
@@ -23,20 +15,20 @@ intuitive, and responsive experience when building and running the
 projection needs of a church service.
 <p>&nbsp;</p>
 
-#### Installation
+# Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
 system only. Download the current ProjectOn installer (v.1.1rc3) and run
 it on your computer.
 <p>&nbsp;</p>
 
-#### Using ProjectOn
+# Using ProjectOn
 
 This information will get you started, but for more in-depth information
 on using ProjectOn, please click “Help” and “Help Contents” in the menu.
 <p>&nbsp;</p>
 
-*Screen Layout*
+### Screen Layout
 
 When you first run ProjectOn, you’ll be greeted with a screen split into
 four main areas:
@@ -75,7 +67,7 @@ service, while the Live Panel shows you the content of what is currently
 being displayed.
 <p>&nbsp;</p>
 
-*Remote Interfaces*
+### Remote Interfaces
 
 The ProjectOn program, while it is running, creates a server that can be
 accessed by any browser on any device connected to the same network or
@@ -99,7 +91,7 @@ The specific web pages for these can be found by choosing “Help” and
 “About” from the menu.
 <p>&nbsp;</p>
 
-*Settings*
+### Settings
 
 There are various changes that can be made to how ProjectOn works. By
 clicking on the settings icon, you will see what those changes are:
@@ -138,7 +130,7 @@ Here, too, you can choose a custom “Logo” image to display when nothing
 else is being shown; for example, a graphic with a welcome message.
 <p>&nbsp;</p>
 
-*Shortcut Keys*
+### Shortcut Keys
 
 There are a variety of Shortcut Keys that can be used when using the
 program or navigating a service:
@@ -234,7 +226,7 @@ black)</p></td>
 </table>
 <p>&nbsp;</p>
 
-#### Technologies and Credits
+# Technologies and Credits
 
 <br>
 <div>
@@ -263,7 +255,7 @@ while this program was being developed.
 All trademarks (c) their respective owners.
 <p>&nbsp;</p>
 
-#### Licensing
+# Licensing
 <br>
 
 <img src='https://github.com/pastorjeremywilson/public/blob/main/gnu-4.svg?raw=true' height=120px align='left' />
