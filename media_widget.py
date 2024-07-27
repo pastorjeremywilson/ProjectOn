@@ -31,13 +31,6 @@ class MediaWidget(QTabWidget):
         self.gui = gui
         self.setFont(self.gui.standard_font)
         self.setObjectName('media_widget')
-        '''self.setStyleSheet(
-            'QTabBar:tab { background: lightGrey; border: 1px solid black; border-top-left-radius: 5px; '
-            'border-top-right-radius: 5px; padding: 5px; }'
-            'QTabBar:tab:selected { background: white; border: 1px solid black; padding: 5px; }'
-            'QTabBar:tab:hover { background: white; border: 1px solid black; padding: 5px; }'
-            '#media_widget::pane { border: 2px solid black; }'
-        )'''
         self.setTabShape(QTabWidget.TabShape.Rounded)
 
         self.formatted_reference = None
@@ -878,6 +871,7 @@ class MediaWidget(QTabWidget):
         # if the current changes means that the line edit is empty, also clear the scripture text edit
         if text == '':
             self.scripture_text_edit.clear()
+            self.formatted_reference = None
             return
 
         # create an instance of GetScripture if one doesn't already exist
@@ -941,6 +935,9 @@ class MediaWidget(QTabWidget):
             version = self.bible_selector_combobox.currentText()
             self.gui.add_scripture_item(reference, self.passages[1], version)
             self.formatted_reference = None
+            self.gui.changes = True
+        elif len(self.scripture_text_edit.toPlainText()) > 0:
+            self.gui.add_scripture_item(None, self.scripture_text_edit.toPlainText(), None)
             self.gui.changes = True
 
     def send_scripture_to_live(self):

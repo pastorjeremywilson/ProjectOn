@@ -583,20 +583,8 @@ class ProjectOn(QObject):
                     'title': self.gui.oos_widget.oos_list_widget.item(i).data(20),
                     'type': self.gui.oos_widget.oos_list_widget.item(i).data(40)
                 }
-            """for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                service_items[i] = {}
-                for j in range(20, 33):
-                    if j == 21 and self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'bible':
-                        service_items[i][j] = self.gui.oos_widget.oos_list_widget.item(i).data(j)
-                    elif j == 31:
-                        service_items[i][j] = self.gui.oos_widget.oos_list_widget.item(i).data(j)
-                        if self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'image':
-                            service_items[i][j][2] = ''
-                    else:
-                        if type(self.gui.oos_widget.oos_list_widget.item(i).data(j)) == bytes:
-                            service_items[i][j] = ''
-                        else:
-                            service_items[i][j] = str(self.gui.oos_widget.oos_list_widget.item(i).data(j))"""
+                if self.gui.oos_widget.oos_list_widget.item(i).data(20) == 'custom_scripture':
+                    service_items[i]['text'] = self.gui.oos_widget.oos_list_widget.item(i).data(24)[2]
 
             dialog_needed = True
             if self.gui.current_file:
@@ -773,22 +761,25 @@ class ProjectOn(QObject):
                             self.gui.media_widget.add_song_to_service(song_item, from_load_service=True)
 
                     elif service_dict[key]['type'] == 'bible':
-                        if not self.gui.main.get_scripture:
-                            from get_scripture import GetScripture
-                            self.get_scripture = GetScripture(self)
-                        passages = self.get_scripture.get_passage(service_dict[key]['title'])
-
-                        if passages[0] == -1:
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Error Loading Scripture',
-                                'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
-                                QMessageBox.StandardButton.Ok
-                            )
+                        if service_dict[key]['title'] == 'custom_scripture':
+                            self.gui.add_scripture_item(None, service_dict[key]['text'], None)
                         else:
-                            reference = service_dict[key]['title']
-                            version = self.gui.media_widget.bible_selector_combobox.currentText()
-                            self.gui.add_scripture_item(reference, passages[1], version)
+                            if not self.gui.main.get_scripture:
+                                from get_scripture import GetScripture
+                                self.get_scripture = GetScripture(self)
+                            passages = self.get_scripture.get_passage(service_dict[key]['title'])
+
+                            if passages[0] == -1:
+                                QMessageBox.information(
+                                    self.gui.main_window,
+                                    'Error Loading Scripture',
+                                    'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
+                                    QMessageBox.StandardButton.Ok
+                                )
+                            else:
+                                reference = service_dict[key]['title']
+                                version = self.gui.media_widget.bible_selector_combobox.currentText()
+                                self.gui.add_scripture_item(reference, passages[1], version)
 
                     elif service_dict[key]['type'] == 'custom':
                         try:

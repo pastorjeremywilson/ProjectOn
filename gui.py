@@ -1369,8 +1369,11 @@ class GUI(QObject):
                     footer_text += '\nCCLI License #: ' + self.main.settings['ccli_num']
                 lyric_widget.footer_label.setText(footer_text)
             elif current_item.data(40) == 'bible':
-                lyric_widget.footer_label.setText(
-                    current_item.data(20) + ' (' + current_item.data(23) + ')')
+                if current_item.data(20) == 'custom_scripture':
+                    lyric_widget.footer_label.setText('')
+                else:
+                    lyric_widget.footer_label.setText(
+                        current_item.data(20) + ' (' + current_item.data(23) + ')')
             else:
                 lyric_widget.footer_label.clear()
 
@@ -1626,6 +1629,10 @@ class GUI(QObject):
         return lyric_dictionary
 
     def add_scripture_item(self, reference, text, version):
+        if not reference:
+            reference = 'custom_scripture'
+            version = 'custom_scripture'
+
         """
         Method to take a block of scripture and add it as a QListWidgetItem to the order of service widget.
         :param str reference: The scripture passage's reference from the bible
@@ -1712,7 +1719,7 @@ class GUI(QObject):
         """
         Take a passage of scripture and split it according to how many verses will fit on the display screen, given
         the current font and size.
-        :param str text: The bible passage to be split
+        :param list of str text: The bible passage to be split
         """
         # configure the hidden sample widget according to the current font
         self.sample_lyric_widget.setFont(
@@ -1730,15 +1737,35 @@ class GUI(QObject):
         footer_label_height = self.sample_lyric_widget.footer_label.height()
         preferred_height = secondary_screen_height - footer_label_height
 
-        # walk through the text to locate and index the verse numbers
-        """skip_next = False
-        for i in range(len(text)):
-            if text[i].isnumeric() and not skip_next:
-                verse_indices.append(i)
-                if i < len(text) - 1 and text[i + 1].isnumeric():
-                    skip_next = True
-            else:
-                skip_next = False"""
+        # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
+        # that needs to be parsed into verses and their corresponding verse numbers
+        if type(text) is str:
+            verse_numbers = []
+            skip_next = False
+            for i in range(len(text)):
+                if text[i].isnumeric() and not skip_next:
+                    verse_number = text[i]
+                    if i < len(text) - 1 and text[i + 1].isnumeric():
+                        verse_number += text[i + 1]
+                        skip_next = True
+                    verse_numbers.append(verse_number)
+                else:
+                    skip_next = False
+
+            text_split = []
+            for i in range(len(verse_numbers)):
+                verse_index = text.index(verse_numbers[i])
+                number_length = len(verse_numbers[i])
+                if i < len(verse_numbers) - 1:
+                    text_split.append(
+                        [
+                            verse_numbers[i],
+                            text[verse_index + number_length:text.index(verse_numbers[i + 1])]
+                        ]
+                    )
+                else:
+                    text_split.append([verse_numbers[i], text[verse_index + number_length:]])
+            text = text_split
 
         verse_index = 0
         segment_indices = []
