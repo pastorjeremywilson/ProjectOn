@@ -5,7 +5,7 @@ a = Analysis(
     ['..\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[('../static', 'static/'), ('../resources', 'resources/'), ('../ghostscript', 'ghostscript')],
+    datas=[('../resources', 'resources/'), ('../ghostscript', 'ghostscript'), ('../README.md', '.'), ('../README.html', '.')],
     hiddenimports=['PyQt5.sip'],
     hookspath=[],
     hooksconfig={},

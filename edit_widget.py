@@ -236,25 +236,33 @@ class EditWidget(QDialog):
             toolbar_layout.addWidget(ending_button)
             toolbar_layout.addStretch()
 
+        show_hide_advanced_widget = QWidget()
+        show_hide_advanced_layout = QHBoxLayout(show_hide_advanced_widget)
+        main_layout.addWidget(show_hide_advanced_widget)
+
+        self.show_hide_advanced_button = QPushButton('+')
+        self.show_hide_advanced_button.setFont(self.gui.bold_font)
+        self.show_hide_advanced_button.setFixedSize(40, 40)
+        self.show_hide_advanced_button.pressed.connect(self.show_hide_advanced_options)
+        show_hide_advanced_layout.addWidget(self.show_hide_advanced_button)
+
+        show_hide_advanced_label = QLabel('Advanced Options')
+        show_hide_advanced_label.setFont(self.gui.standard_font)
+        show_hide_advanced_layout.addWidget(show_hide_advanced_label)
+        show_hide_advanced_layout.addStretch()
+
+        self.advanced_options_widget = QWidget()
+        advanced_options_layout = QVBoxLayout(self.advanced_options_widget)
+        main_layout.addWidget(self.advanced_options_widget)
+        self.advanced_options_widget.hide()
+
         self.override_global_checkbox = QCheckBox('Override Global Settings')
         self.override_global_checkbox.setObjectName('override_global_checkbox')
         self.override_global_checkbox.setToolTip(
             'Checking this box will apply all of the below settings to this song/custom slide')
         self.override_global_checkbox.setFont(self.gui.bold_font)
-        self.override_global_checkbox.stateChanged.connect(self.override_global_checkbox_changed)
-        main_layout.addWidget(self.override_global_checkbox)
         self.override_global_checkbox.setChecked(False)
-
-        advanced_options_widget = QWidget()
-        advanced_options_layout = QHBoxLayout()
-        advanced_options_widget.setLayout(advanced_options_layout)
-        main_layout.addWidget(advanced_options_widget)
-
-        self.format_widget = QWidget()
-        format_layout = QVBoxLayout()
-        self.format_widget.setLayout(format_layout)
-        main_layout.addWidget(self.format_widget)
-        self.format_widget.hide()
+        advanced_options_layout.addWidget(self.override_global_checkbox)
 
         if self.type == 'song':
             self.footer_checkbox = QCheckBox('Use Footer for this song')
@@ -262,11 +270,11 @@ class EditWidget(QDialog):
                 'Unchecking this box will prevent the slide footer from being displayed')
             self.footer_checkbox.setFont(self.gui.bold_font)
             self.footer_checkbox.setChecked(True)
-            format_layout.addWidget(self.footer_checkbox)
+            advanced_options_layout.addWidget(self.footer_checkbox)
 
         slide_settings_container = QWidget()
         slide_settings_layout = QHBoxLayout(slide_settings_container)
-        format_layout.addWidget(slide_settings_container)
+        advanced_options_layout.addWidget(slide_settings_container)
 
         self.font_widget = FontWidget(self.gui, draw_border=False, auto_update=False)
         slide_settings_layout.addWidget(self.font_widget)
@@ -463,10 +471,8 @@ class EditWidget(QDialog):
 
         if song_data[17] == 'True':
             self.override_global_checkbox.setChecked(True)
-            self.show_hide_advanced_options('show')
         else:
             self.override_global_checkbox.setChecked(False)
-            self.show_hide_advanced_options('hide')
 
         if song_data[7] == 'global':
             for i in range(self.font_widget.font_list_widget.count()):
@@ -660,42 +666,27 @@ class EditWidget(QDialog):
 
         if custom_data[12]:
             self.override_global_checkbox.setChecked(True)
-            self.show_hide_advanced_options('show')
         else:
             self.override_global_checkbox.setChecked(False)
-            self.show_hide_advanced_options('hide')
 
         self.font_widget.blockSignals(False)
 
-    def show_hide_advanced_options(self, action=None):
+    def show_hide_advanced_options(self):
         """
         Method to show or hide advanced options the user may or may not want to change. Advanced options are contained
         in the format_widget QWidget.
         """
-        if action == 'show':
-            self.format_widget.show()
-            self.format_widget.adjustSize()
-            width = self.format_widget.width()
+        if self.advanced_options_widget.isHidden():
+            self.advanced_options_widget.show()
+            self.advanced_options_widget.adjustSize()
+            width = self.advanced_options_widget.width()
             if width > self.gui.main_window.width():
                 width = self.gui.main_window.width()
             self.setMinimumWidth(width)
-        elif action == 'hide':
-            self.format_widget.hide()
-        elif self.format_widget.isHidden():
-            self.format_widget.show()
-            self.format_widget.adjustSize()
-            width = self.format_widget.width()
-            if width > self.gui.main_window.width():
-                width = self.gui.main_window.width()
-            self.setMinimumWidth(width)
-        elif not self.format_widget.isHidden():
-            self.format_widget.hide()
-
-    def override_global_checkbox_changed(self):
-        if self.override_global_checkbox.isChecked():
-            self.show_hide_advanced_options('show')
+            self.show_hide_advanced_button.setText('-')
         else:
-            self.show_hide_advanced_options('hide')
+            self.advanced_options_widget.hide()
+            self.show_hide_advanced_button.setText('+')
 
     def disambiguate_background_click(self, background_button_group):
         """
@@ -740,6 +731,9 @@ class EditWidget(QDialog):
         :param str type: The tag type to be inserted
         :return:
         """
+
+        slider_pos = self.lyrics_edit.text_edit.verticalScrollBar().sliderPosition()
+
         if type == 'os':
             self.lyrics_edit.text_edit.insertPlainText('\n#optional split#')
 
@@ -765,6 +759,7 @@ class EditWidget(QDialog):
                 self.lyrics_edit.text_edit.setFocus()
 
         self.populate_tag_list()
+        self.lyrics_edit.text_edit.verticalScrollBar().setSliderPosition(slider_pos)
 
     def populate_tag_list(self):
         """
