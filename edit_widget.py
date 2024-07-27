@@ -10,7 +10,7 @@ from simple_splash import SimpleSplash
 from widgets import StandardItemWidget, FontWidget
 
 
-class EditWidget(QWidget):
+class EditWidget(QDialog):
     """
     Provides a QDialog containing the necessary widgets to edit a song or custom slide.
     """
@@ -68,6 +68,7 @@ class EditWidget(QWidget):
         self.setLayout(layout)
 
         self.main_widget = QWidget()
+        self.main_widget.setObjectName('edit_main_widget')
         main_layout = QVBoxLayout()
         main_layout.setSpacing(0)
         self.main_widget.setLayout(main_layout)
@@ -196,59 +197,44 @@ class EditWidget(QWidget):
             verse_button.setFixedSize(button_size)
             verse_button.setFont(self.gui.standard_font)
             verse_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            verse_button.pressed.connect(self.add_tag)
+            verse_button.clicked.connect(self.add_tag)
             toolbar_layout.addWidget(verse_button)
 
             chorus_button = QPushButton('Chorus')
             chorus_button.setFixedSize(button_size)
             chorus_button.setFont(self.gui.standard_font)
             chorus_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            chorus_button.pressed.connect(self.add_tag)
+            chorus_button.clicked.connect(self.add_tag)
             toolbar_layout.addWidget(chorus_button)
 
             pre_chorus_button = QPushButton('Pre-Chorus')
             pre_chorus_button.setFixedSize(button_size)
             pre_chorus_button.setFont(self.gui.standard_font)
             pre_chorus_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            pre_chorus_button.pressed.connect(self.add_tag)
+            pre_chorus_button.clicked.connect(self.add_tag)
             toolbar_layout.addWidget(pre_chorus_button)
 
             bridge_button = QPushButton('Bridge')
             bridge_button.setFixedSize(button_size)
             bridge_button.setFont(self.gui.standard_font)
             bridge_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            bridge_button.pressed.connect(self.add_tag)
+            bridge_button.clicked.connect(self.add_tag)
             toolbar_layout.addWidget(bridge_button)
 
             tag_button = QPushButton('Tag')
             tag_button.setFixedSize(button_size)
             tag_button.setFont(self.gui.standard_font)
             tag_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            tag_button.pressed.connect(self.add_tag)
+            tag_button.clicked.connect(self.add_tag)
             toolbar_layout.addWidget(tag_button)
 
             ending_button = QPushButton('Ending')
             ending_button.setFixedSize(button_size)
             ending_button.setFont(self.gui.standard_font)
             ending_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            ending_button.pressed.connect(self.add_tag)
+            ending_button.clicked.connect(self.add_tag)
             toolbar_layout.addWidget(ending_button)
             toolbar_layout.addStretch()
-
-        """advanced_options_expander = QWidget()
-        advanced_options_layout = QHBoxLayout(advanced_options_expander)
-        main_layout.addWidget(advanced_options_expander)
-
-        self.advanced_options_button = QPushButton('+')
-        self.advanced_options_button.setFixedSize(QSize(20, 20))
-        self.advanced_options_button.setFont(self.gui.bold_font)
-        self.advanced_options_button.pressed.connect(self.show_hide_advanced_options)
-        advanced_options_layout.addWidget(self.advanced_options_button)
-
-        advanced_options_label = QLabel('Show/Hide Advanced Options')
-        advanced_options_label.setFont(self.gui.bold_font)
-        advanced_options_layout.addWidget(advanced_options_label)
-        advanced_options_layout.addStretch()"""
 
         self.override_global_checkbox = QCheckBox('Override Global Settings')
         self.override_global_checkbox.setObjectName('override_global_checkbox')
@@ -296,17 +282,17 @@ class EditWidget(QWidget):
 
         background_default_radio_button = QRadioButton('Use Global Song Background')
         background_default_radio_button.setFont(self.gui.standard_font)
-        background_default_radio_button.pressed.connect(
+        background_default_radio_button.clicked.connect(
             lambda: self.background_line_edit.setText('Use Global Song Background'))
 
         background_bible_default_radio_button = QRadioButton('Use Global Bible Background')
         background_bible_default_radio_button.setFont(self.gui.standard_font)
-        background_bible_default_radio_button.pressed.connect(
+        background_bible_default_radio_button.clicked.connect(
             lambda: self.background_line_edit.setText('Use Global Bible Background'))
 
         background_color_radio_button = QRadioButton('Solid Color')
         background_color_radio_button.setFont(self.gui.standard_font)
-        background_color_radio_button.pressed.connect(self.color_chooser)
+        background_color_radio_button.clicked.connect(self.color_chooser)
 
         from widgets import ImageCombobox
         background_combobox = ImageCombobox(self.gui, 'edit')
@@ -315,7 +301,7 @@ class EditWidget(QWidget):
 
         self.background_image_radio_button = QRadioButton('Image')
         self.background_image_radio_button.setFont(self.gui.standard_font)
-        self.background_image_radio_button.pressed.connect(background_combobox.show)
+        self.background_image_radio_button.clicked.connect(background_combobox.show)
 
         self.background_button_group = QButtonGroup()
         self.background_button_group.setObjectName('background_button_group')
@@ -359,16 +345,16 @@ class EditWidget(QWidget):
         save_button = QPushButton('Save')
         save_button.setFont(self.gui.standard_font)
         if self.type == 'song':
-            save_button.pressed.connect(self.save_song)
+            save_button.clicked.connect(self.save_song)
         elif self.type == 'custom':
-            save_button.pressed.connect(self.save_custom)
+            save_button.clicked.connect(self.save_custom)
         button_layout.addStretch()
         button_layout.addWidget(save_button)
         button_layout.addSpacing(20)
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(self.deleteLater)
+        cancel_button.clicked.connect(self.deleteLater)
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 
@@ -925,14 +911,14 @@ class EditWidget(QWidget):
 
                 ok_button = QPushButton('OK')
                 ok_button.setFont(self.gui.standard_font)
-                ok_button.pressed.connect(lambda: dialog.done(1))
+                ok_button.clicked.connect(lambda: dialog.done(1))
                 button_widget.layout().addStretch()
                 button_widget.layout().addWidget(ok_button)
                 button_widget.layout().addStretch()
 
                 cancel_button = QPushButton('Cancel')
                 cancel_button.setFont(self.gui.standard_font)
-                cancel_button.pressed.connect(lambda: dialog.done(-1))
+                cancel_button.clicked.connect(lambda: dialog.done(-1))
                 button_widget.layout().addWidget(cancel_button)
                 button_widget.layout().addStretch()
 
@@ -1046,14 +1032,14 @@ class EditWidget(QWidget):
 
                 ok_button = QPushButton('OK')
                 ok_button.setFont(self.gui.standard_font)
-                ok_button.pressed.connect(lambda: dialog.done(1))
+                ok_button.clicked.connect(lambda: dialog.done(1))
                 button_widget.layout().addStretch()
                 button_widget.layout().addWidget(ok_button)
                 button_widget.layout().addStretch()
 
                 cancel_button = QPushButton('Cancel')
                 cancel_button.setFont(self.gui.standard_font)
-                cancel_button.pressed.connect(lambda: dialog.done(-1))
+                cancel_button.clicked.connect(lambda: dialog.done(-1))
                 button_widget.layout().addWidget(cancel_button)
                 button_widget.layout().addStretch()
 

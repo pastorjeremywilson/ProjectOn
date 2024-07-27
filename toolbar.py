@@ -2,8 +2,8 @@ import os
 import shutil
 
 from PyQt5.QtCore import QSize, QPoint
-from PyQt5.QtGui import QIcon, QPalette
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog, QStyle
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog
 
 from openlp_import import OpenLPImport
 from settings_widget import SettingsWidget
@@ -27,31 +27,31 @@ class Toolbar(QWidget):
         self.setMaximumHeight(60)
 
         save_button = QPushButton()
-        save_button.setIcon(QIcon('./resources/save.svg'))
+        save_button.setIcon(QIcon('resources/gui_icons/save.svg'))
         save_button.setToolTip('Save this Order of Service')
         save_button.setIconSize(QSize(36, 36))
-        save_button.pressed.connect(self.gui.main.save_service)
+        save_button.clicked.connect(self.gui.main.save_service)
         self.layout.addWidget(save_button)
 
         load_button = QPushButton()
-        load_button.setIcon(QIcon('./resources/open.svg'))
+        load_button.setIcon(QIcon('resources/gui_icons/open.svg'))
         load_button.setToolTip('Load a Service')
         load_button.setIconSize(QSize(36, 36))
-        load_button.pressed.connect(self.gui.main.load_service)
+        load_button.clicked.connect(self.gui.main.load_service)
         self.layout.addWidget(load_button)
 
         new_button = QPushButton()
-        new_button.setIcon(QIcon('./resources/new.svg'))
+        new_button.setIcon(QIcon('resources/gui_icons/new.svg'))
         new_button.setToolTip('Create a New Service')
         new_button.setIconSize(QSize(36, 36))
-        new_button.pressed.connect(self.gui.new_service)
+        new_button.clicked.connect(self.gui.new_service)
         self.layout.addWidget(new_button)
 
         settings_button = QPushButton()
-        settings_button.setIcon(QIcon('./resources/settings.svg'))
+        settings_button.setIcon(QIcon('resources/gui_icons/settings.svg'))
         settings_button.setToolTip('Open Program Settings')
         settings_button.setIconSize(QSize(36, 36))
-        settings_button.pressed.connect(self.open_settings)
+        settings_button.clicked.connect(self.open_settings)
         self.layout.addWidget(settings_button)
 
         self.layout.addStretch()
@@ -59,11 +59,12 @@ class Toolbar(QWidget):
         self.font_widget = FontWidget(self.gui)
 
         self.font_button = QPushButton()
-        self.font_button.setIcon(QIcon('./resources/font_settings.svg'))
+        self.font_button.setIcon(QIcon('resources/gui_icons/font_settings.svg'))
         self.font_button.setIconSize(QSize(36, 36))
         self.font_button.setToolTip('Change Font Settings')
         self.font_button.setFont(self.gui.standard_font)
-        self.font_button.pressed.connect(self.font_widget.show)
+        self.font_button.setCheckable(True)
+        self.font_button.clicked.connect(self.show_hide_font_widget)
         self.font_widget.hide()
         self.layout.addWidget(self.font_button)
 
@@ -88,7 +89,7 @@ class Toolbar(QWidget):
         self.layout.addStretch()
 
         self.show_display_button = QPushButton()
-        self.show_display_button.setIcon(QIcon('./resources/no_display.svg'))
+        self.show_display_button.setIcon(QIcon('resources/gui_icons/no_display.svg'))
         self.show_display_button.setToolTip('Show/Hide the Display Screen')
         self.show_display_button.setIconSize(QSize(36, 36))
         self.show_display_button.setFixedSize(48, 48)
@@ -97,7 +98,7 @@ class Toolbar(QWidget):
         self.layout.addWidget(self.show_display_button)
 
         self.black_screen_button = QPushButton()
-        self.black_screen_button.setIcon(QIcon('./resources/black_display.svg'))
+        self.black_screen_button.setIcon(QIcon('resources/gui_icons/black_display.svg'))
         self.black_screen_button.setToolTip('Show a Black Screen')
         self.black_screen_button.setIconSize(QSize(36, 36))
         self.black_screen_button.setFixedSize(48, 48)
@@ -106,7 +107,7 @@ class Toolbar(QWidget):
         self.layout.addWidget(self.black_screen_button)
 
         self.logo_screen_button = QPushButton()
-        self.logo_screen_button.setIcon(QIcon('./resources/logo_display.svg'))
+        self.logo_screen_button.setIcon(QIcon('resources/gui_icons/logo_display.svg'))
         self.logo_screen_button.setToolTip('Show the Logo Screen')
         self.logo_screen_button.setIconSize(QSize(36, 36))
         self.logo_screen_button.setFixedSize(48, 48)
@@ -119,6 +120,12 @@ class Toolbar(QWidget):
 
     def open_settings(self):
         self.sw = SettingsWidget(self.gui)
+
+    def show_hide_font_widget(self):
+        if self.font_widget.isHidden():
+            self.font_widget.show()
+        else:
+            self.font_widget.hide()
 
     def import_background(self):
         result = QFileDialog.getOpenFileName(

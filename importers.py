@@ -56,14 +56,14 @@ class Importers:
         dialog_layout.addWidget(button_widget)
 
         ok_button.setFont(self.gui.standard_font)
-        ok_button.pressed.connect(lambda: dialog.done(1))
+        ok_button.clicked.connect(lambda: dialog.done(1))
         button_layout.addStretch()
         button_layout.addWidget(ok_button)
         button_layout.addSpacing(20)
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(lambda: dialog.done(-1))
+        cancel_button.clicked.connect(lambda: dialog.done(-1))
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 
@@ -339,14 +339,14 @@ class Importers:
 
                 ok_button = QPushButton('OK')
                 ok_button.setFont(self.gui.standard_font)
-                ok_button.pressed.connect(lambda: dialog.done(1))
+                ok_button.clicked.connect(lambda: dialog.done(1))
                 button_widget.layout().addStretch()
                 button_widget.layout().addWidget(ok_button)
                 button_widget.layout().addStretch()
 
                 cancel_button = QPushButton('Cancel')
                 cancel_button.setFont(self.gui.standard_font)
-                cancel_button.pressed.connect(lambda: dialog.done(-1))
+                cancel_button.clicked.connect(lambda: dialog.done(-1))
                 button_widget.layout().addWidget(cancel_button)
                 button_widget.layout().addStretch()
 

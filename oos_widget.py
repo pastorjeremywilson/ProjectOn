@@ -56,7 +56,7 @@ class OOSWidget(QWidget):
         container_layout.addWidget(self.oos_list_widget, 1, 0, 2, 1)
 
         move_up_button = QPushButton()
-        move_up_button.setIcon(QIcon('./resources/item_up.svg'))
+        move_up_button.setIcon(QIcon('resources/gui_icons/item_up.svg'))
         move_up_button.setIconSize(QSize(10, 30))
         move_up_button.setToolTip('Move Item Up')
         move_up_button.setFixedWidth(20)
@@ -65,11 +65,11 @@ class OOSWidget(QWidget):
             'QPushButton:hover { background: lightGrey; }'
         )'''
         move_up_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
-        move_up_button.pressed.connect(self.move_item_up)
+        move_up_button.clicked.connect(self.move_item_up)
         container_layout.addWidget(move_up_button, 1, 1)
 
         move_down_button = QPushButton()
-        move_down_button.setIcon(QIcon('./resources/item_down.svg'))
+        move_down_button.setIcon(QIcon('resources/gui_icons/item_down.svg'))
         move_down_button.setIconSize(QSize(10, 30))
         move_down_button.setToolTip('Move Item Down')
         move_down_button.setFixedWidth(20)
@@ -78,7 +78,7 @@ class OOSWidget(QWidget):
             'QPushButton:hover { background: lightGrey; }'
         )'''
         move_down_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
-        move_down_button.pressed.connect(self.move_item_down)
+        move_down_button.clicked.connect(self.move_item_down)
         container_layout.addWidget(move_down_button, 2, 1)
 
     def move_item_up(self):

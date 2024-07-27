@@ -1,7 +1,7 @@
 import os.path
 
 from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath, QPalette
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, \
     QSizePolicy
@@ -10,7 +10,7 @@ from simple_splash import SimpleSplash
 from widgets import FontWidget
 
 
-class SettingsWidget(QWidget):
+class SettingsWidget(QDialog):
     wait_widget = None
 
     def __init__(self, gui):
@@ -18,6 +18,7 @@ class SettingsWidget(QWidget):
         self.accept_font_changes = False
         self.setObjectName('settings_widget')
         self.gui = gui
+        self.setParent(self.gui.main_window)
         self.min_width = 1000
 
         self.show_wait_widget()
@@ -103,14 +104,14 @@ class SettingsWidget(QWidget):
 
         save_button = QPushButton('Save')
         save_button.setFont(self.gui.standard_font)
-        save_button.pressed.connect(self.save)
+        save_button.clicked.connect(self.save)
         button_layout.addStretch()
         button_layout.addWidget(save_button)
         button_layout.addSpacing(20)
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(self.cancel)
+        cancel_button.clicked.connect(self.cancel)
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 
@@ -261,6 +262,7 @@ class SettingsWidget(QWidget):
         self.stage_font_spinbox.setFont(self.gui.standard_font)
         self.stage_font_spinbox.installEventFilter(self)
         stage_font_layout.addWidget(self.stage_font_spinbox)
+        stage_font_layout.addStretch()
 
         return widget
 
@@ -269,7 +271,6 @@ class SettingsWidget(QWidget):
 
         widget = QWidget()
         widget.setMinimumWidth(self.min_width)
-        widget.setObjectName('background_widget')
         layout = QVBoxLayout()
         widget.setLayout(layout)
 
@@ -291,11 +292,18 @@ class SettingsWidget(QWidget):
         self.song_background_combobox = ImageCombobox(self.gui, 'song', suppress_autosave=True)
         self.song_background_combobox.setMaximumWidth(500)
         song_background_layout.addWidget(self.song_background_combobox)
+        song_background_layout.addSpacing(20)
 
         add_song_button = QPushButton('Import a Background')
         add_song_button.setFont(self.gui.standard_font)
-        add_song_button.pressed.connect(self.gui.tool_bar.import_background)
+        add_song_button.clicked.connect(self.gui.tool_bar.import_background)
         song_background_layout.addWidget(add_song_button)
+        song_background_layout.addSpacing(20)
+
+        delete_background_button = QPushButton('Delete a Background')
+        delete_background_button.setFont(self.gui.standard_font)
+        delete_background_button.clicked.connect(self.delete_background)
+        song_background_layout.addWidget(delete_background_button)
         song_background_layout.addStretch()
 
         bible_background_label = QLabel('Global Bible Background:')
@@ -324,33 +332,19 @@ class SettingsWidget(QWidget):
         self.logo_background_combobox = ImageCombobox(self.gui, 'logo', suppress_autosave=True)
         self.logo_background_combobox.setMaximumWidth(500)
         logo_background_layout.addWidget(self.logo_background_combobox)
+        logo_background_layout.addSpacing(20)
 
         logo_background_button = QPushButton('Add an Image')
         logo_background_button.setFont(self.gui.standard_font)
-        logo_background_button.pressed.connect(self.gui.media_widget.add_image)
+        logo_background_button.clicked.connect(self.gui.media_widget.add_image)
         logo_background_layout.addWidget(logo_background_button)
-        logo_background_layout.addStretch()
-
-        delete_widget = QWidget()
-        delete_layout = QHBoxLayout()
-        delete_widget.setLayout(delete_layout)
-        layout.addWidget(delete_widget)
-
-        delete_background_button = QPushButton('Delete a Background')
-        delete_background_button.setFont(self.gui.standard_font)
-        delete_background_button.pressed.connect(self.delete_background)
-        delete_layout.addWidget(delete_background_button)
-        delete_layout.addSpacing(20)
+        logo_background_layout.addSpacing(20)
 
         delete_image_button = QPushButton('Delete an Image')
         delete_image_button.setFont(self.gui.standard_font)
-        delete_image_button.pressed.connect(self.gui.media_widget.delete_image)
-        delete_layout.addWidget(delete_image_button)
-        delete_layout.addStretch()
-
-        spacing_widget = QWidget()
-        spacing_widget.setFixedHeight(20)
-        layout.addWidget(spacing_widget)
+        delete_image_button.clicked.connect(self.gui.media_widget.delete_image)
+        logo_background_layout.addWidget(delete_image_button)
+        logo_background_layout.addStretch()
 
         return widget
 
@@ -437,12 +431,12 @@ class SettingsWidget(QWidget):
 
         remove_button = QPushButton('Remove')
         remove_button.setFont(self.gui.standard_font)
-        remove_button.pressed.connect(lambda: dialog.done(0))
+        remove_button.clicked.connect(lambda: dialog.done(0))
         button_layout.addWidget(remove_button)
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(lambda: dialog.done(1))
+        cancel_button.clicked.connect(lambda: dialog.done(1))
         button_layout.addWidget(cancel_button)
 
         response = dialog.exec()
@@ -482,9 +476,17 @@ class SettingsWidget(QWidget):
             try:
                 if 'ccli_num' in self.gui.main.settings.keys():
                     self.ccli_line_edit.setText(self.gui.main.settings['ccli_num'])
+
+                screen_found = False
                 for button in self.screen_button_group.buttons():
                     if button.objectName() == self.gui.main.settings['selected_screen_name']:
                         button.setChecked(True)
+                        screen_fount = True
+
+                if not screen_found:
+                    for button in self.screen_button_group.buttons():
+                        if 'primary' not in button.text():
+                            button.setChecked(True)
 
                 self.font_settings_widget.apply_settings()
 
@@ -581,11 +583,11 @@ class SettingsWidget(QWidget):
         self.gui.main.save_settings()
         self.gui.apply_settings()
         self.gui.tool_bar.font_widget.apply_settings()
-        self.deleteLater()
+        self.done(0)
         self.gui.main.app.processEvents()
 
     def cancel(self):
-        self.deleteLater()
+        self.done(0)
         self.gui.main.app.processEvents()
 
 

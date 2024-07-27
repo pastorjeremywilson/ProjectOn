@@ -1,4 +1,3 @@
-
 import json
 import os
 import re
@@ -14,7 +13,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QStyle
 
 from help import Help
 from importers import Importers
@@ -90,7 +89,6 @@ class GUI(QObject):
         :param ProjectOn main: The current instance of ProjectOn
         """
         super().__init__()
-        palette = QPalette()
 
         self.audio_output = None
         self.main = main
@@ -106,11 +104,10 @@ class GUI(QObject):
         self.widget_item_background_color = 'white'
         self.widget_item_font_color = 'black'
 
-        self.check_files()
+        self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
+        self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        # if settings exist, set the secondary screen (the display screen) to the one in the settings
-        if len(self.main.settings) > 0:
-            self.secondary_screen = self.main.settings['selected_screen_name']
+        self.check_files()
 
         self.main.status_label.setText('Indexing Images')
         self.main.app.processEvents()
@@ -126,6 +123,10 @@ class GUI(QObject):
         self.main.thread_pool.waitForDone()
 
         self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
+
+        # if settings exist, set the secondary screen (the display screen) to the one in the settings
+        if len(self.main.settings) > 0:
+            self.secondary_screen = self.main.settings['selected_screen_name']
 
         self.screens = self.main.app.screens()
         screen_found = False
@@ -180,7 +181,8 @@ class GUI(QObject):
                 'used_services': '',
                 'last_save_dir': '',
                 'last_status_count': 100,
-                'data_dir': ''
+                'data_dir': '',
+                'selected_screen_name' : ''
             }
         else:
             with open(self.main.device_specific_config_file, 'r') as file:
@@ -245,9 +247,13 @@ class GUI(QObject):
 
         self.main.settings['used_services'] = device_specific_settings['used_services']
         self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']
-        self.main.settings['data_dir'] = self.main.data_dir
+        if 'selected_screen_name' in device_specific_settings.keys():
+            self.main.settings['selected_screen_name'] = device_specific_settings['selected_screen_name']
+        else:
+            self.main.settings['selected_screen_name'] = ''
         if 'last_status_count' in device_specific_settings.keys():
             self.main.settings['last_status_count'] = device_specific_settings['last_status_count']
+        self.main.settings['data_dir'] = self.main.data_dir
 
         if not exists(self.main.config_file):
             if exists(self.main.data_dir + '/settings.json'):
@@ -269,7 +275,7 @@ class GUI(QObject):
 
         self.main_window = CustomMainWindow(self)
         self.main_window.setObjectName('main_window')
-        self.main_window.setWindowIcon(QIcon('resources/alt-logo2.svg'))
+        self.main_window.setWindowIcon(QIcon('resources/branding/logo.svg'))
         self.main_window.setWindowTitle('ProjectOn')
 
         self.central_widget = QWidget()
@@ -281,7 +287,7 @@ class GUI(QObject):
 
         self.main.update_status_signal.emit('Creating GUI: Building Display Widget', 'status')
         self.display_widget = DisplayWidget(self)
-        self.display_widget.setWindowIcon(QIcon('resources/alt-logo2.svg'))
+        self.display_widget.setWindowIcon(QIcon('resources/branding/logo.svg'))
         self.display_widget.setWindowTitle('ProjectOn Display Window')
         self.display_widget.setCursor(Qt.CursorShape.BlankCursor)
 
@@ -458,10 +464,10 @@ class GUI(QObject):
             wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
         if theme == 'light':
             self.main.settings['theme'] = 'light'
-            self.main.app.setStyleSheet(open('resources/projecton-light.qss', 'r').read())
+            self.main_window.setStyleSheet(self.light_style_sheet)
         else:
             self.main.settings['theme'] = 'dark'
-            self.main.app.setStyleSheet(open('resources/projecton-dark.qss', 'r').read())
+            self.main_window.setStyleSheet(self.dark_style_sheet)
         if wait_widget:
             wait_widget.widget.deleteLater()
 
@@ -549,24 +555,23 @@ class GUI(QObject):
         self.help = Help(self)
 
     def show_about(self):
-        widget = QWidget()
+        widget = QDialog()
         widget.setObjectName('widget')
         widget.setParent(self.main_window)
-        widget.setStyleSheet('#widget { border: 3px solid black; background: white; }')
         widget.setLayout(QVBoxLayout())
 
         title_widget = QWidget()
         title_widget.setLayout(QHBoxLayout())
         widget.layout().addWidget(title_widget)
 
-        title_pixmap = QPixmap('resources/logo.svg')
+        title_pixmap = QPixmap('resources/branding/logo.svg')
         title_pixmap = title_pixmap.scaled(
             36, 36, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
         title_pixmap_label = QLabel()
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.1rc2')
+        title_label = QLabel('ProjectOn v.1.1rc3')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -631,7 +636,7 @@ class GUI(QObject):
         ok_button.setFont(self.standard_font)
         ok_button.setObjectName('ok_button')
         ok_button.setMaximumWidth(60)
-        ok_button.pressed.connect(widget.deleteLater)
+        ok_button.clicked.connect(lambda: widget.done(0))
         widget.layout().addWidget(ok_button, Qt.AlignmentFlag.AlignCenter)
 
         widget.show()
@@ -682,7 +687,7 @@ class GUI(QObject):
         except Exception:
             self.main.error_log()
 
-    def apply_settings(self):
+    def apply_settings(self, theme_too=True):
         """
         Provides a method to apply all of the settings obtained from the settings json file.
         """
@@ -694,13 +699,15 @@ class GUI(QObject):
             if 'global_bible_background' in self.main.settings.keys():
                 self.global_bible_background_pixmap = QPixmap(
                     self.main.image_dir + '/' + self.main.settings['global_bible_background'])
-            if 'theme' in self.main.settings.keys():
-                if self.main.settings['theme'] == 'light':
-                    self.set_theme('light')
+
+            if theme_too:
+                if 'theme' in self.main.settings.keys():
+                    if self.main.settings['theme'] == 'light':
+                        self.set_theme('light')
+                    else:
+                        self.set_theme('dark')
                 else:
                     self.set_theme('dark')
-            else:
-                self.set_theme('dark')
 
             # apply the font, shadow, and outline settings to main and sample lyric widgets.py
             for lyric_widget in [self.lyric_widget, self.sample_lyric_widget]:
@@ -1089,9 +1096,6 @@ class GUI(QObject):
             self.live_widget.blockSignals(True)
             self.live_widget.slide_list.clear()
 
-            for i in range(self.oos_widget.oos_list_widget.count()):
-                widget = self.oos_widget.oos_list_widget.itemWidget(self.oos_widget.oos_list_widget.item(i))
-
             item_index = self.preview_widget.slide_list.currentRow()
             for i in range(self.preview_widget.slide_list.count()):
                 original_item = self.preview_widget.slide_list.item(i)
@@ -1105,9 +1109,9 @@ class GUI(QObject):
                 elif item.data(40) == 'video':
                     lyric_widget = StandardItemWidget(self, item.data(20), '')
                 elif item.data(40) == 'song':
-                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2])
+                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2], wrap_subtitle=True)
                 else:
-                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2])
+                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2], wrap_subtitle=True)
 
                 self.live_widget.slide_list.addItem(item)
                 self.live_widget.slide_list.setItemWidget(item, lyric_widget)
@@ -1365,8 +1369,11 @@ class GUI(QObject):
                     footer_text += '\nCCLI License #: ' + self.main.settings['ccli_num']
                 lyric_widget.footer_label.setText(footer_text)
             elif current_item.data(40) == 'bible':
-                lyric_widget.footer_label.setText(
-                    current_item.data(20) + ' (' + current_item.data(23) + ')')
+                if current_item.data(20) == 'custom_scripture':
+                    lyric_widget.footer_label.setText('')
+                else:
+                    lyric_widget.footer_label.setText(
+                        current_item.data(20) + ' (' + current_item.data(23) + ')')
             else:
                 lyric_widget.footer_label.clear()
 
@@ -1439,13 +1446,16 @@ class GUI(QObject):
 
                     stage_html = re.sub('<p.*?>', '', lyrics_html)
                     stage_html = stage_html.replace('</p>', '')
-                    self.main.remote_server.socketio.emit('update_stage', [stage_html, self.stage_font_size])
+                    self.main.remote_server.socketio.emit(
+                        'update_stage', [stage_html, self.main.settings['stage_font_size']])
                 elif current_item.data(40) == 'web':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
-                    self.main.remote_server.socketio.emit('update_stage', [lyrics_html, self.stage_font_size])
+                    self.main.remote_server.socketio.emit(
+                        'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
                 elif current_item.data(40) == 'video':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
-                    self.main.remote_server.socketio.emit('update_stage', [lyrics_html, self.stage_font_size])
+                    self.main.remote_server.socketio.emit(
+                        'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
             elif widget == 'sample':
                 pixmap = display_widget.grab(display_widget.rect())
                 pixmap = pixmap.scaled(
@@ -1619,6 +1629,10 @@ class GUI(QObject):
         return lyric_dictionary
 
     def add_scripture_item(self, reference, text, version):
+        if not reference:
+            reference = 'custom_scripture'
+            version = 'custom_scripture'
+
         """
         Method to take a block of scripture and add it as a QListWidgetItem to the order of service widget.
         :param str reference: The scripture passage's reference from the bible
@@ -1705,7 +1719,7 @@ class GUI(QObject):
         """
         Take a passage of scripture and split it according to how many verses will fit on the display screen, given
         the current font and size.
-        :param str text: The bible passage to be split
+        :param list of str text: The bible passage to be split
         """
         # configure the hidden sample widget according to the current font
         self.sample_lyric_widget.setFont(
@@ -1723,15 +1737,35 @@ class GUI(QObject):
         footer_label_height = self.sample_lyric_widget.footer_label.height()
         preferred_height = secondary_screen_height - footer_label_height
 
-        # walk through the text to locate and index the verse numbers
-        """skip_next = False
-        for i in range(len(text)):
-            if text[i].isnumeric() and not skip_next:
-                verse_indices.append(i)
-                if i < len(text) - 1 and text[i + 1].isnumeric():
-                    skip_next = True
-            else:
-                skip_next = False"""
+        # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
+        # that needs to be parsed into verses and their corresponding verse numbers
+        if type(text) is str:
+            verse_numbers = []
+            skip_next = False
+            for i in range(len(text)):
+                if text[i].isnumeric() and not skip_next:
+                    verse_number = text[i]
+                    if i < len(text) - 1 and text[i + 1].isnumeric():
+                        verse_number += text[i + 1]
+                        skip_next = True
+                    verse_numbers.append(verse_number)
+                else:
+                    skip_next = False
+
+            text_split = []
+            for i in range(len(verse_numbers)):
+                verse_index = text.index(verse_numbers[i])
+                number_length = len(verse_numbers[i])
+                if i < len(verse_numbers) - 1:
+                    text_split.append(
+                        [
+                            verse_numbers[i],
+                            text[verse_index + number_length:text.index(verse_numbers[i + 1])]
+                        ]
+                    )
+                else:
+                    text_split.append([verse_numbers[i], text[verse_index + number_length:]])
+            text = text_split
 
         verse_index = 0
         segment_indices = []

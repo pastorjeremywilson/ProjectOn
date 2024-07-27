@@ -61,10 +61,10 @@ class PrintDialog(QDialog):
         nav_button_widget.setLayout(nav_button_layout)
 
         previous_button = QPushButton()
-        previous_button.setIcon(QIcon('resources/previous.svg'))
+        previous_button.setIcon(QIcon('resources/gui_icons/previous.svg'))
         previous_button.setAutoFillBackground(False)
         previous_button.setStyleSheet('border: none')
-        previous_button.pressed.connect(self.previous_page)
+        previous_button.clicked.connect(self.previous_page)
         nav_button_layout.addStretch()
         nav_button_layout.addWidget(previous_button)
         nav_button_layout.addSpacing(20)
@@ -75,10 +75,10 @@ class PrintDialog(QDialog):
         nav_button_layout.addSpacing(20)
 
         next_button = QPushButton()
-        next_button.setIcon(QIcon('resources/next.svg'))
+        next_button.setIcon(QIcon('resources/gui_icons/next.svg'))
         next_button.setAutoFillBackground(False)
         next_button.setStyleSheet('border: none')
-        next_button.pressed.connect(self.next_page)
+        next_button.clicked.connect(self.next_page)
         nav_button_layout.addWidget(next_button)
         nav_button_layout.addStretch()
 
@@ -98,14 +98,14 @@ class PrintDialog(QDialog):
 
         ok_button = QPushButton('Print')
         ok_button.setFont(self.gui.standard_font)
-        ok_button.pressed.connect(lambda: self.do_print(printer_combobox.currentText()))
+        ok_button.clicked.connect(lambda: self.do_print(printer_combobox.currentText()))
         ok_cancel_layout.addStretch()
         ok_cancel_layout.addWidget(ok_button)
         ok_cancel_layout.addSpacing(20)
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(self.cancel)
+        cancel_button.clicked.connect(self.cancel)
         ok_cancel_layout.addWidget(cancel_button)
         ok_cancel_layout.addStretch()
 

@@ -45,14 +45,14 @@ class OpenlyricsExport(QWidget):
         check_all_button = QPushButton('Check All')
         check_all_button.setFont(self.gui.standard_font)
         check_all_button.setStyleSheet('background: none; border: none; color: darkBlue;')
-        check_all_button.pressed.connect(self.check_all)
+        check_all_button.clicked.connect(self.check_all)
         check_button_layout.addWidget(check_all_button)
         check_button_layout.addSpacing(20)
 
         uncheck_all_button = QPushButton('Uncheck All')
         uncheck_all_button.setFont(self.gui.standard_font)
         uncheck_all_button.setStyleSheet('background: none; border: none; color: darkBlue;')
-        uncheck_all_button.pressed.connect(self.uncheck_all)
+        uncheck_all_button.clicked.connect(self.uncheck_all)
         check_button_layout.addWidget(uncheck_all_button)
         check_button_layout.addStretch()
 
@@ -64,13 +64,13 @@ class OpenlyricsExport(QWidget):
 
         export_button = QPushButton('Export Songs')
         export_button.setFont(self.gui.standard_font)
-        export_button.pressed.connect(self.do_export)
+        export_button.clicked.connect(self.do_export)
         button_layout.addWidget(export_button)
         button_layout.addSpacing(20)
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(self.deleteLater)
+        cancel_button.clicked.connect(self.deleteLater)
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 

@@ -5,11 +5,10 @@ import sqlite3
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt5.QtCore import Qt, QSize, QPoint, QEvent
+from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
-    QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, \
-    QGridLayout, QStyleOption, QStyle, QAction
+    QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, QAction
 
 from edit_widget import EditWidget
 from get_scripture import GetScripture
@@ -32,13 +31,6 @@ class MediaWidget(QTabWidget):
         self.gui = gui
         self.setFont(self.gui.standard_font)
         self.setObjectName('media_widget')
-        '''self.setStyleSheet(
-            'QTabBar:tab { background: lightGrey; border: 1px solid black; border-top-left-radius: 5px; '
-            'border-top-right-radius: 5px; padding: 5px; }'
-            'QTabBar:tab:selected { background: white; border: 1px solid black; padding: 5px; }'
-            'QTabBar:tab:hover { background: white; border: 1px solid black; padding: 5px; }'
-            '#media_widget::pane { border: 2px solid black; }'
-        )'''
         self.setTabShape(QTabWidget.TabShape.Rounded)
 
         self.formatted_reference = None
@@ -76,11 +68,11 @@ class MediaWidget(QTabWidget):
         song_widget.setLayout(song_layout)
 
         add_button = QPushButton()
-        add_button.setIcon(QIcon('./resources/add_icon.svg'))
+        add_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
         add_button.setToolTip('Add a New Song')
         add_button.setIconSize(QSize(20, 20))
         add_button.setFixedSize(30, 30)
-        add_button.pressed.connect(lambda: self.add_song('song'))
+        add_button.clicked.connect(lambda: self.add_song('song'))
         song_layout.addWidget(add_button)
 
         search_widget = QWidget()
@@ -98,11 +90,11 @@ class MediaWidget(QTabWidget):
         search_layout.addWidget(self.search_line_edit)
 
         clear_search_button = QPushButton()
-        clear_search_button.setIcon(QIcon('./resources/x_icon.svg'))
+        clear_search_button.setIcon(QIcon('resources/gui_icons/x_icon.svg'))
         clear_search_button.setToolTip('Clear Song Search')
         clear_search_button.setIconSize(QSize(20, 20))
         clear_search_button.setFixedSize(30, 30)
-        clear_search_button.pressed.connect(self.search_line_edit.clear)
+        clear_search_button.clicked.connect(self.search_line_edit.clear)
         search_layout.addWidget(clear_search_button)
 
         button_widget = QWidget()
@@ -110,20 +102,20 @@ class MediaWidget(QTabWidget):
         song_layout.addWidget(button_widget)
 
         add_to_service_button = QPushButton()
-        add_to_service_button.setIcon(QIcon('./resources/add_to_service_icon.svg'))
+        add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Song to Service')
         add_to_service_button.setIconSize(QSize(20, 20))
         add_to_service_button.setFixedSize(30, 30)
-        add_to_service_button.pressed.connect(self.add_song_to_service)
+        add_to_service_button.clicked.connect(self.add_song_to_service)
         button_widget.layout().addWidget(add_to_service_button)
         button_widget.layout().addStretch()
 
         send_to_live_button = QPushButton()
-        send_to_live_button.setIcon(QIcon('./resources/send_to_live_icon.svg'))
+        send_to_live_button.setIcon(QIcon('resources/gui_icons/send_to_live_icon.svg'))
         send_to_live_button.setToolTip('Send Song to Live')
         send_to_live_button.setIconSize(QSize(20, 20))
         send_to_live_button.setFixedSize(30, 30)
-        send_to_live_button.pressed.connect(self.send_to_live)
+        send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
         self.song_list = CustomListWidget(self.gui, 'song')
@@ -186,7 +178,7 @@ class MediaWidget(QTabWidget):
 
         default_bible_button = QPushButton('Set As Default')
         default_bible_button.setFont(self.gui.standard_font)
-        default_bible_button.pressed.connect(self.set_default_bible)
+        default_bible_button.clicked.connect(self.set_default_bible)
         bible_selector_layout.addWidget(default_bible_button)
         bible_selector_layout.addStretch()
 
@@ -207,11 +199,11 @@ class MediaWidget(QTabWidget):
         bible_search_layout.addWidget(self.bible_search_line_edit)
 
         clear_search_button = QPushButton()
-        clear_search_button.setIcon(QIcon('./resources/x_icon.svg'))
+        clear_search_button.setIcon(QIcon('resources/gui_icons/x_icon.svg'))
         clear_search_button.setToolTip('Clear Passage Search')
         clear_search_button.setIconSize(QSize(20, 20))
         clear_search_button.setFixedSize(30, 30)
-        clear_search_button.pressed.connect(self.bible_search_line_edit.clear)
+        clear_search_button.clicked.connect(self.bible_search_line_edit.clear)
         bible_search_layout.addWidget(clear_search_button)
 
         self.bible_search_status_label = QLabel()
@@ -228,20 +220,20 @@ class MediaWidget(QTabWidget):
         scripture_layout.addWidget(button_widget)
 
         self.add_to_service_button = QPushButton()
-        self.add_to_service_button.setIcon(QIcon('./resources/add_to_service_icon.svg'))
+        self.add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         self.add_to_service_button.setToolTip('Add this Passage to the Service')
         self.add_to_service_button.setIconSize(QSize(20, 20))
         self.add_to_service_button.setFixedSize(30, 30)
-        self.add_to_service_button.pressed.connect(self.add_scripture_to_service)
+        self.add_to_service_button.clicked.connect(self.add_scripture_to_service)
         button_layout.addWidget(self.add_to_service_button)
         button_layout.addStretch()
 
         self.send_to_live_button = QPushButton()
-        self.send_to_live_button.setIcon(QIcon('./resources/send_to_live_icon.svg'))
+        self.send_to_live_button.setIcon(QIcon('resources/gui_icons/send_to_live_icon.svg'))
         self.send_to_live_button.setToolTip('Send to Live')
         self.send_to_live_button.setIconSize(QSize(20, 20))
         self.send_to_live_button.setFixedSize(30, 30)
-        self.send_to_live_button.pressed.connect(self.send_scripture_to_live)
+        self.send_to_live_button.clicked.connect(self.send_scripture_to_live)
         button_layout.addWidget(self.send_to_live_button)
 
         self.scripture_text_edit = QTextEdit()
@@ -262,11 +254,11 @@ class MediaWidget(QTabWidget):
         custom_widget.setLayout(custom_layout)
 
         add_custom_button = QPushButton()
-        add_custom_button.setIcon(QIcon('./resources/add_icon.svg'))
+        add_custom_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
         add_custom_button.setToolTip('Create a New Custom Slide')
         add_custom_button.setIconSize(QSize(20, 20))
         add_custom_button.setFixedSize(30, 30)
-        add_custom_button.pressed.connect(lambda: self.add_song('custom'))
+        add_custom_button.clicked.connect(lambda: self.add_song('custom'))
         custom_layout.addWidget(add_custom_button)
 
         button_widget = QWidget()
@@ -274,20 +266,20 @@ class MediaWidget(QTabWidget):
         custom_layout.addWidget(button_widget)
 
         add_to_service_button = QPushButton()
-        add_to_service_button.setIcon(QIcon('./resources/add_to_service_icon.svg'))
+        add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Custom Slide to Service')
         add_to_service_button.setIconSize(QSize(20, 20))
         add_to_service_button.setFixedSize(30, 30)
-        add_to_service_button.pressed.connect(self.add_custom_to_service)
+        add_to_service_button.clicked.connect(self.add_custom_to_service)
         button_widget.layout().addWidget(add_to_service_button)
         button_widget.layout().addStretch()
 
         send_to_live_button = QPushButton()
-        send_to_live_button.setIcon(QIcon('./resources/send_to_live_icon.svg'))
+        send_to_live_button.setIcon(QIcon('resources/gui_icons/send_to_live_icon.svg'))
         send_to_live_button.setToolTip('Send Custom Slide to Live')
         send_to_live_button.setIconSize(QSize(20, 20))
         send_to_live_button.setFixedSize(30, 30)
-        send_to_live_button.pressed.connect(self.send_to_live)
+        send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
         self.custom_list = CustomListWidget(self.gui, 'custom')
@@ -311,11 +303,11 @@ class MediaWidget(QTabWidget):
         image_widget.setLayout(image_layout)
 
         add_image_button = QPushButton()
-        add_image_button.setIcon(QIcon('./resources/add_icon.svg'))
+        add_image_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
         add_image_button.setToolTip('Import an Image')
         add_image_button.setIconSize(QSize(20, 20))
         add_image_button.setFixedSize(30, 30)
-        add_image_button.pressed.connect(self.add_image)
+        add_image_button.clicked.connect(self.add_image)
         image_layout.addWidget(add_image_button)
 
         button_widget = QWidget()
@@ -323,20 +315,20 @@ class MediaWidget(QTabWidget):
         image_layout.addWidget(button_widget)
 
         add_to_service_button = QPushButton()
-        add_to_service_button.setIcon(QIcon('./resources/add_to_service_icon.svg'))
+        add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Image to Service')
         add_to_service_button.setIconSize(QSize(20, 20))
         add_to_service_button.setFixedSize(30, 30)
-        add_to_service_button.pressed.connect(self.add_image_to_service)
+        add_to_service_button.clicked.connect(self.add_image_to_service)
         button_widget.layout().addWidget(add_to_service_button)
         button_widget.layout().addStretch()
 
         send_to_live_button = QPushButton()
-        send_to_live_button.setIcon(QIcon('./resources/send_to_live_icon.svg'))
+        send_to_live_button.setIcon(QIcon('resources/gui_icons/send_to_live_icon.svg'))
         send_to_live_button.setToolTip('Send Image to Live')
         send_to_live_button.setIconSize(QSize(20, 20))
         send_to_live_button.setFixedSize(30, 30)
-        send_to_live_button.pressed.connect(self.send_to_live)
+        send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
         self.image_list = CustomListWidget(self.gui, 'image')
@@ -361,11 +353,11 @@ class MediaWidget(QTabWidget):
         video_widget.setLayout(video_layout)
 
         add_video_button = QPushButton()
-        add_video_button.setIcon(QIcon('./resources/add_icon.svg'))
+        add_video_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
         add_video_button.setToolTip('Import a Video')
         add_video_button.setIconSize(QSize(20, 20))
         add_video_button.setFixedSize(30, 30)
-        add_video_button.pressed.connect(self.add_video)
+        add_video_button.clicked.connect(self.add_video)
         video_layout.addWidget(add_video_button)
 
         button_widget = QWidget()
@@ -373,20 +365,20 @@ class MediaWidget(QTabWidget):
         video_layout.addWidget(button_widget)
 
         add_to_service_button = QPushButton()
-        add_to_service_button.setIcon(QIcon('./resources/add_to_service_icon.svg'))
+        add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Video to Service')
         add_to_service_button.setIconSize(QSize(20, 20))
         add_to_service_button.setFixedSize(30, 30)
-        add_to_service_button.pressed.connect(self.add_video_to_service)
+        add_to_service_button.clicked.connect(self.add_video_to_service)
         button_widget.layout().addWidget(add_to_service_button)
         button_widget.layout().addStretch()
 
         send_to_live_button = QPushButton()
-        send_to_live_button.setIcon(QIcon('./resources/send_to_live_icon.svg'))
+        send_to_live_button.setIcon(QIcon('resources/gui_icons/send_to_live_icon.svg'))
         send_to_live_button.setToolTip('Send Video to Live')
         send_to_live_button.setIconSize(QSize(20, 20))
         send_to_live_button.setFixedSize(30, 30)
-        send_to_live_button.pressed.connect(self.send_to_live)
+        send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
         self.video_list = CustomListWidget(self.gui, 'video')
@@ -410,11 +402,11 @@ class MediaWidget(QTabWidget):
         web_widget.setLayout(web_layout)
 
         add_web_button = QPushButton()
-        add_web_button.setIcon(QIcon('./resources/add_icon.svg'))
+        add_web_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
         add_web_button.setToolTip('Create a New Web Slide')
         add_web_button.setIconSize(QSize(20, 20))
         add_web_button.setFixedSize(30, 30)
-        add_web_button.pressed.connect(self.add_web)
+        add_web_button.clicked.connect(self.add_web)
         web_layout.addWidget(add_web_button)
 
         button_widget = QWidget()
@@ -422,20 +414,20 @@ class MediaWidget(QTabWidget):
         web_layout.addWidget(button_widget)
 
         add_to_service_button = QPushButton()
-        add_to_service_button.setIcon(QIcon('./resources/add_to_service_icon.svg'))
+        add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Web Page to Service')
         add_to_service_button.setIconSize(QSize(20, 20))
         add_to_service_button.setFixedSize(30, 30)
-        add_to_service_button.pressed.connect(self.add_web_to_service)
+        add_to_service_button.clicked.connect(self.add_web_to_service)
         button_widget.layout().addWidget(add_to_service_button)
         button_widget.layout().addStretch()
 
         send_to_live_button = QPushButton()
-        send_to_live_button.setIcon(QIcon('./resources/send_to_live_icon.svg'))
+        send_to_live_button.setIcon(QIcon('resources/gui_icons/send_to_live_icon.svg'))
         send_to_live_button.setToolTip('Send Video to Live')
         send_to_live_button.setIconSize(QSize(20, 20))
         send_to_live_button.setFixedSize(30, 30)
-        send_to_live_button.pressed.connect(self.send_to_live)
+        send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
         self.web_list = CustomListWidget(self.gui, 'web')
@@ -879,6 +871,7 @@ class MediaWidget(QTabWidget):
         # if the current changes means that the line edit is empty, also clear the scripture text edit
         if text == '':
             self.scripture_text_edit.clear()
+            self.formatted_reference = None
             return
 
         # create an instance of GetScripture if one doesn't already exist
@@ -942,6 +935,9 @@ class MediaWidget(QTabWidget):
             version = self.bible_selector_combobox.currentText()
             self.gui.add_scripture_item(reference, self.passages[1], version)
             self.formatted_reference = None
+            self.gui.changes = True
+        elif len(self.scripture_text_edit.toPlainText()) > 0:
+            self.gui.add_scripture_item(None, self.scripture_text_edit.toPlainText(), None)
             self.gui.changes = True
 
     def send_scripture_to_live(self):
@@ -1072,14 +1068,14 @@ class MediaWidget(QTabWidget):
         web_layout.addWidget(button_widget)
 
         ok_button = QPushButton('Add')
-        ok_button.pressed.connect(lambda: web_dialog.done(0))
+        ok_button.clicked.connect(lambda: web_dialog.done(0))
         ok_button.setFont(self.gui.standard_font)
         button_layout.addStretch()
         button_layout.addWidget(ok_button)
         button_layout.addSpacing(20)
 
         cancel_button = QPushButton('Cancel')
-        cancel_button.pressed.connect(lambda: web_dialog.done(1))
+        cancel_button.clicked.connect(lambda: web_dialog.done(1))
         cancel_button.setFont(self.gui.standard_font)
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()

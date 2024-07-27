@@ -37,8 +37,9 @@
 		var socket = io();
 		socket.on('update_stage', function(text) {
 			console.log(text[0]);
+			console.log(text[1]);
+			document.getElementById("lyric_display").style.fontSize = text[1] + 'px';
 			document.getElementById("lyric_display").innerHTML = text[0];
-			document.getElementById("lyric_display").style.fontSize = text[1];
 		});
 	</script>
 </html>

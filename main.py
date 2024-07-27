@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.1rc2
+ProjectOn v.1.1rc3
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -74,8 +74,7 @@ class ProjectOn(QObject):
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         self.app = QApplication(sys.argv)
-        #self.app.setStyle('Fusion')
-        self.app.setStyleSheet(open('resources/projecton-light.qss', 'r').read())
+        self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
 
         self.thread_pool = QThreadPool()
         self.server_thread_pool = QThreadPool()
@@ -157,7 +156,7 @@ class ProjectOn(QObject):
         icon_label = QLabel()
         icon_label.setStyleSheet('background: #6060c0')
         icon_label.setPixmap(
-            QPixmap('resources/alt-logo2.svg').scaled(
+            QPixmap('resources/branding/logo.svg').scaled(
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         splash_layout.addWidget(icon_label)
 
@@ -540,6 +539,7 @@ class ProjectOn(QObject):
             device_specific_settings['used_services'] = self.settings['used_services']
             device_specific_settings['last_save_dir'] = self.settings['last_save_dir']
             device_specific_settings['last_status_count'] = self.settings['last_status_count']
+            device_specific_settings['selected_screen_name'] = self.settings['selected_screen_name']
             device_specific_settings['data_dir'] = self.data_dir
             with open(self.device_specific_config_file, 'w') as file:
                 file.write(json.dumps(device_specific_settings, indent=4))
@@ -583,20 +583,8 @@ class ProjectOn(QObject):
                     'title': self.gui.oos_widget.oos_list_widget.item(i).data(20),
                     'type': self.gui.oos_widget.oos_list_widget.item(i).data(40)
                 }
-            """for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                service_items[i] = {}
-                for j in range(20, 33):
-                    if j == 21 and self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'bible':
-                        service_items[i][j] = self.gui.oos_widget.oos_list_widget.item(i).data(j)
-                    elif j == 31:
-                        service_items[i][j] = self.gui.oos_widget.oos_list_widget.item(i).data(j)
-                        if self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'image':
-                            service_items[i][j][2] = ''
-                    else:
-                        if type(self.gui.oos_widget.oos_list_widget.item(i).data(j)) == bytes:
-                            service_items[i][j] = ''
-                        else:
-                            service_items[i][j] = str(self.gui.oos_widget.oos_list_widget.item(i).data(j))"""
+                if self.gui.oos_widget.oos_list_widget.item(i).data(20) == 'custom_scripture':
+                    service_items[i]['text'] = self.gui.oos_widget.oos_list_widget.item(i).data(24)[2]
 
             dialog_needed = True
             if self.gui.current_file:
@@ -773,22 +761,25 @@ class ProjectOn(QObject):
                             self.gui.media_widget.add_song_to_service(song_item, from_load_service=True)
 
                     elif service_dict[key]['type'] == 'bible':
-                        if not self.gui.main.get_scripture:
-                            from get_scripture import GetScripture
-                            self.get_scripture = GetScripture(self)
-                        passages = self.get_scripture.get_passage(service_dict[key]['title'])
-
-                        if passages[0] == -1:
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Error Loading Scripture',
-                                'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
-                                QMessageBox.StandardButton.Ok
-                            )
+                        if service_dict[key]['title'] == 'custom_scripture':
+                            self.gui.add_scripture_item(None, service_dict[key]['text'], None)
                         else:
-                            reference = service_dict[key]['title']
-                            version = self.gui.media_widget.bible_selector_combobox.currentText()
-                            self.gui.add_scripture_item(reference, passages[1], version)
+                            if not self.gui.main.get_scripture:
+                                from get_scripture import GetScripture
+                                self.get_scripture = GetScripture(self)
+                            passages = self.get_scripture.get_passage(service_dict[key]['title'])
+
+                            if passages[0] == -1:
+                                QMessageBox.information(
+                                    self.gui.main_window,
+                                    'Error Loading Scripture',
+                                    'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
+                                    QMessageBox.StandardButton.Ok
+                                )
+                            else:
+                                reference = service_dict[key]['title']
+                                version = self.gui.media_widget.bible_selector_combobox.currentText()
+                                self.gui.add_scripture_item(reference, passages[1], version)
 
                     elif service_dict[key]['type'] == 'custom':
                         try:
@@ -1308,15 +1299,16 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
     with open('./error.log', 'a') as file:
         file.write(log_text)
 
-    QMessageBox.critical(
-        None,
-        'Unhandled Exception',
-        'An unhandled exception occurred:\n\n'
-        f'{exc_type}\n'
-        f'{exc_value}\n'
-        f'{full_traceback}',
-        QMessageBox.StandardButton.Close
-    )
+    message_box = QMessageBox()
+    message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
+    message_box.setWindowTitle('Unhandled Exception')
+    message_box.setText(
+        '<strong>Well, that wasn\'t supposed to happen!</strong><br><br>An unhandled exception occurred:<br>'
+        f'{exc_type}<br>'
+        f'{exc_value}<br>'
+        f'{full_traceback}')
+    message_box.setStandardButtons(QMessageBox.StandardButton.Close)
+    message_box.exec()
 
 if __name__ == '__main__':
     sys.excepthook = log_unhandled_exception

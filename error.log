@@ -1185,3 +1185,47 @@ Fri Jul 19 16:48:27 2024:
     families(self, writingSystem: QFontDatabase.WritingSystem = QFontDatabase.Any): first argument of unbound method must have type 'QFontDatabase' on line 31 of \\LBCN\jeremy\Documents\Python Workspace\project_on\widgets.py in FontFaceListWidget.populate_widget
 Sat Jul 20 10:48:58 2024:
     'GUI' object has no attribute 'apply_theme' on line 696 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.apply_settings
+Wed Jul 24 11:16:17 2024:
+    'NoneType' object has no attribute 'data' on line 1163 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.send_to_liveunknown server errorunknown server error
+Thu Jul 25 15:12:38 2024:
+    'SettingsWidget' object has no attribute 'font_settings_widget' on line 493 of \\LBCN\jeremy\Documents\Python Workspace\project_on\settings_widget.py in SettingsWidget.apply_settings
+Thu Jul 25 15:58:09 2024:
+    UNHANDLED EXCEPTION
+    'ZeroDivisionError'
+    division by zero
+    file X:\Documents\Python Workspace\project_on\main.py, line 1324 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__
+Thu Jul 25 16:00:52 2024:
+    UNHANDLED EXCEPTION
+    'ZeroDivisionError'
+    division by zero
+    file X:\Documents\Python Workspace\project_on\main.py, line 1324 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__
+Thu Jul 25 16:04:01 2024:
+    UNHANDLED EXCEPTION
+    'ZeroDivisionError'
+    division by zero
+    file X:\Documents\Python Workspace\project_on\main.py, line 1324 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__
+Thu Jul 25 16:19:03 2024:
+    UNHANDLED EXCEPTION
+    'ZeroDivisionError'
+    division by zero
+    file X:\Documents\Python Workspace\project_on\main.py, line 1326 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__
+Thu Jul 25 16:20:15 2024:
+    UNHANDLED EXCEPTION
+    'ZeroDivisionError'
+    division by zero
+    file X:\Documents\Python Workspace\project_on\main.py, line 1326 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__
+Thu Jul 25 16:23:54 2024:
+    UNHANDLED EXCEPTION
+    'ZeroDivisionError'
+    division by zero
+    file X:\Documents\Python Workspace\project_on\main.py, line 1325 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__
+Thu Jul 25 16:26:02 2024:
+    UNHANDLED EXCEPTION
+    'ZeroDivisionError'
+    division by zero
+    file X:\Documents\Python Workspace\project_on\main.py, line 1325 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__
+Thu Jul 25 16:28:02 2024:
+    UNHANDLED EXCEPTION
+    'ZeroDivisionError'
+    division by zero
+    file X:\Documents\Python Workspace\project_on\main.py, line 1325 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__

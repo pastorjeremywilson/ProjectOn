@@ -14,7 +14,7 @@ from cryptography.fernet import Fernet
 from simple_splash import SimpleSplash
 
 
-class SongselectImport(QWidget):
+class SongselectImport(QDialog):
     BASE_URL = 'https://songselect.ccli.com'
     LOGIN_PAGE = ('https://profile.ccli.com/Account/Signin?'
                   'appContext=SongSelect&returnUrl=https%3A%2F%2Fsongselect.ccli.com%2F')
@@ -59,7 +59,7 @@ class SongselectImport(QWidget):
         import_layout.addWidget(nav_widget)
 
         self.back_button = QPushButton(self)
-        self.back_button.setIcon(QIcon('resources/browser_back.svg'))
+        self.back_button.setIcon(QIcon('resources/gui_icons/browser_back.svg'))
         nav_layout.addWidget(self.back_button)
 
         self.url_bar = QLineEdit(self)
@@ -108,6 +108,7 @@ class SongselectImport(QWidget):
 
     def store_credentials(self):
         dialog = QDialog()
+        dialog.setObjectName('ccli_credentials_dialog')
         dialog_layout = QVBoxLayout(dialog)
         dialog.setWindowTitle('CCLI Credentials')
 
@@ -147,7 +148,7 @@ class SongselectImport(QWidget):
         dialog_layout.addWidget(button_widget)
 
         ok_button.setFont(self.gui.standard_font)
-        ok_button.pressed.connect(lambda: dialog.done(1))
+        ok_button.clicked.connect(lambda: dialog.done(1))
         ok_button.setEnabled(False)
         button_layout.addStretch()
         button_layout.addWidget(ok_button)
@@ -155,7 +156,7 @@ class SongselectImport(QWidget):
 
         cancel_button = QPushButton('Cancel')
         cancel_button.setFont(self.gui.standard_font)
-        cancel_button.pressed.connect(lambda: dialog.done(-1))
+        cancel_button.clicked.connect(lambda: dialog.done(-1))
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 
@@ -346,14 +347,14 @@ class SongselectImport(QWidget):
 
                     ok_button = QPushButton('OK')
                     ok_button.setFont(self.gui.standard_font)
-                    ok_button.pressed.connect(lambda: dialog.done(1))
+                    ok_button.clicked.connect(lambda: dialog.done(1))
                     button_widget.layout().addStretch()
                     button_widget.layout().addWidget(ok_button)
                     button_widget.layout().addStretch()
 
                     cancel_button = QPushButton('Cancel')
                     cancel_button.setFont(self.gui.standard_font)
-                    cancel_button.pressed.connect(lambda: dialog.done(-1))
+                    cancel_button.clicked.connect(lambda: dialog.done(-1))
                     button_widget.layout().addWidget(cancel_button)
                     button_widget.layout().addStretch()
 
@@ -373,4 +374,4 @@ class SongselectImport(QWidget):
                     self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
 
                 save_widget.widget.deleteLater()
-                self.deleteLater()
+                self.done(0)

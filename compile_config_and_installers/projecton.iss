@@ -2,12 +2,13 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ProjectOn"
-#define MyAppVersion "1.1rc2"
+#define MyAppVersion "1.1rc3"
 #define MyAppPublisher "Wilson's Widgets"
 #define MyAppExeName "ProjectOn.exe"
 #define MyAppAssocName MyAppName + " File"
 #define MyAppAssocExt ".pro"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
+#define ResourceLocation "C:\Users\pasto\Desktop\output\ProjectOn\_internal"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -26,10 +27,13 @@ LicenseFile=C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\gpl-3.0.
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\Users\pasto\Desktop\output
 OutputBaseFilename=Setup Projecton v.{#MyAppVersion}
-SetupIconFile=C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\alt-icon2.ico
+SetupIconFile={#ResourceLocation}\resources\branding\logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+
+WizardImageFile={#ResourceLocation}\resources\branding\install_image_large.bmp
+WizardSmallImageFile = {#ResourceLocation}\resources\branding\install_image_small.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -40,6 +44,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "C:\Users\pasto\Desktop\output\ProjectOn\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\README.md"; DestDir: "{app}"; Flags: isreadme
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

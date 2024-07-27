@@ -1,42 +1,50 @@
-/*----- Light Stylesheet for ProjectOn -----
+/*-------------------- Light Stylesheet for ProjectOn --------------------
 Note: Qt default background for widgets is #f0f0f0 or 240, 240, 240
 
 General Theme Colors:
-Background, usable widget: #ffffff
-Background, widget: #f0f0f0
-Font color: #000000
-Hover: #aaaaff
-Selected/Pressed: #5555aa
-Disabled: #505050
+    Background, usable widget: #ffffff
+    Background, widget: #f0f0f0
+    Font color: #000000
+    Hover: #aaaaff
+    Selected/Pressed: #5555aa
+    Disabled: #505050
 */
 
-/*----- QListWidget -----*/
-QListWidget {
-	background: #ffffff;
-	color: #000000;
+/*-------------------- item_widget --------------------*/
+QWidget[objectName="item_widget"] {
+    background: #aaaaff;
+    color: #000000
 }
-QListView {
+
+/*-------------------- tool_bar_container --------------------*/
+QWidget[objectName="tool_bar_container"] {
     background: #ffffff;
 }
-QListView::item {
-	background: #ffffff;
-	color: #000000;
-}
-QListView::item:hover {
-	background: #ffffff;
-	border: 1px solid #aaaaff;
-}
-QListView::item:selected {
-	background: #aaaaff;
+
+/*-------------------- tab_widget --------------------*/
+QWidget[objectName="tab_widget"] {
+    background: #c0c0c0;
 }
 
-/*----- QScrollBar -----*/
-QScrollBar {
-	background : #f0f0f0;
-	color: #000000;
+/*-------------------- font_widget --------------------*/
+QWidget[objectName="font_widget"] {
+    background: #ffffff;
+    color: #000000;
 }
 
-/*----- QPushButton -----*/
+/*-------------------- settings_container --------------------*/
+QWidget[objectName="settings_container"] {
+    background: #ffffff;
+    color: #000000;
+}
+
+/*-------------------- edit_main_widget --------------------*/
+QWidget[objectName="edit_main_widget"] {
+    background: #ffffff;
+    color: #000000;
+}
+
+/*-------------------- QPushButton --------------------*/
 QPushButton {
 	background: #ffffff;
 	color: #000000;
@@ -66,7 +74,151 @@ QPushButton:unchecked {
     border-style: outset;
 }
 
-/*----- QMenuBar -----*/
+/*-------------------- QComboBox --------------------*/
+QComboBox {
+    background: #ffffff;
+    color: #000000;
+    selection-background-color: #aaaaff;
+    selection-color: #000000;
+    border: 1px solid #000000;
+}
+QComboBox::item {
+    background: #ffffff;
+    color: #000000;
+}
+QComboBox::item:hover {
+    background: #5555aa;
+}
+QComboBox::down-arrow {
+    background: #f0f0f0;
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
+}
+
+/*-------------------- QSpinBox --------------------*/
+QSpinBox {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+}
+QSpinBox QLineEdit {
+    background: #ffffff;
+    color: #000000;
+}
+QSpinBox::up-button, QSpinBox::down-button {
+    background: #ffffff;
+}
+QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+    background: #aaaaff
+}
+QSpinBox::up-button {
+    image: url('resources/gui_icons/scroll_up_arrow.svg');
+}
+QSpinBox::down-button {
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
+}
+
+/*-------------------- QScrollBar --------------------*/
+QScrollBar {
+	background : #f0f0f0;
+	color: #000000;
+}
+
+/*-------------------- QRadioButton --------------------*/
+QRadioButton {
+    color: #000000;
+}
+
+/*-------------------- QSlider --------------------*/
+QSlider::handle {
+    background-color: #aaaaff;
+}
+QSlider::handle:hover {
+    background-color: #5555aa;
+}
+
+/*-------------------- QLabel --------------------*/
+QLabel {
+    background: transparent;
+    color: #000000
+}
+
+/*-------------------- QLineEdit --------------------*/
+QLineEdit {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #f0f0f0;
+}
+QLineEdit:focus {
+    border-bottom: 2px solid #5555aa;
+}
+
+/*-------------------- QTextEdit --------------------*/
+QTextEdit {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #f0f0f0;
+}
+
+/*-------------------- QMessageBox --------------------*/
+QMessageBox {
+    background: #ffffff;
+    color: #000000;
+}
+
+/*-------------------- QWebEngineView --------------------*/
+QWebEngineView {
+    background: #ffffff;
+    color: #000000;
+}
+
+/*-------------------- QWebEngineView --------------------*/
+QWebEngineView {
+    background: #ffffff;
+    color: #000000;
+}
+
+/*-------------------- QCheckBox --------------------*/
+QCheckbox {
+    color: #ffffff;
+}
+
+/*-------------------- QMainWindow --------------------*/
+QMainWindow {
+    background: #f0f0f0;
+}
+
+/*-------------------- QScrollArea --------------------*/
+QScrollArea {
+    background: #ffffff;
+}
+
+/*-------------------- QDialog --------------------*/
+QDialog {
+    background: #ffffff;
+    color: #000000;
+}
+
+/*-------------------- QListWidget --------------------*/
+QListWidget {
+	background: #ffffff;
+	color: #000000;
+}
+QListView {
+    background: #ffffff;
+}
+QListView::item {
+	background: #ffffff;
+	color: #000000;
+}
+QListView::item:hover {
+	background: #ffffff;
+	border: 1px solid #aaaaff;
+}
+QListView::item:selected {
+	background: #aaaaff;
+}
+
+/*-------------------- QMenuBar --------------------*/
 QMenuBar {
     background: #f0f0f0;
     color: #000000;
@@ -82,7 +234,7 @@ QMenuBar::item:pressed {
     background: #aaaaff;
 }
 
-/*----- QMenu -----*/
+/*-------------------- QMenu --------------------*/
 QMenu {
     background: #f0f0f0;
     color: #000000;
@@ -98,12 +250,12 @@ QMenu::item:pressed {
     background: #aaaaff;
 }
 
-/*----- QTabWidget -----*/
+/*-------------------- QTabWidget --------------------*/
 QTabWidget::pane {
     background: #ffffff;
 }
 
-/*----- QTabBar -----*/
+/*-------------------- QTabBar --------------------*/
 QTabBar {
     background: #f0f0f0;
     color: #000000;
@@ -131,77 +283,4 @@ QTabBar::tab:!selected {
 }
 QTabBar::tab:last {
     margin-right: 0px;
-}
-
-/*----- QSlider -----*/
-QSlider::handle {
-    background-color: #aaaaff;
-}
-QSlider::handle:hover {
-    background-color: #5555aa;
-}
-
-/*----- QLabel -----*/
-QLabel {
-    background: transparent;
-    color: #000000
-}
-
-/*----- QLineEdit -----*/
-QLineEdit {
-    background: #ffffff;
-    color: #000000;
-    border: 1px solid #f0f0f0;
-}
-QLineEdit:focus {
-    border-bottom: 2px solid #5555aa;
-}
-
-/*----- QTextEdit -----*/
-QTextEdit {
-    background: #ffffff;
-    color: #000000;
-    border: 1px solid #f0f0f0;
-}
-
-/*----- QComboBox -----*/
-QComboBox {
-    background: #ffffff;
-    color: #000000;
-    selection-background-color: #aaaaff;
-    selection-color: #000000;
-}
-QComboBox::item {
-    background: #ffffff;
-    color: #000000;
-}
-QComboBox::item:hover {
-    background: #5555aa;
-}
-
-/*----- item_widget -----*/
-QWidget[objectName="item_widget"] {
-    background: #aaaaff;
-    color: #000000
-}
-
-/*----- tool_bar_container -----*/
-QWidget[objectName="tool_bar_container"] {
-    background: #ffffff;
-}
-
-/*----- tab_widget -----*/
-QWidget[objectName="tab_widget"] {
-    background: #c0c0c0;
-}
-
-/*----- settings_widget -----*/
-QWidget[objectName="settings_widget"] {
-    background: #c0c0c0;
-}
-
-/*----- settings_container -----*/
-QWidget[objectName="settings_container"] {
-    background: #ffffff;
-    color: #000000;
 }
