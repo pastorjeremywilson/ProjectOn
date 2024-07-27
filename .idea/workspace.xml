@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-    </list>
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -321,7 +318,23 @@
       <option name="project" value="LOCAL" />
       <updated>1722049560162</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Reimplemented show/hide advanced options in the edit widget.">
+      <option name="closed" value="true" />
+      <created>1722052903017</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1722052903017</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Added images for the installer.">
+      <option name="closed" value="true" />
+      <created>1722053099109</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1722053099109</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -348,6 +361,8 @@
     <MESSAGE value="Forgot ghostscript icon" />
     <MESSAGE value="Fixed theming on edit widget" />
     <MESSAGE value="Added the ability to paste a passage into the bible text edit and have it parse and save." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added the ability to paste a passage into the bible text edit and have it parse and save." />
+    <MESSAGE value="Reimplemented show/hide advanced options in the edit widget." />
+    <MESSAGE value="Added images for the installer." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added images for the installer." />
   </component>
 </project>
