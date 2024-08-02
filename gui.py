@@ -484,6 +484,8 @@ class GUI(QObject):
             )
             return
 
+        wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
+
         from reportlab.pdfgen import canvas
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.utils import ImageReader
@@ -492,9 +494,9 @@ class GUI(QObject):
 
         print_file_loc = tempfile.gettempdir() + '/print.pdf'
         marginH = 80
-        marginV = 80
+        marginV = 70
         font_size = 12
-        lineHeight = 36
+        lineHeight = 38
 
         # letter size = 612.0 x 792.0
         # create variables based on letter-sized canvas
@@ -513,6 +515,9 @@ class GUI(QObject):
             widget = self.oos_widget.oos_list_widget.itemWidget(item)
             widget.setObjectName('item_widget')
             if widget:
+                canvas.setFont('Helvetica', font_size)
+                canvas.drawString(lineStart, currentLine + 16, f'{i + 1}.')
+
                 pixmap = widget.icon.pixmap()
                 type = widget.subtitle.text()
                 title = widget.title.text()
@@ -520,11 +525,16 @@ class GUI(QObject):
                 image = Image.fromqpixmap(pixmap)
                 image_reader = ImageReader(image)
 
-                canvas.drawImage(image_reader, lineStart, currentLine)
+                canvas.drawImage(image_reader, lineStart + 30, currentLine)
                 canvas.setFont('Helvetica-Bold', font_size)
-                canvas.drawString(lineStart + 60, currentLine + 16, title)
+                canvas.drawString(lineStart + 100, currentLine + 16, title)
                 canvas.setFont('Helvetica', font_size)
-                canvas.drawString(lineStart + 60, currentLine, type)
+                canvas.drawString(lineStart + 100, currentLine, type)
+
+                # only draw a line separator if this isn't the last one
+                if i < self.oos_widget.oos_list_widget.count() - 1:
+                    canvas.line(lineStart, currentLine - 5, lineStart + 300, currentLine - 5)
+
                 currentLine -= lineHeight
 
                 if currentLine < lastLine:
@@ -534,6 +544,9 @@ class GUI(QObject):
         canvas.save()
         print_dialog = PrintDialog(print_file_loc, self)
         print_dialog.exec()
+
+        if wait_widget:
+            wait_widget.widget.deleteLater()
 
     def ccli_import(self):
         from songselect_import import SongselectImport

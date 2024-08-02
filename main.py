@@ -935,7 +935,7 @@ class ProjectOn(QObject):
 
             # set the last used directory in settings
             file_dir = os.path.dirname(result[0])
-            file_name = result[0].replace(file_dir, '').replace('/', '')
+            file_name = result[0].replace(file_dir, '').replace('/', '').replace('\\', '')
             self.settings['last_save_dir'] = file_dir
 
             # add this file to the recently used services menu
