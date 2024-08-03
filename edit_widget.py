@@ -760,6 +760,7 @@ class EditWidget(QDialog):
 
         self.populate_tag_list()
         self.lyrics_edit.text_edit.verticalScrollBar().setSliderPosition(slider_pos)
+        self.lyrics_edit.text_edit.setFocus()
 
     def populate_tag_list(self):
         """
@@ -854,7 +855,7 @@ class EditWidget(QDialog):
         elif lyrics.startswith('\n'):
             lyrics = lyrics[1:len(lyrics)]
 
-        lyrics = lyrics.replace('<br />', '\n')
+        lyrics = lyrics.replace('\n', '<br />')
 
         song_order = ''
         for i in range(self.song_order_list_widget.count()):

@@ -1,3 +1,4 @@
+After inserting a tag while editing a song, return the cursor to the text edit (after the inserted tag)
 
 Future Releases:
 Accurate preview when editing a song or a custom slide

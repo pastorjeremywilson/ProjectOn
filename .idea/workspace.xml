@@ -6,8 +6,22 @@
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/backgrounds/Plasmoid.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/backgrounds/bible.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/backgrounds/default_logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/backgrounds/desert.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/backgrounds/paper.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/backgrounds/prayer.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/bibles/SF_2009-01-23_ENG_KJV_(KING JAMES VERSION).xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/default_database.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/images/Go In Peace.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/images/Welcome.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/videos/Video MP4_Lake - testfile.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/videos/Video MP4_Lake - testfile.mp4" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -346,7 +360,15 @@
       <option name="project" value="LOCAL" />
       <updated>1722091576808</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Fixed Qt import issue in PIL&#10;Fixed '\' showing in recent files when loaded from command line">
+      <option name="closed" value="true" />
+      <created>1722639040822</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1722639040822</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -376,6 +398,7 @@
     <MESSAGE value="Reimplemented show/hide advanced options in the edit widget." />
     <MESSAGE value="Added images for the installer." />
     <MESSAGE value="Added readme as html.&#10;Included readme in pyinstaller command and inno setup script." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added readme as html.&#10;Included readme in pyinstaller command and inno setup script." />
+    <MESSAGE value="Fixed Qt import issue in PIL&#10;Fixed '\' showing in recent files when loaded from command line" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed Qt import issue in PIL&#10;Fixed '\' showing in recent files when loaded from command line" />
   </component>
 </project>

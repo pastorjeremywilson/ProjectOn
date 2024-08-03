@@ -45,6 +45,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "C:\Users\pasto\Desktop\output\ProjectOn\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\README.html"; DestDir: "{app}\_internal"; Flags: isreadme
+Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\defaults\data\*"; DestDir: "{userappdata}\ProjectOn\data\"; Flags: createallsubdirs onlyifdoesntexist uninsneveruninstall
+Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\defaults\localConfig.json"; DestDir: "{userappdata}\ProjectOn\"; Flags: onlyifdoesntexist uninsneveruninstall
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

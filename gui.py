@@ -1637,7 +1637,10 @@ class GUI(QObject):
                     except IndexError:
                         lyric_dictionary.update({segment_markers[i]: segment_split[i + 1].strip()})
             else:
-                lyric_dictionary.update({'[v1]': lyrics})
+                lyrics_split = lyrics.split('<br /><br />')
+                for i in range(len(lyrics_split)):
+                    if len(lyrics_split[i].strip()) > 0:
+                        lyric_dictionary.update({f'[Verse {i + 1}]': lyrics_split[i].strip()})
 
         return lyric_dictionary
 
