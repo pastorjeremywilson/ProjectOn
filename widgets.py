@@ -916,9 +916,11 @@ class FontWidget(QWidget):
         """
         self.blockSignals(True)
 
-        #self.font_combo_box.setCurrentText(self.gui.main.settings['font_face'])
+        font_face = self.gui.main.settings['font_face']
+        if not len(font_face) > 0:
+            font_face = 'Arial Black'
         for i in range(self.font_list_widget.count()):
-            if self.font_list_widget.item(i).data(20) == self.gui.main.settings['font_face']:
+            if self.font_list_widget.item(i).data(20) == font_face:
                 self.font_list_widget.setCurrentRow(i)
                 break
 

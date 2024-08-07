@@ -107,7 +107,16 @@ class GUI(QObject):
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        self.check_files()
+        self.main.status_label.setText('Checking Files')
+        self.main.app.processEvents()
+
+        # ensure all needed files exist; thread it and wait until done before moving on
+        from main import CheckFiles
+        cf = CheckFiles(self.main)
+        self.main.thread_pool.start(cf)
+        self.main.thread_pool.waitForDone()
+
+        self.main.get_song_titles()
 
         self.main.status_label.setText('Indexing Images')
         self.main.app.processEvents()
@@ -175,14 +184,15 @@ class GUI(QObject):
     def check_files(self):
         if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
             os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
-        self.main.device_specific_config_file = os.path.expanduser('~/Appdata/Roaming/ProjectOn/localConfig.json')
+        self.main.device_specific_config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')
+
         if not exists(self.main.device_specific_config_file):
             device_specific_settings = {
                 'used_services': '',
                 'last_save_dir': '',
                 'last_status_count': 100,
                 'data_dir': '',
-                'selected_screen_name' : ''
+                'selected_screen_name': ''
             }
         else:
             with open(self.main.device_specific_config_file, 'r') as file:
@@ -190,7 +200,11 @@ class GUI(QObject):
 
         data_dir = False
         if 'data_dir' in device_specific_settings.keys():
-            self.main.data_dir = device_specific_settings['data_dir']
+            if '~' in device_specific_settings['data_dir']:
+                self.main.data_dir = os.path.expanduser(device_specific_settings['data_dir'])
+            else:
+                self.main.data_dir = device_specific_settings['data_dir']
+
             if exists(self.main.data_dir):
                 data_dir = True
 
@@ -259,13 +273,13 @@ class GUI(QObject):
             if exists(self.main.data_dir + '/settings.json'):
                 shutil.copy(self.main.data_dir + '/settings.json', self.main.config_file)
 
+        """
         # ensure all needed files exist; thread it and wait until done before moving on
         from main import CheckFiles
         cf = CheckFiles(self.main)
         self.main.thread_pool.start(cf)
         self.main.thread_pool.waitForDone()
-
-        self.main.get_song_titles()
+        """
 
     def init_components(self):
         """
@@ -584,7 +598,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.2')
+        title_label = QLabel('ProjectOn v.1.2.8.7')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1000,9 +1014,13 @@ class GUI(QObject):
                         self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
             elif item.data(40) == 'bible':
+                title = item.data(20)
+                book_chapter = title.split(':')[0]
+                book = book_chapter[:-1].strip()
+                current_chapter = book_chapter.replace(book_chapter[:-1], '')
+
                 slide_texts = item.data(21)
                 for i in range(len(slide_texts)):
-                    title = item.data(20)
                     list_item = QListWidgetItem()
                     for j in range(20, 41):
                         list_item.setData(j, item.data(j))
@@ -1011,7 +1029,6 @@ class GUI(QObject):
                     list_item.setData(22, item.text())
                     list_item.setData(40, 'bible')
 
-                    new_title = title.split(':')[0] + ':'
                     first_num_found = False
                     first_num = ''
                     last_num = ''
@@ -1019,6 +1036,7 @@ class GUI(QObject):
 
                     # find the verse range for each segment of scripture
                     scripture_text = re.sub('<.*?>', '', list_item.data(21))
+                    next_chapter = False
                     for j in range(len(scripture_text)):
                         data = scripture_text[j]
                         next_data = None
@@ -1036,13 +1054,22 @@ class GUI(QObject):
                                     first_num_found = True
                                 else:
                                     last_num = num
+
+                                if i > 0 and num == '1':
+                                    next_chapter = True
                         else:
                             skip_next = False
 
+                    if next_chapter:
+                        current_chapter = str(int(current_chapter) + 1)
+
                     if last_num == '':
-                        new_title += first_num
+                        new_title = f'{book} {current_chapter}:{first_num}'
                     else:
-                        new_title += first_num + '-' + last_num
+                        if int(first_num) > int(last_num):
+                            new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                        else:
+                            new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
 
                     list_item.setData(24, ['', new_title, slide_texts[i]])
 

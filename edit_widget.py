@@ -870,7 +870,6 @@ class EditWidget(QDialog):
             self.copyright_line_edit.text(),
             self.ccli_num_line_edit.text(),
             lyrics,
-            # self.song_order_line_edit.text(),
             song_order,
             footer,
             font,
@@ -956,35 +955,51 @@ class EditWidget(QDialog):
         else:
             override_global = 'False'
 
-        if self.font_widget.font_list_widget.currentItem():
-            font = self.font_widget.font_list_widget.currentItem().data(20)
+        if self.override_global_checkbox.isChecked():
+            if self.font_widget.font_list_widget.currentItem():
+                font = self.font_widget.font_list_widget.currentItem().data(20)
+            else:
+                font = self.font_widget.font_list_widget.item(0).data(20)
+
+            if self.font_widget.font_color_button_group.checkedButton():
+                font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
+            else:
+                font_color = 'white'
+
+            font_size = str(self.font_widget.font_size_spinbox.value())
+
+            use_shadow = str(self.font_widget.shadow_checkbox.isChecked())
+            shadow_color = str(self.font_widget.shadow_color_slider.color_slider.value())
+            shadow_offset = str(self.font_widget.shadow_offset_slider.offset_slider.value())
+
+            use_outline = str(self.font_widget.outline_checkbox.isChecked())
+            outline_color = str(self.font_widget.outline_color_slider.color_slider.value())
+            outline_width = str(self.font_widget.outline_width_slider.offset_slider.value())
+
+            if 'Global' in self.background_line_edit.text():
+                if 'Song' in self.background_line_edit.text():
+                    background = 'global_song'
+                else:
+                    background = 'global_bible'
+            elif 'rgb(' in self.background_line_edit.text():
+                background = self.background_line_edit.text()
+            else:
+                background = self.background_line_edit.text()
+
         else:
-            font = self.font_widget.font_list_widget.item(0).data(20)
-
-        if self.font_widget.font_color_button_group.checkedButton():
-            font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
-        else:
-            font_color = 'white'
-
-        font_size = str(self.font_widget.font_size_spinbox.value())
-
-        use_shadow = str(self.font_widget.shadow_checkbox.isChecked())
-        shadow_color = str(self.font_widget.shadow_color_slider.color_slider.value())
-        shadow_offset = str(self.font_widget.shadow_offset_slider.offset_slider.value())
-
-        use_outline = str(self.font_widget.outline_checkbox.isChecked())
-        outline_color = str(self.font_widget.outline_color_slider.color_slider.value())
-        outline_width = str(self.font_widget.outline_width_slider.offset_slider.value())
-
-        if 'Global' in self.background_line_edit.text():
-            if 'Song' in self.background_line_edit.text():
+            font = 'global'
+            font_color = 'global'
+            font_size = 'global'
+            use_shadow = 'global'
+            shadow_color = 'global'
+            shadow_offset = 'global'
+            use_outline = 'global'
+            outline_color = 'global'
+            outline_width = 'global'
+            if self.type == 'song':
                 background = 'global_song'
             else:
                 background = 'global_bible'
-        elif 'rgb(' in self.background_line_edit.text():
-            background = self.background_line_edit.text()
-        else:
-            background = self.background_line_edit.text()
 
         text = self.lyrics_edit.text_edit.toHtml()
         text_split = re.split('<body.*?>', text)
@@ -1050,7 +1065,6 @@ class EditWidget(QDialog):
 
         self.gui.main.save_custom(custom_data, self.old_title)
         self.gui.media_widget.populate_custom_list()
-        self.gui.main.app.processEvents()
 
         if self.old_title:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):

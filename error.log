@@ -1229,3 +1229,17 @@ Thu Jul 25 16:28:02 2024:
     'ZeroDivisionError'
     division by zero
     file X:\Documents\Python Workspace\project_on\main.py, line 1325 in <module, file X:\Documents\Python Workspace\project_on\main.py, line 103 in __init__, file X:\Documents\Python Workspace\project_on\gui.py, line 95 in __init__
+Tue Aug  6 16:42:59 2024:
+    UNHANDLED EXCEPTION
+    'KeyError'
+    'self'
+    file \\LBCN\jeremy\Documents\Python Workspace\project_on\main.py, line 1118 in run, file X:\Documents\Python Workspace\project_on\main.py, line 1021 in error_log
+Tue Aug  6 16:45:27 2024:
+    UNHANDLED EXCEPTION
+    'KeyError'
+    'self'
+    file \\LBCN\jeremy\Documents\Python Workspace\project_on\main.py, line 1118 in run, file X:\Documents\Python Workspace\project_on\main.py, line 1021 in error_log
+Wed Aug  7 15:29:44 2024:
+    wrapped C/C++ object of type QVideoWidget has been deleted on line 701 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Wed Aug  7 15:33:15 2024:
+    local variable 'pixmap' referenced before assignment on line 709 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
