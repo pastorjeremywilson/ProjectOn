@@ -5,97 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/logo.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/backgrounds/Blue Wave.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/backgrounds/Cross Cloud.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/backgrounds/Gold Arcs.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/backgrounds/Green Clouds.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/backgrounds/Pastel Blobs.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/bibles/KJV.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/images/Go In Peace.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/images/Welcome.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/images/background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/projecton.db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/videos/Video MP4_Lake - testfile.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/data/videos/Video MP4_Lake - testfile.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/defaults/localConfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/Picture 2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/Plasmoid.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/Prayer 1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/Prayer 2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/Prayer 3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/Prayer 4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/abstract cross.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/abstract red.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/announcements.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/beach.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/bible.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/bible_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/bible_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/bible_3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/bible_4.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/blue tunnel.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/blue wall.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/blue waves.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/bread and grapes.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/christmas story.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/christmas welcome.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/city dawn.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/clouds and grass.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/clouds and tree.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/cloudy hills.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/default_logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/desert ibex.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/desert.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/flame corners.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/footprints.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/good friday.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/green brush.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/green contours.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/green seeds.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/green waves.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/hilly view.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/jesus cross.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/lake sunset.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/lavenders.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/light supernova.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/lilly.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/misty mountain.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/mountain slope.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/night sky.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/onyx.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/paper.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/patchy.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/peachy.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/poppy.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/pulled smoke.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/sea and sky.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/sea cliff.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/sea path.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/sea.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/snow.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/sunset lake.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/sunset sky 2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/sunset sky.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/supernova.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/thanksgiving.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/to bethlehem.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/water cross.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/wheat path.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/yellow rays.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/backgrounds/zoomed lattice.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/bibles/SF_2009-01-23_ENG_KJV_(KING JAMES VERSION).xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/bibles/nasb.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/ccli_data.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/.Go_in_Peace.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Abstract_Advent_3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Abstract_Advent_4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Abstract_Advent_All.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Benediction_4.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Go_in_Peace.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Prayer_1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Prayer_2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Prayer_3.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Prayer_4.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/images/Welcome Slide 1920x1200.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/projecton.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/settings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/videos/Video MP4_Lake - testfile.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/videos/Video MP4_Lake - testfile.mp4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/error.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -458,14 +382,29 @@
       <option name="project" value="LOCAL" />
       <updated>1722725018599</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install">
+      <option name="closed" value="true" />
+      <created>1723069078171</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1723069078171</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install">
+      <option name="closed" value="true" />
+      <created>1723069148627</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1723069148627</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.qss" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Made screen icon dimensions match ratio of screens they represent and improved their coloring" />
     <MESSAGE value="Changed logo" />
     <MESSAGE value="Fixed help pages not loading" />
     <MESSAGE value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
@@ -490,6 +429,7 @@
     <MESSAGE value="Fixed Qt import issue in PIL&#10;Fixed '\' showing in recent files when loaded from command line" />
     <MESSAGE value="Fixed confusion between \n and &lt;br /&gt; in editing and parsing songs.&#10;Fixed double-return not parsing as a new slide" />
     <MESSAGE value="Changed version number - ready for release" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed version number - ready for release" />
+    <MESSAGE value="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install" />
   </component>
 </project>
