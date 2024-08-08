@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.2.8.7
+ProjectOn v.1.2.8.8
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -1039,9 +1039,13 @@ class ProjectOn(QObject):
         with open('./error.log', 'a') as file:
             file.write(log_text)
 
-        if 'has been deleted' not in (sys.exc_info()[1]):
-            QMessageBox.critical(None, 'An Error Occurred', message_box_text, QMessageBox.StandardButton.Ok)
-            self.app.processEvents()
+        QMessageBox.critical(
+            None,
+            'An Error Occurred',
+            '<strong>Well, that wasn\'t supposed to happen!</strong><br><br>' + message_box_text,
+            QMessageBox.StandardButton.Ok
+        )
+        self.app.processEvents()
 
 
 class CheckFiles(QRunnable):

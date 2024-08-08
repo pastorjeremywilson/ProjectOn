@@ -1211,7 +1211,6 @@ class MediaWidget(QTabWidget):
 
         if item and not from_load_service:
             item.setText(None)
-            #item.setData(24, self.parse_song_data(item))
 
             # Create a thumbnail of either the global song background or the custom background associated with this song
             if item.data(29) == 'global_song':
@@ -1312,39 +1311,39 @@ class MediaWidget(QTabWidget):
         :param QListWidgetItem item: Optional: a specific custom slide item
         :param int row: Optional: a specific row of the custom slide widget's QListWidget
         """
-        add_item = False
-        if self.custom_list.currentItem():
-            if not item:
-                item = QListWidgetItem()
-                add_item = True
+        if not item and self.custom_list.currentItem():
+            item = QListWidgetItem()
             for i in range(20, 41):
                 item.setData(i, self.custom_list.currentItem().data(i))
+        elif not item and not self.custom_list.currentItem():
+            print('no item to add')
+            return
 
-            if item.data(29) == 'global_song':
-                pixmap = self.gui.global_song_background_pixmap
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif item.data(29) == 'global_bible':
-                pixmap = self.gui.global_bible_background_pixmap
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif 'rgb(' in item.data(29):
-                pixmap = QPixmap(50, 27)
-                painter = QPainter(pixmap)
-                brush = QBrush(QColor(item.data(29)))
-                painter.fillRect(pixmap.rect(), brush)
-                painter.end()
-            else:
-                pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        if item.data(29) == 'global_song':
+            pixmap = self.gui.global_song_background_pixmap
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        elif item.data(29) == 'global_bible':
+            pixmap = self.gui.global_bible_background_pixmap
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        elif 'rgb(' in item.data(29):
+            pixmap = QPixmap(50, 27)
+            painter = QPainter(pixmap)
+            brush = QBrush(QColor(item.data(29)))
+            painter.fillRect(pixmap.rect(), brush)
+            painter.end()
+        else:
+            pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-            widget = StandardItemWidget(self.gui, self.custom_list.currentItem().text(), 'Custom Slide', pixmap)
-
-            item.setSizeHint(widget.sizeHint())
-            if add_item:
-                self.gui.oos_widget.oos_list_widget.addItem(item)
-            else:
-                self.gui.oos_widget.oos_list_widget.insertItem(row, item)
-            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
-            self.gui.changes = True
+        widget = StandardItemWidget(self.gui, item.data(20), 'Custom Slide', pixmap)
+        item.setText(None)
+        item.setSizeHint(widget.sizeHint())
+        if not row:
+            self.gui.oos_widget.oos_list_widget.addItem(item)
+        else:
+            self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+        self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        self.gui.changes = True
 
     def add_web_to_service(self, item=None, row=None):
         """

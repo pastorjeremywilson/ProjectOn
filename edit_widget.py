@@ -303,13 +303,13 @@ class EditWidget(QDialog):
         background_color_radio_button.clicked.connect(self.color_chooser)
 
         from widgets import ImageCombobox
-        background_combobox = ImageCombobox(self.gui, 'edit')
-        background_combobox.currentIndexChanged.connect(
-            lambda: self.background_line_edit.setText(background_combobox.currentData(Qt.ItemDataRole.UserRole)))
+        self.background_combobox = ImageCombobox(self.gui, 'edit')
+        self.background_combobox.currentIndexChanged.connect(
+            lambda: self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole)))
 
         self.background_image_radio_button = QRadioButton('Image')
         self.background_image_radio_button.setFont(self.gui.standard_font)
-        self.background_image_radio_button.clicked.connect(background_combobox.show)
+        self.background_image_radio_button.clicked.connect(self.background_combobox.show)
 
         self.background_button_group = QButtonGroup()
         self.background_button_group.setObjectName('background_button_group')
@@ -329,9 +329,9 @@ class EditWidget(QDialog):
             background_layout.addWidget(background_bible_default_radio_button)
         background_layout.addWidget(background_color_radio_button)
         background_layout.addWidget(self.background_image_radio_button)
-        background_layout.addWidget(background_combobox)
+        background_layout.addWidget(self.background_combobox)
         if self.type == 'song':
-            background_combobox.hide()
+            self.background_combobox.hide()
 
         chosen_widget = QWidget()
         chosen_layout = QHBoxLayout()
@@ -618,53 +618,54 @@ class EditWidget(QDialog):
             self.background_line_edit.setText(custom_data[4])
         else:
             self.background_button_group.button(3).setChecked(True)
+            for i in range(self.background_combobox.count()):
+                if self.background_combobox.itemText(i) == custom_data[4].split('.')[0]:
+                    self.background_combobox.setCurrentIndex(i)
+                    break
             self.background_line_edit.setText(custom_data[4])
 
-        if custom_data[5]:
-            if 'global' in custom_data[5]:
-                self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
-            else:
-                self.font_widget.font_size_spinbox.setValue(int(custom_data[5]))
-        else:
+        if 'global' in custom_data[5]:
             self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
+        else:
+            self.font_widget.font_size_spinbox.setValue(int(custom_data[5]))
 
-        if custom_data[6]:
+        if 'global' in custom_data[6]:
+            self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['use_shadow'])
+        else:
             if custom_data[6] == 'True':
                 self.font_widget.shadow_checkbox.setChecked(True)
             else:
                 self.font_widget.shadow_checkbox.setChecked(False)
-        else:
-            self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['use_shadow'])
 
-        if custom_data[7]:
-            self.font_widget.shadow_color_slider.color_slider.setValue(int(custom_data[7]))
-        else:
+        if 'global' in custom_data[7]:
             self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['shadow_color'])
-
-        if custom_data[8]:
-            self.font_widget.shadow_offset_slider.offset_slider.setValue(int(custom_data[8]))
         else:
-            self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
+            self.font_widget.shadow_color_slider.color_slider.setValue(int(custom_data[7]))
 
-        if custom_data[9]:
+        if 'global' in custom_data[8]:
+            self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
+        else:
+            self.font_widget.shadow_offset_slider.offset_slider.setValue(int(custom_data[8]))
+
+        if 'global' in custom_data[9]:
+            self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['use_outline'])
+        else:
             if custom_data[9] == 'True':
                 self.font_widget.outline_checkbox.setChecked(True)
             else:
                 self.font_widget.outline_checkbox.setChecked(False)
-        else:
-            self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['use_outline'])
 
-        if custom_data[10]:
-            self.font_widget.outline_color_slider.color_slider.setValue(int(custom_data[10]))
-        else:
+        if 'global' in custom_data[10]:
             self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
-
-        if custom_data[11]:
-            self.font_widget.outline_width_slider.offset_slider.setValue(int(custom_data[11]))
         else:
-            self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
+            self.font_widget.outline_color_slider.color_slider.setValue(int(custom_data[10]))
 
-        if custom_data[12]:
+        if 'global' in custom_data[11]:
+            self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
+        else:
+            self.font_widget.outline_width_slider.offset_slider.setValue(int(custom_data[11]))
+
+        if custom_data[12] == 'True':
             self.override_global_checkbox.setChecked(True)
         else:
             self.override_global_checkbox.setChecked(False)
@@ -1069,10 +1070,13 @@ class EditWidget(QDialog):
         if self.old_title:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 if self.gui.oos_widget.oos_list_widget.item(i).data(20) == self.old_title:
-                    new_item = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)[0]
-                    for j in range(20, 33):
-                        self.gui.oos_widget.oos_list_widget.item(i).setData(j, new_item.data(j))
                     self.change_thumbnail(self.gui.oos_widget.oos_list_widget.item(i))
+                    new_item = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)[
+                        0].clone()
+                    self.gui.oos_widget.oos_list_widget.takeItem(i)
+                    self.gui.media_widget.add_custom_to_service(new_item, i)
+                    self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
+                    break
 
         self.deleteLater()
         save_widget.widget.deleteLater()

@@ -598,7 +598,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.2.8.7')
+        title_label = QLabel('ProjectOn v.1.2.8.8')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1689,6 +1689,15 @@ class GUI(QObject):
         item.setData(23, version)
         item.setData(40, 'bible')
         item.setData(24, ['', reference, text])
+
+        if len(item.data(21)) == 0:
+            QMessageBox.information(
+                self.main_window,
+                'No Verses',
+                'No verses were found in the passage. Please ensure that your scripture passage includes verse numbers.',
+                QMessageBox.Ok
+            )
+            return
 
         label_pixmap = self.global_bible_background_pixmap.scaled(
             50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
