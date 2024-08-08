@@ -314,7 +314,14 @@ class Importers:
             'global',
             'global',
             'global_song',
-            'global'
+            'global',
+            'global',
+            'global',
+            'global',
+            'global',
+            'global',
+            'global',
+            'False'
         ]
 
         if song_data:

@@ -108,7 +108,6 @@ class OpenLPImport:
                 ccli_song_num = song[7]
                 song_order = song[4]
                 lyrics = song[3]
-                footer = 'true'
 
                 # rearrange the song's data to conform to the order used in this program's database
                 converted_lyrics = self.convert_lyrics(lyrics)
@@ -120,10 +119,18 @@ class OpenLPImport:
                         ccli_song_num,
                         converted_lyrics,
                         song_order,
-                        footer,
+                        'true',
                         'global',
                         'global',
-                        'global'
+                        'global_song',
+                        'global',
+                        'global',
+                        'global',
+                        'global',
+                        'global',
+                        'global',
+                        'global',
+                        'False'
                     ]
                 )
                 self.progress_bar.setValue(self.progress_bar.value() + 1)

@@ -1243,3 +1243,23 @@ Wed Aug  7 15:29:44 2024:
     wrapped C/C++ object of type QVideoWidget has been deleted on line 701 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
 Wed Aug  7 15:33:15 2024:
     local variable 'pixmap' referenced before assignment on line 709 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.grab_display
+Thu Aug  8 10:48:05 2024:
+    'NoneType' object has no attribute 'data' on line 1207 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Thu Aug  8 10:49:27 2024:
+    'NoneType' object has no attribute 'data' on line 1207 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Thu Aug  8 10:50:37 2024:
+    'NoneType' object has no attribute 'data' on line 1207 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Thu Aug  8 10:51:29 2024:
+    'NoneType' object has no attribute 'data' on line 1207 of \\LBCN\jeremy\Documents\Python Workspace\project_on\gui.py in GUI.send_to_live
+Thu Aug  8 13:33:55 2024:
+    list index out of range on line 334 of X:\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu Aug  8 13:38:55 2024:
+    list index out of range on line 334 of X:\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu Aug  8 13:39:00 2024:
+    list index out of range on line 334 of X:\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu Aug  8 13:39:01 2024:
+    list index out of range on line 334 of X:\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu Aug  8 13:39:02 2024:
+    list index out of range on line 334 of X:\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu Aug  8 13:42:10 2024:
+    list index out of range on line 331 of X:\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song

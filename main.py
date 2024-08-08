@@ -327,6 +327,8 @@ class ProjectOn(QObject):
                     'override_global="' + song_data[17] + '" WHERE title="' + old_title + '"'
                 )
             else:
+                for i in range(18):
+                    print(f'{i}: {song_data[i]}')
                 sql = ('INSERT INTO songs (title, author, copyright, ccliNum, lyrics, vorder, footer, font, fontColor, '
                        'background, font_size, use_shadow, shadow_color, shadow_offset, use_outline, outline_color, '
                        'outline_width, override_global) VALUES ("' + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
