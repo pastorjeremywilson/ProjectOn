@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QSize, QPoint
-from PyQt5.QtGui import QCursor, QIcon
+from PyQt5.QtGui import QCursor, QIcon, QDropEvent
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QLabel, QMenu, QGridLayout, \
     QPushButton, QSizePolicy, QMessageBox, QAction
 
@@ -169,7 +169,7 @@ class CustomListWidget(QListWidget):
             return
         item = evt.source().currentItem().clone()
         item.setText('')
-        row = self.row(self.itemAt(QPoint(int(evt.position().x()), int(evt.position().y()))))
+        row = self.row(self.itemAt(QPoint(int(evt.pos().x()), int(evt.pos().y()))))
         if row == -1:
             row = self.count()
 

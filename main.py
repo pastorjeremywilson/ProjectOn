@@ -33,9 +33,9 @@ from xml.etree import ElementTree
 
 import requests
 from PyQt5.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
-from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen
+from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QAction
+    QProgressBar, QHBoxLayout, QAction, QDialog, QLineEdit, QPushButton
 
 from gui import GUI
 from simple_splash import SimpleSplash
@@ -327,8 +327,6 @@ class ProjectOn(QObject):
                     'override_global="' + song_data[17] + '" WHERE title="' + old_title + '"'
                 )
             else:
-                for i in range(18):
-                    print(f'{i}: {song_data[i]}')
                 sql = ('INSERT INTO songs (title, author, copyright, ccliNum, lyrics, vorder, footer, font, fontColor, '
                        'background, font_size, use_shadow, shadow_color, shadow_offset, use_outline, outline_color, '
                        'outline_width, override_global) VALUES ("' + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
@@ -590,7 +588,6 @@ class ProjectOn(QObject):
 
             dialog_needed = True
             if self.gui.current_file:
-                print(self.gui.current_file)
                 dialog_needed = False
             elif len(self.settings['last_save_dir']) > 0:
                 save_dir = self.settings['last_save_dir']
@@ -988,31 +985,83 @@ class ProjectOn(QObject):
             'XML Files (*.xml)'
         )
 
-        if len(file[0]) > 0:
-            result = QMessageBox.question(
-                self.gui.main_window,
-                'Make Default',
-                'Make this your default bible?',
-                QMessageBox.StandardButton.Yes,
-                QMessageBox.StandardButton.No
-            )
+        if len(file[0]) == 0:
+            return
 
-            file_name_split = file[0].split('/')
-            file_name = file_name_split[len(file_name_split) - 1]
-            shutil.copy(file[0], self.bible_dir + '/' + file_name)
+        file_name_split = file[0].split('/')
+        file_name = file_name_split[len(file_name_split) - 1]
+        new_location = self.bible_dir + '/' + file_name
+        shutil.copy(file[0], new_location)
 
-            if result == QMessageBox.StandardButton.Yes:
-                self.settings['default_bible'] = self.bible_dir + '/' + file_name
+        result = QMessageBox.question(
+            self.gui.main_window,
+            'Make Default',
+            'Make this your default bible?',
+            QMessageBox.StandardButton.Yes,
+            QMessageBox.StandardButton.No
+        )
+        if result == QMessageBox.StandardButton.Yes:
+            self.settings['default_bible'] = new_location
+            self.save_settings()
 
-            tree = ElementTree.parse(self.gui.main.data_dir + '/bibles/' + file)
-            root = tree.getroot()
-            name = root.attrib['biblename']
+        new_tree = ElementTree.parse(new_location)
+        new_root = new_tree.getroot()
+        name = new_root.attrib['biblename']
 
-            self.gui.media_widget.bible_selector_combobox.addItem(name)
-            self.gui.media_widget.bible_selector_combobox.setItemData(
-                self.gui.media_widget.bible_selector_combobox.count() - 1,
-                self.bible_dir + '/' + file_name, Qt.ItemDataRole.UserRole
-            )
+        dialog = QDialog(self.gui.main_window)
+        dialog.setWindowIcon(QIcon('resources/branding/logo.svg'))
+        dialog.setWindowTitle('Set Bible Name')
+        layout = QVBoxLayout(dialog)
+        label = QLabel('What would you like to name this bible?')
+        layout.addWidget(label)
+        edit = QLineEdit(name)
+        layout.addWidget(edit)
+        button_widget = QWidget()
+        layout.addWidget(button_widget)
+        button_layout = QHBoxLayout(button_widget)
+        ok_button = QPushButton('OK')
+        ok_button.released.connect(lambda: dialog.done(0))
+        button_layout.addStretch()
+        button_layout.addWidget(ok_button)
+        button_layout.addStretch()
+
+        dialog.exec()
+        bible_name = edit.text()
+        if len(bible_name) == 0:
+            bible_name = name
+        new_root.attrib['biblename'] = bible_name
+
+        new_tree.write(new_location)
+
+        # refresh the bible combobox in the media widget
+        self.gui.media_widget.bible_selector_combobox.blockSignals(True)
+        self.gui.media_widget.bible_selector_combobox.clear()
+        bibles = self.gui.media_widget.get_bibles()
+
+        if len(bibles[0]) > 0:
+            for bible in bibles:
+                self.gui.media_widget.bible_selector_combobox.addItem(bible[1])
+                self.gui.media_widget.bible_selector_combobox.setItemData(
+                    self.gui.media_widget.bible_selector_combobox.count() - 1, bible[0], Qt.ItemDataRole.UserRole)
+
+            default_bible_exists = False
+            if 'default_bible' in self.settings.keys():
+                if exists(self.settings['default_bible']):
+                    tree = ElementTree.parse(self.settings['default_bible'])
+                    root = tree.getroot()
+                    name = root.attrib['biblename']
+                    self.gui.media_widget.bible_selector_combobox.setCurrentText(name)
+                    default_bible_exists = True
+
+            if not default_bible_exists:
+                self.settings['default_bible'] = bibles[0][0]
+                self.gui.media_widget.bible_selector_combobox.setCurrentIndex(0)
+                self.gui.main.save_settings()
+                tree = ElementTree.parse(self.settings['default_bible'])
+                root = tree.getroot()
+                name = root.attrib['biblename']
+
+        self.gui.media_widget.bible_selector_combobox.blockSignals(False)
 
     def error_log(self):
         """

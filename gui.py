@@ -8,12 +8,12 @@ import time
 from os.path import exists
 
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QPalette
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QStyle
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog
 
 from help import Help
 from importers import Importers
@@ -272,14 +272,6 @@ class GUI(QObject):
         if not exists(self.main.config_file):
             if exists(self.main.data_dir + '/settings.json'):
                 shutil.copy(self.main.data_dir + '/settings.json', self.main.config_file)
-
-        """
-        # ensure all needed files exist; thread it and wait until done before moving on
-        from main import CheckFiles
-        cf = CheckFiles(self.main)
-        self.main.thread_pool.start(cf)
-        self.main.thread_pool.waitForDone()
-        """
 
     def init_components(self):
         """

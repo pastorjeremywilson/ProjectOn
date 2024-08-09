@@ -855,7 +855,7 @@ class MediaWidget(QTabWidget):
                     tree = ElementTree.parse(self.gui.main.data_dir + '/bibles/' + file)
                     root = tree.getroot()
                     bibles.append([self.gui.main.data_dir + '/bibles/' + file, root.attrib['biblename']])
-            return (bibles)
+            return bibles
         except Exception:
             self.gui.main.error_log()
             return -1
@@ -1316,7 +1316,6 @@ class MediaWidget(QTabWidget):
             for i in range(20, 41):
                 item.setData(i, self.custom_list.currentItem().data(i))
         elif not item and not self.custom_list.currentItem():
-            print('no item to add')
             return
 
         if item.data(29) == 'global_song':

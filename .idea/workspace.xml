@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed wrong number of list items for saving song from import">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/error.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -401,14 +405,21 @@
       <option name="project" value="LOCAL" />
       <updated>1723136949947</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Fixed wrong signal attached to download finished">
+      <option name="closed" value="true" />
+      <created>1723149487587</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1723149487587</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.qss" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
     <MESSAGE value="Added light/dark themes through the use of qss stylesheets" />
     <MESSAGE value="Fixed mobile remote html and changed layout to nav buttons on the right." />
     <MESSAGE value="Merged sandbox into development" />
@@ -433,6 +444,7 @@
     <MESSAGE value="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install" />
     <MESSAGE value="Fixed problem with not handling 'global' in custom slide settings&#10;Prevented custom bible passage with no verses from being added to OOS" />
     <MESSAGE value="Fixed wrong number of list items for saving song from import" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed wrong number of list items for saving song from import" />
+    <MESSAGE value="Fixed wrong signal attached to download finished" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed wrong signal attached to download finished" />
   </component>
 </project>

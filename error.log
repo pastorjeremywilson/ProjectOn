@@ -1263,3 +1263,20 @@ Thu Aug  8 13:39:02 2024:
     list index out of range on line 334 of X:\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
 Thu Aug  8 13:42:10 2024:
     list index out of range on line 331 of X:\Documents\Python Workspace\project_on\main.py in ProjectOn.save_song
+Thu Aug  8 14:28:03 2024:
+    UNHANDLED EXCEPTION
+    'IndexError'
+    list index out of range
+    file \\LBCN\jeremy\Documents\Python Workspace\project_on\web_remote.py, line 180 in run, file X:\Documents\Python Workspace\project_on\main.py, line 1023 in error_log
+Thu Aug  8 14:28:44 2024:
+    UNHANDLED EXCEPTION
+    'IndexError'
+    list index out of range
+    file X:\Documents\Python Workspace\project_on\web_remote.py, line 180 in run, file X:\Documents\Python Workspace\project_on\main.py, line 1023 in error_log
+Thu Aug  8 14:30:52 2024:
+    UNHANDLED EXCEPTION
+    'AttributeError'
+    'QWebEngineDownloadItem' object has no attribute 'isFinishedChanged'
+    file X:\Documents\Python Workspace\project_on\songselect_import.py, line 259 in download_requested
+Thu Aug  8 15:37:50 2024:
+    No module named 'cv2' on line 1118 of \\LBCN\jeremy\Documents\Python Workspace\project_on\media_widget.py in MediaWidget.add_video
