@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple_splash.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_splash.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/file_locations.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/file_locations.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -437,14 +432,21 @@
       <option name="project" value="LOCAL" />
       <updated>1723307760036</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="Ensured that files created when importing a video or a SongSelect song are removed afterwards.&#10;Moved the location of the error log file to the appdata folder.">
+      <option name="closed" value="true" />
+      <created>1723322573068</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1723322573068</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.qss" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Merged sandbox into development" />
     <MESSAGE value="Changed most &quot;pressed&quot; signals to &quot;clicked&quot; to avoid duplicate calls.&#10;Fixed font widget background color.&#10;Changed version to release candidate 3." />
     <MESSAGE value="Fixed icon dimensions" />
     <MESSAGE value="Fixed font color in screen settings area of settings widget.&#10;Fixed subtitle not wrapping for bible passages in live widget list widget items.&#10;Fixed default screen handling when a chosen display screen hasn't yet been saved to settings." />
@@ -469,6 +471,7 @@
     <MESSAGE value="Fixed wrong signal attached to download finished" />
     <MESSAGE value="Fixed bible combobox not updating after importing an XML bible" />
     <MESSAGE value="Added &quot;Known Issues&quot; section to README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added &quot;Known Issues&quot; section to README.md" />
+    <MESSAGE value="Ensured that files created when importing a video or a SongSelect song are removed afterwards.&#10;Moved the location of the error log file to the appdata folder." />
+    <option name="LAST_COMMIT_MESSAGE" value="Ensured that files created when importing a video or a SongSelect song are removed afterwards.&#10;Moved the location of the error log file to the appdata folder." />
   </component>
 </project>
