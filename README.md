@@ -229,6 +229,10 @@ black)</p></td>
 </table>
 <p>&nbsp;</p>
 
+# Known Issues
+
+Applying bold to a single word in a song or custom slide will result in the whole line being bolded when displayed.
+
 # Technologies and Credits
 
 <br>
