@@ -6,8 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton-console.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -450,14 +451,21 @@
       <option name="project" value="LOCAL" />
       <updated>1723322742210</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="Added the static folder back in to the arguments for pyinstaller.&#10;This may be the last of the bugs found while creating the how-to video.">
+      <option name="closed" value="true" />
+      <created>1723325295678</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1723325295678</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.qss" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed icon dimensions" />
     <MESSAGE value="Fixed font color in screen settings area of settings widget.&#10;Fixed subtitle not wrapping for bible passages in live widget list widget items.&#10;Fixed default screen handling when a chosen display screen hasn't yet been saved to settings." />
     <MESSAGE value="Futher refined the light and dark themes.&#10;Fixed theming on buttons and combo boxes in settings widget." />
     <MESSAGE value="Futher refined the light and dark themes.&#10;Fixed theming on buttons and combo boxes in settings widget.&#10;Changed modal widgets to QDialogs.&#10;Made setting theme along with applying settings changes optional." />
@@ -482,6 +490,7 @@
     <MESSAGE value="Added &quot;Known Issues&quot; section to README.md" />
     <MESSAGE value="Ensured that files created when importing a video or a SongSelect song are removed afterwards.&#10;Moved the location of the error log file to the appdata folder." />
     <MESSAGE value="Changed error log file location in the help widget's file_locations.html" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed error log file location in the help widget's file_locations.html" />
+    <MESSAGE value="Added the static folder back in to the arguments for pyinstaller.&#10;This may be the last of the bugs found while creating the how-to video." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added the static folder back in to the arguments for pyinstaller.&#10;This may be the last of the bugs found while creating the how-to video." />
   </component>
 </project>

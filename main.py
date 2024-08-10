@@ -952,6 +952,8 @@ class ProjectOn(QObject):
         """
         if 'used_services' in self.settings.keys():
             used_services = self.settings['used_services']
+            if len(used_services) == 0:
+                used_services = []
         else:
             used_services = []
 
@@ -1127,6 +1129,8 @@ class CheckFiles(QRunnable):
                 'data_dir': '',
                 'selected_screen_name': ''
             }
+            with open(self.main.device_specific_config_file, 'w') as file:
+                file.write(json.dumps(device_specific_settings))
         else:
             with open(self.main.device_specific_config_file, 'r') as file:
                 device_specific_settings = json.loads(file.read())
@@ -1139,6 +1143,7 @@ class CheckFiles(QRunnable):
                 self.main.data_dir = device_specific_settings['data_dir']
 
             if exists(self.main.data_dir):
+                print('data dir found')
                 data_dir = True
 
         if not data_dir:
@@ -1148,6 +1153,7 @@ class CheckFiles(QRunnable):
                 'Please locate the ProjectOn Data Directory that contains "projecton.db"',
                 QMessageBox.StandardButton.Ok
             )
+            self.main.app.processEvents()
 
             result = QFileDialog.getExistingDirectory(
                 None,

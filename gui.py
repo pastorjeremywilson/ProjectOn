@@ -111,10 +111,11 @@ class GUI(QObject):
         self.main.app.processEvents()
 
         # ensure all needed files exist; thread it and wait until done before moving on
-        from main import CheckFiles
+        self.check_files()
+        """from main import CheckFiles
         cf = CheckFiles(self.main)
         self.main.thread_pool.start(cf)
-        self.main.thread_pool.waitForDone()
+        self.main.thread_pool.waitForDone()"""
 
         self.main.get_song_titles()
 
@@ -194,6 +195,8 @@ class GUI(QObject):
                 'data_dir': '',
                 'selected_screen_name': ''
             }
+            with open(self.main.device_specific_config_file, 'w') as file:
+                file.write(json.dumps(device_specific_settings))
         else:
             with open(self.main.device_specific_config_file, 'r') as file:
                 device_specific_settings = json.loads(file.read())
