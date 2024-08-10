@@ -1441,7 +1441,10 @@ class CustomListWidget(QListWidget):
         menu = QMenu()
 
         add_song_action = QAction('Add to Order of Service')
-        add_song_action.triggered.connect(self.gui.media_widget.add_song_to_service)
+        if self.type == 'song':
+            add_song_action.triggered.connect(self.gui.media_widget.add_song_to_service)
+        elif self.type == 'custom':
+            add_song_action.triggered.connect(self.gui.media_widget.add_custom_to_service)
         menu.addAction(add_song_action)
 
         edit_song_action = None

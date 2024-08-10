@@ -849,6 +849,12 @@ class EditWidget(QDialog):
             '<span style="text-decoration: underline; text-underline-width: 5px;">',
             lyrics
         )
+        lyrics = re.sub(
+            '<span style=.*?font-weight.*?>',
+            '<b>',
+            lyrics
+        )
+        lyrics = re.sub('</.*?span>', '</b>', lyrics)
         lyrics = re.sub('<p.*?>', '', lyrics)
         lyrics = re.sub('</p>', '', lyrics)
         if lyrics.startswith('<br />'):
@@ -1006,6 +1012,12 @@ class EditWidget(QDialog):
         text_split = re.split('<body.*?>', text)
         text = text_split[1].replace('</body></html>', '')
         text = text.replace('"', '""').strip()
+        text = re.sub(
+            '<span style=.*?font-weight.*?>',
+            '<b>',
+            text
+        )
+        text = re.sub('</.*?span>', '</b>', text)
 
         custom_data = [
             self.title_line_edit.text(),
