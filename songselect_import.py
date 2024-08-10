@@ -374,4 +374,5 @@ class SongselectImport(QDialog):
                     self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
 
                 save_widget.widget.deleteLater()
+                os.remove(song_filename)
                 self.done(0)

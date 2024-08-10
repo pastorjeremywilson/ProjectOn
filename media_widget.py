@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabe
 
 from edit_widget import EditWidget
 from get_scripture import GetScripture
+from simple_splash import SimpleSplash
 from widgets import AutoSelectLineEdit, StandardItemWidget
 
 
@@ -1110,6 +1111,8 @@ class MediaWidget(QTabWidget):
         )
 
         if len(result[0]) > 0:
+            wait_widget = SimpleSplash(self.gui, 'Please wait...')
+
             file_name_split = result[0].split('/')
             file_name = file_name_split[len(file_name_split) - 1]
             shutil.copy(result[0], self.gui.main.video_dir + '/' + file_name)
@@ -1120,13 +1123,13 @@ class MediaWidget(QTabWidget):
                 iteration = 0
                 while True:
                     result, frame = cap.read()
-                    if iteration % 50 == 0 and iteration <= 250:
+                    if iteration % 100 == 0:
                         if result:
-                            cv2.imwrite(f'./thumbnail{str(iteration)}.jpg', frame)
+                            cv2.imwrite(f'{os.path.expanduser("~/AppData/Roaming/ProjectOn")}/thumbnail{str(iteration)}.jpg', frame)
                         else:
                             break
                     iteration += 1
-                    if iteration > 250:
+                    if iteration > 500:
                         break
                 cap.release()
                 cv2.destroyAllWindows()
@@ -1146,11 +1149,16 @@ class MediaWidget(QTabWidget):
                     lambda: self.copy_video(file_name, thumbnail_list.currentItem().data(20), thumbnail_widget))
                 thumbnail_layout.addWidget(thumbnail_list)
 
-                file_list = os.listdir('./')
+                file_list = os.listdir(os.path.expanduser("~/AppData/Roaming/ProjectOn"))
                 for file in file_list:
                     if file.startswith('thumbnail'):
-                        pixmap = QPixmap('./' + file)
-                        pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                        pixmap = QPixmap(os.path.expanduser("~/AppData/Roaming/ProjectOn") + '/' + file)
+                        pixmap = pixmap.scaled(
+                            96,
+                            54,
+                            Qt.AspectRatioMode.IgnoreAspectRatio,
+                            Qt.TransformationMode.SmoothTransformation
+                        )
 
                         widget = StandardItemWidget(
                             self.gui, 'Frame ' + file.split('.')[0].replace('thumbnail', ''), '', pixmap)
@@ -1161,7 +1169,12 @@ class MediaWidget(QTabWidget):
                         thumbnail_list.addItem(item)
                         thumbnail_list.setItemWidget(item, widget)
 
+                wait_widget.widget.deleteLater()
                 thumbnail_widget.exec()
+
+                for file in os.listdir(os.path.expanduser("~/AppData/Roaming/ProjectOn")):
+                    if file.startswith('thumbnail'):
+                        os.remove(os.path.expanduser("~/AppData/Roaming/ProjectOn") + '/' + file)
 
             except Exception:
                 self.gui.main.error_log()
@@ -1178,11 +1191,10 @@ class MediaWidget(QTabWidget):
         """
         try:
             new_image_file_name = video_file.split('.')[0] + '.jpg'
-            shutil.copy('./' + image_file, self.gui.main.video_dir + '/' + new_image_file_name)
-            file_list = os.listdir('./')
-            for file in file_list:
-                if file.startswith('thumbnail'):
-                    os.remove('./' + file)
+            shutil.copy(
+                os.path.expanduser('~/AppData/Roaming/ProjectOn') + '/' + image_file,
+                self.gui.main.video_dir + '/' + new_image_file_name
+            )
         except Exception:
             self.gui.main.error_log()
             return

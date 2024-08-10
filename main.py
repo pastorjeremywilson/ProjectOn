@@ -1087,16 +1087,19 @@ class ProjectOn(QObject):
             log_text = (f'\n{date_time}:\n'
                         f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
 
-        with open('./error.log', 'a') as file:
+        if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log')):
+            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log'), 'w') as file:
+                pass
+
+        with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log'), 'a') as file:
             file.write(log_text)
 
-        QMessageBox.critical(
-            None,
-            'An Error Occurred',
-            '<strong>Well, that wasn\'t supposed to happen!</strong><br><br>' + message_box_text,
-            QMessageBox.StandardButton.Ok
-        )
-        self.app.processEvents()
+        message_box = QMessageBox()
+        message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
+        message_box.setWindowTitle('An Error Occurred')
+        message_box.setText('<strong>Well, that wasn\'t supposed to happen!</strong><br><br>' + message_box_text)
+        message_box.setStandardButtons(QMessageBox.StandardButton.Close)
+        message_box.exec()
 
 
 class CheckFiles(QRunnable):
