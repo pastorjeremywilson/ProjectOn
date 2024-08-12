@@ -13,7 +13,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction
 
 from help import Help
 from importers import Importers
@@ -375,9 +375,10 @@ class GUI(QObject):
         self.open_recent_menu = file_menu.addMenu('Open Recent Service')
         if 'used_services' in self.main.settings.keys():
             for item in self.main.settings['used_services']:
-                open_recent_action = self.open_recent_menu.addAction(item[1])
-                open_recent_action.setData(item[0] + '/' + item[1])
-                open_recent_action.triggered.connect(lambda: self.main.load_service(open_recent_action.data()))
+                open_recent_action = QAction(item[1], self.open_recent_menu)
+                path = item[0] + '/' + item[1]
+                open_recent_action.triggered.connect(lambda checked, path=path: self.main.load_service(path))
+                self.open_recent_menu.addAction(open_recent_action)
 
         save_action = file_menu.addAction('Save Service')
         save_action.setShortcut(QKeySequence('Ctrl+S'))
@@ -593,7 +594,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.2.8.10')
+        title_label = QLabel('ProjectOn v.1.2.8.11')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()

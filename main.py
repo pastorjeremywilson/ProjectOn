@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.2.8.10
+ProjectOn v.1.2.8.11
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -585,6 +585,8 @@ class ProjectOn(QObject):
                 }
                 if self.gui.oos_widget.oos_list_widget.item(i).data(20) == 'custom_scripture':
                     service_items[i]['text'] = self.gui.oos_widget.oos_list_widget.item(i).data(24)[2]
+                elif self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'custom':
+                    service_items[i]['text'] = self.gui.oos_widget.oos_list_widget.item(i).data(24)[2]
 
             dialog_needed = True
             if self.gui.current_file:
@@ -652,6 +654,7 @@ class ProjectOn(QObject):
         :param str filename: Optional, the file location to be opened
         """
         # first, check for any changes to the current order of service
+        print(filename)
         response = -1
         if self.gui.changes:
             response = QMessageBox.question(
@@ -802,6 +805,12 @@ class ProjectOn(QObject):
                             widget_item = QListWidgetItem()
                             for i in range(20, 41):
                                 widget_item.setData(i, custom_item.data(i))
+
+                            if 'text' in service_dict[key].keys():
+                                slide_text = widget_item.data(24)
+                                slide_text[2] = service_dict[key]['text']
+                                widget_item.setData(21, service_dict[key]['text'])
+                                widget_item.setData(24, slide_text)
 
                             if widget_item.data(29) == 'global_song':
                                 pixmap = self.gui.global_song_background_pixmap
