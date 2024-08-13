@@ -841,25 +841,33 @@ class EditWidget(QDialog):
             else:
                 background = 'global_bible'
 
+        # remove extraneous html tags from the lyrics
         lyrics = self.lyrics_edit.text_edit.toHtml()
         lyrics_split = re.split('<body.*?>', lyrics)
         lyrics = lyrics_split[1].replace('</body></html>', '')
-        lyrics = re.sub(
-            '<span style=" text-decoration: underline.*?>',
-            '<span style="text-decoration: underline; text-underline-width: 5px;">',
-            lyrics
-        )
-        lyrics = re.sub(
-            '<span style=.*?font-weight.*?>',
-            '<b>',
-            lyrics
-        )
-        lyrics = re.sub('</.*?span>', '</b>', lyrics)
+
         lyrics = re.sub('<p.*?>', '', lyrics)
-        lyrics = re.sub('</p>', '', lyrics)
-        if lyrics.startswith('<br />'):
-            lyrics = lyrics[6:len(lyrics)]
-        elif lyrics.startswith('\n'):
+        lyrics = re.sub('</p>', '<br />', lyrics)
+
+        # simplify the formatting tags for bold, italic, and underline
+        style_substrings = re.findall('<span.*?</span>', lyrics)
+        for substring in style_substrings:
+            prefix = ''
+            suffix = ''
+            if 'font-weight' in substring:
+                prefix += '<b>'
+                suffix += '</b>'
+            if 'font-style' in substring:
+                prefix += '<i>'
+                suffix += '</i>'
+            if 'text-decoration' in substring:
+                prefix += '<u>'
+                suffix += '</u>'
+
+            new_substring = prefix + re.sub('<.*?>', '', substring) + suffix
+            lyrics = lyrics.replace(substring, new_substring)
+
+        if lyrics.startswith('\n'):
             lyrics = lyrics[1:len(lyrics)]
 
         lyrics = lyrics.replace('\n', '<br />')

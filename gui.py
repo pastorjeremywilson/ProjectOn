@@ -1354,7 +1354,7 @@ class GUI(QObject):
                 outline_color = self.main.settings['outline_color']
                 outline_width = self.main.settings['outline_width']
 
-            lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
+            lyric_widget.setFont(QFont(font_face, font_size))
             lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
             lyric_widget.use_shadow = use_shadow
             lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)

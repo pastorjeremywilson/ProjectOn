@@ -543,6 +543,7 @@ class LyricDisplayWidget(QWidget):
         text_lines = self.text.split('<br />')
         metrics = self.fontMetrics()
         line_height = metrics.boundingRect('Way').height()
+        space_width = metrics.boundingRect('m m').width() - metrics.boundingRect('mm').width()
         lines = []
         for this_line in text_lines:
             this_line = this_line.strip()
@@ -604,6 +605,33 @@ class LyricDisplayWidget(QWidget):
             # check for any html formatting in this line
             formatted_line = []
             if '<i>' in this_line or '<b>' in this_line or '<u>' in this_line:
+                index = 0
+                line_parts = ['']
+                j = 0
+                while j < len(this_line):
+                    if this_line[j] == '<':
+                        index += 1
+                        line_parts.append('')
+                        while this_line[j] != '/':
+                            line_parts[index] += this_line[j]
+                            j += 1
+
+                        if len(this_line) == j + 3 or this_line[j + 3] != '<':
+                            line_parts[index] += this_line[j:j + 3]
+                            j += 3
+                        elif len(this_line) == j + 7 or this_line[j + 7] != '<':
+                            line_parts[index] += this_line[j:j + 7]
+                            j += 7
+                        elif len(this_line) == j + 11 or this_line[j + 11] != '<':
+                            line_parts[index] += this_line[j:j + 11]
+                            j += 11
+
+                        index += 1
+                        line_parts.append('')
+                    else:
+                        line_parts[index] += this_line[j]
+                        j += 1
+
                 line_split = re.split('<i>|<b>|<u>', this_line)
                 for item in line_split:
                     formatting_markers = ''
@@ -616,6 +644,7 @@ class LyricDisplayWidget(QWidget):
                     formatted_line.append([formatting_markers, re.sub('<.*?>', '', item)])
             else:
                 formatted_line.append(['', this_line])
+                line_parts = [this_line]
 
             this_line = re.sub('<.*?>', '', this_line)
             line_width = metrics.boundingRect(this_line).adjusted(
@@ -623,7 +652,24 @@ class LyricDisplayWidget(QWidget):
             x = (self.width() - line_width) / 2
             y = (self.gui.display_widget.height() / 2) - (line_height * len(lines) / 2) + (line_height / 1.5) + (i * line_height)
 
-            for item in formatted_line:
+            for part in line_parts:
+                font = self.font()
+                if '<b>' in part:
+                    font.setWeight(1000)
+                if '<i>' in part:
+                    font.setItalic(True)
+                if '<u>' in part:
+                    font.setUnderline(True)
+
+                part = re.sub('<.*?>', '', part)
+                if self.use_shadow:
+                    self.shadow_path.addText(QPointF(x + self.shadow_offset, y + self.shadow_offset), font, part)
+                self.path.addText(QPointF(x, y), font, part)
+                x += metrics.boundingRect(part).width()
+                if part.endswith(' '):
+                    x += space_width
+
+            """for item in formatted_line:
                 font = self.font()
                 if 'i' in item[0]:
                     font.setItalic(True)
@@ -638,7 +684,7 @@ class LyricDisplayWidget(QWidget):
 
                 item_width = metrics.boundingRect(item[1]).adjusted(
                     0, 0, self.outline_width, self.outline_width).width()
-                x += item_width + metrics.horizontalAdvance(' ')
+                x += item_width + metrics.horizontalAdvance(' ')"""
 
         brush = QBrush()
         brush.setColor(self.fill_color)
