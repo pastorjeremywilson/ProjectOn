@@ -669,23 +669,6 @@ class LyricDisplayWidget(QWidget):
                 if part.endswith(' '):
                     x += space_width
 
-            """for item in formatted_line:
-                font = self.font()
-                if 'i' in item[0]:
-                    font.setItalic(True)
-                if 'b' in item[0]:
-                    font.setWeight(1000)
-                if 'u' in item[0]:
-                    font.setUnderline(True)
-
-                if self.use_shadow:
-                    self.shadow_path.addText(QPointF(x + self.shadow_offset, y + self.shadow_offset), font, item[1])
-                self.path.addText(QPointF(x, y), font, item[1])
-
-                item_width = metrics.boundingRect(item[1]).adjusted(
-                    0, 0, self.outline_width, self.outline_width).width()
-                x += item_width + metrics.horizontalAdvance(' ')"""
-
         brush = QBrush()
         brush.setColor(self.fill_color)
         brush.setStyle(Qt.BrushStyle.SolidPattern)
