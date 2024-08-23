@@ -460,13 +460,20 @@ class GUI(QObject):
 
         help_menu = menu_bar.addMenu('Help')
 
+        about_action = help_menu.addAction('About')
+        about_action.setShortcut(QKeySequence('Ctrl+A'))
+        about_action.triggered.connect(self.show_about)
+
         help_action = help_menu.addAction('Help Contents')
         help_action.setShortcut(QKeySequence('F1'))
         help_action.triggered.connect(self.show_help)
 
-        about_action = help_menu.addAction('About')
-        about_action.setShortcut(QKeySequence('Ctrl+A'))
-        about_action.triggered.connect(self.show_about)
+        video_action = help_menu.addAction('Video Tutorial')
+        video_url = 'https://youtu.be/hUmMZhuyVJ8'
+        if os.name == 'nt':
+            video_action.triggered.connect(lambda: os.system(f'start \"\" {video_url}'))
+        elif os.name == 'linux':
+            video_action.triggered.connect(lambda: os.system(f'xdg-open \'\' {video_url}'))
 
     def set_theme(self, theme):
         wait_widget = None
@@ -594,7 +601,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.2.8.11')
+        title_label = QLabel('ProjectOn v.1.2.8.23rc')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()

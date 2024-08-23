@@ -6,10 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -476,14 +473,29 @@
       <option name="project" value="LOCAL" />
       <updated>1723429407658</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="Fixed setting style of entire line when only one word of a line has a style set.">
+      <option name="closed" value="true" />
+      <created>1723524149074</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1723524149074</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Fixed setting style of entire line when only one word of a line has a style set.">
+      <option name="closed" value="true" />
+      <created>1723524214331</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1723524214331</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.qss" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Futher refined the light and dark themes.&#10;Fixed theming on buttons and combo boxes in settings widget.&#10;Changed modal widgets to QDialogs.&#10;Made setting theme along with applying settings changes optional." />
     <MESSAGE value="Added custom QMessageBox icon" />
     <MESSAGE value="Added readme&#10;Refined the logo" />
     <MESSAGE value="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md" />
@@ -508,6 +520,7 @@
     <MESSAGE value="Added the static folder back in to the arguments for pyinstaller.&#10;This may be the last of the bugs found while creating the how-to video." />
     <MESSAGE value="Moved checking for files back into the GUI thread since dialogs may need to be shown." />
     <MESSAGE value="Custom slide text needs to be saved in the service file for when multiple services are being prepared ahead of time.&#10;Fixed proper file not being loaded from recent files menu." />
-    <option name="LAST_COMMIT_MESSAGE" value="Custom slide text needs to be saved in the service file for when multiple services are being prepared ahead of time.&#10;Fixed proper file not being loaded from recent files menu." />
+    <MESSAGE value="Fixed setting style of entire line when only one word of a line has a style set." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed setting style of entire line when only one word of a line has a style set." />
   </component>
 </project>
