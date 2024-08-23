@@ -31,7 +31,7 @@ class SimpleSplash:
         main_layout.addWidget(container)
 
         self.label = QLabel(text)
-        self.label.setFont(gui.bold_font)
+        self.label.setFont(self.gui.bold_font)
         self.label.setStyleSheet('color: white; padding: 10px 5px;')
         layout.addWidget(self.label, 0, 0, Qt.AlignmentFlag.AlignHCenter)
 

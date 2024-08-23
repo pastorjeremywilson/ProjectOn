@@ -6,7 +6,7 @@ from os.path import exists
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineDownloadItem
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
     QMessageBox, QDialog
 from cryptography.fernet import Fernet
@@ -256,7 +256,7 @@ class SongselectImport(QDialog):
             download_item.setDownloadDirectory(download_dir)
             download_item.accept()
             self.current_download_item = download_item
-            self.current_download_item.isFinishedChanged.connect(self.download_finished)
+            self.current_download_item.finished.connect(self.download_finished)
         else:
             download_item.cancel()
             QMessageBox.information(
@@ -374,4 +374,5 @@ class SongselectImport(QDialog):
                     self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
 
                 save_widget.widget.deleteLater()
+                os.remove(song_filename)
                 self.done(0)

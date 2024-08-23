@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.1rc3
+ProjectOn v.1.2.8.23rc
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -33,9 +33,9 @@ from xml.etree import ElementTree
 
 import requests
 from PyQt5.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
-from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen
+from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QAction
+    QProgressBar, QHBoxLayout, QAction, QDialog, QLineEdit, QPushButton
 
 from gui import GUI
 from simple_splash import SimpleSplash
@@ -585,10 +585,11 @@ class ProjectOn(QObject):
                 }
                 if self.gui.oos_widget.oos_list_widget.item(i).data(20) == 'custom_scripture':
                     service_items[i]['text'] = self.gui.oos_widget.oos_list_widget.item(i).data(24)[2]
+                elif self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'custom':
+                    service_items[i]['text'] = self.gui.oos_widget.oos_list_widget.item(i).data(24)[2]
 
             dialog_needed = True
             if self.gui.current_file:
-                print(self.gui.current_file)
                 dialog_needed = False
             elif len(self.settings['last_save_dir']) > 0:
                 save_dir = self.settings['last_save_dir']
@@ -653,6 +654,7 @@ class ProjectOn(QObject):
         :param str filename: Optional, the file location to be opened
         """
         # first, check for any changes to the current order of service
+        print(filename)
         response = -1
         if self.gui.changes:
             response = QMessageBox.question(
@@ -804,6 +806,12 @@ class ProjectOn(QObject):
                             for i in range(20, 41):
                                 widget_item.setData(i, custom_item.data(i))
 
+                            if 'text' in service_dict[key].keys():
+                                slide_text = widget_item.data(24)
+                                slide_text[2] = service_dict[key]['text']
+                                widget_item.setData(21, service_dict[key]['text'])
+                                widget_item.setData(24, slide_text)
+
                             if widget_item.data(29) == 'global_song':
                                 pixmap = self.gui.global_song_background_pixmap
                                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -935,7 +943,7 @@ class ProjectOn(QObject):
 
             # set the last used directory in settings
             file_dir = os.path.dirname(result[0])
-            file_name = result[0].replace(file_dir, '').replace('/', '')
+            file_name = result[0].replace(file_dir, '').replace('/', '').replace('\\', '')
             self.settings['last_save_dir'] = file_dir
 
             # add this file to the recently used services menu
@@ -953,6 +961,8 @@ class ProjectOn(QObject):
         """
         if 'used_services' in self.settings.keys():
             used_services = self.settings['used_services']
+            if len(used_services) == 0:
+                used_services = []
         else:
             used_services = []
 
@@ -986,31 +996,83 @@ class ProjectOn(QObject):
             'XML Files (*.xml)'
         )
 
-        if len(file[0]) > 0:
-            result = QMessageBox.question(
-                self.gui.main_window,
-                'Make Default',
-                'Make this your default bible?',
-                QMessageBox.StandardButton.Yes,
-                QMessageBox.StandardButton.No
-            )
+        if len(file[0]) == 0:
+            return
 
-            file_name_split = file[0].split('/')
-            file_name = file_name_split[len(file_name_split) - 1]
-            shutil.copy(file[0], self.bible_dir + '/' + file_name)
+        file_name_split = file[0].split('/')
+        file_name = file_name_split[len(file_name_split) - 1]
+        new_location = self.bible_dir + '/' + file_name
+        shutil.copy(file[0], new_location)
 
-            if result == QMessageBox.StandardButton.Yes:
-                self.settings['default_bible'] = self.bible_dir + '/' + file_name
+        result = QMessageBox.question(
+            self.gui.main_window,
+            'Make Default',
+            'Make this your default bible?',
+            QMessageBox.StandardButton.Yes,
+            QMessageBox.StandardButton.No
+        )
+        if result == QMessageBox.StandardButton.Yes:
+            self.settings['default_bible'] = new_location
+            self.save_settings()
 
-            tree = ElementTree.parse(self.gui.main.data_dir + '/bibles/' + file)
-            root = tree.getroot()
-            name = root.attrib['biblename']
+        new_tree = ElementTree.parse(new_location)
+        new_root = new_tree.getroot()
+        name = new_root.attrib['biblename']
 
-            self.gui.media_widget.bible_selector_combobox.addItem(name)
-            self.gui.media_widget.bible_selector_combobox.setItemData(
-                self.gui.media_widget.bible_selector_combobox.count() - 1,
-                self.bible_dir + '/' + file_name, Qt.ItemDataRole.UserRole
-            )
+        dialog = QDialog(self.gui.main_window)
+        dialog.setWindowIcon(QIcon('resources/branding/logo.svg'))
+        dialog.setWindowTitle('Set Bible Name')
+        layout = QVBoxLayout(dialog)
+        label = QLabel('What would you like to name this bible?')
+        layout.addWidget(label)
+        edit = QLineEdit(name)
+        layout.addWidget(edit)
+        button_widget = QWidget()
+        layout.addWidget(button_widget)
+        button_layout = QHBoxLayout(button_widget)
+        ok_button = QPushButton('OK')
+        ok_button.released.connect(lambda: dialog.done(0))
+        button_layout.addStretch()
+        button_layout.addWidget(ok_button)
+        button_layout.addStretch()
+
+        dialog.exec()
+        bible_name = edit.text()
+        if len(bible_name) == 0:
+            bible_name = name
+        new_root.attrib['biblename'] = bible_name
+
+        new_tree.write(new_location)
+
+        # refresh the bible combobox in the media widget
+        self.gui.media_widget.bible_selector_combobox.blockSignals(True)
+        self.gui.media_widget.bible_selector_combobox.clear()
+        bibles = self.gui.media_widget.get_bibles()
+
+        if len(bibles[0]) > 0:
+            for bible in bibles:
+                self.gui.media_widget.bible_selector_combobox.addItem(bible[1])
+                self.gui.media_widget.bible_selector_combobox.setItemData(
+                    self.gui.media_widget.bible_selector_combobox.count() - 1, bible[0], Qt.ItemDataRole.UserRole)
+
+            default_bible_exists = False
+            if 'default_bible' in self.settings.keys():
+                if exists(self.settings['default_bible']):
+                    tree = ElementTree.parse(self.settings['default_bible'])
+                    root = tree.getroot()
+                    name = root.attrib['biblename']
+                    self.gui.media_widget.bible_selector_combobox.setCurrentText(name)
+                    default_bible_exists = True
+
+            if not default_bible_exists:
+                self.settings['default_bible'] = bibles[0][0]
+                self.gui.media_widget.bible_selector_combobox.setCurrentIndex(0)
+                self.gui.main.save_settings()
+                tree = ElementTree.parse(self.settings['default_bible'])
+                root = tree.getroot()
+                name = root.attrib['biblename']
+
+        self.gui.media_widget.bible_selector_combobox.blockSignals(False)
 
     def error_log(self):
         """
@@ -1036,10 +1098,19 @@ class ProjectOn(QObject):
             log_text = (f'\n{date_time}:\n'
                         f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
 
-        with open('./error.log', 'a') as file:
+        if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log')):
+            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log'), 'w') as file:
+                pass
+
+        with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log'), 'a') as file:
             file.write(log_text)
-        QMessageBox.critical(None, 'An Error Occurred', message_box_text, QMessageBox.StandardButton.Ok)
-        self.app.processEvents()
+
+        message_box = QMessageBox()
+        message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
+        message_box.setWindowTitle('An Error Occurred')
+        message_box.setText('<strong>Well, that wasn\'t supposed to happen!</strong><br><br>' + message_box_text)
+        message_box.setStandardButtons(QMessageBox.StandardButton.Close)
+        message_box.exec()
 
 
 class CheckFiles(QRunnable):
@@ -1055,67 +1126,100 @@ class CheckFiles(QRunnable):
         self.main = main
 
     def run(self):
-        defaults_dir = os.path.dirname(os.path.abspath(__file__)).replace('\\\\', '/') + '/resources/defaults'
-        try:
-            if not exists(self.main.data_dir):
-                os.mkdir(self.main.data_dir)
+        if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
+            os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
+        self.main.device_specific_config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')
 
-            if not exists(self.main.config_file):
-                config = {
-                    'selected_screen_name': '',
-                    'font_face': 'Helvetica',
-                    'font_size': 60,
-                    'font_color': 'white',
-                    'global_song_background': '',
-                    'global_bible_background': '',
-                    'logo_image': '',
-                    'last_save_dir': '',
-                    'last_status_count': 1000,
-                    'stage_font_size': 60,
-                    'use_shadow': False,
-                    'shadow_color': 190,
-                    'use_outline': True,
-                    'outline_color': 0,
-                    'outline_width': 3,
-                    'ccli_num': '',
-                    'used_services': [],
-                    'default_bible': ''
-                }
-                with open(self.main.config_file, 'w') as file:
-                    file.write(json.dumps(config, indent=4))
+        if not exists(self.main.device_specific_config_file):
+            device_specific_settings = {
+                'used_services': '',
+                'last_save_dir': '',
+                'last_status_count': 100,
+                'data_dir': '',
+                'selected_screen_name': ''
+            }
+            with open(self.main.device_specific_config_file, 'w') as file:
+                file.write(json.dumps(device_specific_settings))
+        else:
+            with open(self.main.device_specific_config_file, 'r') as file:
+                device_specific_settings = json.loads(file.read())
 
-            if not exists(self.main.database):
-                shutil.copy(defaults_dir + '/default_database.db', self.main.database)
+        data_dir = False
+        if 'data_dir' in device_specific_settings.keys():
+            if '~' in device_specific_settings['data_dir']:
+                self.main.data_dir = os.path.expanduser(device_specific_settings['data_dir'])
+            else:
+                self.main.data_dir = device_specific_settings['data_dir']
 
-            if not exists(self.main.background_dir):
-                os.mkdir(self.main.background_dir)
-                default_background_dir = defaults_dir + '/backgrounds'
-                image_files = os.listdir(default_background_dir)
-                for file in image_files:
-                    shutil.copy(default_background_dir + '/' + file, self.main.background_dir + '/' + file)
+            if exists(self.main.data_dir):
+                print('data dir found')
+                data_dir = True
 
-            if not exists(self.main.image_dir):
-                os.mkdir(self.main.image_dir)
-                default_image_dir = defaults_dir + '/images'
-                image_files = os.listdir(default_image_dir)
-                for file in image_files:
-                    shutil.copy(default_image_dir + '/' + file, self.main.image_dir + '/' + file)
+        if not data_dir:
+            QMessageBox.question(
+                None,
+                'Locate Data Directory',
+                'Please locate the ProjectOn Data Directory that contains "projecton.db"',
+                QMessageBox.StandardButton.Ok
+            )
+            self.main.app.processEvents()
 
-            if not exists(self.main.bible_dir):
-                os.mkdir(self.main.bible_dir)
-                default_bible_dir = defaults_dir + '/bibles'
-                bible_files = os.listdir(default_bible_dir)
-                for file in bible_files:
-                    shutil.copy(default_bible_dir + '/' + file, self.main.bible_dir + '/' + file)
+            result = QFileDialog.getExistingDirectory(
+                None,
+                'Data Directory',
+                os.path.expanduser('~/Documents')
+            )
+            if len(result) == 0:
+                sys.exit(-1)
+            self.main.data_dir = result
 
-            if not exists(self.main.video_dir):
-                os.mkdir(self.main.video_dir)
-                default_video_dir = defaults_dir + '/videos'
-                video_files = os.listdir(default_video_dir)
-                for file in video_files:
-                    shutil.copy(default_video_dir + '/' + file, self.main.video_dir + '/' + file)
-        except Exception:
-            self.main.error_log()
+        self.main.config_file = self.main.data_dir + '/settings.json'
+        self.main.database = self.main.data_dir + '/projecton.db'
+        self.main.background_dir = self.main.data_dir + '/backgrounds'
+        self.main.image_dir = self.main.data_dir + '/images'
+        self.main.bible_dir = self.main.data_dir + '/bibles'
+        self.main.video_dir = self.main.data_dir + '/videos'
+
+        # provide default settings should the settings file not exist
+        default_settings = {
+            'selected_screen_name': '',
+            'font_face': 'Helvetica',
+            'font_size': 60,
+            'font_color': 'white',
+            'global_song_background': '',
+            'global_bible_background': '',
+            'logo_image': '',
+            'last_save_dir': './saved services',
+            'last_status_count': 0,
+            'stage_font_size': 60
+        }
+
+        if exists(self.main.data_dir + '/settings.json'):
+            with open(self.main.data_dir + '/settings.json', 'r') as file:
+                try:
+                    self.main.settings = json.loads(file.read())
+                except json.decoder.JSONDecodeError:
+                    self.main.settings = {}
+        else:
+            self.main.settings = default_settings
+
+        for key in default_settings:
+            if key not in self.main.settings.keys():
+                self.main.settings[key] = default_settings[key]
+
+        self.main.settings['used_services'] = device_specific_settings['used_services']
+        self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']
+        if 'selected_screen_name' in device_specific_settings.keys():
+            self.main.settings['selected_screen_name'] = device_specific_settings['selected_screen_name']
+        else:
+            self.main.settings['selected_screen_name'] = ''
+        if 'last_status_count' in device_specific_settings.keys():
+            self.main.settings['last_status_count'] = device_specific_settings['last_status_count']
+        self.main.settings['data_dir'] = self.main.data_dir
+
+        if not exists(self.main.config_file):
+            if exists(self.main.data_dir + '/settings.json'):
+                shutil.copy(self.main.data_dir + '/settings.json', self.main.config_file)
 
 
 class IndexImages(QRunnable):

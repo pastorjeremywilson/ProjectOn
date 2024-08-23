@@ -8,12 +8,12 @@ import time
 from os.path import exists
 
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QPalette
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QStyle
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction
 
 from help import Help
 from importers import Importers
@@ -107,7 +107,17 @@ class GUI(QObject):
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
+        self.main.status_label.setText('Checking Files')
+        self.main.app.processEvents()
+
+        # ensure all needed files exist; thread it and wait until done before moving on
         self.check_files()
+        """from main import CheckFiles
+        cf = CheckFiles(self.main)
+        self.main.thread_pool.start(cf)
+        self.main.thread_pool.waitForDone()"""
+
+        self.main.get_song_titles()
 
         self.main.status_label.setText('Indexing Images')
         self.main.app.processEvents()
@@ -175,22 +185,29 @@ class GUI(QObject):
     def check_files(self):
         if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
             os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
-        self.main.device_specific_config_file = os.path.expanduser('~/Appdata/Roaming/ProjectOn/localConfig.json')
+        self.main.device_specific_config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')
+
         if not exists(self.main.device_specific_config_file):
             device_specific_settings = {
                 'used_services': '',
                 'last_save_dir': '',
                 'last_status_count': 100,
                 'data_dir': '',
-                'selected_screen_name' : ''
+                'selected_screen_name': ''
             }
+            with open(self.main.device_specific_config_file, 'w') as file:
+                file.write(json.dumps(device_specific_settings))
         else:
             with open(self.main.device_specific_config_file, 'r') as file:
                 device_specific_settings = json.loads(file.read())
 
         data_dir = False
         if 'data_dir' in device_specific_settings.keys():
-            self.main.data_dir = device_specific_settings['data_dir']
+            if '~' in device_specific_settings['data_dir']:
+                self.main.data_dir = os.path.expanduser(device_specific_settings['data_dir'])
+            else:
+                self.main.data_dir = device_specific_settings['data_dir']
+
             if exists(self.main.data_dir):
                 data_dir = True
 
@@ -258,14 +275,6 @@ class GUI(QObject):
         if not exists(self.main.config_file):
             if exists(self.main.data_dir + '/settings.json'):
                 shutil.copy(self.main.data_dir + '/settings.json', self.main.config_file)
-
-        # ensure all needed files exist; thread it and wait until done before moving on
-        from main import CheckFiles
-        cf = CheckFiles(self.main)
-        self.main.thread_pool.start(cf)
-        self.main.thread_pool.waitForDone()
-
-        self.main.get_song_titles()
 
     def init_components(self):
         """
@@ -366,9 +375,10 @@ class GUI(QObject):
         self.open_recent_menu = file_menu.addMenu('Open Recent Service')
         if 'used_services' in self.main.settings.keys():
             for item in self.main.settings['used_services']:
-                open_recent_action = self.open_recent_menu.addAction(item[1])
-                open_recent_action.setData(item[0] + '/' + item[1])
-                open_recent_action.triggered.connect(lambda: self.main.load_service(open_recent_action.data()))
+                open_recent_action = QAction(item[1], self.open_recent_menu)
+                path = item[0] + '/' + item[1]
+                open_recent_action.triggered.connect(lambda checked, path=path: self.main.load_service(path))
+                self.open_recent_menu.addAction(open_recent_action)
 
         save_action = file_menu.addAction('Save Service')
         save_action.setShortcut(QKeySequence('Ctrl+S'))
@@ -450,13 +460,20 @@ class GUI(QObject):
 
         help_menu = menu_bar.addMenu('Help')
 
+        about_action = help_menu.addAction('About')
+        about_action.setShortcut(QKeySequence('Ctrl+A'))
+        about_action.triggered.connect(self.show_about)
+
         help_action = help_menu.addAction('Help Contents')
         help_action.setShortcut(QKeySequence('F1'))
         help_action.triggered.connect(self.show_help)
 
-        about_action = help_menu.addAction('About')
-        about_action.setShortcut(QKeySequence('Ctrl+A'))
-        about_action.triggered.connect(self.show_about)
+        video_action = help_menu.addAction('Video Tutorial')
+        video_url = 'https://youtu.be/hUmMZhuyVJ8'
+        if os.name == 'nt':
+            video_action.triggered.connect(lambda: os.system(f'start \"\" {video_url}'))
+        elif os.name == 'linux':
+            video_action.triggered.connect(lambda: os.system(f'xdg-open \'\' {video_url}'))
 
     def set_theme(self, theme):
         wait_widget = None
@@ -484,6 +501,8 @@ class GUI(QObject):
             )
             return
 
+        wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
+
         from reportlab.pdfgen import canvas
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.utils import ImageReader
@@ -492,9 +511,9 @@ class GUI(QObject):
 
         print_file_loc = tempfile.gettempdir() + '/print.pdf'
         marginH = 80
-        marginV = 80
+        marginV = 70
         font_size = 12
-        lineHeight = 36
+        lineHeight = 38
 
         # letter size = 612.0 x 792.0
         # create variables based on letter-sized canvas
@@ -513,6 +532,9 @@ class GUI(QObject):
             widget = self.oos_widget.oos_list_widget.itemWidget(item)
             widget.setObjectName('item_widget')
             if widget:
+                canvas.setFont('Helvetica', font_size)
+                canvas.drawString(lineStart, currentLine + 16, f'{i + 1}.')
+
                 pixmap = widget.icon.pixmap()
                 type = widget.subtitle.text()
                 title = widget.title.text()
@@ -520,11 +542,16 @@ class GUI(QObject):
                 image = Image.fromqpixmap(pixmap)
                 image_reader = ImageReader(image)
 
-                canvas.drawImage(image_reader, lineStart, currentLine)
+                canvas.drawImage(image_reader, lineStart + 30, currentLine)
                 canvas.setFont('Helvetica-Bold', font_size)
-                canvas.drawString(lineStart + 60, currentLine + 16, title)
+                canvas.drawString(lineStart + 100, currentLine + 16, title)
                 canvas.setFont('Helvetica', font_size)
-                canvas.drawString(lineStart + 60, currentLine, type)
+                canvas.drawString(lineStart + 100, currentLine, type)
+
+                # only draw a line separator if this isn't the last one
+                if i < self.oos_widget.oos_list_widget.count() - 1:
+                    canvas.line(lineStart, currentLine - 5, lineStart + 300, currentLine - 5)
+
                 currentLine -= lineHeight
 
                 if currentLine < lastLine:
@@ -534,6 +561,9 @@ class GUI(QObject):
         canvas.save()
         print_dialog = PrintDialog(print_file_loc, self)
         print_dialog.exec()
+
+        if wait_widget:
+            wait_widget.widget.deleteLater()
 
     def ccli_import(self):
         from songselect_import import SongselectImport
@@ -571,7 +601,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.1rc3')
+        title_label = QLabel('ProjectOn v.1.2.8.23rc')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -987,9 +1017,13 @@ class GUI(QObject):
                         self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
             elif item.data(40) == 'bible':
+                title = item.data(20)
+                book_chapter = title.split(':')[0]
+                book = book_chapter[:-1].strip()
+                current_chapter = book_chapter.replace(book_chapter[:-1], '')
+
                 slide_texts = item.data(21)
                 for i in range(len(slide_texts)):
-                    title = item.data(20)
                     list_item = QListWidgetItem()
                     for j in range(20, 41):
                         list_item.setData(j, item.data(j))
@@ -998,7 +1032,6 @@ class GUI(QObject):
                     list_item.setData(22, item.text())
                     list_item.setData(40, 'bible')
 
-                    new_title = title.split(':')[0] + ':'
                     first_num_found = False
                     first_num = ''
                     last_num = ''
@@ -1006,6 +1039,7 @@ class GUI(QObject):
 
                     # find the verse range for each segment of scripture
                     scripture_text = re.sub('<.*?>', '', list_item.data(21))
+                    next_chapter = False
                     for j in range(len(scripture_text)):
                         data = scripture_text[j]
                         next_data = None
@@ -1023,13 +1057,22 @@ class GUI(QObject):
                                     first_num_found = True
                                 else:
                                     last_num = num
+
+                                if i > 0 and num == '1':
+                                    next_chapter = True
                         else:
                             skip_next = False
 
+                    if next_chapter:
+                        current_chapter = str(int(current_chapter) + 1)
+
                     if last_num == '':
-                        new_title += first_num
+                        new_title = f'{book} {current_chapter}:{first_num}'
                     else:
-                        new_title += first_num + '-' + last_num
+                        if int(first_num) > int(last_num):
+                            new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                        else:
+                            new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
 
                     list_item.setData(24, ['', new_title, slide_texts[i]])
 
@@ -1318,7 +1361,7 @@ class GUI(QObject):
                 outline_color = self.main.settings['outline_color']
                 outline_width = self.main.settings['outline_width']
 
-            lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
+            lyric_widget.setFont(QFont(font_face, font_size))
             lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
             lyric_widget.use_shadow = use_shadow
             lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
@@ -1624,7 +1667,10 @@ class GUI(QObject):
                     except IndexError:
                         lyric_dictionary.update({segment_markers[i]: segment_split[i + 1].strip()})
             else:
-                lyric_dictionary.update({'[v1]': lyrics})
+                lyrics_split = lyrics.split('<br /><br />')
+                for i in range(len(lyrics_split)):
+                    if len(lyrics_split[i].strip()) > 0:
+                        lyric_dictionary.update({f'[Verse {i + 1}]': lyrics_split[i].strip()})
 
         return lyric_dictionary
 
@@ -1646,6 +1692,15 @@ class GUI(QObject):
         item.setData(23, version)
         item.setData(40, 'bible')
         item.setData(24, ['', reference, text])
+
+        if len(item.data(21)) == 0:
+            QMessageBox.information(
+                self.main_window,
+                'No Verses',
+                'No verses were found in the passage. Please ensure that your scripture passage includes verse numbers.',
+                QMessageBox.Ok
+            )
+            return
 
         label_pixmap = self.global_bible_background_pixmap.scaled(
             50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)

@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -46,7 +49,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/project_on/main.py&quot;,
+    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/soundBoard&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
 }</component>
@@ -334,26 +337,165 @@
       <option name="project" value="LOCAL" />
       <updated>1722053099109</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Added readme as html.&#10;Included readme in pyinstaller command and inno setup script.">
+      <option name="closed" value="true" />
+      <created>1722091576808</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1722091576808</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Fixed Qt import issue in PIL&#10;Fixed '\' showing in recent files when loaded from command line">
+      <option name="closed" value="true" />
+      <created>1722639040822</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1722639040822</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Fixed confusion between \n and &lt;br /&gt; in editing and parsing songs.&#10;Fixed double-return not parsing as a new slide">
+      <option name="closed" value="true" />
+      <created>1722724816237</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1722724816237</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Changed version number - ready for release">
+      <option name="closed" value="true" />
+      <created>1722725018599</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1722725018599</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install">
+      <option name="closed" value="true" />
+      <created>1723069078171</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1723069078171</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install">
+      <option name="closed" value="true" />
+      <created>1723069148627</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1723069148627</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install">
+      <option name="closed" value="true" />
+      <created>1723069257803</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1723069257803</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Fixed problem with not handling 'global' in custom slide settings&#10;Prevented custom bible passage with no verses from being added to OOS">
+      <option name="closed" value="true" />
+      <created>1723136949947</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1723136949947</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Fixed wrong signal attached to download finished">
+      <option name="closed" value="true" />
+      <created>1723149487587</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1723149487587</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Fixed bible combobox not updating after importing an XML bible">
+      <option name="closed" value="true" />
+      <created>1723237331843</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1723237331843</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Fixed bible combobox not updating after importing an XML bible">
+      <option name="closed" value="true" />
+      <created>1723307468073</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1723307468073</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Added &quot;Known Issues&quot; section to README.md">
+      <option name="closed" value="true" />
+      <created>1723307760036</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1723307760036</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Ensured that files created when importing a video or a SongSelect song are removed afterwards.&#10;Moved the location of the error log file to the appdata folder.">
+      <option name="closed" value="true" />
+      <created>1723322573068</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1723322573068</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Changed error log file location in the help widget's file_locations.html">
+      <option name="closed" value="true" />
+      <created>1723322742210</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1723322742210</updated>
+    </task>
+    <task id="LOCAL-00042" summary="Added the static folder back in to the arguments for pyinstaller.&#10;This may be the last of the bugs found while creating the how-to video.">
+      <option name="closed" value="true" />
+      <created>1723325295678</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1723325295678</updated>
+    </task>
+    <task id="LOCAL-00043" summary="Moved checking for files back into the GUI thread since dialogs may need to be shown.">
+      <option name="closed" value="true" />
+      <created>1723328236377</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1723328236377</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Custom slide text needs to be saved in the service file for when multiple services are being prepared ahead of time.&#10;Fixed proper file not being loaded from recent files menu.">
+      <option name="closed" value="true" />
+      <created>1723429407658</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1723429407658</updated>
+    </task>
+    <task id="LOCAL-00045" summary="Fixed setting style of entire line when only one word of a line has a style set.">
+      <option name="closed" value="true" />
+      <created>1723524149074</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1723524149074</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Fixed setting style of entire line when only one word of a line has a style set.">
+      <option name="closed" value="true" />
+      <created>1723524214331</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1723524214331</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.qss" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Improved layout of the settings and font widgets." />
-    <MESSAGE value="Made screen icon dimensions match ratio of screens they represent and improved their coloring" />
-    <MESSAGE value="Changed logo" />
-    <MESSAGE value="Fixed help pages not loading" />
-    <MESSAGE value="Switched from Qt6 to Qt5 to alleviate a couple of video bugs" />
-    <MESSAGE value="Added light/dark themes through the use of qss stylesheets" />
-    <MESSAGE value="Fixed mobile remote html and changed layout to nav buttons on the right." />
-    <MESSAGE value="Merged sandbox into development" />
-    <MESSAGE value="Changed most &quot;pressed&quot; signals to &quot;clicked&quot; to avoid duplicate calls.&#10;Fixed font widget background color.&#10;Changed version to release candidate 3." />
-    <MESSAGE value="Fixed icon dimensions" />
-    <MESSAGE value="Fixed font color in screen settings area of settings widget.&#10;Fixed subtitle not wrapping for bible passages in live widget list widget items.&#10;Fixed default screen handling when a chosen display screen hasn't yet been saved to settings." />
-    <MESSAGE value="Futher refined the light and dark themes.&#10;Fixed theming on buttons and combo boxes in settings widget." />
-    <MESSAGE value="Futher refined the light and dark themes.&#10;Fixed theming on buttons and combo boxes in settings widget.&#10;Changed modal widgets to QDialogs.&#10;Made setting theme along with applying settings changes optional." />
     <MESSAGE value="Added custom QMessageBox icon" />
     <MESSAGE value="Added readme&#10;Refined the logo" />
     <MESSAGE value="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md" />
@@ -363,6 +505,22 @@
     <MESSAGE value="Added the ability to paste a passage into the bible text edit and have it parse and save." />
     <MESSAGE value="Reimplemented show/hide advanced options in the edit widget." />
     <MESSAGE value="Added images for the installer." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added images for the installer." />
+    <MESSAGE value="Added readme as html.&#10;Included readme in pyinstaller command and inno setup script." />
+    <MESSAGE value="Fixed Qt import issue in PIL&#10;Fixed '\' showing in recent files when loaded from command line" />
+    <MESSAGE value="Fixed confusion between \n and &lt;br /&gt; in editing and parsing songs.&#10;Fixed double-return not parsing as a new slide" />
+    <MESSAGE value="Changed version number - ready for release" />
+    <MESSAGE value="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install" />
+    <MESSAGE value="Fixed problem with not handling 'global' in custom slide settings&#10;Prevented custom bible passage with no verses from being added to OOS" />
+    <MESSAGE value="Fixed wrong number of list items for saving song from import" />
+    <MESSAGE value="Fixed wrong signal attached to download finished" />
+    <MESSAGE value="Fixed bible combobox not updating after importing an XML bible" />
+    <MESSAGE value="Added &quot;Known Issues&quot; section to README.md" />
+    <MESSAGE value="Ensured that files created when importing a video or a SongSelect song are removed afterwards.&#10;Moved the location of the error log file to the appdata folder." />
+    <MESSAGE value="Changed error log file location in the help widget's file_locations.html" />
+    <MESSAGE value="Added the static folder back in to the arguments for pyinstaller.&#10;This may be the last of the bugs found while creating the how-to video." />
+    <MESSAGE value="Moved checking for files back into the GUI thread since dialogs may need to be shown." />
+    <MESSAGE value="Custom slide text needs to be saved in the service file for when multiple services are being prepared ahead of time.&#10;Fixed proper file not being loaded from recent files menu." />
+    <MESSAGE value="Fixed setting style of entire line when only one word of a line has a style set." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed setting style of entire line when only one word of a line has a style set." />
   </component>
 </project>

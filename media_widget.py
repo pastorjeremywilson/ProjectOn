@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabe
 
 from edit_widget import EditWidget
 from get_scripture import GetScripture
+from simple_splash import SimpleSplash
 from widgets import AutoSelectLineEdit, StandardItemWidget
 
 
@@ -855,7 +856,7 @@ class MediaWidget(QTabWidget):
                     tree = ElementTree.parse(self.gui.main.data_dir + '/bibles/' + file)
                     root = tree.getroot()
                     bibles.append([self.gui.main.data_dir + '/bibles/' + file, root.attrib['biblename']])
-            return (bibles)
+            return bibles
         except Exception:
             self.gui.main.error_log()
             return -1
@@ -1110,6 +1111,8 @@ class MediaWidget(QTabWidget):
         )
 
         if len(result[0]) > 0:
+            wait_widget = SimpleSplash(self.gui, 'Please wait...')
+
             file_name_split = result[0].split('/')
             file_name = file_name_split[len(file_name_split) - 1]
             shutil.copy(result[0], self.gui.main.video_dir + '/' + file_name)
@@ -1120,13 +1123,13 @@ class MediaWidget(QTabWidget):
                 iteration = 0
                 while True:
                     result, frame = cap.read()
-                    if iteration % 50 == 0 and iteration <= 250:
+                    if iteration % 100 == 0:
                         if result:
-                            cv2.imwrite(f'./thumbnail{str(iteration)}.jpg', frame)
+                            cv2.imwrite(f'{os.path.expanduser("~/AppData/Roaming/ProjectOn")}/thumbnail{str(iteration)}.jpg', frame)
                         else:
                             break
                     iteration += 1
-                    if iteration > 250:
+                    if iteration > 500:
                         break
                 cap.release()
                 cv2.destroyAllWindows()
@@ -1146,11 +1149,16 @@ class MediaWidget(QTabWidget):
                     lambda: self.copy_video(file_name, thumbnail_list.currentItem().data(20), thumbnail_widget))
                 thumbnail_layout.addWidget(thumbnail_list)
 
-                file_list = os.listdir('./')
+                file_list = os.listdir(os.path.expanduser("~/AppData/Roaming/ProjectOn"))
                 for file in file_list:
                     if file.startswith('thumbnail'):
-                        pixmap = QPixmap('./' + file)
-                        pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                        pixmap = QPixmap(os.path.expanduser("~/AppData/Roaming/ProjectOn") + '/' + file)
+                        pixmap = pixmap.scaled(
+                            96,
+                            54,
+                            Qt.AspectRatioMode.IgnoreAspectRatio,
+                            Qt.TransformationMode.SmoothTransformation
+                        )
 
                         widget = StandardItemWidget(
                             self.gui, 'Frame ' + file.split('.')[0].replace('thumbnail', ''), '', pixmap)
@@ -1161,7 +1169,12 @@ class MediaWidget(QTabWidget):
                         thumbnail_list.addItem(item)
                         thumbnail_list.setItemWidget(item, widget)
 
+                wait_widget.widget.deleteLater()
                 thumbnail_widget.exec()
+
+                for file in os.listdir(os.path.expanduser("~/AppData/Roaming/ProjectOn")):
+                    if file.startswith('thumbnail'):
+                        os.remove(os.path.expanduser("~/AppData/Roaming/ProjectOn") + '/' + file)
 
             except Exception:
                 self.gui.main.error_log()
@@ -1178,11 +1191,10 @@ class MediaWidget(QTabWidget):
         """
         try:
             new_image_file_name = video_file.split('.')[0] + '.jpg'
-            shutil.copy('./' + image_file, self.gui.main.video_dir + '/' + new_image_file_name)
-            file_list = os.listdir('./')
-            for file in file_list:
-                if file.startswith('thumbnail'):
-                    os.remove('./' + file)
+            shutil.copy(
+                os.path.expanduser('~/AppData/Roaming/ProjectOn') + '/' + image_file,
+                self.gui.main.video_dir + '/' + new_image_file_name
+            )
         except Exception:
             self.gui.main.error_log()
             return
@@ -1211,7 +1223,6 @@ class MediaWidget(QTabWidget):
 
         if item and not from_load_service:
             item.setText(None)
-            #item.setData(24, self.parse_song_data(item))
 
             # Create a thumbnail of either the global song background or the custom background associated with this song
             if item.data(29) == 'global_song':
@@ -1312,39 +1323,38 @@ class MediaWidget(QTabWidget):
         :param QListWidgetItem item: Optional: a specific custom slide item
         :param int row: Optional: a specific row of the custom slide widget's QListWidget
         """
-        add_item = False
-        if self.custom_list.currentItem():
-            if not item:
-                item = QListWidgetItem()
-                add_item = True
+        if not item and self.custom_list.currentItem():
+            item = QListWidgetItem()
             for i in range(20, 41):
                 item.setData(i, self.custom_list.currentItem().data(i))
+        elif not item and not self.custom_list.currentItem():
+            return
 
-            if item.data(29) == 'global_song':
-                pixmap = self.gui.global_song_background_pixmap
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif item.data(29) == 'global_bible':
-                pixmap = self.gui.global_bible_background_pixmap
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif 'rgb(' in item.data(29):
-                pixmap = QPixmap(50, 27)
-                painter = QPainter(pixmap)
-                brush = QBrush(QColor(item.data(29)))
-                painter.fillRect(pixmap.rect(), brush)
-                painter.end()
-            else:
-                pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        if item.data(29) == 'global_song':
+            pixmap = self.gui.global_song_background_pixmap
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        elif item.data(29) == 'global_bible':
+            pixmap = self.gui.global_bible_background_pixmap
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        elif 'rgb(' in item.data(29):
+            pixmap = QPixmap(50, 27)
+            painter = QPainter(pixmap)
+            brush = QBrush(QColor(item.data(29)))
+            painter.fillRect(pixmap.rect(), brush)
+            painter.end()
+        else:
+            pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-            widget = StandardItemWidget(self.gui, self.custom_list.currentItem().text(), 'Custom Slide', pixmap)
-
-            item.setSizeHint(widget.sizeHint())
-            if add_item:
-                self.gui.oos_widget.oos_list_widget.addItem(item)
-            else:
-                self.gui.oos_widget.oos_list_widget.insertItem(row, item)
-            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
-            self.gui.changes = True
+        widget = StandardItemWidget(self.gui, item.data(20), 'Custom Slide', pixmap)
+        item.setText(None)
+        item.setSizeHint(widget.sizeHint())
+        if not row:
+            self.gui.oos_widget.oos_list_widget.addItem(item)
+        else:
+            self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+        self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        self.gui.changes = True
 
     def add_web_to_service(self, item=None, row=None):
         """
@@ -1443,7 +1453,10 @@ class CustomListWidget(QListWidget):
         menu = QMenu()
 
         add_song_action = QAction('Add to Order of Service')
-        add_song_action.triggered.connect(self.gui.media_widget.add_song_to_service)
+        if self.type == 'song':
+            add_song_action.triggered.connect(self.gui.media_widget.add_song_to_service)
+        elif self.type == 'custom':
+            add_song_action.triggered.connect(self.gui.media_widget.add_custom_to_service)
         menu.addAction(add_song_action)
 
         edit_song_action = None

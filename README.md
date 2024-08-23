@@ -21,7 +21,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.1rc3) and run
+system only. Download the current ProjectOn installer (v.1.2.8.23rc) and run
 it on your computer.
 <p>&nbsp;</p>
 
@@ -228,6 +228,10 @@ black)</p></td>
 </tbody>
 </table>
 <p>&nbsp;</p>
+
+# Known Issues
+
+Applying bold to a single word in a song or custom slide will result in the whole line being bolded when displayed.
 
 # Technologies and Credits
 
