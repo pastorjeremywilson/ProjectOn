@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.2.8.23rc
+ProjectOn v.1.3.0
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -30,6 +30,7 @@ import time
 import traceback
 from os.path import exists
 from xml.etree import ElementTree
+from gevent import monkey
 
 import requests
 from PyQt5.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
@@ -1416,4 +1417,5 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
 
 if __name__ == '__main__':
     sys.excepthook = log_unhandled_exception
+    monkey.patch_all(ssl=False)
     ProjectOn()
