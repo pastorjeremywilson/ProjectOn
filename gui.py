@@ -7,13 +7,14 @@ import tempfile
 import time
 from os.path import exists
 
+import requests
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
 from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction, QProgressBar, QCheckBox
 
 from help import Help
 from importers import Importers
@@ -181,6 +182,8 @@ class GUI(QObject):
             self.tool_bar.show_display_button.setChecked(False)
         else:
             self.tool_bar.show_display_button.setChecked(True)
+
+        self.check_update()
 
     def check_files(self):
         if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
@@ -488,6 +491,129 @@ class GUI(QObject):
         if wait_widget:
             wait_widget.widget.deleteLater()
 
+    def check_update(self):
+        current_version = 'v.1.3.0'
+        current_version = current_version.replace('v.', '')
+        current_version = current_version.replace('rc', '')
+        current_version = ''.join(current_version.split('.'))
+        if len(current_version) > 3:
+            current_version = current_version[:3]
+        current_version = int(current_version)
+
+        response = None
+        try:
+            response = requests.get('https://api.github.com/repos/pastorjeremywilson/ProjectOn/releases', timeout=20)
+        except Exception:
+            return
+
+        if response and response.status_code == 200:
+            text = response.text
+            release_info = json.loads(text)
+            latest_version = [0, 0]
+            for i in range(len(release_info)):
+                this_version = release_info[i]['tag_name']
+                this_version = this_version.replace('v.', '')
+                this_version = this_version.replace('rc', '')
+                this_version = ''.join(this_version.split('.'))
+                if len(this_version) > 3:
+                    this_version = this_version[:3]
+                this_version = int(this_version)
+                if this_version > latest_version[1]:
+                    latest_version = [i, this_version]
+
+            if 'skip_update' in self.main.settings.keys():
+                if self.main.settings['skip_update'] == latest_version[1]:
+                    return
+
+            if latest_version[1] > current_version:
+                latest_version_string = (f'{str(latest_version[1])[0]}.'
+                                         f'{str(latest_version[1])[1]}.'
+                                         f'{str(latest_version[1])[2]}')
+                dialog = QDialog()
+                layout = QVBoxLayout(dialog)
+                dialog.setWindowTitle('Update ProjectOn')
+
+                label = QLabel(f'An updated version of ProjectOn is available ({latest_version_string}). '
+                               f'Would you like to update now?')
+                label.setFont(self.standard_font)
+                layout.addWidget(label)
+
+                checkbox = QCheckBox('Don\'t remind me again for this version')
+                layout.addWidget(checkbox, Qt.AlignmentFlag.AlignCenter)
+
+                button_widget = QWidget()
+                button_layout = QHBoxLayout(button_widget)
+                layout.addWidget(button_widget)
+
+                yes_button = QPushButton('Yes')
+                yes_button.setFont(self.standard_font)
+                yes_button.pressed.connect(lambda: dialog.done(1))
+                button_layout.addStretch()
+                button_layout.addWidget(yes_button)
+
+                no_button = QPushButton('No')
+                no_button.setFont(self.standard_font)
+                no_button.pressed.connect(lambda: dialog.done(0))
+                button_layout.addSpacing(20)
+                button_layout.addWidget(no_button)
+                button_layout.addStretch()
+
+                response = dialog.exec()
+
+                if checkbox.isChecked():
+                    self.main.settings['skip_update'] = latest_version[1]
+                else:
+                    self.main.settings['skip_update'] = -1
+
+                if response == 1:
+                    download_url = release_info[latest_version[0]]['assets'][0]['browser_download_url']
+                    download_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
+                    file_name_split = download_url.split('/')
+                    file_name = file_name_split[len(file_name_split) - 1]
+                    save_location = download_dir + '/' + file_name
+
+                    self.dialog = None
+                    self.progress_bar = QProgressBar()
+                    def show_progress(block_num, block_size, total_size):
+                        if not self.dialog:
+                            print('creating dialog')
+                            self.dialog = QWidget(self.main_window)
+                            dialog_layout = QVBoxLayout(self.dialog)
+
+                            label = QLabel(f'Downloading {file_name}')
+                            label.setFont(self.bold_font)
+                            dialog_layout.addWidget(label)
+
+                            self.progress_bar.setRange(0, total_size)
+                            self.progress_bar.setValue(block_size)
+                            self.progress_bar.setTextVisible(True)
+                            self.progress_bar.setFont(self.standard_font)
+                            dialog_layout.addWidget(self.progress_bar)
+
+                            self.dialog.adjustSize()
+                            x = int((self.main_window.width() / 2) - (self.dialog.width() / 2))
+                            y = int((self.main_window.height() / 2) - (self.dialog.height() / 2))
+                            self.dialog.move(x, y)
+                            self.dialog.show()
+                            self.main.app.processEvents()
+
+                        self.progress_bar.setValue(self.progress_bar.value() + block_size)
+                        self.main.app.processEvents()
+                        if self.progress_bar.value() + block_size >= total_size:
+                            self.dialog.deleteLater()
+
+                    from urllib.request import urlretrieve
+                    urlretrieve(download_url, save_location, show_progress)
+
+                    QMessageBox.information(
+                        self.main_window,
+                        'Closing Program',
+                        'ProjectOn will now close to install the new version.',
+                        QMessageBox.StandardButton.Ok
+                    )
+                    os.system(f'start \"\" {save_location}')
+                    self.main_window.close()
+
     def print_oos(self):
         """
         Provides a method to create a printout of the current order of service
@@ -601,7 +727,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.2.8.23rc')
+        title_label = QLabel('ProjectOn v.1.3.0')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()

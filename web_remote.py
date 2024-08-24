@@ -1,8 +1,5 @@
-from gevent import monkey
 import geventwebsocket
 from engineio.async_drivers import gevent
-
-monkey.patch_all()
 
 import logging
 from http.server import BaseHTTPRequestHandler

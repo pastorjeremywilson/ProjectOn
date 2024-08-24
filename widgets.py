@@ -380,7 +380,10 @@ class CustomMainWindow(QMainWindow):
             continue_close = True
 
         if continue_close:
-            self.gui.main.server_check.keep_checking = False
+            try:
+                self.gui.main.server_check.keep_checking = False
+            except AttributeError:
+                pass
             self.gui.main.save_settings()
             self.gui.display_widget.deleteLater()
             # shutdown the remote server

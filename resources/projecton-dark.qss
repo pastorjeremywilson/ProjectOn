@@ -1,5 +1,5 @@
 /*-------------------- Dark Stylesheet for ProjectOn --------------------
-Note: Qt default background for widgets is #000000 or 240, 240, 240
+Note: Qt default background for widgets is #303030
 
 General Theme Colors:
     Background, usable widget: #303030
@@ -300,4 +300,17 @@ QTabBar::tab:!selected {
 }
 QTabBar::tab:last {
     margin-right: 0px;
+}
+
+/*-------------------- QProgressBar --------------------*/
+QProgressBar {
+    color: #e0e0e0;
+    background-color: #000000;
+    border: 1px solid #e0e0e0;
+    margin-right: 40%;
+    text-align: right;
+}
+QProgressBar::chunk {
+    background-color: #e0e0e0;
+    color: #303030;
 }
