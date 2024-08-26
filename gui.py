@@ -1145,8 +1145,8 @@ class GUI(QObject):
             elif item.data(40) == 'bible':
                 title = item.data(20)
                 book_chapter = title.split(':')[0]
-                book = book_chapter[:-1].strip()
-                current_chapter = book_chapter.replace(book_chapter[:-1], '')
+                book = ' '.join(book_chapter.split(' ')[:-1]).strip()
+                current_chapter = book_chapter.replace(book, '').strip()
 
                 slide_texts = item.data(21)
                 for i in range(len(slide_texts)):
