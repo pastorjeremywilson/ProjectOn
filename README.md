@@ -21,7 +21,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.3.1) and run
+system only. Download the current ProjectOn installer (v.1.3.2) and run
 it on your computer.
 <p>&nbsp;</p>
 
