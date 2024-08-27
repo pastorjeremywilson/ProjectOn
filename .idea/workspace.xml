@@ -6,16 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/error.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -506,7 +498,23 @@
       <option name="project" value="LOCAL" />
       <updated>1724446231679</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Added update check at startup.&#10;Added entry for QProgressBar in qss files.&#10;Release!">
+      <option name="closed" value="true" />
+      <created>1724540411975</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1724540411975</updated>
+    </task>
+    <task id="LOCAL-00049" summary="Fixed extra space in bible chapter in preview titles.">
+      <option name="closed" value="true" />
+      <created>1724712056945</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1724712056945</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -524,8 +532,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added readme&#10;Refined the logo" />
-    <MESSAGE value="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md" />
     <MESSAGE value="Added GhostScript to the credits section of README.md" />
     <MESSAGE value="Forgot ghostscript icon" />
     <MESSAGE value="Fixed theming on edit widget" />
@@ -549,6 +555,8 @@
     <MESSAGE value="Custom slide text needs to be saved in the service file for when multiple services are being prepared ahead of time.&#10;Fixed proper file not being loaded from recent files menu." />
     <MESSAGE value="Fixed setting style of entire line when only one word of a line has a style set." />
     <MESSAGE value="Added link to tutorial video to help menu." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added link to tutorial video to help menu." />
+    <MESSAGE value="Added update check at startup.&#10;Added entry for QProgressBar in qss files.&#10;Release!" />
+    <MESSAGE value="Fixed extra space in bible chapter in preview titles." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed extra space in bible chapter in preview titles." />
   </component>
 </project>

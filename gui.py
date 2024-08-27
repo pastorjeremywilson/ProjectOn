@@ -492,7 +492,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.3.0'
+        current_version = 'v.1.3.1'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version = ''.join(current_version.split('.'))
@@ -727,7 +727,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.3.0')
+        title_label = QLabel('ProjectOn v.1.3.1')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1145,8 +1145,8 @@ class GUI(QObject):
             elif item.data(40) == 'bible':
                 title = item.data(20)
                 book_chapter = title.split(':')[0]
-                book = book_chapter[:-1].strip()
-                current_chapter = book_chapter.replace(book_chapter[:-1], '')
+                book = ' '.join(book_chapter.split(' ')[:-1]).strip()
+                current_chapter = book_chapter.replace(book, '').strip()
 
                 slide_texts = item.data(21)
                 for i in range(len(slide_texts)):
