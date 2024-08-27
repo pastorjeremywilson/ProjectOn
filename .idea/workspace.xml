@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added update check at startup.&#10;Added entry for QProgressBar in qss files.&#10;Release!">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/error.log" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -506,7 +506,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724540411975</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Fixed extra space in bible chapter in preview titles.">
+      <option name="closed" value="true" />
+      <created>1724712056945</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1724712056945</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -524,7 +532,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md" />
     <MESSAGE value="Added GhostScript to the credits section of README.md" />
     <MESSAGE value="Forgot ghostscript icon" />
     <MESSAGE value="Fixed theming on edit widget" />
@@ -549,6 +556,7 @@
     <MESSAGE value="Fixed setting style of entire line when only one word of a line has a style set." />
     <MESSAGE value="Added link to tutorial video to help menu." />
     <MESSAGE value="Added update check at startup.&#10;Added entry for QProgressBar in qss files.&#10;Release!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added update check at startup.&#10;Added entry for QProgressBar in qss files.&#10;Release!" />
+    <MESSAGE value="Fixed extra space in bible chapter in preview titles." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed extra space in bible chapter in preview titles." />
   </component>
 </project>

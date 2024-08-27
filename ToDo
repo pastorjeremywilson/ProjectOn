@@ -1,9 +1,8 @@
-Fix extra space in scripture slide titles
-
 Future Releases:
 Set font independently for songs and bible
 Add auto-play slide feature
 Accurate preview when editing a song or a custom slide
 Simple audio slide
 Video backgrounds
+Move parsers into their own file
 Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
