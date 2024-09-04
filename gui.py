@@ -495,10 +495,10 @@ class GUI(QObject):
         current_version = 'v.1.3.3'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
-        current_version = ''.join(current_version.split('.'))
-        if len(current_version) > 3:
-            current_version = current_version[:3]
-        current_version = int(current_version)
+        current_version_split = current_version.split('.')
+        current_major = int(current_version_split[0])
+        current_minor = int(current_version_split[1])
+        current_patch = int(current_version_split[2])
 
         response = None
         try:
@@ -509,31 +509,33 @@ class GUI(QObject):
         if response and response.status_code == 200:
             text = response.text
             release_info = json.loads(text)
-            latest_version = [0, 0]
+            latest_version = [None, None]
             for i in range(len(release_info)):
                 this_version = release_info[i]['tag_name']
                 this_version = this_version.replace('v.', '')
                 this_version = this_version.replace('rc', '')
-                this_version = ''.join(this_version.split('.'))
-                if len(this_version) > 3:
-                    this_version = this_version[:3]
-                this_version = int(this_version)
-                if this_version > latest_version[1]:
+                this_version_split = this_version.split('.')
+                this_major = int(this_version_split[0])
+                this_minor = int(this_version_split[1])
+                this_patch = int(this_version_split[2])
+
+                if this_major > current_major:
+                    latest_version = [i, this_version]
+                elif this_minor > current_minor:
+                    latest_version = [i, this_version]
+                elif this_patch > current_patch:
                     latest_version = [i, this_version]
 
             if 'skip_update' in self.main.settings.keys():
                 if self.main.settings['skip_update'] == latest_version[1]:
                     return
 
-            if latest_version[1] > current_version:
-                latest_version_string = (f'{str(latest_version[1])[0]}.'
-                                         f'{str(latest_version[1])[1]}.'
-                                         f'{str(latest_version[1])[2]}')
+            if latest_version[1]:
                 dialog = QDialog()
                 layout = QVBoxLayout(dialog)
                 dialog.setWindowTitle('Update ProjectOn')
 
-                label = QLabel(f'An updated version of ProjectOn is available ({latest_version_string}). '
+                label = QLabel(f'An updated version of ProjectOn is available ({latest_version[1]}). '
                                f'Would you like to update now?')
                 label.setFont(self.standard_font)
                 layout.addWidget(label)
@@ -563,11 +565,11 @@ class GUI(QObject):
                 if checkbox.isChecked():
                     self.main.settings['skip_update'] = latest_version[1]
                 else:
-                    self.main.settings['skip_update'] = -1
+                    self.main.settings['skip_update'] = 'none'
 
                 if response == 1:
                     download_url = release_info[latest_version[0]]['assets'][0]['browser_download_url']
-                    download_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
+                    download_dir = tempfile.gettempdir()
                     file_name_split = download_url.split('/')
                     file_name = file_name_split[len(file_name_split) - 1]
                     save_location = download_dir + '/' + file_name
@@ -576,7 +578,6 @@ class GUI(QObject):
                     self.progress_bar = QProgressBar()
                     def show_progress(block_num, block_size, total_size):
                         if not self.dialog:
-                            print('creating dialog')
                             self.dialog = QWidget(self.main_window)
                             dialog_layout = QVBoxLayout(self.dialog)
 
@@ -613,6 +614,7 @@ class GUI(QObject):
                     )
                     os.system(f'start \"\" {save_location}')
                     self.main_window.close()
+                    sys.exit(0)
 
     def print_oos(self):
         """

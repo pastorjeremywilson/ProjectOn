@@ -402,7 +402,7 @@ class CustomMainWindow(QMainWindow):
             try:
                 requests.get('http://' + self.gui.main.ip + ':15171/shutdown')
             except requests.exceptions.ConnectionError as e:
-                print("Shutdown with Connection Error" + e.__str__())
+                print("Shutdown with Connection Error " + e.__str__())
             except BaseException as e:
                 print("Shutdown Error " + e.__str__())
 
