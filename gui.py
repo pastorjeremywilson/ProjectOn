@@ -10,7 +10,7 @@ from os.path import exists
 import requests
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
 from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QVideoProbe
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
@@ -49,7 +49,6 @@ class GUI(QObject):
     global_bible_background_pixmap = None
     custom_pixmap = None
     last_pixmap = None
-    display_widget = None
     sample_widget = None
     lyric_widget = None
     sample_lyric_widget = None
@@ -58,6 +57,7 @@ class GUI(QObject):
     web_view = None
     video_widget = None
     media_player = None
+    video_probe = None
     timed_update = None
     central_widget = None
     central_layout = None
@@ -492,7 +492,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.3.2'
+        current_version = 'v.1.3.3'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -729,7 +729,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.3.2')
+        title_label = QLabel('ProjectOn v.1.3.3')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -823,16 +823,13 @@ class GUI(QObject):
                                  int(self.main_window.menuBar().height() / 2) - int(block_label.height() / 2))
                 block_label.show()
 
-    def grab_display(self):
+    def grab_display(self, frame=None):
         """
         Provides a method to grab the display widget and scale it down as a preview.
         """
-        if self.video_widget:
-            try:
-                image = self.video_widget.grab(self.video_widget.rect())
-                pixmap = QPixmap(image)
-            except Exception as ex:
-                self.main.error_log()
+        pixmap = None
+        if frame:
+            pixmap = QPixmap(frame.image())
         else:
             pixmap = self.display_widget.grab(self.display_widget.rect())
 
@@ -1363,13 +1360,12 @@ class GUI(QObject):
                     self.media_player.stop()
                     if self.timed_update:
                         self.timed_update.stop = True
-                #self.media_player.media().clear()
                 self.media_player.deleteLater()
                 self.video_widget.deleteLater()
                 self.media_player = None
                 self.video_widget = None
                 self.audio_output = None
-                self.timed_update = None
+                self.video_probe = None
 
             display_widget = self.display_widget
             lyric_widget = self.lyric_widget
@@ -1431,6 +1427,7 @@ class GUI(QObject):
                 display_widget.background_label.setPixmap(pixmap)
 
             # set the lyrics html
+            lyrics_html = ''
             if current_item.data(40) == 'song':
                 lyrics_html = current_item.data(24)[2]
             elif current_item.data(40) == 'bible' or current_item.data(23) == 'custom':
@@ -1580,8 +1577,6 @@ class GUI(QObject):
                     media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
                     self.media_player.setMedia(media_content)
                     self.media_player.play()
-                    self.timed_update = TimedPreviewUpdate(self)
-                    self.main.thread_pool.start(self.timed_update)
 
                     if not self.lyric_widget.isHidden():
                         self.lyric_widget.hide()
@@ -1681,6 +1676,10 @@ class GUI(QObject):
         self.media_player.stateChanged.connect(self.media_playing_change)
         self.media_player.error.connect(self.media_error)
         self.media_player.setVideoOutput(self.video_widget)
+
+        self.video_probe = QVideoProbe()
+        self.video_probe.setSource(self.media_player)
+        self.video_probe.videoFrameProbed.connect(self.grab_display)
 
     def media_playing_change(self):
         if self.media_player.state() == QMediaPlayer.State.StoppedState:

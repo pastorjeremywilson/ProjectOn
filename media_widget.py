@@ -545,17 +545,16 @@ class MediaWidget(QTabWidget):
                 segment_text = self.lyric_dictionary[segment].rstrip()
                 segment_text = re.sub('<p.*?>', '', segment_text)
                 segment_text = segment_text.replace('</p>', '')
+                segment_text = segment_text.replace('\n', '<br />')
+                segment_text = segment_text.replace('&quot;', '"')
             except Exception:
                 segment_text = ''
                 pass
 
-            if segment_text.startswith('<br />'):
+            while segment_text.startswith('<br />'):
                 segment_text = segment_text[6:]
-            if segment_text.endswith('<br />'):
+            while segment_text.endswith('<br />'):
                 segment_text = segment_text[:len(segment_text) - 6]
-
-            segment_text = segment_text.replace('\n', '<br />')
-            segment_text = segment_text.replace('&quot;', '"')
 
             if 'span' in segment_text and 'italic' in segment_text:
                 italicized_text = re.findall('<span style=" font-style:italic;">.*?</span>', segment_text)
