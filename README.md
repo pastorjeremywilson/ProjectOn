@@ -1,13 +1,20 @@
 [![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=plastic)](https://github.com/pastorjeremywilson/ProjectOn/pulse/monthly)
 [![License](https://img.shields.io/badge/license-GPL-blue.svg?style=plastic)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-<img src='./resources/branding/projecton-banner.svg?raw=true' width='300px' />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width='300px' />
 
 # What Am I?
 
 ProjectOn is an open-source multimedia projection program geared towards
 producing and running church services.
 <p>&nbsp;</p>
+
+# What's New in Version 1.3.3?
+
+Some important bug fixes:
+- Leading and trailing blank lines are now stripped from song lyrics
+- Unwanted blank lines are no longer inserted when saving a song
+- Videos now show in the preview area of the Live panel while playing
 
 # Why ProjectOn?
 
@@ -231,33 +238,31 @@ black)</p></td>
 
 # Known Issues
 
-Applying bold to a single word in a song or custom slide will result in the whole line being bolded when displayed.
-
 # Technologies and Credits
 
 <br>
 <div>
-    <img src='./resources/images/python-logo-only.svg?raw=true' width=40px align='right' />
+    <img src='https://github.com/pastorjeremywilson/public/blob/main/python-logo-only.svg?raw=true' width=40px align='right' />
     ProjectOn is written primarily in <a href="https://www.python.org" target="_blank">Python</a>, compiled through <a href="https://www.pyinstaller.org" target="_blank">PyInstaller</a>,
     and packaged into an installation executable with <a href="https://jrsoftware.org/isinfo.php" target="_blank">Inno Setup Compiler</a>.
 </div>
 <br>
 
 <div>
-    <img src='./resources/images/sqlite370.jpg?raw=true' height=40px align='right' />
+    <img src='https://github.com/pastorjeremywilson/public/blob/main/sqlite370.jpg?raw=true' height=40px align='right' />
     ProjectOn’s main database is <a href="https://www.sqlite.org" target="_blank">SQLite</a> and the remaining data files are
     stored in the <a href="https://www.json.org/json-en.html" target="_blank">JSON</a> format.
 </div>
 <br>
 
 <div>
-    <img src='./resources/images/Qt-logo-neon.png?raw=true' height=40px align='right' />
+    <img src='https://github.com/pastorjeremywilson/public/blob/main/Qt-logo-neon.png?raw=true' height=40px align='right' />
     ProjectOn uses <a href="https://www.qt.io/product/framework" target="_blank">Qt</a> (PyQt5) for the user interface.
 </div>
 <br>
 
 <div>
-    <img src='./resources/images/ghostscript-plus-text.png?raw=true' height=40px align='right' />
+    <img src='https://github.com/pastorjeremywilson/public/blob/main/ghostscript-plus-text.png?raw=true' height=40px align='right' />
     Printing made possible with the help of Artifex Software's <a href="https://www.ghostscript.com" target="_blank">Ghostscript</a>.
 </div>
 <br>
@@ -271,7 +276,7 @@ All trademarks (c) their respective owners.
 # Licensing
 <br>
 
-<img src='./resources/images/gnu-4.svg?raw=true' height=120px align='left' />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/gnu-4.svg?raw=true' height=120px align='left' />
 ProjectOn is licensed under the GNU General Public License (GNU GPL)
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version. See

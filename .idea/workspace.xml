@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Ensured that blank lines before and after lyric text are removed.&#10;Fixed preview not showing currently playing video.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,15 +141,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1721321664836</updated>
-      <workItem from="1725478278113" duration="2837000" />
-    </task>
-    <task id="LOCAL-00004" summary="Fixed help pages not loading">
-      <option name="closed" value="true" />
-      <created>1721422714998</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1721422714998</updated>
+      <workItem from="1725478278113" duration="3484000" />
     </task>
     <task id="LOCAL-00005" summary="Switched from Qt6 to Qt5 to alleviate a couple of video bugs">
       <option name="closed" value="true" />
@@ -536,7 +527,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725475724056</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Ensured that blank lines before and after lyric text are removed.&#10;Fixed preview not showing currently playing video.">
+      <option name="closed" value="true" />
+      <created>1725481244582</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1725481244583</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -557,7 +556,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed theming on edit widget" />
     <MESSAGE value="Added the ability to paste a passage into the bible text edit and have it parse and save." />
     <MESSAGE value="Reimplemented show/hide advanced options in the edit widget." />
     <MESSAGE value="Added images for the installer." />
@@ -582,7 +580,8 @@
     <MESSAGE value="Fixed extra space in bible chapter in preview titles." />
     <MESSAGE value="More progress on setting song and bible slide fonts independently" />
     <MESSAGE value="Fixed extra space in lyrics after saving a new song" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed extra space in lyrics after saving a new song" />
+    <MESSAGE value="Ensured that blank lines before and after lyric text are removed.&#10;Fixed preview not showing currently playing video." />
+    <option name="LAST_COMMIT_MESSAGE" value="Ensured that blank lines before and after lyric text are removed.&#10;Fixed preview not showing currently playing video." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1725481040904" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
