@@ -847,7 +847,7 @@ class EditWidget(QDialog):
         lyrics = lyrics_split[1].replace('</body></html>', '')
 
         lyrics = re.sub('<p.*?>', '', lyrics)
-        lyrics = re.sub('</p>', '<br />', lyrics)
+        lyrics = re.sub('</p>', '', lyrics)
 
         # simplify the formatting tags for bold, italic, and underline
         style_substrings = re.findall('<span.*?</span>', lyrics)

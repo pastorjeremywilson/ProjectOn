@@ -4,6 +4,7 @@ import sqlite3
 import requests
 from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal
 from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter
+from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
                             QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
                             QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog
@@ -380,6 +381,17 @@ class CustomMainWindow(QMainWindow):
             continue_close = True
 
         if continue_close:
+            # shutdown the media player
+            if self.gui.media_player:
+                if self.gui.media_player.state() == QMediaPlayer.State.PlayingState:
+                    self.gui.media_player.stop()
+                self.gui.media_player.deleteLater()
+                self.gui.video_widget.deleteLater()
+                self.gui.media_player = None
+                self.gui.video_widget = None
+                self.gui.audio_output = None
+                self.gui.video_probe = None
+
             try:
                 self.gui.main.server_check.keep_checking = False
             except AttributeError:
