@@ -1,5 +1,8 @@
+Figure out why main window resizes after saving settings
+
 Future Releases:
-Set font independently for songs and bible
+Set font independently for songs and bible - in progress, need to modify GUI.change_display
+Auto-hide font widget when mouse leaves
 Add auto-play slide feature
 Accurate preview when editing a song or a custom slide
 Simple audio slide

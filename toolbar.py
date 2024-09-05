@@ -56,30 +56,44 @@ class Toolbar(QWidget):
 
         self.layout.addStretch()
 
-        self.font_widget = FontWidget(self.gui)
+        self.song_font_widget = FontWidget(self.gui, 'song')
+        self.song_font_widget.hide()
 
-        self.font_button = QPushButton()
-        self.font_button.setIcon(QIcon('resources/gui_icons/font_settings.svg'))
-        self.font_button.setIconSize(QSize(36, 36))
-        self.font_button.setToolTip('Change Font Settings')
-        self.font_button.setFont(self.gui.standard_font)
-        self.font_button.setCheckable(True)
-        self.font_button.clicked.connect(self.show_hide_font_widget)
-        self.font_widget.hide()
-        self.layout.addWidget(self.font_button)
-
-        song_background_label = QLabel('Global Song Background:')
+        song_background_label = QLabel('Global Song Settings:')
         song_background_label.setFont(self.gui.standard_font)
         self.layout.addWidget(song_background_label)
+
+        self.song_font_button = QPushButton()
+        self.song_font_button.setObjectName('song_font_button')
+        self.song_font_button.setIcon(QIcon('resources/gui_icons/font_settings.svg'))
+        self.song_font_button.setIconSize(QSize(36, 36))
+        self.song_font_button.setToolTip('Change Font Settings')
+        self.song_font_button.setFont(self.gui.standard_font)
+        self.song_font_button.setCheckable(True)
+        self.song_font_button.clicked.connect(self.show_hide_font_widget)
+        self.layout.addWidget(self.song_font_button)
 
         self.song_background_combobox = ImageCombobox(self.gui, 'song')
         self.song_background_combobox.setObjectName('song_background_combobox')
         self.song_background_combobox.setToolTip('Choose a Background for All Songs')
         self.layout.addWidget(self.song_background_combobox)
 
-        bible_background_label = QLabel('Global Bible Background:')
+        self.bible_font_widget = FontWidget(self.gui, 'bible')
+        self.bible_font_widget.hide()
+
+        bible_background_label = QLabel('Global Bible Settings:')
         bible_background_label.setFont(self.gui.standard_font)
         self.layout.addWidget(bible_background_label)
+
+        self.bible_font_button = QPushButton()
+        self.bible_font_button.setObjectName('bible_font_button')
+        self.bible_font_button.setIcon(QIcon('resources/gui_icons/font_settings.svg'))
+        self.bible_font_button.setIconSize(QSize(36, 36))
+        self.bible_font_button.setToolTip('Change Font Settings')
+        self.bible_font_button.setFont(self.gui.standard_font)
+        self.bible_font_button.setCheckable(True)
+        self.bible_font_button.clicked.connect(self.show_hide_font_widget)
+        self.layout.addWidget(self.bible_font_button)
 
         self.bible_background_combobox = ImageCombobox(self.gui, 'bible')
         self.bible_background_combobox.setObjectName('bible_background_combobox')
@@ -122,10 +136,15 @@ class Toolbar(QWidget):
         self.sw = SettingsWidget(self.gui)
 
     def show_hide_font_widget(self):
-        if self.font_widget.isHidden():
-            self.font_widget.show()
+        if self.sender().objectName() == 'song_font_button':
+            font_widget = self.song_font_widget
+        elif self.sender().objectName() == 'bible_font_button':
+            font_widget = self.bible_font_widget
+
+        if font_widget.isHidden():
+            font_widget.show()
         else:
-            self.font_widget.hide()
+            font_widget.hide()
 
     def import_background(self):
         result = QFileDialog.getOpenFileName(
@@ -190,5 +209,16 @@ class Toolbar(QWidget):
                         self.gui.logo_label.setPixmap(self.gui.logo_pixmap)
 
     def paintEvent(self, evt):
-        self.font_widget.move(
-            self.mapToGlobal(QPoint(self.font_button.x(), self.font_button.y() + self.font_button.height())))
+        self.song_font_widget.adjustSize()
+        self.bible_font_widget.adjustSize()
+        self.song_font_widget.move(
+            self.mapToGlobal(
+                QPoint(self.song_font_button.x(), self.song_font_button.y() + self.song_font_button.height())))
+        self.bible_font_widget.move(
+            self.mapToGlobal(
+                QPoint(self.bible_font_button.x(), self.bible_font_button.y() + self.bible_font_button.height())))
+        if self.bible_font_widget.x() + self.bible_font_widget.width() > self.gui.main_window.width():
+            self.bible_font_widget.move(
+                self.mapToGlobal(
+                    QPoint(self.gui.main_window.width() - self.bible_font_widget.width(),
+                           self.bible_font_button.y() + self.bible_font_button.height())))

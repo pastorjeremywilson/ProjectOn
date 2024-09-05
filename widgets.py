@@ -761,7 +761,7 @@ class FontWidget(QWidget):
     """
     mouse_release_signal = pyqtSignal(int)
 
-    def __init__(self, gui, draw_border=True, auto_update=True):
+    def __init__(self, gui, slide_type, draw_border=True, auto_update=True):
         """
         Implements QWidget that contains all of the settings that can be applied to the display font
         :param GUI gui: the current instance of GUI
@@ -782,6 +782,7 @@ class FontWidget(QWidget):
         self.outline_color_slider = None
         self.outline_width_slider = None
         self.gui = gui
+        self.slide_type = slide_type
         self.draw_border = draw_border
         self.auto_update = auto_update
 
@@ -948,7 +949,7 @@ class FontWidget(QWidget):
         """
         self.blockSignals(True)
 
-        font_face = self.gui.main.settings['font_face']
+        font_face = self.gui.main.settings[f'{self.slide_type}_font_face']
         if not len(font_face) > 0:
             font_face = 'Arial Black'
         for i in range(self.font_list_widget.count()):
@@ -956,30 +957,38 @@ class FontWidget(QWidget):
                 self.font_list_widget.setCurrentRow(i)
                 break
 
-        self.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
+        self.font_size_spinbox.setValue(self.gui.main.settings[f'{self.slide_type}_font_size'])
 
-        if self.gui.main.settings['font_color'] == 'white':
+        font_color = self.gui.main.settings[f'{self.slide_type}_font_color']
+        if font_color == 'white':
             self.white_radio_button.setChecked(True)
-        elif self.gui.main.settings['font_color'] == 'black':
+        elif font_color == 'black':
             self.black_radio_button.setChecked(True)
         else:
             self.custom_font_color_radio_button.setChecked(True)
-            self.custom_font_color_radio_button.setText('Custom: ' + self.gui.main.settings['font_color'])
-            self.custom_font_color_radio_button.setObjectName(self.gui.main.settings['font_color'])
+            self.custom_font_color_radio_button.setText('Custom: ' + font_color)
+            self.custom_font_color_radio_button.setObjectName(font_color)
 
-        if self.gui.main.settings['use_shadow']:
+        use_shadow = self.gui.main.settings[f'{self.slide_type}_use_shadow']
+        shadow_color = self.gui.main.settings[f'{self.slide_type}_shadow_color']
+        shadow_offset = self.gui.main.settings[f'{self.slide_type}_shadow_offset']
+
+        if use_shadow:
             self.shadow_checkbox.setChecked(True)
-        self.shadow_color_slider.color_slider.setValue(self.gui.main.settings['shadow_color'])
-        self.shadow_color_slider.change_sample(self.gui.main.settings['shadow_color'])
-        self.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
-        self.shadow_offset_slider.current_label.setText(str(self.gui.main.settings['shadow_offset']) + 'px')
+        self.shadow_color_slider.color_slider.setValue(shadow_color)
+        self.shadow_color_slider.change_sample(shadow_color)
+        self.shadow_offset_slider.offset_slider.setValue(shadow_offset)
+        self.shadow_offset_slider.current_label.setText(str(shadow_offset) + 'px')
 
-        if self.gui.main.settings['use_outline']:
-            self.outline_checkbox.setChecked(True)
-        self.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
-        self.outline_color_slider.change_sample(self.gui.main.settings['outline_color'])
-        self.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
-        self.outline_width_slider.current_label.setText(str(self.gui.main.settings['outline_width']) + 'px')
+        use_outline = self.gui.main.settings[f'{self.slide_type}_use_outline']
+        outline_color = self.gui.main.settings[f'{self.slide_type}_outline_color']
+        outline_width = self.gui.main.settings[f'{self.slide_type}_outline_width']
+
+        self.outline_checkbox.setChecked(use_outline)
+        self.outline_color_slider.color_slider.setValue(outline_color)
+        self.outline_color_slider.change_sample(outline_color)
+        self.outline_width_slider.offset_slider.setValue(outline_width)
+        self.outline_width_slider.current_label.setText(str(outline_width) + 'px')
         self.blockSignals(False)
 
     def change_font(self, value=None):
@@ -987,6 +996,7 @@ class FontWidget(QWidget):
         applies the currently chosen font settings to gui's global_font_face, global_footer_font_face, and settings
         """
 
+        slide_type = self.objectName().split('_')[0]
         shadow_color = None
         shadow_offset = None
         outline_color = None
@@ -1006,28 +1016,28 @@ class FontWidget(QWidget):
             self.gui.global_font_face = new_font_face
             self.gui.global_footer_font_face = new_font_face
 
-            self.gui.main.settings['font_face'] = self.font_list_widget.currentItem().data(20)
-            self.gui.main.settings['font_size'] = self.font_size_spinbox.value()
+            self.gui.main.settings[f'{slide_type}_font_face'] = self.font_list_widget.currentItem().data(20)
+            self.gui.main.settings[f'{slide_type}_font_size'] = self.font_size_spinbox.value()
             if self.font_color_button_group.checkedButton():
-                self.gui.main.settings['font_color'] = self.font_color_button_group.checkedButton().objectName()
-            self.gui.main.settings['use_shadow'] = self.shadow_checkbox.isChecked()
+                self.gui.main.settings[f'{slide_type}_font_color'] = self.font_color_button_group.checkedButton().objectName()
+            self.gui.main.settings[f'{slide_type}_use_shadow'] = self.shadow_checkbox.isChecked()
             if shadow_color:
-                self.gui.main.settings['shadow_color'] = shadow_color
+                self.gui.main.settings[f'{slide_type}_shadow_color'] = shadow_color
             else:
-                self.gui.main.settings['shadow_color'] = self.shadow_color_slider.color_slider.value()
+                self.gui.main.settings[f'{slide_type}_shadow_color'] = self.shadow_color_slider.color_slider.value()
             if shadow_offset:
-                self.gui.main.settings['shadow_offset'] = shadow_offset
+                self.gui.main.settings[f'{slide_type}_shadow_offset'] = shadow_offset
             else:
-                self.gui.main.settings['shadow_offset'] = self.shadow_offset_slider.offset_slider.value()
-            self.gui.main.settings['use_outline'] = self.outline_checkbox.isChecked()
+                self.gui.main.settings[f'{slide_type}_shadow_offset'] = self.shadow_offset_slider.offset_slider.value()
+            self.gui.main.settings[f'{slide_type}_use_outline'] = self.outline_checkbox.isChecked()
             if outline_color:
-                self.gui.main.settings['outline_color'] = outline_color
+                self.gui.main.settings[f'{slide_type}_outline_color'] = outline_color
             else:
-                self.gui.main.settings['outline_color'] = self.outline_color_slider.color_slider.value()
+                self.gui.main.settings[f'{slide_type}_outline_color'] = self.outline_color_slider.color_slider.value()
             if outline_width:
-                self.gui.main.settings['outline_width'] = outline_width
+                self.gui.main.settings[f'{slide_type}_outline_width'] = outline_width
             else:
-                self.gui.main.settings['outline_width'] = self.outline_width_slider.offset_slider.value()
+                self.gui.main.settings[f'{slide_type}_outline_width'] = self.outline_width_slider.offset_slider.value()
 
             self.gui.apply_settings(theme_too=False)
 

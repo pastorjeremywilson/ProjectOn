@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.3.2
+ProjectOn v.1.3.3.002
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -562,21 +562,27 @@ class ProjectOn(QObject):
             return
 
         try:
-            if not self.gui.tool_bar.font_widget.font_list_widget.currentItem().data(20):
-                self.gui.tool_bar.font_widget.font_list_widget.setCurrentRow(0)
-
             service_items = {
                 'global_song_background': self.settings['global_song_background'],
                 'global_bible_background': self.settings['global_bible_background'],
-                'font_face': self.settings['font_face'],
-                'font_size': self.settings['font_size'],
-                'font_color': self.settings['font_color'],
-                'use_shadow': self.settings['use_shadow'],
-                'shadow_color': self.settings['shadow_color'],
-                'shadow_offset': self.settings['shadow_offset'],
-                'use_outline': self.settings['use_outline'],
-                'outline_color': self.settings['outline_color'],
-                'outline_width': self.settings['outline_width'],
+                'song_font_face': self.settings['song_font_face'],
+                'song_font_size': self.settings['song_font_size'],
+                'song_font_color': self.settings['song_font_color'],
+                'song_use_shadow': self.settings['song_use_shadow'],
+                'song_shadow_color': self.settings['song_shadow_color'],
+                'song_shadow_offset': self.settings['song_shadow_offset'],
+                'song_use_outline': self.settings['song_use_outline'],
+                'song_outline_color': self.settings['song_outline_color'],
+                'song_outline_width': self.settings['song_outline_width'],
+                'bible_font_face': self.settings['bible_font_face'],
+                'bible_font_size': self.settings['bible_font_size'],
+                'bible_font_color': self.settings['bible_font_color'],
+                'bible_use_shadow': self.settings['bible_use_shadow'],
+                'bible_shadow_color': self.settings['bible_shadow_color'],
+                'bible_shadow_offset': self.settings['bible_shadow_offset'],
+                'bible_use_outline': self.settings['bible_use_outline'],
+                'bible_outline_color': self.settings['bible_outline_color'],
+                'bible_outline_width': self.settings['bible_outline_width'],
             }
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):

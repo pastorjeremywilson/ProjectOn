@@ -276,7 +276,7 @@ class EditWidget(QDialog):
         slide_settings_layout = QHBoxLayout(slide_settings_container)
         advanced_options_layout.addWidget(slide_settings_container)
 
-        self.font_widget = FontWidget(self.gui, draw_border=False, auto_update=False)
+        self.font_widget = FontWidget(self.gui, self.type, draw_border=False, auto_update=False)
         slide_settings_layout.addWidget(self.font_widget)
 
         background_widget = QWidget()

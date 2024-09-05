@@ -241,15 +241,36 @@ class GUI(QObject):
         # provide default settings should the settings file not exist
         default_settings = {
             'selected_screen_name': '',
-            'font_face': 'Helvetica',
-            'font_size': 60,
-            'font_color': 'white',
-            'global_song_background': '',
-            'global_bible_background': '',
-            'logo_image': '',
-            'last_save_dir': './saved services',
+            'global_song_background': 'choose_global',
+            'global_bible_background': 'choose_global',
+            'logo_image': 'choose_logo',
+            'last_save_dir': os.path.expanduser('~/Documents'),
             'last_status_count': 0,
-            'stage_font_size': 60
+            'stage_font_size': 60,
+            'used_services': [],
+            'data_dir': self.main.data_dir,
+            'default_bible': '',
+            'theme': 'light',
+            'skip_update': -1,
+            "song_font_face": "Arial",
+            "song_font_size": 60,
+            "song_font_color": "white",
+            "song_use_shadow": True,
+            "song_shadow_color": 0,
+            "song_shadow_offset": 4,
+            "song_use_outline": True,
+            "song_outline_color": 0,
+            "song_outline_width": 3,
+            "bible_font_face": "Arial",
+            "bible_font_size": 60,
+            "bible_font_color": "white",
+            "bible_use_shadow": True,
+            "bible_shadow_color": 0,
+            "bible_shadow_offset": 4,
+            "bible_use_outline": True,
+            "bible_outline_color": 0,
+            "bible_outline_width": 3,
+            "ccli_num": ""
         }
 
         if exists(self.main.data_dir + '/settings.json'):
@@ -258,12 +279,49 @@ class GUI(QObject):
                     self.main.settings = json.loads(file.read())
                 except json.decoder.JSONDecodeError:
                     self.main.settings = {}
+
+            # make sure the new font keys exist; copy them from the old if not
+            if 'song_font_face' not in self.main.settings.keys() or 'bible_font_face' not in self.main.settings.keys():
+                self.main.settings['song_font_face'] = self.main.settings['font_face']
+                self.main.settings['song_font_size'] = self.main.settings['font_size']
+                self.main.settings['song_font_color'] = self.main.settings['font_color']
+                self.main.settings['song_use_shadow'] = self.main.settings['use_shadow']
+                self.main.settings['song_shadow_color'] = self.main.settings['shadow_color']
+                self.main.settings['song_shadow_offset'] = self.main.settings['shadow_offset']
+                self.main.settings['song_use_outline'] = self.main.settings['use_outline']
+                self.main.settings['song_outline_color'] = self.main.settings['outline_color']
+                self.main.settings['song_outline_width'] = self.main.settings['outline_width']
+
+                self.main.settings['bible_font_face'] = self.main.settings['font_face']
+                self.main.settings['bible_font_size'] = self.main.settings['font_size']
+                self.main.settings['bible_font_color'] = self.main.settings['font_color']
+                self.main.settings['bible_use_shadow'] = self.main.settings['use_shadow']
+                self.main.settings['bible_shadow_color'] = self.main.settings['shadow_color']
+                self.main.settings['bible_shadow_offset'] = self.main.settings['shadow_offset']
+                self.main.settings['bible_use_outline'] = self.main.settings['use_outline']
+                self.main.settings['bible_outline_color'] = self.main.settings['outline_color']
+                self.main.settings['bible_outline_width'] = self.main.settings['outline_width']
+
+                self.main.settings.pop('font_face')
+                self.main.settings.pop('font_size')
+                self.main.settings.pop('font_color')
+                self.main.settings.pop('use_shadow')
+                self.main.settings.pop('shadow_color')
+                self.main.settings.pop('shadow_offset')
+                self.main.settings.pop('use_outline')
+                self.main.settings.pop('outline_color')
+                self.main.settings.pop('outline_width')
+
+                self.main.save_settings()
+
         else:
             self.main.settings = default_settings
 
         for key in default_settings:
             if key not in self.main.settings.keys():
                 self.main.settings[key] = default_settings[key]
+
+        self.main.save_settings()
 
         self.main.settings['used_services'] = device_specific_settings['used_services']
         self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']
@@ -492,7 +550,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.3.2'
+        current_version = 'v.1.3.3.002'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -729,7 +787,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.3.2')
+        title_label = QLabel('ProjectOn v.1.3.3.002')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -867,36 +925,10 @@ class GUI(QObject):
                 else:
                     self.set_theme('dark')
 
-            # apply the font, shadow, and outline settings to main and sample lyric widgets.py
-            for lyric_widget in [self.lyric_widget, self.sample_lyric_widget]:
-                if self.main.settings['font_color'] == 'black':
-                    lyric_widget.fill_color = QColor(0, 0, 0)
-                elif self.main.settings['font_color'] == 'white':
-                    lyric_widget.fill_color = QColor(255, 255, 255)
-                else:
-                    font_color = self.main.settings['font_color'].replace('rgb(', '').replace(')', '')
-                    font_color_split = font_color.split(', ')
-                    lyric_widget.fill_color = QColor(
-                        int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
-
-                lyric_widget.use_shadow = self.main.settings['use_shadow']
-                lyric_widget.shadow_color = QColor(
-                    self.main.settings['shadow_color'],
-                    self.main.settings['shadow_color'],
-                    self.main.settings['shadow_color']
-                )
-                lyric_widget.shadow_offset = int(self.main.settings['shadow_offset'])
-                lyric_widget.use_outline = self.main.settings['use_outline']
-                lyric_widget.outline_color = QColor(
-                    self.main.settings['outline_color'],
-                    self.main.settings['outline_color'],
-                    self.main.settings['outline_color'])
-                lyric_widget.outline_width = int(self.main.settings['outline_width'])
-
             self.tool_bar.song_background_combobox.blockSignals(True)
             self.tool_bar.bible_background_combobox.blockSignals(True)
 
-            # check that the saved song background exists in the combobox
+            # check that the saved song backgrounds exists in the comboboxes
             index = None
             for i in range(self.tool_bar.bible_background_combobox.count()):
                 if self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole):
@@ -956,7 +988,8 @@ class GUI(QObject):
                         QMessageBox.StandardButton.Ok
                     )
 
-            self.tool_bar.font_widget.apply_settings()
+            self.tool_bar.song_font_widget.apply_settings()
+            self.tool_bar.bible_font_widget.apply_settings()
 
             self.tool_bar.song_background_combobox.blockSignals(False)
             self.tool_bar.bible_background_combobox.blockSignals(False)
@@ -1479,6 +1512,7 @@ class GUI(QObject):
                 else:
                     outline_width = self.main.settings['outline_width']
             else:
+
                 font_face = self.main.settings['font_face']
                 font_size = self.main.settings['font_size']
                 font_color = self.main.settings['font_color']
