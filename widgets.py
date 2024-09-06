@@ -802,6 +802,7 @@ class FontWidget(QWidget):
 
         self.setParent(self.gui.main_window)
         self.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
+        self.setWindowFlag(Qt.WindowType.Popup)
         self.init_components()
 
     def init_components(self):

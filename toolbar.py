@@ -69,8 +69,7 @@ class Toolbar(QWidget):
         self.song_font_button.setIconSize(QSize(36, 36))
         self.song_font_button.setToolTip('Change Font Settings')
         self.song_font_button.setFont(self.gui.standard_font)
-        self.song_font_button.setCheckable(True)
-        self.song_font_button.clicked.connect(self.show_hide_font_widget)
+        self.song_font_button.clicked.connect(self.song_font_widget.show)
         self.layout.addWidget(self.song_font_button)
 
         self.song_background_combobox = ImageCombobox(self.gui, 'song')
@@ -91,8 +90,7 @@ class Toolbar(QWidget):
         self.bible_font_button.setIconSize(QSize(36, 36))
         self.bible_font_button.setToolTip('Change Font Settings')
         self.bible_font_button.setFont(self.gui.standard_font)
-        self.bible_font_button.setCheckable(True)
-        self.bible_font_button.clicked.connect(self.show_hide_font_widget)
+        self.bible_font_button.clicked.connect(self.bible_font_widget.show)
         self.layout.addWidget(self.bible_font_button)
 
         self.bible_background_combobox = ImageCombobox(self.gui, 'bible')
@@ -134,17 +132,6 @@ class Toolbar(QWidget):
 
     def open_settings(self):
         self.sw = SettingsWidget(self.gui)
-
-    def show_hide_font_widget(self):
-        if self.sender().objectName() == 'song_font_button':
-            font_widget = self.song_font_widget
-        elif self.sender().objectName() == 'bible_font_button':
-            font_widget = self.bible_font_widget
-
-        if font_widget.isHidden():
-            font_widget.show()
-        else:
-            font_widget.hide()
 
     def import_background(self):
         result = QFileDialog.getOpenFileName(
