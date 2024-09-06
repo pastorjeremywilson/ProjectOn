@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Began adding code to set font independently for song and bible slides">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Finished adding the ability to set song and bible fonts independently">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,15 +140,7 @@
       <updated>1721321664836</updated>
       <workItem from="1725490141279" duration="1072000" />
       <workItem from="1725491247133" duration="106000" />
-      <workItem from="1725650345914" duration="2808000" />
-    </task>
-    <task id="LOCAL-00003" summary="Changed logo">
-      <option name="closed" value="true" />
-      <created>1721419699708</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1721419699708</updated>
+      <workItem from="1725650345914" duration="3943000" />
     </task>
     <task id="LOCAL-00004" summary="Fixed help pages not loading">
       <option name="closed" value="true" />
@@ -536,7 +526,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725557435603</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="Finished adding the ability to set song and bible fonts independently">
+      <option name="closed" value="true" />
+      <created>1725653400318</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1725653400318</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -557,7 +555,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Forgot ghostscript icon" />
     <MESSAGE value="Fixed theming on edit widget" />
     <MESSAGE value="Added the ability to paste a passage into the bible text edit and have it parse and save." />
     <MESSAGE value="Reimplemented show/hide advanced options in the edit widget." />
@@ -582,9 +579,10 @@
     <MESSAGE value="Added update check at startup.&#10;Added entry for QProgressBar in qss files.&#10;Release!" />
     <MESSAGE value="Fixed extra space in bible chapter in preview titles." />
     <MESSAGE value="Began adding code to set font independently for song and bible slides" />
-    <option name="LAST_COMMIT_MESSAGE" value="Began adding code to set font independently for song and bible slides" />
+    <MESSAGE value="Finished adding the ability to set song and bible fonts independently" />
+    <option name="LAST_COMMIT_MESSAGE" value="Finished adding the ability to set song and bible fonts independently" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1725653152246" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1725653705992" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

@@ -559,7 +559,24 @@ class SettingsWidget(QDialog):
                 self.gui.main.error_log()
 
     def save(self):
-        self.gui.main.settings['selected_screen_name'] = self.screen_button_group.checkedButton().objectName()
+        if not self.screen_button_group.checkedButton().objectName() == self.gui.main.settings['selected_screen_name']:
+            screen_name = self.screen_button_group.checkedButton().objectName()
+
+            self.gui.main.settings['selected_screen_name'] = screen_name
+            primary_screen = None
+            secondary_screen = None
+
+            if len(self.gui.main.app.screens()) == 1:
+                primary_screen = self.gui.main.app.screens()[0]
+                secondary_screen = self.gui.main.app.screens()[0]
+            else:
+                for screen in self.gui.main.app.screens():
+                    if screen_name in screen.name():
+                        secondary_screen = screen
+                    else:
+                        primary_screen = screen
+
+            self.gui.position_screens(primary_screen, secondary_screen)
 
         self.gui.main.settings['song_font_face'] = self.song_font_settings_widget.font_list_widget.currentItem().data(20)
         self.gui.main.settings['song_font_size'] = self.song_font_settings_widget.font_size_spinbox.value()
@@ -594,22 +611,6 @@ class SettingsWidget(QDialog):
         )
         self.gui.main.settings['ccli_num'] = self.ccli_line_edit.text()
         self.gui.main.settings['stage_font_size'] = self.stage_font_spinbox.value()
-
-        screen_name = self.screen_button_group.checkedButton().objectName()
-        primary_screen = None
-        secondary_screen = None
-
-        if len(self.gui.main.app.screens()) == 1:
-            primary_screen = self.gui.main.app.screens()[0]
-            secondary_screen = self.gui.main.app.screens()[0]
-        else:
-            for screen in self.gui.main.app.screens():
-                if screen_name in screen.name():
-                    secondary_screen = screen
-                else:
-                    primary_screen = screen
-
-        self.gui.position_screens(primary_screen, secondary_screen)
 
         self.gui.main.save_settings()
         self.gui.apply_settings()
