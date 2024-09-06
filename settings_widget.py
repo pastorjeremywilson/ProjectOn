@@ -242,7 +242,7 @@ class SettingsWidget(QDialog):
 
         self.song_font_sample = FontSample(self)
         self.song_font_sample.setText('Song Font')
-        self.song_font_sample.setObjectName('font_sample')
+        self.song_font_sample.setObjectName('song_font_sample')
         font_layout.addWidget(self.song_font_sample)
 
         self.song_font_settings_widget = FontWidget(self.gui, 'song', draw_border=False, auto_update=False)
@@ -267,11 +267,11 @@ class SettingsWidget(QDialog):
             lambda: self.change_font_sample('song'))
 
         self.bible_font_sample = FontSample(self)
-        self.bible_font_sample.setText('Song Font')
-        self.bible_font_sample.setObjectName('font_sample')
+        self.bible_font_sample.setText('Bible Font')
+        self.bible_font_sample.setObjectName('bible_font_sample')
         font_layout.addWidget(self.bible_font_sample)
 
-        self.bible_font_settings_widget = FontWidget(self.gui, 'song', draw_border=False, auto_update=False)
+        self.bible_font_settings_widget = FontWidget(self.gui, 'bible', draw_border=False, auto_update=False)
         font_layout.addWidget(self.bible_font_settings_widget)
         self.bible_font_settings_widget.font_list_widget.currentRowChanged.connect(
             lambda: self.change_font_sample('bible'))
@@ -614,7 +614,6 @@ class SettingsWidget(QDialog):
         self.gui.main.save_settings()
         self.gui.apply_settings()
         self.done(0)
-        self.gui.main.app.processEvents()
 
     def cancel(self):
         self.done(0)

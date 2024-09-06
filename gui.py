@@ -1512,16 +1512,26 @@ class GUI(QObject):
                 else:
                     outline_width = self.main.settings['outline_width']
             else:
-
-                font_face = self.main.settings['font_face']
-                font_size = self.main.settings['font_size']
-                font_color = self.main.settings['font_color']
-                use_shadow = self.main.settings['use_shadow']
-                shadow_color = self.main.settings['shadow_color']
-                shadow_offset = self.main.settings['shadow_offset']
-                use_outline = self.main.settings['use_outline']
-                outline_color = self.main.settings['outline_color']
-                outline_width = self.main.settings['outline_width']
+                if current_item.data(40) == 'bible':
+                    font_face = self.main.settings['bible_font_face']
+                    font_size = self.main.settings['bible_font_size']
+                    font_color = self.main.settings['bible_font_color']
+                    use_shadow = self.main.settings['bible_use_shadow']
+                    shadow_color = self.main.settings['bible_shadow_color']
+                    shadow_offset = self.main.settings['bible_shadow_offset']
+                    use_outline = self.main.settings['bible_use_outline']
+                    outline_color = self.main.settings['bible_outline_color']
+                    outline_width = self.main.settings['bible_outline_width']
+                else:
+                    font_face = self.main.settings['song_font_face']
+                    font_size = self.main.settings['song_font_size']
+                    font_color = self.main.settings['song_font_color']
+                    use_shadow = self.main.settings['song_use_shadow']
+                    shadow_color = self.main.settings['song_shadow_color']
+                    shadow_offset = self.main.settings['song_shadow_offset']
+                    use_outline = self.main.settings['song_use_outline']
+                    outline_color = self.main.settings['song_outline_color']
+                    outline_width = self.main.settings['song_outline_width']
 
             lyric_widget.setFont(QFont(font_face, font_size))
             lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
