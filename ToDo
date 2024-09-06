@@ -1,5 +1,4 @@
 Future Releases:
-Auto-hide font widget when mouse leaves
 Add auto-play slide feature
 Accurate preview when editing a song or a custom slide
 Simple audio slide
@@ -9,3 +8,4 @@ Create single CustomListWidget for media_widget, oos_widget, preview_widget, and
 
 DONE
 Set font independently for songs and bible
+Auto-hide font widget when mouse leaves
