@@ -773,7 +773,7 @@ class FontWidget(QWidget):
     """
     mouse_release_signal = pyqtSignal(int)
 
-    def __init__(self, gui, slide_type, draw_border=True, auto_update=True):
+    def __init__(self, gui, slide_type, draw_border=True):
         """
         Implements QWidget that contains all of the settings that can be applied to the display font
         :param GUI gui: the current instance of GUI
@@ -796,7 +796,6 @@ class FontWidget(QWidget):
         self.gui = gui
         self.slide_type = slide_type
         self.draw_border = draw_border
-        self.auto_update = auto_update
 
         self.mouse_release_signal.connect(lambda value: self.change_font(value))
 
@@ -806,15 +805,19 @@ class FontWidget(QWidget):
         self.init_components()
 
     def init_components(self):
-        layout = QHBoxLayout(self)
+        layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
+        sample_text = self.slide_type.capitalize() + ' Font Sample'
+        self.font_sample = FontSample(self)
+        self.font_sample.setText(sample_text)
+        self.font_sample.setObjectName('bible_font_sample')
+        layout.addWidget(self.font_sample)
+
         self.font_widget = QWidget()
-        self.font_widget.setObjectName('font_widget')
+        self.setObjectName('font_widget')
         layout.addWidget(self.font_widget)
         font_widget_layout = QGridLayout(self.font_widget)
-
-        self.move(int(self.width() / 2), int(self.height() / 2))
 
         font_face_widget = QWidget()
         font_face_layout = QVBoxLayout(font_face_widget)
@@ -934,7 +937,7 @@ class FontWidget(QWidget):
         outline_layout.addWidget(self.outline_width_slider)
         outline_layout.addStretch()
 
-        self.adjustSize()
+        #self.adjustSize()
 
     def blockSignals(self, block):
         """
@@ -1004,6 +1007,8 @@ class FontWidget(QWidget):
         self.outline_width_slider.current_label.setText(str(outline_width) + 'px')
         self.blockSignals(False)
 
+        self.change_font_sample()
+
     def change_font(self, value=None):
         """
         applies the currently chosen font settings to gui's global_font_face, global_footer_font_face, and settings
@@ -1013,7 +1018,7 @@ class FontWidget(QWidget):
         shadow_offset = None
         outline_color = None
         outline_width = None
-        if not self.signalsBlocked() and self.auto_update:
+        if not self.signalsBlocked():
             if value:
                 if self.sender().objectName() == 'shadow_color_slider':
                     shadow_color = value
@@ -1051,7 +1056,44 @@ class FontWidget(QWidget):
             else:
                 self.gui.main.settings[f'{self.slide_type}_outline_width'] = self.outline_width_slider.offset_slider.value()
 
-            self.gui.apply_settings(theme_too=False)
+            self.change_font_sample()
+
+    def change_font_sample(self):
+        self.font_sample.setFont(
+            QFont(
+                self.font_list_widget.currentItem().data(20),
+                self.font_size_spinbox.value(),
+                QFont.Weight.Bold))
+
+        color = self.font_color_button_group.checkedButton().objectName()
+        if color == 'black':
+            self.font_sample.fill_color = QColor(0, 0, 0)
+        elif color == 'white':
+            self.font_sample.fill_color = QColor(255, 255, 255)
+        else:
+            fill_color_split = self.custom_font_color_radio_button.objectName().split(', ')
+            self.font_sample.fill_color = QColor(
+                int(fill_color_split[0]), int(fill_color_split[1]), int(fill_color_split[2]))
+
+        if self.shadow_checkbox.isChecked():
+            self.font_sample.use_shadow = True
+        else:
+            self.font_sample.use_shadow = False
+
+        if self.outline_checkbox.isChecked():
+            self.font_sample.use_outline = True
+        else:
+            self.font_sample.use_outline = False
+
+        shadow_color = self.shadow_color_slider.color_slider.value()
+        self.font_sample.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
+        self.font_sample.shadow_offset = self.shadow_offset_slider.offset_slider.value()
+
+        outline_color = self.outline_color_slider.color_slider.value()
+        self.font_sample.outline_color = QColor(outline_color, outline_color, outline_color)
+        self.font_sample.outline_width = self.outline_width_slider.offset_slider.value()
+
+        self.font_sample.paint_font()
 
     def color_chooser(self):
         """
@@ -1071,6 +1113,7 @@ class FontWidget(QWidget):
         overrides hideEvent to save settings when the widget is hidden
         """
         self.gui.main.save_settings()
+        self.gui.apply_settings(theme_too=False)
         super().hideEvent(evt)
 
 
@@ -1086,3 +1129,68 @@ class CustomSlider(QSlider):
     def mouseReleaseEvent(self, evt):
         self.mouse_pressed = False
         super().mouseReleaseEvent(evt)
+
+
+class FontSample(QLabel):
+    def __init__(self, settings_widget,
+                 use_outline=True,
+                 outline_color=QColor(0, 0, 0),
+                 outline_width=8,
+                 fill_color=QColor(255, 255, 255),
+                 use_shadow=True,
+                 shadow_color=QColor(0, 0, 0),
+                 shadow_offset=5):
+        super().__init__()
+        self.settings_widget = settings_widget
+        self.use_outline = use_outline
+        self.outline_color = outline_color
+        self.outline_width = outline_width
+        self.fill_color = fill_color
+        self.use_shadow = use_shadow
+        self.shadow_color = shadow_color
+        self.shadow_offset = shadow_offset
+
+    def paintEvent(self, evt):
+        self.paint_font()
+
+    def paint_font(self):
+        path = QPainterPath()
+        shadow_path = QPainterPath()
+        metrics = self.fontMetrics()
+
+        y = metrics.ascent() - metrics.descent() + 10
+        point = QPointF(0, y)
+        shadow_point = QPointF(self.shadow_offset, y + self.shadow_offset)
+
+        if self.use_shadow:
+            shadow_path.addText(shadow_point, self.font(), self.text())
+        path.addText(point, self.font(), self.text())
+
+        brush = QBrush()
+        brush.setColor(self.fill_color)
+        brush.setStyle(Qt.BrushStyle.SolidPattern)
+        pen = QPen()
+        pen.setColor(self.outline_color)
+        pen.setWidth(self.outline_width)
+
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setBrush(brush)
+        painter.setPen(pen)
+
+        if self.use_shadow:
+            shadow_brush = QBrush()
+            shadow_brush.setColor(self.shadow_color)
+            shadow_brush.setStyle(Qt.BrushStyle.SolidPattern)
+            painter.fillPath(shadow_path, shadow_brush)
+
+        painter.fillPath(path, brush)
+        if self.use_outline:
+            painter.strokePath(path, pen)
+
+        widget = self.parent()
+        widget.adjustSize()
+        while widget.parent():
+            widget = widget.parent()
+            widget.update()
+        #self.settings_widget.settings_container.adjustSize()

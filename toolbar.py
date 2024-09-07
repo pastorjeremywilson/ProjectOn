@@ -69,7 +69,7 @@ class Toolbar(QWidget):
         self.song_font_button.setIconSize(QSize(36, 36))
         self.song_font_button.setToolTip('Change Font Settings')
         self.song_font_button.setFont(self.gui.standard_font)
-        self.song_font_button.clicked.connect(self.song_font_widget.show)
+        self.song_font_button.clicked.connect(lambda: self.show_font_widget('song'))
         self.layout.addWidget(self.song_font_button)
 
         self.song_background_combobox = ImageCombobox(self.gui, 'song')
@@ -90,7 +90,7 @@ class Toolbar(QWidget):
         self.bible_font_button.setIconSize(QSize(36, 36))
         self.bible_font_button.setToolTip('Change Font Settings')
         self.bible_font_button.setFont(self.gui.standard_font)
-        self.bible_font_button.clicked.connect(self.bible_font_widget.show)
+        self.bible_font_button.clicked.connect(lambda: self.show_font_widget('bible'))
         self.layout.addWidget(self.bible_font_button)
 
         self.bible_background_combobox = ImageCombobox(self.gui, 'bible')
@@ -126,6 +126,26 @@ class Toolbar(QWidget):
         self.logo_screen_button.setCheckable(True)
         self.logo_screen_button.pressed.connect(self.gui.display_logo_screen)
         self.layout.addWidget(self.logo_screen_button)
+
+    def show_font_widget(self, slide_type):
+        if slide_type == 'song':
+            font_widget = self.song_font_widget
+            font_button = self.song_font_button
+        else:
+            font_widget = self.bible_font_widget
+            font_button = self.bible_font_button
+
+        font_widget.adjustSize()
+        font_widget.move(
+            self.mapToGlobal(
+                QPoint(font_button.x(), font_button.y() + font_button.height())))
+        if font_widget.x() + font_widget.width() > self.gui.main_window.width():
+            font_widget.move(
+                self.mapToGlobal(
+                    QPoint(self.gui.main_window.width() - font_widget.width(),
+                           font_button.y() + font_button.height())))
+
+        font_widget.show()
 
     def import_songs(self):
        self.olpi = OpenLPImport(self.gui)
@@ -194,18 +214,3 @@ class Toolbar(QWidget):
                     if self.gui.logo_widget.isVisible():
                         self.gui.logo_label.clear()
                         self.gui.logo_label.setPixmap(self.gui.logo_pixmap)
-
-    def paintEvent(self, evt):
-        self.song_font_widget.adjustSize()
-        self.bible_font_widget.adjustSize()
-        self.song_font_widget.move(
-            self.mapToGlobal(
-                QPoint(self.song_font_button.x(), self.song_font_button.y() + self.song_font_button.height())))
-        self.bible_font_widget.move(
-            self.mapToGlobal(
-                QPoint(self.bible_font_button.x(), self.bible_font_button.y() + self.bible_font_button.height())))
-        if self.bible_font_widget.x() + self.bible_font_widget.width() > self.gui.main_window.width():
-            self.bible_font_widget.move(
-                self.mapToGlobal(
-                    QPoint(self.gui.main_window.width() - self.bible_font_widget.width(),
-                           self.bible_font_button.y() + self.bible_font_button.height())))
