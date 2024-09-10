@@ -2,8 +2,9 @@ import re
 import sqlite3
 
 import requests
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal
-from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter
+from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect
+from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
+    QImage
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
                             QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
@@ -116,6 +117,7 @@ class ImageCombobox(QComboBox):
         elif self.type == 'song':
             self.gui.main.settings['global_song_background'] = file_name
             self.gui.global_song_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
+            self.gui.tool_bar.song_font_widget.font_sample.change_sample_background()
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 item = self.gui.oos_widget.oos_list_widget.item(i)
@@ -129,6 +131,7 @@ class ImageCombobox(QComboBox):
         elif self.type == 'bible':
             self.gui.main.settings['global_bible_background'] = file_name
             self.gui.global_bible_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
+            self.gui.tool_bar.bible_font_widget.font_sample.change_sample_background()
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 item = self.gui.oos_widget.oos_list_widget.item(i)
@@ -937,8 +940,6 @@ class FontWidget(QWidget):
         outline_layout.addWidget(self.outline_width_slider)
         outline_layout.addStretch()
 
-        #self.adjustSize()
-
     def blockSignals(self, block):
         """
         method to block the signals of all widgets that would be updated during apply_settings
@@ -1008,6 +1009,7 @@ class FontWidget(QWidget):
         self.blockSignals(False)
 
         self.change_font_sample()
+        self.font_sample.change_sample_background()
 
     def change_font(self, value=None):
         """
@@ -1150,10 +1152,41 @@ class FontSample(QLabel):
         self.shadow_color = shadow_color
         self.shadow_offset = shadow_offset
 
+        self.sample_background = None
+
+    def change_sample_background(self):
+        self.adjustSize()
+        slide_type = self.settings_widget.slide_type
+        sample_background = QImage(
+            self.settings_widget.gui.main.background_dir + '/'
+            + self.settings_widget.gui.main.settings[f'global_{slide_type}_background'])
+        ratio = sample_background.width() / self.width()
+        sample_background = sample_background.scaled(
+            int(sample_background.width() / ratio),
+            int(sample_background.height() / ratio),
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        piece_rect = QRect(
+            0,
+            int(sample_background.height() / 2) - int(self.height() / 2),
+            self.width(),
+            self.height()
+        )
+        self.sample_background = sample_background.copy(piece_rect)
+        self.paint_font()
+
     def paintEvent(self, evt):
         self.paint_font()
 
     def paint_font(self):
+        if not self.sample_background:
+            self.change_sample_background()
+        painter = QPainter()
+        painter.begin(self)
+        painter.drawImage(self.rect(), self.sample_background)
+        painter.end()
+
         path = QPainterPath()
         shadow_path = QPainterPath()
         metrics = self.fontMetrics()
@@ -1189,8 +1222,8 @@ class FontSample(QLabel):
             painter.strokePath(path, pen)
 
         widget = self.parent()
-        widget.adjustSize()
-        while widget.parent():
-            widget = widget.parent()
-            widget.update()
-        #self.settings_widget.settings_container.adjustSize()
+        if widget:
+            widget.adjustSize()
+            while widget.parent():
+                widget = widget.parent()
+                widget.update()
