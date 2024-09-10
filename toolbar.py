@@ -144,6 +144,7 @@ class Toolbar(QWidget):
                 self.mapToGlobal(
                     QPoint(self.gui.main_window.width() - font_widget.width(),
                            font_button.y() + font_button.height())))
+            font_widget.change_font()
 
         font_widget.show()
 

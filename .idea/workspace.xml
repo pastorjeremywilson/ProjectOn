@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added the FontSample widget directly to the FontSettings widget, delaying updating the rest of the GUI until settings are saved.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed font sample background not loading correctly when first run.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/toolbar.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -141,15 +142,7 @@
       <workItem from="1725490141279" duration="1072000" />
       <workItem from="1725491247133" duration="106000" />
       <workItem from="1725650345914" duration="5458000" />
-      <workItem from="1725983928582" duration="609000" />
-    </task>
-    <task id="LOCAL-00009" summary="Fixed mobile remote html and changed layout to nav buttons on the right.">
-      <option name="closed" value="true" />
-      <created>1721596608883</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1721596608883</updated>
+      <workItem from="1725983928582" duration="6515000" />
     </task>
     <task id="LOCAL-00010" summary="Fixed mobile remote html and changed layout to nav buttons on the right.">
       <option name="closed" value="true" />
@@ -535,7 +528,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725736746379</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="Fixed font sample background not loading correctly when first run.">
+      <option name="closed" value="true" />
+      <created>1725984829000</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1725984829001</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -556,7 +557,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added images for the installer." />
     <MESSAGE value="Added readme as html.&#10;Included readme in pyinstaller command and inno setup script." />
     <MESSAGE value="Fixed Qt import issue in PIL&#10;Fixed '\' showing in recent files when loaded from command line" />
     <MESSAGE value="Fixed confusion between \n and &lt;br /&gt; in editing and parsing songs.&#10;Fixed double-return not parsing as a new slide" />
@@ -581,9 +581,10 @@
     <MESSAGE value="Prevented screen repositioning if screen settings not changed." />
     <MESSAGE value="Changed FontWidget's WindowType to a popup to facilitate auto-hide when clicked outside" />
     <MESSAGE value="Added the FontSample widget directly to the FontSettings widget, delaying updating the rest of the GUI until settings are saved." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added the FontSample widget directly to the FontSettings widget, delaying updating the rest of the GUI until settings are saved." />
+    <MESSAGE value="Fixed font sample background not loading correctly when first run." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed font sample background not loading correctly when first run." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1725984426452" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1725991159529" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
