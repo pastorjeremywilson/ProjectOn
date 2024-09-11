@@ -31,7 +31,7 @@ need to click the font button to make them go away).
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.3.3.021) and run
+system only. Download the current ProjectOn installer (v.1.3.3.022) and run
 it on your computer.
 <p>&nbsp;</p>
 

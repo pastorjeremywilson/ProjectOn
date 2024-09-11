@@ -1123,11 +1123,12 @@ class FontWidget(QWidget):
         self.font_sample.repaint()
 
     def change_font_sample(self):
-        self.font_sample.setFont(
-            QFont(
-                self.font_list_widget.currentItem().data(20),
-                self.font_size_spinbox.value(),
-                QFont.Weight.Bold))
+        if self.font_list_widget.currentItem():
+            self.font_sample.setFont(
+                QFont(
+                    self.font_list_widget.currentItem().data(20),
+                    self.font_size_spinbox.value(),
+                    QFont.Weight.Bold))
 
         color = self.font_color_button_group.checkedButton().objectName()
         if color == 'black':
