@@ -1,7 +1,7 @@
 [![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=plastic)](https://github.com/pastorjeremywilson/ProjectOn/pulse/monthly)
 [![License](https://img.shields.io/badge/license-GPL-blue.svg?style=plastic)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-<img src='./resources/branding/projecton-banner.svg?raw=true' width='300px' />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width='300px' />
 
 # What Am I?
 
@@ -18,10 +18,20 @@ intuitive, and responsive experience when building and running the
 projection needs of a church service.
 <p>&nbsp;</p>
 
+# What's New in Version 1.4.0?
+
+- Global font for Song slides and Bible slides can now be set independently
+from each other.
+- Added a "Shade Behind Text" option to the font menu, allowing for a translucent
+square to be shown behind the text. This can help readability on 'busy' backgrounds.
+- Improved font preview now included in the toolbar font dropdowns.
+- Font dropdowns now disappear when clicking outside of them (no longer
+need to click the font button to make them go away).
+
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.3.3.020) and run
+system only. Download the current ProjectOn installer (v.1.3.3.021) and run
 it on your computer.
 <p>&nbsp;</p>
 
@@ -237,27 +247,27 @@ Applying bold to a single word in a song or custom slide will result in the whol
 
 <br>
 <div>
-    <img src='./resources/images/python-logo-only.svg?raw=true' width=40px align='right' />
+    <img src='https://github.com/pastorjeremywilson/public/blob/main/python-logo-only.svg?raw=true' width=40px align='right' />
     ProjectOn is written primarily in <a href="https://www.python.org" target="_blank">Python</a>, compiled through <a href="https://www.pyinstaller.org" target="_blank">PyInstaller</a>,
     and packaged into an installation executable with <a href="https://jrsoftware.org/isinfo.php" target="_blank">Inno Setup Compiler</a>.
 </div>
 <br>
 
 <div>
-    <img src='./resources/images/sqlite370.jpg?raw=true' height=40px align='right' />
+    <img src='https://github.com/pastorjeremywilson/public/blob/main/sqlite370.jpg?raw=true' height=40px align='right' />
     ProjectOn’s main database is <a href="https://www.sqlite.org" target="_blank">SQLite</a> and the remaining data files are
     stored in the <a href="https://www.json.org/json-en.html" target="_blank">JSON</a> format.
 </div>
 <br>
 
 <div>
-    <img src='./resources/images/Qt-logo-neon.png?raw=true' height=40px align='right' />
+    <img src='https://github.com/pastorjeremywilson/public/blob/main/Qt-logo-neon.png?raw=true' height=40px align='right' />
     ProjectOn uses <a href="https://www.qt.io/product/framework" target="_blank">Qt</a> (PyQt5) for the user interface.
 </div>
 <br>
 
 <div>
-    <img src='./resources/images/ghostscript-plus-text.png?raw=true' height=40px align='right' />
+    <img src='https://github.com/pastorjeremywilson/public/blob/main/ghostscript-plus-text.png?raw=true' height=40px align='right' />
     Printing made possible with the help of Artifex Software's <a href="https://www.ghostscript.com" target="_blank">Ghostscript</a>.
 </div>
 <br>
@@ -271,7 +281,7 @@ All trademarks (c) their respective owners.
 # Licensing
 <br>
 
-<img src='./resources/images/gnu-4.svg?raw=true' height=120px align='left' />
+<img src='https://github.com/pastorjeremywilson/public/blob/main/gnu-4.svg?raw=true' height=120px align='left' />
 ProjectOn is licensed under the GNU General Public License (GNU GPL)
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version. See

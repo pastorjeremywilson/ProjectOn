@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.3.3.020
+ProjectOn v.1.3.3.021
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -209,6 +209,16 @@ class ProjectOn(QObject):
         try:
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
+
+            # check that the database has the newest columns
+            result = cursor.execute('PRAGMA table_info(songs)').fetchall()
+            updated_table = False
+            for record in result:
+                if record[1] == 'shade_opacity':
+                    updated_table = True
+            if not updated_table:
+                self.update_table(connection, cursor, 'songs')
+
             result = cursor.execute('SELECT * FROM songs ORDER BY title').fetchall()
             connection.close()
             return result
@@ -217,6 +227,17 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
             return -1
+
+    def update_table(self, connection, cursor, table):
+        column_names = [
+            ['use_shade', 'False'],
+            ['shade_color', '0'],
+            ['shade_opacity', '75']
+        ]
+        for name in column_names:
+            cursor.execute(f'ALTER TABLE {table} ADD {name[0]} TEXT;')
+            cursor.execute(f'UPDATE {table} SET {name[0]}={str(name[1])}')
+        connection.commit()
 
     def get_all_custom_slides(self):
         """
@@ -227,6 +248,16 @@ class ProjectOn(QObject):
         try:
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
+
+            # check that the database has the newest columns
+            result = cursor.execute('PRAGMA table_info(customSlides)').fetchall()
+            updated_table = False
+            for record in result:
+                if record[1] == 'shade_opacity':
+                    updated_table = True
+            if not updated_table:
+                self.update_table(connection, cursor, 'customSlides')
+
             result = cursor.execute('SELECT * FROM customSlides ORDER BY title').fetchall()
             connection.close()
             return result
@@ -325,16 +356,22 @@ class ProjectOn(QObject):
                     'use_outline="' + song_data[14] + '", '
                     'outline_color="' + song_data[15] + '", '
                     'outline_width="' + song_data[16] + '", '
-                    'override_global="' + song_data[17] + '" WHERE title="' + old_title + '"'
+                    'override_global="' + song_data[17] + '", '
+                    'use_shade="' + song_data[18] + '", '
+                    'shade_color="' + song_data[19] + '", '
+                    'shade_opacity="' + song_data[20] + '" '
+                    'WHERE title="' + old_title + '"'
                 )
             else:
                 sql = ('INSERT INTO songs (title, author, copyright, ccliNum, lyrics, vorder, footer, font, fontColor, '
                        'background, font_size, use_shadow, shadow_color, shadow_offset, use_outline, outline_color, '
-                       'outline_width, override_global) VALUES ("' + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
+                       'outline_width, override_global, use_shade, shade_color, shade_opacity) VALUES ("'
+                       + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
                        + song_data[3] + '","' + song_data[4] + '","' + song_data[5] + '","' + song_data[6]
                        + '","' + song_data[7] + '","' + song_data[8] + '","' + song_data[9] + '","' + song_data[10]
                        + '","' + song_data[11] + '","' + song_data[12] + '","' + song_data[13] + '","' + song_data[14]
-                       + '","' + song_data[15] + '","' + song_data[16] + '","' + song_data[17] + '")')
+                       + '","' + song_data[15] + '","' + song_data[16] + '","' + song_data[17] + '","' + song_data[18]
+                       + '","' + song_data[19] + '","' + song_data[20] + '")')
 
             cursor.execute(sql)
             connection.commit()
@@ -395,14 +432,20 @@ class ProjectOn(QObject):
                        'use_outline="' + custom_data[9] + '", '
                        'outline_color="' + custom_data[10] + '", '
                        'outline_width="' + custom_data[11] + '", '
-                       'override_global="' + custom_data[12] + '" WHERE title="' + old_title + '"')
+                       'override_global="' + custom_data[12] + '", '
+                       'use_shade="' + custom_data[13] + '", '
+                       'shade_color="' + custom_data[14] + '", '
+                       'shade_opacity="' + custom_data[15] + '" '
+                       'WHERE title="' + old_title + '"')
             else:
                 sql = ('INSERT INTO customSlides (title, text, font, fontColor, background, font_size, use_shadow, '
-                       'shadow_color, shadow_offset, use_outline, outline_color, outline_width, override_global)'
+                       'shadow_color, shadow_offset, use_outline, outline_color, outline_width, override_global, '
+                       'use_shade, shade_color, shade_opacity)'
                        ' VALUES ("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2] + '","'
                        + custom_data[3] + '","' + custom_data[4] + '","' + custom_data[5] + '","' + custom_data[6]
                        + '","' + custom_data[7] + '","' + custom_data[8] + '","' + custom_data[9]
-                       + '","' + custom_data[10] + '","' + custom_data[11] + '","' + custom_data[12] + '")')
+                       + '","' + custom_data[10] + '","' + custom_data[11] + '","' + custom_data[12]
+                       + '","' + custom_data[13] + '","' + custom_data[14] + '","' + custom_data[15] + '")')
 
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
@@ -574,6 +617,9 @@ class ProjectOn(QObject):
                 'song_use_outline': self.settings['song_use_outline'],
                 'song_outline_color': self.settings['song_outline_color'],
                 'song_outline_width': self.settings['song_outline_width'],
+                'song_use_shade': self.settings['song_use_shade'],
+                'song_shade_color': self.settings['song_shade_color'],
+                'song_shade_opacity': self.settings['song_shade_opacity'],
                 'bible_font_face': self.settings['bible_font_face'],
                 'bible_font_size': self.settings['bible_font_size'],
                 'bible_font_color': self.settings['bible_font_color'],
@@ -583,6 +629,9 @@ class ProjectOn(QObject):
                 'bible_use_outline': self.settings['bible_use_outline'],
                 'bible_outline_color': self.settings['bible_outline_color'],
                 'bible_outline_width': self.settings['bible_outline_width'],
+                'bible_use_shade': self.settings['bible_use_shade'],
+                'bible_shade_color': self.settings['bible_shade_color'],
+                'bible_shade_opacity': self.settings['bible_shade_opacity']
             }
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
@@ -661,7 +710,6 @@ class ProjectOn(QObject):
         :param str filename: Optional, the file location to be opened
         """
         # first, check for any changes to the current order of service
-        print(filename)
         response = -1
         if self.gui.changes:
             response = QMessageBox.question(
@@ -723,24 +771,33 @@ class ProjectOn(QObject):
                 self.settings['global_song_background'] = service_dict['global_song_background']
             if 'global_bible_background' in service_dict.keys():
                 self.settings['global_bible_background'] = service_dict['global_bible_background']
-            if 'font_face' in service_dict.keys():
-                self.settings['font_face'] = service_dict['font_face']
-            if 'font_size' in service_dict.keys():
-                self.settings['font_size'] = service_dict['font_size']
-            if 'font_color' in service_dict.keys():
-                self.settings['font_color'] = service_dict['font_color']
-            if 'use_shadow' in service_dict.keys():
-                self.settings['use_shadow'] = service_dict['use_shadow']
-            if 'shadow_color' in service_dict.keys():
-                self.settings['shadow_color'] = service_dict['shadow_color']
-            if 'shadow_offset' in service_dict.keys():
-                self.settings['shadow_offset'] = service_dict['shadow_offset']
-            if 'use_outline' in service_dict.keys():
-                self.settings['use_outline'] = service_dict['use_outline']
-            if 'outline_color' in service_dict.keys():
-                self.settings['outline_color'] = service_dict['outline_color']
-            if 'outline_width' in service_dict.keys():
-                self.settings['outline_width'] = service_dict['outline_width']
+
+            slide_types = ['song', 'bible']
+            for slide_type in slide_types:
+                if f'{slide_type}_font_face' in service_dict.keys():
+                    self.settings[f'{slide_type}_font_face'] = service_dict[f'{slide_type}_font_face']
+                if f'{slide_type}_font_size' in service_dict.keys():
+                    self.settings[f'{slide_type}_font_size'] = service_dict[f'{slide_type}_font_size']
+                if f'{slide_type}_font_color' in service_dict.keys():
+                    self.settings[f'{slide_type}_font_color'] = service_dict[f'{slide_type}_font_color']
+                if f'{slide_type}_use_shadow' in service_dict.keys():
+                    self.settings[f'{slide_type}_use_shadow'] = service_dict[f'{slide_type}_use_shadow']
+                if f'{slide_type}_shadow_color' in service_dict.keys():
+                    self.settings[f'{slide_type}_shadow_color'] = service_dict[f'{slide_type}_shadow_color']
+                if f'{slide_type}_shadow_offset' in service_dict.keys():
+                    self.settings[f'{slide_type}_shadow_offset'] = service_dict[f'{slide_type}_shadow_offset']
+                if f'{slide_type}_use_outline' in service_dict.keys():
+                    self.settings[f'{slide_type}_use_outline'] = service_dict[f'{slide_type}_use_outline']
+                if f'{slide_type}_outline_color' in service_dict.keys():
+                    self.settings[f'{slide_type}_outline_color'] = service_dict[f'{slide_type}_outline_color']
+                if f'{slide_type}_outline_width' in service_dict.keys():
+                    self.settings[f'{slide_type}_outline_width'] = service_dict[f'{slide_type}_outline_width']
+                if f'{slide_type}_use_shade' in service_dict.keys():
+                    self.settings[f'{slide_type}_use_shade'] = service_dict[f'{slide_type}_use_shade']
+                if f'{slide_type}_shade_color' in service_dict.keys():
+                    self.settings[f'{slide_type}_shade_color'] = service_dict[f'{slide_type}_shade_color']
+                if f'{slide_type}_shade_opacity' in service_dict.keys():
+                    self.settings[f'{slide_type}_shade_opacity'] = service_dict[f'{slide_type}_shade_opacity']
 
             self.gui.apply_settings()
 
@@ -955,6 +1012,9 @@ class ProjectOn(QObject):
 
             # add this file to the recently used services menu
             self.add_to_recently_used(file_dir, file_name)
+
+            # apply any settings changes
+            self.gui.apply_settings()
 
             self.gui.changes = False
             wait_widget.widget.deleteLater()

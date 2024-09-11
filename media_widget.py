@@ -470,6 +470,9 @@ class MediaWidget(QTabWidget):
                     list_item.setData(i + 20, item[i])
                 list_item.setData(24, self.gui.format_display_lyrics(list_item.data(24)))
                 list_item.setData(40, 'song')
+                list_item.setData(41, item[18])
+                list_item.setData(42, item[19])
+                list_item.setData(43, item[20])
 
                 self.song_list.addItem(list_item)
         """
@@ -492,6 +495,9 @@ class MediaWidget(QTabWidget):
         data 36: Outline Width
         data 37: Override Global
         data 40: Type
+        data 41: Use Shade
+        data 42: Shade Color
+        data 43: Shade Opacity
         """
 
     def parse_song_data(self, item):
@@ -726,6 +732,9 @@ class MediaWidget(QTabWidget):
                 for i in range(2, 13):
                     widget_item.setData(25 + i, item[i])
                 widget_item.setData(40, 'custom')
+                widget_item.setData(41, item[13])
+                widget_item.setData(42, item[14])
+                widget_item.setData(43, item[15])
 
                 widget_item.setData(24, ['', item[0], text])
                 self.custom_list.addItem(widget_item)
@@ -1217,7 +1226,7 @@ class MediaWidget(QTabWidget):
         """
         if not item and self.song_list.currentItem():
             item = QListWidgetItem()
-            for i in range(20, 41):
+            for i in range(20, 44):
                 item.setData(i, self.song_list.currentItem().data(i))
 
         if item and not from_load_service:
@@ -1254,7 +1263,7 @@ class MediaWidget(QTabWidget):
         else:
             # handle this differently if it's being created while loading a service file
             widget_item = QListWidgetItem()
-            for i in range(20, 41):
+            for i in range(20, 44):
                 widget_item.setData(i, item.data(i))
             widget_item.setData(24, self.parse_song_data(item))
 
@@ -1526,11 +1535,11 @@ class CustomListWidget(QListWidget):
             if self.currentItem().data(40) == 'song':
                 item_text = self.itemAt(self.item_pos).text()
                 song_info = self.gui.main.get_song_data(item_text)
-                EditWidget(self.gui, 'song', song_info, item_text)
+                self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text)
             elif self.currentItem().data(40) == 'custom':
                 item_text = self.itemAt(self.item_pos).text()
                 custom_info = self.gui.main.get_custom_data(item_text)
-                EditWidget(self.gui, 'custom', custom_info, item_text)
+                self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text)
 
     def delete_item(self):
         """

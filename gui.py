@@ -9,7 +9,7 @@ from os.path import exists
 
 import requests
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QPalette
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -61,6 +61,7 @@ class GUI(QObject):
     timed_update = None
     central_widget = None
     central_layout = None
+    edit_widget = None
 
     standard_font = QFont('Helvetica', 12)
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
@@ -261,6 +262,9 @@ class GUI(QObject):
             "song_use_outline": True,
             "song_outline_color": 0,
             "song_outline_width": 3,
+            "song_use_shade": False,
+            "song_shade_color": 0,
+            "song_shade_opacity": 75,
             "bible_font_face": "Arial",
             "bible_font_size": 60,
             "bible_font_color": "white",
@@ -270,6 +274,9 @@ class GUI(QObject):
             "bible_use_outline": True,
             "bible_outline_color": 0,
             "bible_outline_width": 3,
+            "bible_use_shade": False,
+            "bible_shade_color": 0,
+            "bible_shade_opacity": 75,
             "ccli_num": ""
         }
 
@@ -550,7 +557,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.3.3.020'
+        current_version = 'v.1.3.3.021'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -787,7 +794,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.3.3.020')
+        title_label = QLabel('ProjectOn v.1.3.3.021')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1168,7 +1175,7 @@ class GUI(QObject):
                 if item.data(24):
                     for i in range(len(item.data(24))):
                         list_item = QListWidgetItem()
-                        for j in range(20, 41):
+                        for j in range(20, 44):
                             list_item.setData(j, item.data(j))
 
                         list_item.setData(24, [item.data(24)[i][0], item.data(24)[i][1], item.data(24)[i][2]])
@@ -1305,7 +1312,7 @@ class GUI(QObject):
                 original_item = self.preview_widget.slide_list.item(i)
                 size_hint = original_item.sizeHint()
                 item = QListWidgetItem()
-                for j in range(20, 41):
+                for j in range(20, 44):
                     item.setData(j, original_item.data(j))
 
                 if item.data(40) == 'image':
@@ -1511,6 +1518,12 @@ class GUI(QObject):
                     outline_width = int(current_item.data(36))
                 else:
                     outline_width = self.main.settings['outline_width']
+                if current_item.data(41) == 'True':
+                    use_shade = True
+                else:
+                    use_shade = False
+                shade_color = int(current_item.data(42))
+                shade_opacity = int(current_item.data(43))
             else:
                 if current_item.data(40) == 'bible':
                     font_face = self.main.settings['bible_font_face']
@@ -1522,6 +1535,9 @@ class GUI(QObject):
                     use_outline = self.main.settings['bible_use_outline']
                     outline_color = self.main.settings['bible_outline_color']
                     outline_width = self.main.settings['bible_outline_width']
+                    use_shade = self.main.settings['bible_use_shade']
+                    shade_color = self.main.settings['bible_shade_color']
+                    shade_opacity = self.main.settings['bible_shade_opacity']
                 else:
                     font_face = self.main.settings['song_font_face']
                     font_size = self.main.settings['song_font_size']
@@ -1532,6 +1548,9 @@ class GUI(QObject):
                     use_outline = self.main.settings['song_use_outline']
                     outline_color = self.main.settings['song_outline_color']
                     outline_width = self.main.settings['song_outline_width']
+                    use_shade = self.main.settings['song_use_shade']
+                    shade_color = self.main.settings['song_shade_color']
+                    shade_opacity = self.main.settings['song_shade_opacity']
 
             lyric_widget.setFont(QFont(font_face, font_size))
             lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
@@ -1541,8 +1560,13 @@ class GUI(QObject):
             lyric_widget.use_outline = use_outline
             lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
             lyric_widget.outline_width = outline_width
+            if not use_shade:
+                shade_opacity = 0
+            lyric_widget.use_shade = use_shade
+            lyric_widget.shade_color = shade_color
+            lyric_widget.shade_opacity = shade_opacity
 
-            #set the font color
+            # set the font color
             if not font_color == 'global':
                 if font_color == 'white':
                     lyric_widget.fill_color = QColor(Qt.GlobalColor.white)

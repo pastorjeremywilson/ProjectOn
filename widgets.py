@@ -2,13 +2,14 @@ import re
 import sqlite3
 
 import requests
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect
+from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint
 from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
     QImage
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
-                            QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
-                            QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog
+    QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
+    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QSizePolicy, QGraphicsScene, QGraphicsRectItem, \
+    QGraphicsWidget, QGraphicsPixmapItem, QGraphicsView
 
 
 class FontFaceListWidget(QListWidget):
@@ -117,7 +118,6 @@ class ImageCombobox(QComboBox):
         elif self.type == 'song':
             self.gui.main.settings['global_song_background'] = file_name
             self.gui.global_song_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
-            self.gui.tool_bar.song_font_widget.font_sample.change_sample_background()
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 item = self.gui.oos_widget.oos_list_widget.item(i)
@@ -131,7 +131,6 @@ class ImageCombobox(QComboBox):
         elif self.type == 'bible':
             self.gui.main.settings['global_bible_background'] = file_name
             self.gui.global_bible_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
-            self.gui.tool_bar.bible_font_widget.font_sample.change_sample_background()
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 item = self.gui.oos_widget.oos_list_widget.item(i)
@@ -474,7 +473,10 @@ class LyricDisplayWidget(QWidget):
             fill_color=QColor(255, 255, 255),
             use_shadow=True,
             shadow_color=QColor(0, 0, 0),
-            shadow_offset=5):
+            shadow_offset=5,
+            use_shade=False,
+            shade_color=0,
+            shade_opacity=75):
         """
         Provide a standardized QWidget to be used for showing lyrics on the display and sample widgets.py
         :param gui.GUI gui: The current instance of GUI
@@ -497,6 +499,9 @@ class LyricDisplayWidget(QWidget):
         self.use_shadow = use_shadow
         self.shadow_color = shadow_color
         self.shadow_offset = shadow_offset
+        self.use_shade = use_shade
+        self.shade_color = shade_color
+        self.shade_opacity = shade_opacity
 
         self.text = ''
         self.path = QPainterPath()
@@ -685,16 +690,24 @@ class LyricDisplayWidget(QWidget):
                 if part.endswith(' '):
                     x += space_width
 
+        painter = QPainter(self)
         brush = QBrush()
+        painter.setBrush(brush)
+        pen = QPen()
+        painter.setPen(pen)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        opacity = self.shade_opacity
+        if not self.use_shade:
+            opacity = 0
+        path_rect = self.path.boundingRect()
+        shade_rect = QRectF(path_rect.x() - 20, path_rect.y() - 20, path_rect.width() + 40, path_rect.height() + 40)
+        painter.fillRect(shade_rect, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
+
         brush.setColor(self.fill_color)
         brush.setStyle(Qt.BrushStyle.SolidPattern)
-        pen = QPen()
         pen.setColor(self.outline_color)
         pen.setWidth(self.outline_width)
-
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setBrush(brush)
         painter.setPen(pen)
 
         if self.use_shadow:
@@ -774,7 +787,7 @@ class FontWidget(QWidget):
     """
     mouse_release_signal = pyqtSignal(int)
 
-    def __init__(self, gui, slide_type, draw_border=True):
+    def __init__(self, gui, slide_type, draw_border=True, applies_to_global=True):
         """
         Implements QWidget that contains all of the settings that can be applied to the display font
         :param GUI gui: the current instance of GUI
@@ -797,6 +810,7 @@ class FontWidget(QWidget):
         self.gui = gui
         self.slide_type = slide_type
         self.draw_border = draw_border
+        self.applies_to_global = applies_to_global
 
         self.mouse_release_signal.connect(lambda value: self.change_font(value))
 
@@ -809,7 +823,7 @@ class FontWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        self.font_sample_container = QWidget()
+        """self.font_sample_container = QWidget()
         self.font_sample_container.setObjectName('font_sample_container')
         font_sample_container_layout = QVBoxLayout(self.font_sample_container)
         font_sample_container_layout.setContentsMargins(20, 20, 20, 20)
@@ -823,13 +837,13 @@ class FontWidget(QWidget):
         self.font_sample_widget.setAutoFillBackground(True)
         font_sample_layout = QVBoxLayout(self.font_sample_widget)
         font_sample_layout.setContentsMargins(20, 20, 20, 20)
-        font_sample_container_layout.addWidget(self.font_sample_widget)
+        font_sample_container_layout.addWidget(self.font_sample_widget)"""
 
         sample_text = self.slide_type.capitalize() + ' Font Sample'
         self.font_sample = FontSample(self)
-        self.font_sample.setText(sample_text)
+        self.font_sample.text = sample_text
         self.font_sample.setObjectName('font_sample')
-        font_sample_layout.addWidget(self.font_sample)
+        layout.addWidget(self.font_sample)
 
         self.font_widget = QWidget()
         self.setObjectName('font_widget')
@@ -1051,7 +1065,6 @@ class FontWidget(QWidget):
             self.shade_opacity_slider.color_slider.setValue(self.gui.main.settings[f'{self.slide_type}_shade_opacity'])
 
         self.change_font_sample()
-        self.font_sample.change_sample_background()
 
     def change_font(self, value=None):
         """
@@ -1062,7 +1075,7 @@ class FontWidget(QWidget):
         shadow_offset = None
         outline_color = None
         outline_width = None
-        if not self.signalsBlocked():
+        if not self.signalsBlocked() and self.applies_to_global:
             if value:
                 if self.sender().objectName() == 'shadow_color_slider':
                     shadow_color = value
@@ -1106,7 +1119,8 @@ class FontWidget(QWidget):
             self.gui.main.settings[f'{self.slide_type}_shade_color'] = self.shade_color_slider.color_slider.value()
             self.gui.main.settings[f'{self.slide_type}_shade_opacity'] = self.shade_opacity_slider.color_slider.value()
 
-            self.change_font_sample()
+        self.change_font_sample()
+        self.font_sample.repaint()
 
     def change_font_sample(self):
         self.font_sample.setFont(
@@ -1147,7 +1161,7 @@ class FontWidget(QWidget):
         self.font_sample.shade_color = self.shade_color_slider.color_slider.value()
         self.font_sample.shade_opacity = self.shade_opacity_slider.color_slider.value()
 
-        self.font_sample.paint_font()
+        self.font_sample.repaint()
 
     def color_chooser(self):
         """
@@ -1186,6 +1200,7 @@ class CustomSlider(QSlider):
 
 
 class FontSample(QLabel):
+    text = ''
     def __init__(self, settings_widget,
                  use_outline=True,
                  outline_color=QColor(0, 0, 0),
@@ -1216,19 +1231,94 @@ class FontSample(QLabel):
         self.widget = self.settings_widget.findChild(QWidget, 'font_sample_widget')
         self.background_label = self.settings_widget.findChild(QLabel, 'font_sample_background_label')
 
-    def change_sample_background(self):
-        self.adjustSize()
-        self.widget.adjustSize()
-        self.container.adjustSize()
-        self.background_label.setGeometry(self.container.rect())
+    def paintEvent(self, evt):
+        self.paint_font()
+        super().paintEvent(evt)
 
+    def paint_font(self):
+        brush = QBrush()
+        pen = QPen()
+
+        path = QPainterPath()
+        shadow_path = QPainterPath()
+        metrics = self.fontMetrics()
+
+        y = metrics.ascent() - metrics.descent() + 20
+        point = QPointF(20, y)
+        shadow_point = QPointF(point.x() + self.shadow_offset, point.y() + self.shadow_offset)
+
+        if self.use_shadow:
+            shadow_path.addText(shadow_point, self.font(), self.text)
+        path.addText(point, self.font(), self.text)
+        path_rect = path.boundingRect()
+
+        image_rect = QRectF(0, 0, path_rect.width() + 40, path_rect.height() + 40)
+        image = QPixmap(int(image_rect.width()), int(image_rect.height()))
+
+        painter = QPainter(image)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.begin(image)
+
+        background_image = self.make_sample_background(image_rect)
+        painter.drawImage(QPoint(0, 0), background_image)
+
+        opacity = self.shade_opacity
+        if not self.use_shade:
+            opacity = 0
+        brush.setColor(QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
+        brush.setStyle(Qt.BrushStyle.SolidPattern)
+        shade_rect = QRectF(10, 10, path_rect.width() + 20, path_rect.height() + 20)
+        rect_item = QGraphicsRectItem(shade_rect)
+        rect_item.setBrush(brush)
+        painter.fillRect(shade_rect, brush)
+
+        if self.use_shadow:
+            brush.setColor(self.shadow_color)
+            pen.setWidth(0)
+            painter.fillPath(shadow_path, brush)
+
+        brush.setColor(self.fill_color)
+        pen.setColor(self.outline_color)
+        pen.setWidth(self.outline_width)
+        painter.fillPath(path, brush)
+
+        if self.use_outline:
+            painter.setPen(pen)
+            painter.drawPath(path)
+        painter.end()
+
+        self.setPixmap(image)
+
+    def make_sample_background(self, rect):
         slide_type = self.settings_widget.slide_type
-        sample_background = QImage(
-            self.settings_widget.gui.main.background_dir + '/'
-            + self.settings_widget.gui.main.settings[f'global_{slide_type}_background'])
-        ratio = sample_background.width() / self.container.width()
+
+        if self.settings_widget.applies_to_global:
+            sample_background = QImage(
+                self.settings_widget.gui.main.background_dir + '/'
+                + self.settings_widget.gui.main.settings[f'global_{slide_type}_background'])
+        else:
+            background = self.settings_widget.parent().parent().findChild(QLineEdit, 'background_line_edit').text()
+            if 'rgb(' in background:
+                background = background.replace('rgb(', '')
+                background = background.replace(')', '')
+                background_split = background.split(', ')
+                sample_background = QImage(QSize(1920, 1080), QImage.Format.Format_RGB32)
+                sample_background.fill(
+                    QColor(int(background_split[0]), int(background_split[1]), int(background_split[2])))
+            elif 'Song' in background:
+                sample_background = QImage(
+                    self.settings_widget.gui.main.background_dir + '/'
+                    + self.settings_widget.gui.main.settings['global_song_background'])
+            elif 'Bible' in background:
+                sample_background = QImage(
+                    self.settings_widget.gui.main.background_dir + '/'
+                    + self.settings_widget.gui.main.settings['global_bible_background'])
+            else:
+                sample_background = QImage(self.settings_widget.gui.main.background_dir + '/' + background)
+
+        ratio = sample_background.width() / rect.width()
         sample_background = sample_background.scaled(
-            int(sample_background.width() / ratio),
+            int(rect.width()),
             int(sample_background.height() / ratio),
             Qt.AspectRatioMode.IgnoreAspectRatio,
             Qt.TransformationMode.SmoothTransformation
@@ -1236,64 +1326,11 @@ class FontSample(QLabel):
 
         piece_rect = QRect(
             0,
-            int(sample_background.height() / 2) - int(self.container.height() / 2),
-            self.container.width(),
-            self.container.height()
+            int(sample_background.height() / 2) - int(rect.height() / 2),
+            int(rect.width()),
+            int(rect.height())
         )
-        self.sample_background = sample_background.copy(piece_rect)
-        self.paint_font()
+        sample_background = sample_background.copy(piece_rect)
 
-    def paintEvent(self, evt):
-        self.paint_font()
+        return sample_background
 
-    def paint_font(self):
-        if not self.sample_background:
-            self.change_sample_background()
-        self.background_label.setPixmap(QPixmap(self.sample_background))
-
-        opacity = self.shade_opacity
-        if not self.use_shade:
-            opacity = 0
-        palette = self.widget.palette()
-        palette.setColor(
-            QPalette.ColorRole.Background, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
-        self.widget.setPalette(palette)
-
-        path = QPainterPath()
-        shadow_path = QPainterPath()
-        metrics = self.fontMetrics()
-
-        y = metrics.ascent() - metrics.descent() + 10
-        point = QPointF(0, y)
-        shadow_point = QPointF(self.shadow_offset, y + self.shadow_offset)
-
-        if self.use_shadow:
-            shadow_path.addText(shadow_point, self.font(), self.text())
-        path.addText(point, self.font(), self.text())
-
-        brush = QBrush()
-        brush.setColor(self.fill_color)
-        brush.setStyle(Qt.BrushStyle.SolidPattern)
-        pen = QPen()
-        pen.setColor(self.outline_color)
-        pen.setWidth(self.outline_width)
-
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setBrush(brush)
-        painter.setPen(pen)
-
-        if self.use_shadow:
-            shadow_brush = QBrush()
-            shadow_brush.setColor(self.shadow_color)
-            shadow_brush.setStyle(Qt.BrushStyle.SolidPattern)
-            painter.fillPath(shadow_path, shadow_brush)
-
-        painter.fillPath(path, brush)
-        if self.use_outline:
-            painter.strokePath(path, pen)
-
-        self.adjustSize()
-        self.widget.adjustSize()
-        self.container.adjustSize()
-        self.background_label.setGeometry(self.container.rect())

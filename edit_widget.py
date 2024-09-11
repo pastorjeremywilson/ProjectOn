@@ -42,8 +42,10 @@ class EditWidget(QDialog):
         self.title_line_edit.setFocus()
         if data and type == 'song':
             self.populate_song_data(data)
+            self.font_widget.change_font_sample()
         elif data and type == 'custom':
             self.populate_custom_data(data)
+            self.font_widget.change_font_sample()
         elif not data:
             if type == 'song':
                 self.new_song = True
@@ -276,7 +278,7 @@ class EditWidget(QDialog):
         slide_settings_layout = QHBoxLayout(slide_settings_container)
         advanced_options_layout.addWidget(slide_settings_container)
 
-        self.font_widget = FontWidget(self.gui, self.type, draw_border=False, auto_update=False)
+        self.font_widget = FontWidget(self.gui, self.type, draw_border=False, applies_to_global=False)
         slide_settings_layout.addWidget(self.font_widget)
 
         background_widget = QWidget()
@@ -342,8 +344,11 @@ class EditWidget(QDialog):
         chosen_layout.addWidget(chosen_background_label)
 
         self.background_line_edit = QLineEdit()
+        self.background_line_edit.setObjectName('background_line_edit')
         self.background_line_edit.setText('Use Global Background')
+        self.background_line_edit.textChanged.connect(self.font_widget.font_sample.repaint)
         chosen_layout.addWidget(self.background_line_edit)
+        background_layout.addStretch()
 
         button_widget = QWidget()
         button_layout = QHBoxLayout()
@@ -403,6 +408,10 @@ class EditWidget(QDialog):
         self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['use_outline'])
         self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
         self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
+
+        self.font_widget.shade_behind_text_checkbox.setFont(self.gui.main.settings['shade_behind_text'])
+        self.font_widget.shade_color_slider.color_slider.setFont(self.gui.main.settings['shade_color'])
+        self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings['shade_opacity'])
 
     def populate_song_data(self, song_data):
         """
@@ -560,6 +569,16 @@ class EditWidget(QDialog):
         else:
             self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
 
+        if song_data[18]:
+            if song_data[18] == 'True':
+                self.font_widget.shade_behind_text_checkbox.setChecked(True)
+            else:
+                self.font_widget.shade_behind_text_checkbox.setChecked(False)
+        if song_data[19]:
+            self.font_widget.shade_color_slider.color_slider.setValue(int(song_data[19]))
+        if song_data[20]:
+            self.font_widget.shade_opacity_slider.color_slider.setValue(int(song_data[20]))
+
         self.font_widget.blockSignals(False)
 
         self.populate_tag_list()
@@ -669,6 +688,16 @@ class EditWidget(QDialog):
             self.override_global_checkbox.setChecked(True)
         else:
             self.override_global_checkbox.setChecked(False)
+
+        if custom_data[13]:
+            if custom_data[13] == 'True':
+                self.font_widget.shade_behind_text_checkbox.setChecked(True)
+            else:
+                self.font_widget.shade_behind_text_checkbox.setChecked(False)
+        if custom_data[14]:
+            self.font_widget.shade_color_slider.color_slider.setValue(int(custom_data[14]))
+        if custom_data[15]:
+            self.font_widget.shade_opacity_slider.color_slider.setValue(int(custom_data[15]))
 
         self.font_widget.blockSignals(False)
 
@@ -818,6 +847,10 @@ class EditWidget(QDialog):
             outline_color = str(self.font_widget.outline_color_slider.color_slider.value())
             outline_width = str(self.font_widget.outline_width_slider.offset_slider.value())
 
+            use_shade = str(self.font_widget.shade_behind_text_checkbox.isChecked())
+            shade_color = str(self.font_widget.shade_color_slider.color_slider.value())
+            shade_opacity = str(self.font_widget.shade_opacity_slider.color_slider.value())
+
             if 'Global' in self.background_line_edit.text():
                 if 'Song' in self.background_line_edit.text():
                     background = 'global_song'
@@ -840,6 +873,9 @@ class EditWidget(QDialog):
                 background = 'global_song'
             else:
                 background = 'global_bible'
+            use_shade = 'False'
+            shade_color = '0'
+            shade_opacity = '75'
 
         # remove extraneous html tags from the lyrics
         lyrics = self.lyrics_edit.text_edit.toHtml()
@@ -897,7 +933,10 @@ class EditWidget(QDialog):
             use_outline,
             outline_color,
             outline_width,
-            override_global
+            override_global,
+            use_shade,
+            shade_color,
+            shade_opacity
         ]
 
         if self.new_song:
@@ -991,6 +1030,10 @@ class EditWidget(QDialog):
             outline_color = str(self.font_widget.outline_color_slider.color_slider.value())
             outline_width = str(self.font_widget.outline_width_slider.offset_slider.value())
 
+            use_shade = str(self.font_widget.shade_behind_text_checkbox.isChecked())
+            shade_color = str(self.font_widget.shade_color_slider.color_slider.value())
+            shade_opacity = str(self.font_widget.shade_opacity_slider.color_slider.value())
+
             if 'Global' in self.background_line_edit.text():
                 if 'Song' in self.background_line_edit.text():
                     background = 'global_song'
@@ -1015,6 +1058,9 @@ class EditWidget(QDialog):
                 background = 'global_song'
             else:
                 background = 'global_bible'
+            use_shade = 'False'
+            shade_color = '0'
+            shade_opacity = '75'
 
         text = self.lyrics_edit.text_edit.toHtml()
         text_split = re.split('<body.*?>', text)
@@ -1040,7 +1086,10 @@ class EditWidget(QDialog):
             use_outline,
             outline_color,
             outline_width,
-            override_global
+            override_global,
+            use_shade,
+            shade_color,
+            shade_opacity
         ]
 
         if self.new_custom:
