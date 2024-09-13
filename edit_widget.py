@@ -150,6 +150,7 @@ class EditWidget(QDialog):
             main_layout.addWidget(lyrics_widget)
 
         self.lyrics_edit = FormattableTextEdit(self.gui)
+        self.lyrics_edit.setMinimumHeight(400)
         self.lyrics_edit.setFont(self.gui.standard_font)
         if self.type == 'song':
             lyrics_layout.addWidget(self.lyrics_edit, 0, 0, 3, 1)
@@ -238,7 +239,7 @@ class EditWidget(QDialog):
             toolbar_layout.addWidget(ending_button)
             toolbar_layout.addStretch()
 
-        show_hide_advanced_widget = QWidget()
+        """show_hide_advanced_widget = QWidget()
         show_hide_advanced_layout = QHBoxLayout(show_hide_advanced_widget)
         main_layout.addWidget(show_hide_advanced_widget)
 
@@ -251,12 +252,12 @@ class EditWidget(QDialog):
         show_hide_advanced_label = QLabel('Advanced Options')
         show_hide_advanced_label.setFont(self.gui.standard_font)
         show_hide_advanced_layout.addWidget(show_hide_advanced_label)
-        show_hide_advanced_layout.addStretch()
+        show_hide_advanced_layout.addStretch()"""
 
         self.advanced_options_widget = QWidget()
         advanced_options_layout = QVBoxLayout(self.advanced_options_widget)
         main_layout.addWidget(self.advanced_options_widget)
-        self.advanced_options_widget.hide()
+        #self.advanced_options_widget.hide()
 
         self.override_global_checkbox = QCheckBox('Override Global Settings')
         self.override_global_checkbox.setObjectName('override_global_checkbox')
@@ -264,15 +265,21 @@ class EditWidget(QDialog):
             'Checking this box will apply all of the below settings to this song/custom slide')
         self.override_global_checkbox.setFont(self.gui.bold_font)
         self.override_global_checkbox.setChecked(False)
+        self.override_global_checkbox.stateChanged.connect(self.override_global_changed)
         advanced_options_layout.addWidget(self.override_global_checkbox)
 
         if self.type == 'song':
+            footer_widget = QWidget()
+            footer_layout = QVBoxLayout(footer_widget)
+            footer_layout.setContentsMargins(60, 0, 0, 0)
+            advanced_options_layout.addWidget(footer_widget)
+
             self.footer_checkbox = QCheckBox('Use Footer for this song')
             self.footer_checkbox.setToolTip(
                 'Unchecking this box will prevent the slide footer from being displayed')
             self.footer_checkbox.setFont(self.gui.bold_font)
             self.footer_checkbox.setChecked(True)
-            advanced_options_layout.addWidget(self.footer_checkbox)
+            footer_layout.addWidget(self.footer_checkbox)
 
         slide_settings_container = QWidget()
         slide_settings_layout = QHBoxLayout(slide_settings_container)
@@ -284,7 +291,8 @@ class EditWidget(QDialog):
         background_widget = QWidget()
         background_layout = QVBoxLayout()
         background_widget.setLayout(background_layout)
-        slide_settings_layout.addWidget(background_widget)
+        background_layout.setContentsMargins(60, 0, 0, 0)
+        advanced_options_layout.addWidget(background_widget)
 
         background_label = QLabel('Background')
         background_label.setFont(self.gui.bold_font)
@@ -306,24 +314,17 @@ class EditWidget(QDialog):
 
         from widgets import ImageCombobox
         self.background_combobox = ImageCombobox(self.gui, 'edit')
-        self.background_combobox.currentIndexChanged.connect(
-            lambda: self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole)))
+        self.background_combobox.currentIndexChanged.connect(self.background_combobox_change)
 
         self.background_image_radio_button = QRadioButton('Image')
         self.background_image_radio_button.setFont(self.gui.standard_font)
-        self.background_image_radio_button.clicked.connect(self.background_combobox.show)
 
         self.background_button_group = QButtonGroup()
         self.background_button_group.setObjectName('background_button_group')
-        if self.type == 'custom':
-            self.background_button_group.addButton(background_default_radio_button, 0)
-            self.background_button_group.addButton(background_bible_default_radio_button, 1)
-            self.background_button_group.addButton(background_color_radio_button, 2)
-            self.background_button_group.addButton(self.background_image_radio_button, 3)
-        else:
-            self.background_button_group.addButton(background_default_radio_button, 0)
-            self.background_button_group.addButton(background_color_radio_button, 1)
-            self.background_button_group.addButton(self.background_image_radio_button, 2)
+        self.background_button_group.addButton(background_default_radio_button, 0)
+        self.background_button_group.addButton(background_bible_default_radio_button, 1)
+        self.background_button_group.addButton(background_color_radio_button, 2)
+        self.background_button_group.addButton(self.background_image_radio_button, 3)
         background_default_radio_button.setChecked(True)
 
         background_layout.addWidget(background_default_radio_button)
@@ -332,8 +333,6 @@ class EditWidget(QDialog):
         background_layout.addWidget(background_color_radio_button)
         background_layout.addWidget(self.background_image_radio_button)
         background_layout.addWidget(self.background_combobox)
-        if self.type == 'song':
-            self.background_combobox.hide()
 
         chosen_widget = QWidget()
         chosen_layout = QHBoxLayout()
@@ -345,7 +344,7 @@ class EditWidget(QDialog):
 
         self.background_line_edit = QLineEdit()
         self.background_line_edit.setObjectName('background_line_edit')
-        self.background_line_edit.setText('Use Global Background')
+        self.background_line_edit.setText('Use Global Song Background')
         self.background_line_edit.textChanged.connect(self.font_widget.font_sample.repaint)
         chosen_layout.addWidget(self.background_line_edit)
         background_layout.addStretch()
@@ -412,6 +411,17 @@ class EditWidget(QDialog):
         self.font_widget.shade_behind_text_checkbox.setFont(self.gui.main.settings['shade_behind_text'])
         self.font_widget.shade_color_slider.color_slider.setFont(self.gui.main.settings['shade_color'])
         self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings['shade_opacity'])
+
+    def background_combobox_change(self):
+        self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole))
+        self.font_widget.font_sample.paint_font()
+
+    def override_global_changed(self):
+        for widget in self.advanced_options_widget.findChildren(QWidget):
+            if not widget.objectName() == 'override_global_checkbox':
+                set_enabled = getattr(widget, "setEnabled", None)
+                if callable(set_enabled):
+                    widget.setEnabled(self.override_global_checkbox.isChecked())
 
     def populate_song_data(self, song_data):
         """
@@ -480,105 +490,91 @@ class EditWidget(QDialog):
 
         if song_data[17] == 'True':
             self.override_global_checkbox.setChecked(True)
-        else:
-            self.override_global_checkbox.setChecked(False)
-
-        if song_data[7] == 'global':
-            for i in range(self.font_widget.font_list_widget.count()):
-                if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['font_face']:
-                    self.font_widget.font_list_widget.setCurrentRow(i)
-                    break
-        else:
             for i in range(self.font_widget.font_list_widget.count()):
                 if self.font_widget.font_list_widget.item(i).data(20) == song_data[7]:
                     self.font_widget.font_list_widget.setCurrentRow(i)
                     break
-
-        if song_data[8] == 'global':
-            if self.gui.main.settings['font_color'] == 'black':
-                self.font_widget.black_radio_button.setChecked(True)
-            elif self.gui.main.settings['font_color'] == 'white':
+            if song_data[8] == '#FFFFFF':
                 self.font_widget.white_radio_button.setChecked(True)
+            elif song_data[8] == '#000000':
+                self.font_widget.black_radio_button.setChecked(True)
             else:
                 self.font_widget.custom_font_color_radio_button.setChecked(True)
-                self.font_widget.custom_font_color_radio_button.setObjectName(self.gui.main.settings['font_color'])
-        elif song_data[8] == '#FFFFFF':
-            self.font_widget.white_radio_button.setChecked(True)
-        elif song_data[8] == '#000000':
-            self.font_widget.black_radio_button.setChecked(True)
-        else:
-            self.font_widget.custom_font_color_radio_button.setChecked(True)
-            self.font_widget.custom_font_color_radio_button.setObjectName(song_data[8])
+                self.font_widget.custom_font_color_radio_button.setObjectName(song_data[8])
 
-        if song_data[9] == 'global_song':
-            self.background_button_group.button(0).setChecked(True)
-            self.background_line_edit.setText('Use Global Song Background')
-        elif 'rgb(' in song_data[9]:
-            self.background_button_group.button(1).setChecked(True)
-            self.background_line_edit.setText(song_data[9])
-        else:
-            self.background_button_group.button(2).setChecked(True)
-            self.background_line_edit.setText(song_data[9])
-
-        if song_data[10] == 'global':
-            self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
-        else:
-            try:
-                self.font_widget.font_size_spinbox.setValue(int(song_data[10]))
-            except TypeError:
-                self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
-
-        if song_data[10] and 'global' not in song_data[10]:
+            if song_data[9] == 'global_song':
+                self.background_button_group.button(0).setChecked(True)
+                self.background_line_edit.setText('Use Global Song Background')
+            elif song_data[9] == 'global_bible':
+                self.background_button_group.button(1).setChecked(True)
+                self.background_line_edit.setText('Use Global Bible Background')
+            elif 'rgb(' in song_data[9]:
+                self.background_button_group.button(2).setChecked(True)
+                self.background_line_edit.setText(song_data[9])
+            else:
+                for i in range(self.background_combobox.count()):
+                    if self.background_combobox.itemData(i, Qt.ItemDataRole.UserRole) == song_data[9]:
+                        self.background_combobox.setCurrentIndex(i)
+                        break
+                self.background_button_group.button(3).setChecked(True)
+                self.background_combobox.setEnabled(True)
+                self.background_line_edit.setText(song_data[9])
             self.font_widget.font_size_spinbox.setValue(int(song_data[10]))
-        else:
-            self.font_widget.font_size_spinbox.setValue(int(self.gui.main.settings['font_size']))
 
-        if song_data[11]:
             if song_data[11] == 'True':
                 self.font_widget.shadow_checkbox.setChecked(True)
             else:
                 self.font_widget.shadow_checkbox.setChecked(False)
-        else:
-            self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['use_shadow'])
-
-        if song_data[12] and not song_data[12] == 'global':
             self.font_widget.shadow_color_slider.color_slider.setValue(int(song_data[12]))
-        else:
-            self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['shadow_color'])
-
-        if song_data[13] and not song_data[13] == 'global':
             self.font_widget.shadow_offset_slider.offset_slider.setValue(int(song_data[13]))
-        else:
-            self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
+            self.font_widget.shadow_offset_slider.current_label.setText(song_data[13])
 
-        if song_data[14]:
             if song_data[14] == 'True':
                 self.font_widget.outline_checkbox.setChecked(True)
             else:
                 self.font_widget.outline_checkbox.setChecked(False)
-        else:
-            self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['use_outline'])
-
-        if song_data[15] and not song_data[15] == 'global':
             self.font_widget.outline_color_slider.color_slider.setValue(int(song_data[15]))
-        else:
-            self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
-
-        if song_data[16] and not song_data[16] == 'global':
             self.font_widget.outline_width_slider.offset_slider.setValue(int(song_data[16]))
-        else:
-            self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
+            self.font_widget.outline_width_slider.current_label.setText(song_data[16])
 
-        if song_data[18]:
             if song_data[18] == 'True':
                 self.font_widget.shade_behind_text_checkbox.setChecked(True)
             else:
                 self.font_widget.shade_behind_text_checkbox.setChecked(False)
-        if song_data[19]:
             self.font_widget.shade_color_slider.color_slider.setValue(int(song_data[19]))
-        if song_data[20]:
             self.font_widget.shade_opacity_slider.color_slider.setValue(int(song_data[20]))
+        else:
+            self.override_global_checkbox.setChecked(False)
+            for i in range(self.font_widget.font_list_widget.count()):
+                if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['song_font_face']:
+                    self.font_widget.font_list_widget.setCurrentRow(i)
+                    break
+            if self.gui.main.settings['song_font_color'] == 'black':
+                self.font_widget.black_radio_button.setChecked(True)
+            elif self.gui.main.settings['song_font_color'] == 'white':
+                self.font_widget.white_radio_button.setChecked(True)
+            else:
+                self.font_widget.custom_font_color_radio_button.setChecked(True)
+                self.font_widget.custom_font_color_radio_button.setObjectName(
+                    self.gui.main.settings['song_font_color'])
+            self.background_button_group.button(3).setChecked(True)
+            self.background_combobox.setCurrentIndex(self.gui.tool_bar.bible_background_combobox.currentIndex())
+            self.background_line_edit.setText(self.background_combobox.currentText())
+            self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['song_font_size'])
 
+            self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['song_use_shadow'])
+            self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['song_shadow_color'])
+            self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['song_shadow_offset'])
+
+            self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['song_use_outline'])
+            self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['song_outline_color'])
+            self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['song_outline_width'])
+
+            self.font_widget.shade_behind_text_checkbox.setChecked(self.gui.main.settings['song_use_shade'])
+            self.font_widget.shade_color_slider.color_slider.setValue(self.gui.main.settings['song_shade_color'])
+            self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings['song_shade_opacity'])
+
+        self.override_global_changed()
         self.font_widget.blockSignals(False)
 
         self.populate_tag_list()
@@ -593,112 +589,104 @@ class EditWidget(QDialog):
         self.lyrics_edit.text_edit.setHtml(custom_data[1])
         self.font_widget.blockSignals(True)
 
-        if custom_data[2]:
-            if 'global' in custom_data[2]:
-                for i in range(self.font_widget.font_list_widget.count()):
-                    if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['font_face']:
-                        self.font_widget.font_list_widget.setCurrentRow(i)
-                        break
-            else:
-                for i in range(self.font_widget.font_list_widget.count()):
-                    if self.font_widget.font_list_widget.item(i).data(20) == custom_data[2]:
-                        self.font_widget.font_list_widget.setCurrentRow(i)
-                        break
-        else:
+        if custom_data[12] == 'True':
+            self.override_global_checkbox.setChecked(True)
             for i in range(self.font_widget.font_list_widget.count()):
-                if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['font_face']:
+                if self.font_widget.font_list_widget.item(i).data(20) == custom_data[2]:
                     self.font_widget.font_list_widget.setCurrentRow(i)
                     break
-
-        if 'global' in custom_data[3]:
-            if self.gui.main.settings['font_color'] == 'black':
-                self.font_widget.black_radio_button.setChecked(True)
-            elif self.gui.main.settings['font_color'] == 'white':
+            if custom_data[3] == '#FFFFFF':
                 self.font_widget.white_radio_button.setChecked(True)
+            elif custom_data[3] == '#000000':
+                self.font_widget.black_radio_button.setChecked(True)
             else:
                 self.font_widget.custom_font_color_radio_button.setChecked(True)
-                self.font_widget.custom_font_color_radio_button.setObjectName(self.gui.main.settings['font_color'])
-        elif custom_data[3] == '#FFFFFF':
-            self.font_widget.white_radio_button.setChecked(True)
-        elif custom_data[3] == '#000000':
-            self.font_widget.black_radio_button.setChecked(True)
-        else:
-            self.font_widget.custom_font_color_radio_button.setChecked(True)
-            self.font_widget.custom_font_color_radio_button.setObjectName(custom_data[3])
+                self.font_widget.custom_font_color_radio_button.setObjectName(custom_data[3])
 
-        if custom_data[4] == 'global_song':
-            self.background_button_group.button(0).setChecked(True)
-            self.background_line_edit.setText('Use Global Song Background')
-        elif custom_data[4] == 'global_bible':
-            self.background_button_group.button(1).setChecked(True)
-            self.background_line_edit.setText('Use Global Bible Background')
-        elif 'rgb(' in custom_data[4]:
-            self.background_button_group.button(2).setChecked(True)
-            self.background_line_edit.setText(custom_data[4])
-        else:
-            self.background_button_group.button(3).setChecked(True)
-            for i in range(self.background_combobox.count()):
-                if self.background_combobox.itemText(i) == custom_data[4].split('.')[0]:
-                    self.background_combobox.setCurrentIndex(i)
-                    break
-            self.background_line_edit.setText(custom_data[4])
-
-        if 'global' in custom_data[5]:
-            self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
-        else:
+            if custom_data[4] == 'global_song':
+                self.background_button_group.button(0).setChecked(True)
+                self.background_line_edit.setText('Use Global Song Background')
+            elif custom_data[4] == 'global_bible':
+                self.background_button_group.button(1).setChecked(True)
+                self.background_line_edit.setText('Use Global Bible Background')
+            elif 'rgb(' in custom_data[4]:
+                self.background_button_group.button(2).setChecked(True)
+                self.background_line_edit.setText(custom_data[4])
+            else:
+                for i in range(self.background_combobox.count()):
+                    if self.background_combobox.itemData(i, Qt.ItemDataRole.UserRole) == custom_data[4]:
+                        self.background_combobox.setCurrentIndex(i)
+                        break
+                self.background_button_group.button(3).setChecked(True)
+                self.background_combobox.setEnabled(True)
+                self.background_line_edit.setText(custom_data[4])
             self.font_widget.font_size_spinbox.setValue(int(custom_data[5]))
 
-        if 'global' in custom_data[6]:
-            self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['use_shadow'])
-        else:
             if custom_data[6] == 'True':
                 self.font_widget.shadow_checkbox.setChecked(True)
             else:
                 self.font_widget.shadow_checkbox.setChecked(False)
-
-        if 'global' in custom_data[7]:
-            self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['shadow_color'])
-        else:
             self.font_widget.shadow_color_slider.color_slider.setValue(int(custom_data[7]))
-
-        if 'global' in custom_data[8]:
-            self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
-        else:
             self.font_widget.shadow_offset_slider.offset_slider.setValue(int(custom_data[8]))
+            self.font_widget.shadow_offset_slider.current_label.setText(custom_data[8])
 
-        if 'global' in custom_data[9]:
-            self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['use_outline'])
-        else:
             if custom_data[9] == 'True':
                 self.font_widget.outline_checkbox.setChecked(True)
             else:
                 self.font_widget.outline_checkbox.setChecked(False)
-
-        if 'global' in custom_data[10]:
-            self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
-        else:
             self.font_widget.outline_color_slider.color_slider.setValue(int(custom_data[10]))
-
-        if 'global' in custom_data[11]:
-            self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
-        else:
             self.font_widget.outline_width_slider.offset_slider.setValue(int(custom_data[11]))
+            self.font_widget.outline_width_slider.current_label.setText(custom_data[11])
 
-        if custom_data[12] == 'True':
-            self.override_global_checkbox.setChecked(True)
-        else:
-            self.override_global_checkbox.setChecked(False)
-
-        if custom_data[13]:
             if custom_data[13] == 'True':
                 self.font_widget.shade_behind_text_checkbox.setChecked(True)
             else:
                 self.font_widget.shade_behind_text_checkbox.setChecked(False)
-        if custom_data[14]:
             self.font_widget.shade_color_slider.color_slider.setValue(int(custom_data[14]))
-        if custom_data[15]:
             self.font_widget.shade_opacity_slider.color_slider.setValue(int(custom_data[15]))
+        else:
+            self.override_global_checkbox.setChecked(False)
+            for i in range(self.font_widget.font_list_widget.count()):
+                if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['bible_font_face']:
+                    self.font_widget.font_list_widget.setCurrentRow(i)
+                    break
+            if self.gui.main.settings['bible_font_color'] == 'black':
+                self.font_widget.black_radio_button.setChecked(True)
+            elif self.gui.main.settings['bible_font_color'] == 'white':
+                self.font_widget.white_radio_button.setChecked(True)
+            else:
+                self.font_widget.custom_font_color_radio_button.setChecked(True)
+                self.font_widget.custom_font_color_radio_button.setObjectName(self.gui.main.settings['bible_font_color'])
+            if self.gui.main.settings['global_bible_background'] == 'global_song':
+                self.background_button_group.button(0).setChecked(True)
+                self.background_line_edit.setText('Use Global Song Background')
+            elif self.gui.main.settings['global_bible_background'] == 'global_bible':
+                self.background_button_group.button(1).setChecked(True)
+                self.background_line_edit.setText('Use Global Bible Background')
+            elif 'rgb(' in self.gui.main.settings['global_bible_background']:
+                self.background_button_group.button(2).setChecked(True)
+                self.background_line_edit.setText(self.gui.main.settings['global_bible_background'])
+            else:
+                self.background_button_group.button(3).setChecked(True)
+                for i in range(self.background_combobox.count()):
+                    if self.background_combobox.itemText(i) == self.gui.main.settings['global_bible_background']:
+                        self.background_combobox.setCurrentIndex(i)
+                        break
+            self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['bible_font_size'])
 
+            self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['bible_use_shadow'])
+            self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['bible_shadow_color'])
+            self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['bible_shadow_offset'])
+
+            self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['bible_use_outline'])
+            self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['bible_outline_color'])
+            self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['bible_outline_width'])
+
+            self.font_widget.shade_behind_text_checkbox.setChecked(self.gui.main.settings['bible_use_shade'])
+            self.font_widget.shade_color_slider.color_slider.setValue(self.gui.main.settings['bible_shade_color'])
+            self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings['bible_shade_opacity'])
+
+        self.override_global_changed()
         self.font_widget.blockSignals(False)
 
     def show_hide_advanced_options(self):
@@ -826,56 +814,37 @@ class EditWidget(QDialog):
         else:
             footer = 'false'
 
-        if self.override_global_checkbox.isChecked():
-            if self.font_widget.font_list_widget.currentItem():
-                font = self.font_widget.font_list_widget.currentItem().data(20)
-            else:
-                font = self.font_widget.font_list_widget.item(0).data(20)
-
-            if self.font_widget.font_color_button_group.checkedButton():
-                font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
-            else:
-                font_color = 'white'
-
-            font_size = str(self.font_widget.font_size_spinbox.value())
-
-            use_shadow = str(self.font_widget.shadow_checkbox.isChecked())
-            shadow_color = str(self.font_widget.shadow_color_slider.color_slider.value())
-            shadow_offset = str(self.font_widget.shadow_offset_slider.offset_slider.value())
-
-            use_outline = str(self.font_widget.outline_checkbox.isChecked())
-            outline_color = str(self.font_widget.outline_color_slider.color_slider.value())
-            outline_width = str(self.font_widget.outline_width_slider.offset_slider.value())
-
-            use_shade = str(self.font_widget.shade_behind_text_checkbox.isChecked())
-            shade_color = str(self.font_widget.shade_color_slider.color_slider.value())
-            shade_opacity = str(self.font_widget.shade_opacity_slider.color_slider.value())
-
-            if 'Global' in self.background_line_edit.text():
-                if 'Song' in self.background_line_edit.text():
-                    background = 'global_song'
-                else:
-                    background = 'global_bible'
-            else:
-                background = self.background_line_edit.text()
-
+        if self.font_widget.font_list_widget.currentItem():
+            font = self.font_widget.font_list_widget.currentItem().data(20)
         else:
-            font = 'global'
-            font_color = 'global'
-            font_size = 'global'
-            use_shadow = 'global'
-            shadow_color = 'global'
-            shadow_offset = 'global'
-            use_outline = 'global'
-            outline_color = 'global'
-            outline_width = 'global'
-            if self.type == 'song':
+            font = self.font_widget.font_list_widget.item(0).data(20)
+
+        if self.font_widget.font_color_button_group.checkedButton():
+            font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
+        else:
+            font_color = 'white'
+
+        font_size = str(self.font_widget.font_size_spinbox.value())
+
+        use_shadow = str(self.font_widget.shadow_checkbox.isChecked())
+        shadow_color = str(self.font_widget.shadow_color_slider.color_slider.value())
+        shadow_offset = str(self.font_widget.shadow_offset_slider.offset_slider.value())
+
+        use_outline = str(self.font_widget.outline_checkbox.isChecked())
+        outline_color = str(self.font_widget.outline_color_slider.color_slider.value())
+        outline_width = str(self.font_widget.outline_width_slider.offset_slider.value())
+
+        use_shade = str(self.font_widget.shade_behind_text_checkbox.isChecked())
+        shade_color = str(self.font_widget.shade_color_slider.color_slider.value())
+        shade_opacity = str(self.font_widget.shade_opacity_slider.color_slider.value())
+
+        if 'Global' in self.background_line_edit.text():
+            if 'Song' in self.background_line_edit.text():
                 background = 'global_song'
             else:
                 background = 'global_bible'
-            use_shade = 'False'
-            shade_color = '0'
-            shade_opacity = '75'
+        else:
+            background = self.background_line_edit.text()
 
         # remove extraneous html tags from the lyrics
         lyrics = self.lyrics_edit.text_edit.toHtml()
@@ -1009,58 +978,39 @@ class EditWidget(QDialog):
         else:
             override_global = 'False'
 
-        if self.override_global_checkbox.isChecked():
-            if self.font_widget.font_list_widget.currentItem():
-                font = self.font_widget.font_list_widget.currentItem().data(20)
-            else:
-                font = self.font_widget.font_list_widget.item(0).data(20)
-
-            if self.font_widget.font_color_button_group.checkedButton():
-                font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
-            else:
-                font_color = 'white'
-
-            font_size = str(self.font_widget.font_size_spinbox.value())
-
-            use_shadow = str(self.font_widget.shadow_checkbox.isChecked())
-            shadow_color = str(self.font_widget.shadow_color_slider.color_slider.value())
-            shadow_offset = str(self.font_widget.shadow_offset_slider.offset_slider.value())
-
-            use_outline = str(self.font_widget.outline_checkbox.isChecked())
-            outline_color = str(self.font_widget.outline_color_slider.color_slider.value())
-            outline_width = str(self.font_widget.outline_width_slider.offset_slider.value())
-
-            use_shade = str(self.font_widget.shade_behind_text_checkbox.isChecked())
-            shade_color = str(self.font_widget.shade_color_slider.color_slider.value())
-            shade_opacity = str(self.font_widget.shade_opacity_slider.color_slider.value())
-
-            if 'Global' in self.background_line_edit.text():
-                if 'Song' in self.background_line_edit.text():
-                    background = 'global_song'
-                else:
-                    background = 'global_bible'
-            elif 'rgb(' in self.background_line_edit.text():
-                background = self.background_line_edit.text()
-            else:
-                background = self.background_line_edit.text()
-
+        if self.font_widget.font_list_widget.currentItem():
+            font = self.font_widget.font_list_widget.currentItem().data(20)
         else:
-            font = 'global'
-            font_color = 'global'
-            font_size = 'global'
-            use_shadow = 'global'
-            shadow_color = 'global'
-            shadow_offset = 'global'
-            use_outline = 'global'
-            outline_color = 'global'
-            outline_width = 'global'
-            if self.type == 'song':
+            font = self.font_widget.font_list_widget.item(0).data(20)
+
+        if self.font_widget.font_color_button_group.checkedButton():
+            font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
+        else:
+            font_color = 'white'
+
+        font_size = str(self.font_widget.font_size_spinbox.value())
+
+        use_shadow = str(self.font_widget.shadow_checkbox.isChecked())
+        shadow_color = str(self.font_widget.shadow_color_slider.color_slider.value())
+        shadow_offset = str(self.font_widget.shadow_offset_slider.offset_slider.value())
+
+        use_outline = str(self.font_widget.outline_checkbox.isChecked())
+        outline_color = str(self.font_widget.outline_color_slider.color_slider.value())
+        outline_width = str(self.font_widget.outline_width_slider.offset_slider.value())
+
+        use_shade = str(self.font_widget.shade_behind_text_checkbox.isChecked())
+        shade_color = str(self.font_widget.shade_color_slider.color_slider.value())
+        shade_opacity = str(self.font_widget.shade_opacity_slider.color_slider.value())
+
+        if 'Global' in self.background_line_edit.text():
+            if 'Song' in self.background_line_edit.text():
                 background = 'global_song'
             else:
                 background = 'global_bible'
-            use_shade = 'False'
-            shade_color = '0'
-            shade_opacity = '75'
+        elif 'rgb(' in self.background_line_edit.text():
+            background = self.background_line_edit.text()
+        else:
+            background = self.background_line_edit.text()
 
         text = self.lyrics_edit.text_edit.toHtml()
         text_split = re.split('<body.*?>', text)
