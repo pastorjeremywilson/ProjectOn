@@ -820,6 +820,7 @@ class FontWidget(QWidget):
         self.init_components()
 
     def init_components(self):
+        self.setFixedWidth(950)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
@@ -1016,12 +1017,17 @@ class FontWidget(QWidget):
         self.blockSignals(True)
 
         font_face = self.gui.main.settings[f'{self.slide_type}_font_face']
+        font_face_found = False
         if not len(font_face) > 0:
             font_face = 'Arial Black'
         for i in range(self.font_list_widget.count()):
             if self.font_list_widget.item(i).data(20) == font_face:
                 self.font_list_widget.setCurrentRow(i)
+                font_face_found = True
                 break
+
+        if not font_face_found:
+            self.font_list_widget.setCurrentRow(0)
 
         self.font_size_spinbox.setValue(self.gui.main.settings[f'{self.slide_type}_font_size'])
 
@@ -1123,9 +1129,14 @@ class FontWidget(QWidget):
         self.font_sample.repaint()
 
     def change_font_sample(self):
+        if self.font_list_widget.currentItem():
+            font_name = self.font_list_widget.currentItem().data(20)
+        else:
+            font_name = self.font_list_widget.item(0).data(20)
+
         self.font_sample.setFont(
             QFont(
-                self.font_list_widget.currentItem().data(20),
+                font_name,
                 self.font_size_spinbox.value(),
                 QFont.Weight.Bold))
 

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.3.3.021
+ProjectOn v.1.3.3.026
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -867,7 +867,7 @@ class ProjectOn(QObject):
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
                             widget_item = QListWidgetItem()
-                            for i in range(20, 41):
+                            for i in range(20, 44):
                                 widget_item.setData(i, custom_item.data(i))
 
                             if 'text' in service_dict[key].keys():
