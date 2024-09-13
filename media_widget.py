@@ -1333,7 +1333,7 @@ class MediaWidget(QTabWidget):
         """
         if not item and self.custom_list.currentItem():
             item = QListWidgetItem()
-            for i in range(20, 41):
+            for i in range(20, 44):
                 item.setData(i, self.custom_list.currentItem().data(i))
         elif not item and not self.custom_list.currentItem():
             return

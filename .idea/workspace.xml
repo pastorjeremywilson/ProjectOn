@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Redesigned font sample for better alignment&#10;Ensured new settings key:value pairs are being saved in service files&#10;Updated the readmes with &quot;What's New&quot; section" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Chance that FontSample.setFont() could be called before font list has a current item. Wrapped that in an 'if' statement.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -139,14 +149,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00012" summary="Changed most &quot;pressed&quot; signals to &quot;clicked&quot; to avoid duplicate calls.&#10;Fixed font widget background color.&#10;Changed version to release candidate 3.">
-      <option name="closed" value="true" />
-      <created>1721757334701</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1721757334701</updated>
     </task>
     <task id="LOCAL-00013" summary="Fixed icon dimensions">
       <option name="closed" value="true" />
@@ -532,7 +534,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726092196449</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="Chance that FontSample.setFont() could be called before font list has a current item. Wrapped that in an 'if' statement.">
+      <option name="closed" value="true" />
+      <created>1726094189242</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1726094189243</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -553,7 +563,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed confusion between \n and &lt;br /&gt; in editing and parsing songs.&#10;Fixed double-return not parsing as a new slide" />
     <MESSAGE value="Changed version number - ready for release" />
     <MESSAGE value="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install" />
     <MESSAGE value="Fixed problem with not handling 'global' in custom slide settings&#10;Prevented custom bible passage with no verses from being added to OOS" />
@@ -578,6 +587,7 @@
     <MESSAGE value="Fixed font sample background not loading correctly when first run." />
     <MESSAGE value="Added shade behind text option to settings widgets and implemented visual feedback" />
     <MESSAGE value="Redesigned font sample for better alignment&#10;Ensured new settings key:value pairs are being saved in service files&#10;Updated the readmes with &quot;What's New&quot; section" />
-    <option name="LAST_COMMIT_MESSAGE" value="Redesigned font sample for better alignment&#10;Ensured new settings key:value pairs are being saved in service files&#10;Updated the readmes with &quot;What's New&quot; section" />
+    <MESSAGE value="Chance that FontSample.setFont() could be called before font list has a current item. Wrapped that in an 'if' statement." />
+    <option name="LAST_COMMIT_MESSAGE" value="Chance that FontSample.setFont() could be called before font list has a current item. Wrapped that in an 'if' statement." />
   </component>
 </project>

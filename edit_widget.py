@@ -709,7 +709,7 @@ class EditWidget(QDialog):
         if self.advanced_options_widget.isHidden():
             self.advanced_options_widget.show()
             self.advanced_options_widget.adjustSize()
-            width = self.advanced_options_widget.width()
+            width = self.advanced_options_widget.width() + 60
             if width > self.gui.main_window.width():
                 width = self.gui.main_window.width()
             self.setMinimumWidth(width)
