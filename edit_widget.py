@@ -527,7 +527,7 @@ class EditWidget(QDialog):
                 self.font_widget.shadow_checkbox.setChecked(False)
             self.font_widget.shadow_color_slider.color_slider.setValue(int(song_data[12]))
             self.font_widget.shadow_offset_slider.offset_slider.setValue(int(song_data[13]))
-            self.font_widget.shadow_offset_slider.current_label.setText(song_data[13])
+            self.font_widget.shadow_offset_slider.current_label.setText(song_data[13] + 'px')
 
             if song_data[14] == 'True':
                 self.font_widget.outline_checkbox.setChecked(True)
@@ -535,7 +535,7 @@ class EditWidget(QDialog):
                 self.font_widget.outline_checkbox.setChecked(False)
             self.font_widget.outline_color_slider.color_slider.setValue(int(song_data[15]))
             self.font_widget.outline_width_slider.offset_slider.setValue(int(song_data[16]))
-            self.font_widget.outline_width_slider.current_label.setText(song_data[16])
+            self.font_widget.outline_width_slider.current_label.setText(song_data[16] + 'px')
 
             if song_data[18] == 'True':
                 self.font_widget.shade_behind_text_checkbox.setChecked(True)
@@ -565,10 +565,14 @@ class EditWidget(QDialog):
             self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['song_use_shadow'])
             self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['song_shadow_color'])
             self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['song_shadow_offset'])
+            self.font_widget.shadow_offset_slider.current_label.setText(
+                str(self.gui.main.settings['song_shadow_offset']) + 'px')
 
             self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['song_use_outline'])
             self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['song_outline_color'])
             self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['song_outline_width'])
+            self.font_widget.outline_width_slider.current_label.setText(
+                str(self.gui.main.settings['song_outline_width']) + 'px')
 
             self.font_widget.shade_behind_text_checkbox.setChecked(self.gui.main.settings['song_use_shade'])
             self.font_widget.shade_color_slider.color_slider.setValue(self.gui.main.settings['song_shade_color'])
@@ -628,7 +632,7 @@ class EditWidget(QDialog):
                 self.font_widget.shadow_checkbox.setChecked(False)
             self.font_widget.shadow_color_slider.color_slider.setValue(int(custom_data[7]))
             self.font_widget.shadow_offset_slider.offset_slider.setValue(int(custom_data[8]))
-            self.font_widget.shadow_offset_slider.current_label.setText(custom_data[8])
+            self.font_widget.shadow_offset_slider.current_label.setText(custom_data[8] + 'px')
 
             if custom_data[9] == 'True':
                 self.font_widget.outline_checkbox.setChecked(True)
@@ -636,7 +640,7 @@ class EditWidget(QDialog):
                 self.font_widget.outline_checkbox.setChecked(False)
             self.font_widget.outline_color_slider.color_slider.setValue(int(custom_data[10]))
             self.font_widget.outline_width_slider.offset_slider.setValue(int(custom_data[11]))
-            self.font_widget.outline_width_slider.current_label.setText(custom_data[11])
+            self.font_widget.outline_width_slider.current_label.setText(custom_data[11] + 'px')
 
             if custom_data[13] == 'True':
                 self.font_widget.shade_behind_text_checkbox.setChecked(True)
@@ -677,10 +681,14 @@ class EditWidget(QDialog):
             self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['bible_use_shadow'])
             self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['bible_shadow_color'])
             self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['bible_shadow_offset'])
+            self.font_widget.shadow_offset_slider.current_label.setText(
+                str(self.gui.main.settings['bible_shadow_offset'] + 'px'))
 
             self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['bible_use_outline'])
             self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['bible_outline_color'])
             self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['bible_outline_width'])
+            self.font_widget.outline_width_slider.current_label.setText(
+                str(self.gui.main.settings['bible_outline_width']) + 'px')
 
             self.font_widget.shade_behind_text_checkbox.setChecked(self.gui.main.settings['bible_use_shade'])
             self.font_widget.shade_color_slider.color_slider.setValue(self.gui.main.settings['bible_shade_color'])

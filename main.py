@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.3.3.025
+ProjectOn v.1.3.3.026
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
