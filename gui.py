@@ -193,7 +193,7 @@ class GUI(QObject):
 
         if not exists(self.main.device_specific_config_file):
             device_specific_settings = {
-                'used_services': '',
+                'used_services': [],
                 'last_save_dir': '',
                 'last_status_count': 100,
                 'data_dir': '',
@@ -280,12 +280,12 @@ class GUI(QObject):
             "ccli_num": ""
         }
 
-        if exists(self.main.data_dir + '/settings.json'):
-            with open(self.main.data_dir + '/settings.json', 'r') as file:
+        if exists(self.main.config_file):
+            with open(self.main.config_file, 'r') as file:
                 try:
                     self.main.settings = json.loads(file.read())
                 except json.decoder.JSONDecodeError:
-                    self.main.settings = {}
+                    self.main.settings = default_settings
 
             # make sure the new font keys exist; copy them from the old if not
             if 'song_font_face' not in self.main.settings.keys() or 'bible_font_face' not in self.main.settings.keys():
@@ -324,6 +324,7 @@ class GUI(QObject):
         else:
             self.main.settings = default_settings
 
+        # check for any missing keys in what was pulled from the config file
         for key in default_settings:
             if key not in self.main.settings.keys():
                 self.main.settings[key] = default_settings[key]
@@ -340,9 +341,29 @@ class GUI(QObject):
             self.main.settings['last_status_count'] = device_specific_settings['last_status_count']
         self.main.settings['data_dir'] = self.main.data_dir
 
-        if not exists(self.main.config_file):
-            if exists(self.main.data_dir + '/settings.json'):
-                shutil.copy(self.main.data_dir + '/settings.json', self.main.config_file)
+        # check for the rest of the necessary files/directories
+        if not exists(self.main.database):
+            shutil.copy('resources/defaults/data/projecton.db', self.main.database)
+
+        if not exists(self.main.background_dir):
+            shutil.copytree('resources/defaults/data/backgrounds', self.main.background_dir)
+            from main import IndexImages
+            ii = IndexImages(self.main, 'backgrounds')
+            self.main.thread_pool.start(ii)
+            self.main.thread_pool.waitForDone()
+
+        if not exists(self.main.image_dir):
+            shutil.copytree('resources/defaults/data/images', self.main.image_dir)
+            from main import IndexImages
+            ii = IndexImages(self.main, 'images')
+            self.main.thread_pool.start(ii)
+            self.main.thread_pool.waitForDone()
+
+        if not exists(self.main.bible_dir):
+            shutil.copytree('resources/defaults/data/bibles', self.main.bible_dir)
+
+        if not exists(self.main.video_dir):
+            shutil.copytree('resources/defaults/data/videos', self.main.video_dir)
 
     def init_components(self):
         """
@@ -557,7 +578,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.3.3.026'
+        current_version = 'v.1.3.3.027'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -794,7 +815,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.3.3.026')
+        title_label = QLabel('ProjectOn v.1.3.3.027')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1974,7 +1995,7 @@ class GUI(QObject):
         """
         # configure the hidden sample widget according to the current font
         self.sample_lyric_widget.setFont(
-            QFont(self.main.settings['font_face'], self.main.settings['font_size'], QFont.Weight.Bold))
+            QFont(self.main.settings['bible_font_face'], self.main.settings['bible_font_size'], QFont.Weight.Bold))
         self.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
         self.sample_lyric_widget.footer_label.adjustSize()
         self.sample_lyric_widget.paint_text()

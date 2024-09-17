@@ -611,15 +611,15 @@ class MediaWidget(QTabWidget):
                 else:
                     outline_width = self.gui.main.settings['outline_width']
             else:
-                font_face = self.gui.main.settings['font_face']
-                font_size = self.gui.main.settings['font_size']
-                font_color = self.gui.main.settings['font_color']
-                use_shadow = self.gui.main.settings['use_shadow']
-                shadow_color = self.gui.main.settings['shadow_color']
-                shadow_offset = self.gui.main.settings['shadow_offset']
-                use_outline = self.gui.main.settings['use_outline']
-                outline_color = self.gui.main.settings['outline_color']
-                outline_width = self.gui.main.settings['outline_width']
+                font_face = self.gui.main.settings['song_font_face']
+                font_size = self.gui.main.settings['song_font_size']
+                font_color = self.gui.main.settings['song_font_color']
+                use_shadow = self.gui.main.settings['song_use_shadow']
+                shadow_color = self.gui.main.settings['song_shadow_color']
+                shadow_offset = self.gui.main.settings['song_shadow_offset']
+                use_outline = self.gui.main.settings['song_use_outline']
+                outline_color = self.gui.main.settings['song_outline_color']
+                outline_width = self.gui.main.settings['song_outline_width']
 
             lyric_widget = self.gui.sample_lyric_widget
 
@@ -1260,7 +1260,8 @@ class MediaWidget(QTabWidget):
                 self.gui.oos_widget.oos_list_widget.insertItem(row, item)
             self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
             self.gui.changes = True
-        else:
+
+        if not item and from_load_service:
             # handle this differently if it's being created while loading a service file
             widget_item = QListWidgetItem()
             for i in range(20, 44):

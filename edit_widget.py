@@ -383,34 +383,34 @@ class EditWidget(QDialog):
 
     def set_defaults(self):
         for i in range(self.font_widget.font_list_widget.count()):
-            if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['font_face']:
+            if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['song_font_face']:
                 self.font_widget.font_list_widget.setCurrentRow(i)
                 break
 
-        if self.gui.main.settings['font_color'] == 'black':
+        if self.gui.main.settings['song_font_color'] == 'black':
             self.font_widget.black_radio_button.setChecked(True)
-        elif self.gui.main.settings['font_color'] == 'white':
+        elif self.gui.main.settings['song_font_color'] == 'white':
             self.font_widget.white_radio_button.setChecked(True)
         else:
             self.font_widget.custom_font_color_radio_button.setChecked(True)
-            self.font_widget.custom_font_color_radio_button.setObjectName(self.gui.main.settings['font_color'])
+            self.font_widget.custom_font_color_radio_button.setObjectName(self.gui.main.settings['song_font_color'])
 
         self.background_button_group.button(0).setChecked(True)
         self.background_line_edit.setText('Use Global Song Background')
 
-        self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['font_size'])
+        self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['song_font_size'])
 
-        self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['use_shadow'])
-        self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['shadow_color'])
-        self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['shadow_offset'])
+        self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['song_use_shadow'])
+        self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['song_shadow_color'])
+        self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['song_shadow_offset'])
 
-        self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['use_outline'])
-        self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['outline_color'])
-        self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['outline_width'])
+        self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['song_use_outline'])
+        self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['song_outline_color'])
+        self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['song_outline_width'])
 
-        self.font_widget.shade_behind_text_checkbox.setFont(self.gui.main.settings['shade_behind_text'])
-        self.font_widget.shade_color_slider.color_slider.setFont(self.gui.main.settings['shade_color'])
-        self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings['shade_opacity'])
+        self.font_widget.shade_behind_text_checkbox.setChecked(self.gui.main.settings['song_use_shade'])
+        self.font_widget.shade_color_slider.color_slider.setValue(self.gui.main.settings['song_shade_color'])
+        self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings['song_shade_opacity'])
 
     def background_combobox_change(self):
         self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole))
@@ -682,7 +682,7 @@ class EditWidget(QDialog):
             self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['bible_shadow_color'])
             self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['bible_shadow_offset'])
             self.font_widget.shadow_offset_slider.current_label.setText(
-                str(self.gui.main.settings['bible_shadow_offset'] + 'px'))
+                str(self.gui.main.settings['bible_shadow_offset']) + 'px')
 
             self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['bible_use_outline'])
             self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['bible_outline_color'])

@@ -1140,7 +1140,14 @@ class FontWidget(QWidget):
                 self.font_size_spinbox.value(),
                 QFont.Weight.Bold))
 
-        color = self.font_color_button_group.checkedButton().objectName()
+        if self.font_color_button_group.checkedButton():
+            color = self.font_color_button_group.checkedButton().objectName()
+        else:
+            color = 'black'
+            self.black_radio_button.blockSignals(True)
+            self.black_radio_button.setChecked(True)
+            self.black_radio_button.blockSignals(False)
+
         if color == 'black':
             self.font_sample.fill_color = QColor(0, 0, 0)
         elif color == 'white':
@@ -1185,6 +1192,7 @@ class FontWidget(QWidget):
         self.custom_font_color_radio_button.setText('Custom: ' + color_string)
         self.custom_font_color_radio_button.setObjectName(color_string)
         sender.setChecked(True)
+        self.show()
         self.change_font()
 
     def hideEvent(self, evt):
@@ -1328,20 +1336,25 @@ class FontSample(QLabel):
                 sample_background = QImage(self.settings_widget.gui.main.background_dir + '/' + background)
 
         ratio = sample_background.width() / rect.width()
-        sample_background = sample_background.scaled(
-            int(rect.width()),
-            int(sample_background.height() / ratio),
-            Qt.AspectRatioMode.IgnoreAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
-        )
+        # if there was no background yet chosen, ration will be 0
+        if ratio > 0:
+            sample_background = sample_background.scaled(
+                int(rect.width()),
+                int(sample_background.height() / ratio),
+                Qt.AspectRatioMode.IgnoreAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
 
-        piece_rect = QRect(
-            0,
-            int(sample_background.height() / 2) - int(rect.height() / 2),
-            int(rect.width()),
-            int(rect.height())
-        )
-        sample_background = sample_background.copy(piece_rect)
+            piece_rect = QRect(
+                0,
+                int(sample_background.height() / 2) - int(rect.height() / 2),
+                int(rect.width()),
+                int(rect.height())
+            )
+            sample_background = sample_background.copy(piece_rect)
+        else:
+            sample_background = QImage(QSize(int(rect.width()), int(rect.height())), QImage.Format_RGB32)
+            sample_background.fill(Qt.GlobalColor.black)
 
         return sample_background
 
