@@ -1233,7 +1233,7 @@ class MediaWidget(QTabWidget):
             item.setText(None)
 
             # Create a thumbnail of either the global song background or the custom background associated with this song
-            if item.data(29) == 'global_song':
+            if not item.data(29) or item.data(29) == 'global_song':
                 pixmap = self.gui.global_song_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
             elif 'rgb(' in item.data(29):
@@ -1339,7 +1339,10 @@ class MediaWidget(QTabWidget):
         elif not item and not self.custom_list.currentItem():
             return
 
-        if item.data(29) == 'global_song':
+        if not item.data(29):
+            pixmap = self.gui.global_bible_background_pixmap
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        elif item.data(29) == 'global_song':
             pixmap = self.gui.global_song_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
         elif item.data(29) == 'global_bible':
