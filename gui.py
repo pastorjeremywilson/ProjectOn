@@ -187,9 +187,10 @@ class GUI(QObject):
         self.check_update()
 
     def check_files(self):
-        if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn')):
-            os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
-        self.main.device_specific_config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')
+        self.main.user_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
+        if not exists(self.main.user_dir):
+            os.mkdir(self.main.user_dir)
+        self.main.device_specific_config_file = os.path.expanduser(self.main.user_dir + '/localConfig.json')
 
         if not exists(self.main.device_specific_config_file):
             device_specific_settings = {
@@ -496,6 +497,9 @@ class GUI(QObject):
         export_action = file_menu.addAction('Export Songs')
         export_action.triggered.connect(lambda: OpenlyricsExport(self))
 
+        backup_action = file_menu.addAction('Backup Your Data')
+        backup_action.triggered.connect(self.main.do_backup)
+
         file_menu.addSeparator()
 
         exit_action = file_menu.addAction('Exit')
@@ -578,7 +582,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.3.3.027'
+        current_version = 'v.1.3.3.032'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -815,7 +819,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.3.3.027')
+        title_label = QLabel('ProjectOn v.1.3.3.032')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1459,7 +1463,16 @@ class GUI(QObject):
         if current_item:
             # set the background
             if current_item.data(40) == 'song' or current_item.data(40) == 'custom':
-                if current_item.data(29) == 'global_song':
+                if not current_item.data(37) or current_item.data(37) == 'False':
+                    if current_item.data(40) == 'song':
+                        display_widget.background_label.clear()
+                        display_widget.setStyleSheet('#display_widget { background-color: none }')
+                        display_widget.background_label.setPixmap(self.global_song_background_pixmap)
+                    else:
+                        display_widget.background_label.clear()
+                        display_widget.setStyleSheet('#display_widget { background-color: none }')
+                        display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
+                elif current_item.data(29) == 'global_song':
                     display_widget.background_label.clear()
                     display_widget.setStyleSheet('#display_widget { background-color: none } ')
                     display_widget.background_label.setPixmap(self.global_song_background_pixmap)
@@ -1546,7 +1559,7 @@ class GUI(QObject):
                 shade_color = int(current_item.data(42))
                 shade_opacity = int(current_item.data(43))
             else:
-                if current_item.data(40) == 'bible':
+                if current_item.data(40) == 'bible' or current_item.data(40) == 'custom':
                     font_face = self.main.settings['bible_font_face']
                     font_size = self.main.settings['bible_font_size']
                     font_color = self.main.settings['bible_font_color']

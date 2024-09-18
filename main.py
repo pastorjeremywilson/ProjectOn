@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.3.3.027
+ProjectOn v.1.3.3.032
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -28,6 +28,8 @@ import sys
 import threading
 import time
 import traceback
+import zipfile
+from datetime import datetime
 from os.path import exists
 from xml.etree import ElementTree
 from gevent import monkey
@@ -51,6 +53,7 @@ class ProjectOn(QObject):
     """
     app = None
     data_dir = None
+    user_dir = None
     database = None
     bible_dir = None
     commit_done_event = threading.Event()
@@ -154,12 +157,22 @@ class ProjectOn(QObject):
         splash_layout = QHBoxLayout(self.splash_widget)
         splash_layout.setContentsMargins(20, 20, 20, 20)
 
+        icon_widget = QWidget()
+        icon_layout = QVBoxLayout(icon_widget)
+        icon_layout.setContentsMargins(0, 0, 0, 0)
+        splash_layout.addWidget(icon_widget)
+
         icon_label = QLabel()
         icon_label.setStyleSheet('background: #6060c0')
         icon_label.setPixmap(
             QPixmap('resources/branding/logo.svg').scaled(
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
-        splash_layout.addWidget(icon_label)
+        icon_layout.addWidget(icon_label)
+
+        version_label = QLabel('v.1.3.3.032')
+        version_label.setStyleSheet('color: white')
+        version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
 
         container = QWidget()
         container.setObjectName('container')
@@ -1140,6 +1153,53 @@ class ProjectOn(QObject):
                 name = root.attrib['biblename']
 
         self.gui.media_widget.bible_selector_combobox.blockSignals(False)
+
+    def do_backup(self):
+        response = QMessageBox.question(
+            self.gui.main_window,
+            'Backup Your Data',
+            'This will perform a complete backup of your data and may take a few minutes. Continue?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+        )
+
+        if not response == QMessageBox.StandardButton.Yes:
+            return
+
+        now = str(datetime.now())
+        now = now.replace(' ', '_')
+        now = now.replace('-', '.')
+        now = now.replace(':', '.')
+
+        result = QFileDialog.getSaveFileName(
+            self.gui.main_window,
+            'Backup File',
+            os.path.expanduser('~/Documents') + '/po_backup_' + now + '.zip',
+            'ZIP Files (*.zip)'
+        )
+
+        if not len(result[0]) > 0:
+            return
+        backup_file_name = result[0]
+        wait_widget = SimpleSplash(self.gui, 'Backing Up Data...', subtitle=True)
+
+        zf = zipfile.ZipFile(
+            backup_file_name,
+            'w', compression=zipfile.ZIP_DEFLATED,
+            compresslevel=9
+        )
+        for file in os.listdir(self.data_dir):
+            file_path = self.data_dir + '/' + file
+            zf.write(file_path, arcname=file_path.replace(self.data_dir, 'data'))
+        for root, directories, files in os.walk(self.data_dir):
+            for directory in directories:
+                for file in os.listdir(str(os.path.join(root, directory))):
+                    file_path = root + '/' + directory + '/' + file
+                    if not file.endswith('.zip'):
+                        wait_widget.subtitle_label.setText('Compressing ' + str(file))
+                        zf.write(file_path, arcname=file_path.replace(root, 'data'))
+                        self.app.processEvents()
+        zf.close()
+        wait_widget.widget.deleteLater()
 
     def error_log(self):
         """

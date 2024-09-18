@@ -1153,7 +1153,10 @@ class FontWidget(QWidget):
         elif color == 'white':
             self.font_sample.fill_color = QColor(255, 255, 255)
         else:
-            fill_color_split = self.custom_font_color_radio_button.objectName().split(', ')
+            fill_color = self.custom_font_color_radio_button.objectName()
+            fill_color = fill_color.replace('rgb(', '')
+            fill_color = fill_color.replace(')', '')
+            fill_color_split = fill_color.split(', ')
             self.font_sample.fill_color = QColor(
                 int(fill_color_split[0]), int(fill_color_split[1]), int(fill_color_split[2]))
 

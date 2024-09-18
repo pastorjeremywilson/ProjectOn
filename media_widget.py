@@ -1233,8 +1233,11 @@ class MediaWidget(QTabWidget):
             item.setText(None)
 
             # Create a thumbnail of either the global song background or the custom background associated with this song
-            if item.data(29) == 'global_song':
+            if not item.data(37) or item.data(37) == 'False' or item.data(37) == 'global_song':
                 pixmap = self.gui.global_song_background_pixmap
+                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            elif item.data(29) == 'global_bible':
+                pixmap = self.gui.global_bible_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
             elif 'rgb(' in item.data(29):
                 pixmap = QPixmap(50, 27)
@@ -1261,23 +1264,21 @@ class MediaWidget(QTabWidget):
             self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
             self.gui.changes = True
 
-        if not item and from_load_service:
+        if item and from_load_service:
             # handle this differently if it's being created while loading a service file
             widget_item = QListWidgetItem()
             for i in range(20, 44):
                 widget_item.setData(i, item.data(i))
             widget_item.setData(24, self.parse_song_data(item))
 
-            if widget_item.data(29) == 'global_song':
+            if not item.data(37) or item.data(37) == 'False' or item.data(37) == 'global_song':
                 pixmap = self.gui.global_song_background_pixmap
-                pixmap = pixmap.scaled(
-                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation)
-            elif widget_item.data(29) == 'global_bible':
+                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                       Qt.TransformationMode.SmoothTransformation)
+            elif item.data(29) == 'global_bible':
                 pixmap = self.gui.global_bible_background_pixmap
-                pixmap = pixmap.scaled(
-                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation)
+                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                       Qt.TransformationMode.SmoothTransformation)
             elif 'rgb(' in widget_item.data(29):
                 pixmap = QPixmap(50, 27)
                 painter = QPainter(pixmap)
@@ -1339,7 +1340,10 @@ class MediaWidget(QTabWidget):
         elif not item and not self.custom_list.currentItem():
             return
 
-        if item.data(29) == 'global_song':
+        if not item.data(29):
+            pixmap = self.gui.global_bible_background_pixmap
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        elif item.data(29) == 'global_song':
             pixmap = self.gui.global_song_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
         elif item.data(29) == 'global_bible':
