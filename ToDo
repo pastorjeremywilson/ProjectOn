@@ -1,3 +1,6 @@
+add to service creating wrong thumbnail on non-override songs
+hymns not being added to oos when loading from file
+
 Future Releases:
 Add auto-play slide feature
 Accurate preview when editing a song or a custom slide

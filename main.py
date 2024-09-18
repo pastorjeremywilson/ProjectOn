@@ -157,12 +157,22 @@ class ProjectOn(QObject):
         splash_layout = QHBoxLayout(self.splash_widget)
         splash_layout.setContentsMargins(20, 20, 20, 20)
 
+        icon_widget = QWidget()
+        icon_layout = QVBoxLayout(icon_widget)
+        icon_layout.setContentsMargins(0, 0, 0, 0)
+        splash_layout.addWidget(icon_widget)
+
         icon_label = QLabel()
         icon_label.setStyleSheet('background: #6060c0')
         icon_label.setPixmap(
             QPixmap('resources/branding/logo.svg').scaled(
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
-        splash_layout.addWidget(icon_label)
+        icon_layout.addWidget(icon_label)
+
+        version_label = QLabel('v.1.3.3.031')
+        version_label.setStyleSheet('color: white')
+        version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
 
         container = QWidget()
         container.setObjectName('container')
@@ -200,10 +210,6 @@ class ProjectOn(QObject):
         self.info_label.setStyleSheet('color: white')
         self.info_label.setFont(QFont('Helvetica', 10))
         container_layout.addWidget(self.info_label)
-
-        version_label = QLabel('v.1.3.3.031')
-        version_label.setStyleSheet('color: white')
-        container_layout.addWidget(version_label)
 
         self.splash_widget.show()
 
