@@ -27,6 +27,7 @@ square to be shown behind the text. This can help readability on 'busy' backgrou
 - Improved font preview now included in the toolbar font dropdowns.
 - Font dropdowns now disappear when clicking outside of them (no longer
 need to click the font button to make them go away).
+- Added the ability to backup all data to a zip file (found in the 'File' menu)
 - Other minor improvements and bug fixes.
 
 # Installation

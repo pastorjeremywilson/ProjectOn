@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False.&#10;Fixed wrong oos item icon on non-override song.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,14 +144,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00018" summary="Added readme&#10;Refined the logo">
-      <option name="closed" value="true" />
-      <created>1722026109435</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1722026109435</updated>
     </task>
     <task id="LOCAL-00019" summary="Organized/refactored items in the resources folder&#10;Relativized image urls in README.md">
       <option name="closed" value="true" />
@@ -536,7 +529,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726690710969</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False.&#10;Fixed wrong oos item icon on non-override song.">
+      <option name="closed" value="true" />
+      <created>1726692911827</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1726692911827</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -557,7 +558,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed bible combobox not updating after importing an XML bible" />
     <MESSAGE value="Added &quot;Known Issues&quot; section to README.md" />
     <MESSAGE value="Ensured that files created when importing a video or a SongSelect song are removed afterwards.&#10;Moved the location of the error log file to the appdata folder." />
     <MESSAGE value="Changed error log file location in the help widget's file_locations.html" />
@@ -582,6 +582,7 @@
     <MESSAGE value="Fixed slider pixel values not correct when editing widget first opened" />
     <MESSAGE value="Set self.main.settings to default_settings in case of JSONDecodeError.&#10;&#10;In GUI.check_files, checked for individual files/directories in case only one got deleted.&#10;&#10;Fixed crash in update_font when creating a new song/custom slide.&#10;&#10;Fixed crash in edit widget when no global background(s) have been chosen or when background image is missing.&#10;&#10;Ensured font widget is re-shown after custom color dialog is done." />
     <MESSAGE value="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False." />
+    <MESSAGE value="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False.&#10;Fixed wrong oos item icon on non-override song." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False.&#10;Fixed wrong oos item icon on non-override song." />
   </component>
 </project>

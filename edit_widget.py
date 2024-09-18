@@ -62,6 +62,8 @@ class EditWidget(QDialog):
 
         # ensure the advanced options widgets are hidden or shown accordingly
         self.override_global_changed()
+
+        self.font_widget.change_font()
         self.show()
 
     def init_components(self):
@@ -389,35 +391,44 @@ class EditWidget(QDialog):
         layout.addWidget(self.scroll_area)
 
     def set_defaults(self):
+        if self.type == 'song':
+            slide_type = 'song'
+        else:
+            slide_type = 'bible'
+
         for i in range(self.font_widget.font_list_widget.count()):
-            if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings['song_font_face']:
+            if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings[slide_type + '_font_face']:
                 self.font_widget.font_list_widget.setCurrentRow(i)
                 break
 
-        if self.gui.main.settings['song_font_color'] == 'black':
+        if self.gui.main.settings[slide_type + '_font_color'] == 'black':
             self.font_widget.black_radio_button.setChecked(True)
-        elif self.gui.main.settings['song_font_color'] == 'white':
+        elif self.gui.main.settings[slide_type + '_font_color'] == 'white':
             self.font_widget.white_radio_button.setChecked(True)
         else:
             self.font_widget.custom_font_color_radio_button.setChecked(True)
-            self.font_widget.custom_font_color_radio_button.setObjectName(self.gui.main.settings['song_font_color'])
+            self.font_widget.custom_font_color_radio_button.setObjectName(self.gui.main.settings[slide_type + '_font_color'])
 
-        self.background_button_group.button(0).setChecked(True)
-        self.background_line_edit.setText('Use Global Song Background')
+        if slide_type == 'song':
+            self.background_button_group.button(0).setChecked(True)
+            self.background_line_edit.setText('Use Global Song Background')
+        else:
+            self.background_button_group.button(1).setChecked(True)
+            self.background_line_edit.setText('Use Global Bible Background')
 
-        self.font_widget.font_size_spinbox.setValue(self.gui.main.settings['song_font_size'])
+        self.font_widget.font_size_spinbox.setValue(self.gui.main.settings[slide_type + '_font_size'])
 
-        self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings['song_use_shadow'])
-        self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings['song_shadow_color'])
-        self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings['song_shadow_offset'])
+        self.font_widget.shadow_checkbox.setChecked(self.gui.main.settings[slide_type + '_use_shadow'])
+        self.font_widget.shadow_color_slider.color_slider.setValue(self.gui.main.settings[slide_type + '_shadow_color'])
+        self.font_widget.shadow_offset_slider.offset_slider.setValue(self.gui.main.settings[slide_type + '_shadow_offset'])
 
-        self.font_widget.outline_checkbox.setChecked(self.gui.main.settings['song_use_outline'])
-        self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['song_outline_color'])
-        self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings['song_outline_width'])
+        self.font_widget.outline_checkbox.setChecked(self.gui.main.settings[slide_type + '_use_outline'])
+        self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings[slide_type + '_outline_color'])
+        self.font_widget.outline_width_slider.offset_slider.setValue(self.gui.main.settings[slide_type + '_outline_width'])
 
-        self.font_widget.shade_behind_text_checkbox.setChecked(self.gui.main.settings['song_use_shade'])
-        self.font_widget.shade_color_slider.color_slider.setValue(self.gui.main.settings['song_shade_color'])
-        self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings['song_shade_opacity'])
+        self.font_widget.shade_behind_text_checkbox.setChecked(self.gui.main.settings[slide_type + '_use_shade'])
+        self.font_widget.shade_color_slider.color_slider.setValue(self.gui.main.settings[slide_type + '_shade_color'])
+        self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings[slide_type + '_shade_opacity'])
 
     def background_combobox_change(self):
         self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole))
