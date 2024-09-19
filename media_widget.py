@@ -1465,22 +1465,28 @@ class CustomListWidget(QListWidget):
         self.item_pos = self.mapFromGlobal(self.cursor().pos())
         menu = QMenu()
 
-        add_song_action = QAction('Add to Order of Service')
+        add_to_service_action = QAction('Add to Order of Service')
         if self.type == 'song':
-            add_song_action.triggered.connect(self.gui.media_widget.add_song_to_service)
+            add_to_service_action.triggered.connect(self.gui.media_widget.add_song_to_service)
         elif self.type == 'custom':
-            add_song_action.triggered.connect(self.gui.media_widget.add_custom_to_service)
-        menu.addAction(add_song_action)
+            add_to_service_action.triggered.connect(self.gui.media_widget.add_custom_to_service)
+        elif self.type == 'image':
+            add_to_service_action.triggered.connect(self.gui.media_widget.add_image_to_service)
+        elif self.type == 'video':
+            add_to_service_action.triggered.connect(self.gui.media_widget.add_video_to_service)
+        elif self.type == 'web':
+            add_to_service_action.triggered.connect(self.gui.media_widget.add_web_to_service)
+        menu.addAction(add_to_service_action)
 
-        edit_song_action = None
+        edit_action = None
         if self.type == 'song':
-            edit_song_action = QAction('Edit Song')
+            edit_action = QAction('Edit Song')
         elif self.type == 'custom':
-            edit_song_action = QAction('Edit Slide')
+            edit_action = QAction('Edit Slide')
 
-        if edit_song_action:
-            edit_song_action.triggered.connect(self.edit_song)
-            menu.addAction(edit_song_action)
+        if edit_action:
+            edit_action.triggered.connect(self.edit_song)
+            menu.addAction(edit_action)
 
         delete_action = None
         if self.type == 'image':
@@ -1564,6 +1570,8 @@ class CustomListWidget(QListWidget):
             self.gui.media_widget.populate_song_list()
         elif self.currentItem().data(40) == 'custom':
             self.gui.media_widget.populate_custom_list()
+        elif self.currentItem().data(40) == 'image':
+            self.gui.media_widget.populate_image_list()
         elif self.currentItem().data(40) == 'video':
             self.gui.media_widget.populate_video_list()
         elif self.currentItem().data(40) == 'web':
