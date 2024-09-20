@@ -497,8 +497,13 @@ class GUI(QObject):
         export_action = file_menu.addAction('Export Songs')
         export_action.triggered.connect(lambda: OpenlyricsExport(self))
 
-        backup_action = file_menu.addAction('Backup Your Data')
+        backup_menu = file_menu.addMenu('Backup')
+
+        backup_action = backup_menu.addAction('Backup Your Data')
         backup_action.triggered.connect(self.main.do_backup)
+
+        restore_action = backup_menu.addAction('Restore from Backup')
+        restore_action.triggered.connect(self.main.restore_from_backup)
 
         file_menu.addSeparator()
 
@@ -582,7 +587,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.3.3.032'
+        current_version = 'v.1.3.3.033'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -819,7 +824,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.3.3.032')
+        title_label = QLabel('ProjectOn v.1.3.3.033')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()

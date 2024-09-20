@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.3.3.032
+ProjectOn v.1.3.3.033
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -169,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.3.3.032')
+        version_label = QLabel('v.1.3.3.033')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1200,6 +1200,49 @@ class ProjectOn(QObject):
                         self.app.processEvents()
         zf.close()
         wait_widget.widget.deleteLater()
+
+    def restore_from_backup(self):
+        result = QMessageBox.information(
+            self.gui.main_window,
+            'Restore from Backup',
+            'This will restore all of your data from a backup zip file. Continue?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+        )
+
+        if not result == QMessageBox.StandardButton.Yes:
+            return
+
+        result = QFileDialog.getOpenFileName(
+            self.gui.main_window,
+            'Choose Backup File',
+            os.path.expanduser('~/Documents'),
+            'ZIP Files (*.zip)'
+        )
+
+        if len(result[0]) == 0 or not zipfile.is_zipfile(result[0]):
+            return
+
+        zf = zipfile.ZipFile(
+            result[0],
+            'r',
+        )
+
+        destination = '/'.join(self.data_dir.split('/')[:-1])
+        ss = SimpleSplash(self.gui, 'Restoring', subtitle=True)
+        for file in zf.infolist():
+            ss.subtitle_label.setText(file.filename)
+            self.app.processEvents()
+            try:
+                zf.extract(file, destination)
+            except Exception as ex:
+                print(str(ex))
+
+        QMessageBox.information(
+            self.gui.main_window,
+            'Finished',
+            'Restore from backup complete',
+            QMessageBox.StandardButton.Ok
+        )
 
     def error_log(self):
         """
