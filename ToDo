@@ -1,6 +1,3 @@
-add to service creating wrong thumbnail on non-override songs
-hymns not being added to oos when loading from file
-
 Future Releases:
 Add auto-play slide feature
 Accurate preview when editing a song or a custom slide
@@ -8,7 +5,3 @@ Simple audio slide
 Video backgrounds
 Move parsers into their own file
 Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
-
-DONE
-Set font independently for songs and bible
-Auto-hide font widget when mouse leaves
