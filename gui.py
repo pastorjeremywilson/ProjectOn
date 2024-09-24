@@ -587,7 +587,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.3.3.033'
+        current_version = 'v.1.4.0'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -616,9 +616,9 @@ class GUI(QObject):
 
                 if this_major > current_major:
                     latest_version = [i, this_version]
-                elif this_minor > current_minor:
+                elif this_major == current_major and this_minor > current_minor:
                     latest_version = [i, this_version]
-                elif this_patch > current_patch:
+                elif this_minor == current_minor and this_patch > current_patch:
                     latest_version = [i, this_version]
 
             if 'skip_update' in self.main.settings.keys():
@@ -824,7 +824,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.3.3.033')
+        title_label = QLabel('ProjectOn v.1.4.0')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1591,7 +1591,7 @@ class GUI(QObject):
                     shade_color = self.main.settings['song_shade_color']
                     shade_opacity = self.main.settings['song_shade_opacity']
 
-            lyric_widget.setFont(QFont(font_face, font_size))
+            lyric_widget.setFont(QFont(font_face, font_size, QFont.Bold))
             lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
             lyric_widget.use_shadow = use_shadow
             lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
