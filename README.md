@@ -9,13 +9,6 @@ ProjectOn is an open-source multimedia projection program geared towards
 producing and running church services.
 <p>&nbsp;</p>
 
-# What's New in Version 1.3.3?
-
-Some important bug fixes:
-- Leading and trailing blank lines are now stripped from song lyrics
-- Unwanted blank lines are no longer inserted when saving a song
-- Videos now show in the preview area of the Live panel while playing
-
 # Why ProjectOn?
 
 Working in a smaller church, I was limited by a small budget, the small
@@ -25,10 +18,22 @@ intuitive, and responsive experience when building and running the
 projection needs of a church service.
 <p>&nbsp;</p>
 
+# What's New in Version 1.4.0?
+
+- Global font for Song slides and Bible slides can now be set independently
+from each other.
+- Added a "Shade Behind Text" option to the font menu, allowing for a translucent
+square to be shown behind the text. This can help readability on 'busy' backgrounds.
+- Improved font preview now included in the toolbar font dropdowns.
+- Font dropdowns now disappear when clicking outside of them (no longer
+need to click the font button to make them go away).
+- Added the ability to backup all data to a zip file (found in the 'File' menu)
+- Other minor improvements and bug fixes.
+
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.3.3) and run
+system only. Download the current ProjectOn installer (v.1.4.0) and run
 it on your computer.
 <p>&nbsp;</p>
 
@@ -237,6 +242,8 @@ black)</p></td>
 <p>&nbsp;</p>
 
 # Known Issues
+
+Applying bold to a single word in a song or custom slide will result in the whole line being bolded when displayed.
 
 # Technologies and Credits
 
