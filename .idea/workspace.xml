@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added restore from backup option and corresponding code.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Returned to bold being the default display widget lyric widget font style">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +73,6 @@
   <component name="RunManager" selected="Python.main">
     <configuration name="linecount" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="project_on" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -94,7 +95,6 @@
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="project_on" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -142,14 +142,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00022" summary="Added GhostScript to the credits section of README.md">
-      <option name="closed" value="true" />
-      <created>1722028520417</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1722028520417</updated>
     </task>
     <task id="LOCAL-00023" summary="Forgot ghostscript icon">
       <option name="closed" value="true" />
@@ -535,7 +527,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726849935082</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="Returned to bold being the default display widget lyric widget font style">
+      <option name="closed" value="true" />
+      <created>1726933370342</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1726933370343</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -556,7 +556,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added the static folder back in to the arguments for pyinstaller.&#10;This may be the last of the bugs found while creating the how-to video." />
     <MESSAGE value="Moved checking for files back into the GUI thread since dialogs may need to be shown." />
     <MESSAGE value="Custom slide text needs to be saved in the service file for when multiple services are being prepared ahead of time.&#10;Fixed proper file not being loaded from recent files menu." />
     <MESSAGE value="Fixed setting style of entire line when only one word of a line has a style set." />
@@ -581,6 +580,7 @@
     <MESSAGE value="Fixed default advanced options for new custom slide" />
     <MESSAGE value="Added missing add to service actions (image, video, and web) in the media_widget.py CustomListWidget" />
     <MESSAGE value="Added restore from backup option and corresponding code." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added restore from backup option and corresponding code." />
+    <MESSAGE value="Returned to bold being the default display widget lyric widget font style" />
+    <option name="LAST_COMMIT_MESSAGE" value="Returned to bold being the default display widget lyric widget font style" />
   </component>
 </project>
