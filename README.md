@@ -2,6 +2,7 @@
 [![License](https://img.shields.io/badge/license-GPL-blue.svg?style=plastic)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 <img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width='300px' />
+<a href='https://github.com/pastorjeremywilson/ProjectOn/releases'><img src='https://github.com/pastorjeremywilson/public/blob/main/download_installer.svg?raw=true' /?</a>
 
 # What Am I?
 
