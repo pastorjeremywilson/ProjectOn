@@ -616,9 +616,9 @@ class GUI(QObject):
 
                 if this_major > current_major:
                     latest_version = [i, this_version]
-                elif this_minor > current_minor:
+                elif this_major == current_major and this_minor > current_minor:
                     latest_version = [i, this_version]
-                elif this_patch > current_patch:
+                elif this_minor == current_minor and this_patch > current_patch:
                     latest_version = [i, this_version]
 
             if 'skip_update' in self.main.settings.keys():
