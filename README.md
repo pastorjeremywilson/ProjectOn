@@ -2,7 +2,6 @@
 [![License](https://img.shields.io/badge/license-GPL-blue.svg?style=plastic)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 <img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width='300px' />
-<a href="https://sourceforge.net/projects/projecton/files/v.1.4.0/Setup.Projecton.v.1.4.0.exe/download" rel="nofollow"><img src="https://camo.githubusercontent.com/16389ff70a277784214098c9d1c2dce20f404183457e3bda6a4e69e9dbce8adb/68747470733a2f2f612e6673646e2e636f6d2f636f6e2f6170702f73662d646f776e6c6f61642d627574746f6e" alt="Download ProjectOn" data-canonical-src="https://a.fsdn.com/con/app/sf-download-button" style="max-width: 100%;"></a>
 
 # What Am I?
 
