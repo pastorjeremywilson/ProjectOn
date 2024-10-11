@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/badge/license-GPL-blue.svg?style=plastic)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 <img src='https://github.com/pastorjeremywilson/public/blob/main/projecton-banner.svg?raw=true' width='300px' />
-<a href='https://github.com/pastorjeremywilson/ProjectOn/releases'><img src='https://github.com/pastorjeremywilson/public/blob/main/download_installer.svg?raw=true' width='200px' /?</a>
+<a href='https://github.com/pastorjeremywilson/ProjectOn/releases'><img src='https://github.com/pastorjeremywilson/public/blob/main/download_installer.svg?raw=true' width='200px' /></a>
 
 # What Am I?
 
@@ -19,7 +19,7 @@ intuitive, and responsive experience when building and running the
 projection needs of a church service.
 <p>&nbsp;</p>
 
-# What's New in Version 1.4.0?
+# What's New in Version 1.4.1?
 
 - Global font for Song slides and Bible slides can now be set independently
 from each other.
@@ -30,11 +30,12 @@ square to be shown behind the text. This can help readability on 'busy' backgrou
 need to click the font button to make them go away).
 - Added the ability to backup all data to a zip file (found in the 'File' menu)
 - Other minor improvements and bug fixes.
+- Fixed crash when importing from CCLI SongSelect.
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.4.0) and run
+system only. Download the current ProjectOn installer (v.1.4.1) and run
 it on your computer.
 <p>&nbsp;</p>
 

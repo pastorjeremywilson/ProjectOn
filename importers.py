@@ -315,13 +315,16 @@ class Importers:
             'global',
             'global_song',
             'global',
-            'global',
-            'global',
-            'global',
-            'global',
-            'global',
-            'global',
-            'False'
+            'False',
+            0,
+            0,
+            'False',
+            0,
+            0,
+            'False',
+            'False',
+            100,
+            100
         ]
 
         if song_data:
