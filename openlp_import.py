@@ -124,13 +124,16 @@ class OpenLPImport:
                         'global',
                         'global_song',
                         'global',
-                        'global',
-                        'global',
-                        'global',
-                        'global',
-                        'global',
-                        'global',
-                        'False'
+                        'False',
+                        0,
+                        0,
+                        'False',
+                        0,
+                        0,
+                        'False',
+                        'False',
+                        100,
+                        100
                     ]
                 )
                 self.progress_bar.setValue(self.progress_bar.value() + 1)

@@ -276,34 +276,60 @@ class SongselectImport(QDialog):
                 author = ''
                 copyright = ''
                 song_number = ''
-                order = ''
 
-                song_filename = self.current_download_item.downloadDirectory() + '/' \
-                    + self.current_download_item.downloadFileName()
+                song_filename = os.path.join(self.current_download_item.downloadDirectory(),
+                                             self.current_download_item.downloadFileName())
                 with open(song_filename, 'r', encoding='utf-8') as file:
                     song_text = file.read()
 
-                song_text_split = song_text.split('\n\n')
-                segments = []
+                song_text = re.sub('<br.*?>', '', song_text)
+
+                paragraphs = song_text.split('\n\n')
+                song_title = paragraphs[0].rstrip()
+
+                copyright_info = paragraphs[-1]
+                copyright_lines = copyright_info.split('\n')
+                author = copyright_lines[0].rstrip()
+                copyright = copyright_lines[2]
+                song_number = copyright_lines[1].split('#')[-1]
+
+                song_text = '\n\n'.join(paragraphs[1:-1])
+
+                song_text_split = song_text.split('\n')
+                segment_markers = [
+                    'intro',
+                    'verse',
+                    'pre-chorus',
+                    'chorus',
+                    'bridge',
+                    'tag',
+                    'ending'
+                ]
+                segment_marker_indices = []
+                for i in range(len(song_text_split)):
+                    for marker in segment_markers:
+                        if marker in song_text_split[i].lower() and len(song_text_split[i]) < len(marker) + 3:
+                            segment_marker_indices.append(i)
+                            break
+
+                index = 0
+                formatted_song_text = ''
                 order = []
-                for i in range(1, len(song_text_split)):
-                    if not('CCLI') in song_text_split[i]:
-                        segment_split = song_text_split[i].split('\n')
-                        line_split = segment_split[0].split(' ')
-                        tag = ''
-                        for item in line_split:
-                            tag += item[0].lower()
-
-                        order.append(tag)
-                        segment_lyrics = '\n'.join(segment_split[1:])
-                        segments.append(f'[{tag}]\n{segment_lyrics}')
+                while index < len(song_text_split):
+                    if index in segment_marker_indices:
+                        marker = song_text_split[index].rstrip()
+                        formatted_marker = f'[{marker}]\n'
+                        marker_split = marker.split(' ')
+                        if len(marker_split) < 2:
+                            marker_split.append('1')
+                            formatted_marker = f'[{marker} 1]\n'
+                        formatted_song_text += formatted_marker
+                        marker_split[0] = marker_split[0].lower().rstrip()[0]
+                        marker = ''.join(marker_split)
+                        order.append(marker)
                     else:
-                        info_split = song_text_split[i].split('\n')
-                        author = info_split[0]
-                        song_number = info_split[1].split('#')[1]
-                        copyright = ' '.join(info_split[2].split(' ')[1:])
-
-                song_title = song_text_split[0]
+                        formatted_song_text += song_text_split[index] + '\n'
+                    index += 1
                 order = ' '.join(order)
 
                 song_data = [
@@ -311,7 +337,7 @@ class SongselectImport(QDialog):
                     author,
                     copyright,
                     song_number,
-                    '\n'.join(segments),
+                    formatted_song_text,
                     order,
                     'true',
                     'global',
@@ -324,7 +350,10 @@ class SongselectImport(QDialog):
                     'False',
                     0,
                     0,
-                    'False'
+                    'False',
+                    'False',
+                    100,
+                    100
                 ]
 
                 if song_title in self.gui.main.get_song_titles():

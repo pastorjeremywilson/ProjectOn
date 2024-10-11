@@ -963,7 +963,9 @@ class EditWidget(QDialog):
         song_order = ''
         for i in range(self.song_order_list_widget.count()):
             tag = self.song_order_list_widget.item(i).text()
-            tag = tag.split(' ')[0][:1].lower() + tag.split(' ')[1]
+            tag_split = tag.split(' ')
+            tag_split[0] = tag_split[0][0].lower()
+            tag = ''.join(tag_split)
             song_order += tag + ' '
         song_order = song_order.strip()
 
