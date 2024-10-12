@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.4.1
+ProjectOn v.1.4.1.001
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -169,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.4.1')
+        version_label = QLabel('v.1.4.1.001')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -317,6 +317,10 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
             return -1
+
+    def get_audio_data(self, title):
+        # TODO: add code
+        pass
 
     def copy_image(self, file):
         """
@@ -511,6 +515,9 @@ class ProjectOn(QObject):
             elif item.data(40) == 'custom':
                 table = 'customSlides'
                 description = 'Custom Slide'
+            elif item.data(40) == 'audio':
+                # TODO: add code
+                pass
             elif item.data(40) == 'video':
                 os.remove(self.video_dir + '/' + item.data(20))
                 filename_split = item.data(20).split('.')
