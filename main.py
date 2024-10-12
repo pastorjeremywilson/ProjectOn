@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.4.1.001
+ProjectOn v.1.4.1.002
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -169,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.4.1.001')
+        version_label = QLabel('v.1.4.1.002')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -317,10 +317,6 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
             return -1
-
-    def get_audio_data(self, title):
-        # TODO: add code
-        pass
 
     def copy_image(self, file):
         """
@@ -515,9 +511,6 @@ class ProjectOn(QObject):
             elif item.data(40) == 'custom':
                 table = 'customSlides'
                 description = 'Custom Slide'
-            elif item.data(40) == 'audio':
-                # TODO: add code
-                pass
             elif item.data(40) == 'video':
                 os.remove(self.video_dir + '/' + item.data(20))
                 filename_split = item.data(20).split('.')
@@ -1288,6 +1281,104 @@ class ProjectOn(QObject):
         message_box.setText('<strong>Well, that wasn\'t supposed to happen!</strong><br><br>' + message_box_text)
         message_box.setStandardButtons(QMessageBox.StandardButton.Close)
         message_box.exec()
+
+    def check_db(self, db_file):
+        db_structure = {
+            'backgroundThumbnails': {
+                'fileName': 'TEXT',
+                'image': 'BLOB'
+            },
+            'customSlides': {
+                'title': 'TEXT',
+                'text': 'TEXT',
+                'font': 'TEXT',
+                'fontColor': 'TEXT',
+                'background': 'TEXT',
+                'font_size': 'TEXT',
+                'use_shadow': 'TEXT',
+                'shadow_color': 'TEXT',
+                'shadow_offset': 'TEXT',
+                'use_outline': 'TEXT',
+                'outline_color': 'TEXT',
+                'outline_width': 'TEXT',
+                'override_global': 'TEXT',
+                'use_shade': 'TEXT',
+                'shade_color': 'TEXT',
+                'shade_opacity': 'TEXT',
+                'audio_file': 'TEXT',
+            },
+            'imageThumbnails': {
+                'fileName': 'TEXT',
+                'image': 'BLOB'
+            },
+            'songs': {
+                'title': 'TEXT',
+                'author': 'TEXT',
+                'copyright': 'TEXT',
+                'ccliNum': 'TEXT',
+                'lyrics': 'TEXT',
+                'vorder': 'TEXT',
+                'footer': 'TEXT',
+                'font': 'TEXT',
+                'fontColor': 'TEXT',
+                'background': 'TEXT',
+                'font_size': 'TEXT',
+                'use_shadow': 'TEXT',
+                'shadow_color': 'TEXT',
+                'shadow_offset': 'TEXT',
+                'use_outline': 'TEXT',
+                'outline_color': 'TEXT',
+                'outline_width': 'TEXT',
+                'override_global': 'TEXT',
+                'use_shade': 'TEXT',
+                'shade_color': 'TEXT',
+                'shade_opacity': 'TEXT'
+            },
+            'web': {
+                'title': 'TEXT',
+                'url': 'TEXT'
+            }
+        }
+
+        connection = sqlite3.connect(db_file)
+        cursor = connection.cursor()
+        changes_made = False
+        log_text = ''
+        for table_name in db_structure.keys():
+            result = cursor.execute(
+                f'SELECT name FROM sqlite_master WHERE type = "table" AND name = "{table_name}";').fetchall()
+            if len(result) == 0: # this means the table doesn't exist and must be created
+                date_time = time.ctime(time.time())
+                log_text += f'\n{date_time}:\n    database missing table {table_name}; creating table'
+
+                sql = f'CREATE TABLE {table_name} ('
+                for column in db_structure[table_name]:
+                    sql += f'{column} {db_structure[table_name][column]}, '
+                sql = sql[:-2]
+                sql += ');'
+
+                cursor.execute(sql)
+                changes_made = True
+            else: # this means the table exists and now will be checked that all columns exist
+                result = connection.execute(f'PRAGMA table_info({table_name});').fetchall()
+                existing_columns = []
+                for column in result:
+                    existing_columns.append(column[1])
+
+                for column in db_structure[table_name]:
+                    if column not in existing_columns:
+                        date_time = time.ctime(time.time())
+                        log_text += f'\n{date_time}:\n    table {table_name} missing column {column}; creating column'
+
+                        cursor.execute(
+                            f'ALTER TABLE {table_name} ADD COLUMN {column} {db_structure[table_name][column]};')
+                        changes_made = True
+                        
+        if changes_made:
+            connection.commit()
+            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log'), 'a') as file:
+                file.write(log_text)
+        connection.close()
 
 
 class CheckFiles(QRunnable):

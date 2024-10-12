@@ -342,52 +342,6 @@ class MediaWidget(QTabWidget):
 
         return image_widget
 
-    def make_audio_tab(self):
-        audio_widget = QWidget()
-        audio_widget.setObjectName('tab_widget')
-        audio_widget.setAutoFillBackground(True)
-        audio_layout = QVBoxLayout()
-        audio_widget.setLayout(audio_layout)
-
-        add_audio_button = QPushButton()
-        add_audio_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
-        add_audio_button.setToolTip('Import an Image')
-        add_audio_button.setIconSize(QSize(20, 20))
-        add_audio_button.setFixedSize(30, 30)
-        add_audio_button.clicked.connect(self.add_audio)
-        audio_layout.addWidget(add_audio_button)
-
-        button_widget = QWidget()
-        button_widget.setLayout(QHBoxLayout())
-        audio_layout.addWidget(button_widget)
-
-        add_to_service_button = QPushButton()
-        add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
-        add_to_service_button.setToolTip('Add Audio to Service')
-        add_to_service_button.setIconSize(QSize(20, 20))
-        add_to_service_button.setFixedSize(30, 30)
-        add_to_service_button.clicked.connect(self.add_audio_to_service)
-        button_widget.layout().addWidget(add_to_service_button)
-        button_widget.layout().addStretch()
-
-        send_to_live_button = QPushButton()
-        send_to_live_button.setIcon(QIcon('resources/gui_icons/send_to_live_icon.svg'))
-        send_to_live_button.setToolTip('Send Audio to Live')
-        send_to_live_button.setIconSize(QSize(20, 20))
-        send_to_live_button.setFixedSize(30, 30)
-        send_to_live_button.clicked.connect(self.send_to_live)
-        button_widget.layout().addWidget(send_to_live_button)
-
-        self.audio_list = CustomListWidget(self.gui, 'audio')
-        self.audio_list.setFont(self.gui.standard_font)
-        self.audio_list.setDragEnabled(True)
-        self.audio_list.doubleClicked.connect(self.add_audio_to_service)
-        audio_layout.addWidget(self.audio_list)
-
-        self.populate_audio_list()
-
-        return audio_widget
-
     def make_video_tab(self):
         """
         Creates the video widget to be used in the video tab of this widget.
@@ -833,10 +787,6 @@ class MediaWidget(QTabWidget):
             if connection:
                 connection.close()
 
-    def populate_audio_list(self):
-        # TODO: add code
-        pass
-
     def populate_video_list(self):
         """
         Method that polls the files contained in the video subdirectory of the data directory to create QListWidgetItems
@@ -1060,10 +1010,6 @@ class MediaWidget(QTabWidget):
             except Exception:
                 self.gui.main.error_log()
 
-    def add_audio(self):
-        # TODO: add code
-        pass
-
     def delete_image(self):
         """
         Method to remove an image from the program's database and data directory. Creates a QMessageBox to
@@ -1090,10 +1036,6 @@ class MediaWidget(QTabWidget):
             self.gui.main.thread_pool.waitForDone()
             self.populate_image_list()
             self.image_list.update()
-
-    def delete_audio(self):
-        # TODO: add code
-        pass
 
     def add_web(self):
         """
@@ -1385,10 +1327,6 @@ class MediaWidget(QTabWidget):
             self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
             self.gui.changes = True
 
-    def add_audio_to_service(self, item=None, row=None):
-        # TODO: add code
-        pass
-
     def add_custom_to_service(self, item=None, row=None):
         """
         Method to add a custom slide QListWidgetItem to the order of service's QListWidget
@@ -1534,8 +1472,6 @@ class CustomListWidget(QListWidget):
             add_to_service_action.triggered.connect(self.gui.media_widget.add_custom_to_service)
         elif self.type == 'image':
             add_to_service_action.triggered.connect(self.gui.media_widget.add_image_to_service)
-        elif self.type == 'audio':
-            add_to_service_action.triggered.connect(self.gui.media_widget.add_audio_to_service)
         elif self.type == 'video':
             add_to_service_action.triggered.connect(self.gui.media_widget.add_video_to_service)
         elif self.type == 'web':
@@ -1547,8 +1483,6 @@ class CustomListWidget(QListWidget):
             edit_action = QAction('Edit Song')
         elif self.type == 'custom':
             edit_action = QAction('Edit Slide')
-        elif self.type == 'audio':
-            edit_action = QAction('Edit Audio Slide')
 
         if edit_action:
             edit_action.triggered.connect(self.edit_song)
@@ -1563,9 +1497,6 @@ class CustomListWidget(QListWidget):
             delete_action.triggered.connect(self.delete_item)
         elif self.type == 'song':
             delete_action = QAction('Delete Song')
-            delete_action.triggered.connect(self.delete_item)
-        elif self.type == 'audio':
-            delete_action = QAction('Remove Audio Slide')
             delete_action.triggered.connect(self.delete_item)
         elif self.type == 'video':
             delete_action = QAction('Remove Video')
@@ -1620,10 +1551,6 @@ class CustomListWidget(QListWidget):
                 item_text = self.itemAt(self.item_pos).text()
                 custom_info = self.gui.main.get_custom_data(item_text)
                 self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text)
-            elif self.currentItem().data(40) == 'audio':
-                item_text = self.itemAt(self.item_pos.text())
-                audio_info = self.gui.main.get_audio_data(item_text)
-                self.gui.edit_widget = EditWidget(self.gui, 'audio', audio_info, item_text)
 
     def delete_item(self):
         """
@@ -1645,8 +1572,6 @@ class CustomListWidget(QListWidget):
             self.gui.media_widget.populate_custom_list()
         elif self.currentItem().data(40) == 'image':
             self.gui.media_widget.populate_image_list()
-        elif self.currentItem().data(40) == 'audio':
-            self.gui.media_widget.populate_audio_list()
         elif self.currentItem().data(40) == 'video':
             self.gui.media_widget.populate_video_list()
         elif self.currentItem().data(40) == 'web':
