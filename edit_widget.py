@@ -1,3 +1,4 @@
+import os.path
 import re
 
 from PyQt5.QtCore import Qt, QSize
@@ -249,20 +250,35 @@ class EditWidget(QDialog):
             toolbar_layout.addWidget(ending_button)
             toolbar_layout.addStretch()
 
-        """show_hide_advanced_widget = QWidget()
-        show_hide_advanced_layout = QHBoxLayout(show_hide_advanced_widget)
-        main_layout.addWidget(show_hide_advanced_widget)
+        if self.type == 'custom':
+            audio_widget = QWidget()
+            audio_layout = QHBoxLayout(audio_widget)
+            main_layout.addWidget(audio_widget)
 
-        self.show_hide_advanced_button = QPushButton('+')
-        self.show_hide_advanced_button.setFont(self.gui.bold_font)
-        self.show_hide_advanced_button.setFixedSize(40, 40)
-        self.show_hide_advanced_button.pressed.connect(self.show_hide_advanced_options)
-        show_hide_advanced_layout.addWidget(self.show_hide_advanced_button)
+            self.add_audio_checkbox = QCheckBox('Add audio to this slide')
+            self.add_audio_checkbox.setObjectName('add_audio_checkbox')
+            self.add_audio_checkbox.setToolTip('Add an audio file that will play when this slide is shown')
+            self.add_audio_checkbox.setFont(self.gui.bold_font)
+            self.add_audio_checkbox.setChecked(False)
+            self.add_audio_checkbox.stateChanged.connect(self.add_audio_changed)
+            audio_layout.addWidget(self.add_audio_checkbox)
+            audio_layout.addSpacing(20)
 
-        show_hide_advanced_label = QLabel('Advanced Options')
-        show_hide_advanced_label.setFont(self.gui.standard_font)
-        show_hide_advanced_layout.addWidget(show_hide_advanced_label)
-        show_hide_advanced_layout.addStretch()"""
+            self.audio_line_edit = QLineEdit()
+            self.audio_line_edit.setObjectName('audio_line_edit')
+            self.audio_line_edit.setFont(self.gui.standard_font)
+            audio_layout.addWidget(self.audio_line_edit)
+            audio_layout.addSpacing(20)
+
+            self.choose_file_button = QPushButton('Choose Audio File')
+            self.choose_file_button.setObjectName('choose_file_button')
+            self.choose_file_button.setFont(self.gui.standard_font)
+            self.choose_file_button.pressed.connect(self.get_audio_file)
+            audio_layout.addWidget(self.choose_file_button)
+            audio_layout.addStretch()
+
+            self.audio_line_edit.hide()
+            self.choose_file_button.hide()
 
         self.advanced_options_widget = QWidget()
         advanced_options_layout = QVBoxLayout(self.advanced_options_widget)
@@ -433,6 +449,23 @@ class EditWidget(QDialog):
     def background_combobox_change(self):
         self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole))
         self.font_widget.font_sample.paint_font()
+
+    def add_audio_changed(self):
+        self.audio_line_edit.setHidden(not self.add_audio_checkbox.isChecked())
+        self.choose_file_button.setHidden(not self.add_audio_checkbox.isChecked())
+        if not self.add_audio_checkbox.isChecked():
+            self.audio_line_edit.clear()
+
+    def get_audio_file(self):
+        file_dialog = QFileDialog()
+        result = file_dialog.getOpenFileName(
+            self,
+            'Choose Audio File',
+            os.path.expanduser('~'),
+            'Audio Files (*.mp3 *.wav *.wma)'
+        )
+        if len(result[0]) > 0:
+            self.audio_line_edit.setText(result[0])
 
     def override_global_changed(self):
         for widget in self.advanced_options_widget.findChildren(QWidget):
@@ -769,6 +802,11 @@ class EditWidget(QDialog):
             self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings['bible_shade_opacity'])
         else:
             self.font_widget.shade_opacity_slider.color_slider.setValue(int(custom_data[15]))
+
+        # set the audio file
+        if custom_data[16] and len(custom_data[6]) > 0:
+            self.add_audio_checkbox.setChecked(True)
+            self.audio_line_edit.setText(custom_data[16])
 
         self.font_widget.blockSignals(False)
 
@@ -1111,6 +1149,10 @@ class EditWidget(QDialog):
         )
         text = re.sub('</.*?span>', '</b>', text)
 
+        audio_file = ''
+        if len(self.audio_line_edit.text()) > 0:
+            audio_file = self.audio_line_edit.text()
+
         custom_data = [
             self.title_line_edit.text(),
             text,
@@ -1127,7 +1169,8 @@ class EditWidget(QDialog):
             override_global,
             use_shade,
             shade_color,
-            shade_opacity
+            shade_opacity,
+            audio_file
         ]
 
         if self.new_custom:

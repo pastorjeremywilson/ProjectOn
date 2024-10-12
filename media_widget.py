@@ -735,6 +735,7 @@ class MediaWidget(QTabWidget):
                 widget_item.setData(41, item[13])
                 widget_item.setData(42, item[14])
                 widget_item.setData(43, item[15])
+                widget_item.setData(44, item[16])
 
                 widget_item.setData(24, ['', item[0], text])
                 self.custom_list.addItem(widget_item)

@@ -8,9 +8,9 @@ import time
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QFileInfo, QIODevice, QFile
 from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QPalette
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QSound, QAudioOutput, QAudioDeviceInfo, QAudioFormat, QAudio
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
@@ -587,7 +587,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.4.1.002'
+        current_version = 'v.1.4.1.003'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -824,7 +824,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.4.1.002')
+        title_label = QLabel('ProjectOn v.1.4.1.003')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1291,7 +1291,7 @@ class GUI(QObject):
             elif item.data(40) == 'custom':
                 lyric_widget = StandardItemWidget(self, item.data(20), item.data(21))
                 list_item = QListWidgetItem()
-                for j in range(20, 44):
+                for j in range(20, 45):
                     list_item.setData(j, item.data(j))
                 list_item.setSizeHint(lyric_widget.sizeHint())
                 self.preview_widget.slide_list.addItem(list_item)
@@ -1342,7 +1342,7 @@ class GUI(QObject):
                 original_item = self.preview_widget.slide_list.item(i)
                 size_hint = original_item.sizeHint()
                 item = QListWidgetItem()
-                for j in range(20, 44):
+                for j in range(20, 45):
                     item.setData(j, original_item.data(j))
 
                 if item.data(40) == 'image':
@@ -1435,7 +1435,8 @@ class GUI(QObject):
                         self.timed_update.stop = True
                 #self.media_player.media().clear()
                 self.media_player.deleteLater()
-                self.video_widget.deleteLater()
+                if self.video_widget:
+                    self.video_widget.deleteLater()
                 self.media_player = None
                 self.video_widget = None
                 self.audio_output = None
@@ -1687,6 +1688,7 @@ class GUI(QObject):
                     media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
                     self.media_player.setMedia(media_content)
                     self.media_player.play()
+
                     self.timed_update = TimedPreviewUpdate(self)
                     self.main.thread_pool.start(self.timed_update)
 
@@ -1712,6 +1714,23 @@ class GUI(QObject):
                     self.main.thread_pool.start(self.timed_update)
                     self.live_widget.slide_list.setFocus()
 
+                # start playing audio if this is a custom slide with audio
+                if current_item.data(40) == 'custom' and current_item.data(44) and len(current_item.data(44)) > 0:
+                    if not exists(current_item.data(44)):
+                        file_name = current_item.data(44)
+                        file_name = file_name.replace('/', '\\')
+                        QMessageBox.critical(
+                            self.main_window,
+                            'Missing Audio File',
+                            f'The audio file at {file_name} is missing. Unable to play sound.',
+                            QMessageBox.Ok
+                        )
+                        return
+                    self.media_player = QMediaPlayer()
+                    media_content = QMediaContent(QUrl.fromLocalFile(current_item.data(44)))
+                    self.media_player.setMedia(media_content)
+                    self.media_player.play()
+
             # change the preview image
             if widget == 'live':
                 if not current_item.data(40) == 'web' and not current_item.data(40) == 'video':
@@ -1734,6 +1753,7 @@ class GUI(QObject):
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
                     self.main.remote_server.socketio.emit(
                         'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
+
             elif widget == 'sample':
                 pixmap = display_widget.grab(display_widget.rect())
                 pixmap = pixmap.scaled(
