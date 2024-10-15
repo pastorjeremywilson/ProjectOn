@@ -19,7 +19,7 @@ intuitive, and responsive experience when building and running the
 projection needs of a church service.
 <p>&nbsp;</p>
 
-# What's New in Version 1.4.1.010?
+# What's New in Version 1.4.1.011?
 
 - Global font for Song slides and Bible slides can now be set independently
 from each other.
@@ -35,7 +35,7 @@ need to click the font button to make them go away).
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.4.1.010) and run
+system only. Download the current ProjectOn installer (v.1.4.1.011) and run
 it on your computer.
 <p>&nbsp;</p>
 

@@ -753,6 +753,13 @@ class MediaWidget(QTabWidget):
         data 36: Outline Width
         data 37: Override Global
         data 40: Type
+        data 41: Use Shade
+        data 42: Shade Color
+        data 43: Shade Opacity
+        data 44: Audio File
+        data 45: Loop Audio
+        data 46: Auto Play
+        data 47: Slide Delay (for Auto Play)
         """
 
     def populate_image_list(self):

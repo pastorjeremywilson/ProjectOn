@@ -591,7 +591,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.4.1.010'
+        current_version = 'v.1.4.1.011'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -828,7 +828,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.4.1.010')
+        title_label = QLabel('ProjectOn v.1.4.1.011')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1453,7 +1453,6 @@ class GUI(QObject):
                 self.timed_update.keep_running = False
                 self.timed_update = None
             if self.slide_auto_play:
-                print('stopping slide auto play')
                 self.slide_auto_play.keep_running = False
                 self.slide_auto_play = None
 
@@ -1535,7 +1534,6 @@ class GUI(QObject):
             elif current_item.data(40) == 'custom':
                 # check if auto-play is enabled for this slide and parse the text if so
                 if current_item.data(46) and current_item.data(46) == 'True':
-                    print('parsing auto play text')
                     auto_play_text = current_item.data(21)
                     auto_play_text = re.sub('<p.*?>', '', auto_play_text)
                     auto_play_text = re.sub('</p>', '', auto_play_text)
@@ -1543,7 +1541,6 @@ class GUI(QObject):
                     auto_play_text = re.split('\n', auto_play_text)
                     lyrics_html = auto_play_text[0]
                 else:
-                    print('standard custom slide')
                     lyrics_html = current_item.data(21)
             elif current_item.data(40) == 'web':
                 if widget == 'sample':
@@ -1618,7 +1615,7 @@ class GUI(QObject):
                     shade_color = self.main.settings['song_shade_color']
                     shade_opacity = self.main.settings['song_shade_opacity']
 
-            lyric_widget.setFont(QFont(font_face, font_size, QFont.Bold))
+            lyric_widget.setFont(QFont(font_face, font_size))
             lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
             lyric_widget.use_shadow = use_shadow
             lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
@@ -1658,7 +1655,6 @@ class GUI(QObject):
                     lyric_widget.fill_color = QColor(
                         int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
 
-            print('setting lyrics_html')
             lyric_widget.text = lyrics_html
 
             # set the footer text
@@ -1769,8 +1765,7 @@ class GUI(QObject):
 
                 # cycle through text paragraphs if auto-play is enabled for this slide
                 if auto_play_text:
-                    print(auto_play_text)
-                    self.slide_auto_play = SlideAutoPlay(self, lyric_widget, auto_play_text, current_item.data(47))
+                    self.slide_auto_play = SlideAutoPlay(self, auto_play_text, current_item.data(47))
                     self.main.thread_pool.start(self.slide_auto_play)
 
                     self.timed_update = TimedPreviewUpdate(self)
@@ -1807,9 +1802,12 @@ class GUI(QObject):
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
 
-            print('change_display finished')
-
     def change_lyric_widget_text(self, text):
+        """
+        slot for the change_lyric_widget_text_signal
+        changes the text of the lyric widget and repaints
+        :param str text: the text to change to
+        """
         self.lyric_widget.text = text
         self.lyric_widget.repaint()
 
@@ -2226,10 +2224,15 @@ class TimedPreviewUpdate(QRunnable):
 
 
 class SlideAutoPlay(QRunnable):
-    def __init__(self, gui, lyric_widget, text, interval):
+    def __init__(self, gui, text, interval):
+        """
+        Cycles through the text in a list of strings, changing the display widget's lyrics based on a given interval
+        :param gui: the current instance of GUI
+        :param text: list of strings to be displayed
+        :param interval: number of seconds between each lyric change
+        """
         super().__init__()
         self.gui = gui
-        self.lyric_widget = lyric_widget
         self.interval = interval
         self.text = text
         self.keep_running = True
@@ -2237,8 +2240,9 @@ class SlideAutoPlay(QRunnable):
     def run(self):
         index = 0
         while self.keep_running:
-            self.gui.change_lyric_widget_text_signal.emit(self.text[index].strip())
-            time.sleep(float(self.interval))
+            if len(self.text[index].strip()) > 0:
+                self.gui.change_lyric_widget_text_signal.emit(self.text[index].strip())
+                time.sleep(float(self.interval))
             index += 1
             if index == len(self.text):
                 index = 0

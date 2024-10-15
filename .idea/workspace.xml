@@ -4,16 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added loop option to audio&#10;Changed edit widget audio buttons to icons">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added auto-play option to custom slides. Auto-play parses user's text based on blank lines.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/live_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/live_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/openlp_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlp_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -151,14 +145,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00031" summary="Changed version number - ready for release">
-      <option name="closed" value="true" />
-      <created>1722725018599</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1722725018599</updated>
     </task>
     <task id="LOCAL-00032" summary="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install">
       <option name="closed" value="true" />
@@ -544,7 +530,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729011265985</updated>
     </task>
-    <option name="localTasksCounter" value="80" />
+    <task id="LOCAL-00080" summary="Added auto-play option to custom slides. Auto-play parses user's text based on blank lines.">
+      <option name="closed" value="true" />
+      <created>1729024938172</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1729024938172</updated>
+    </task>
+    <option name="localTasksCounter" value="81" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -565,7 +559,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Began adding code to set font independently for song and bible slides" />
     <MESSAGE value="Finished adding the ability to set song and bible fonts independently" />
     <MESSAGE value="Prevented screen repositioning if screen settings not changed." />
     <MESSAGE value="Changed FontWidget's WindowType to a popup to facilitate auto-hide when clicked outside" />
@@ -590,6 +583,7 @@
     <MESSAGE value="Added full database check for tables and columns, adding either as necessary" />
     <MESSAGE value="Added audio option to custom slides. Needs to be tested against video slides." />
     <MESSAGE value="Added loop option to audio&#10;Changed edit widget audio buttons to icons" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added loop option to audio&#10;Changed edit widget audio buttons to icons" />
+    <MESSAGE value="Added auto-play option to custom slides. Auto-play parses user's text based on blank lines." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added auto-play option to custom slides. Auto-play parses user's text based on blank lines." />
   </component>
 </project>
