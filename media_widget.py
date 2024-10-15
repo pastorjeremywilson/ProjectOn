@@ -736,6 +736,7 @@ class MediaWidget(QTabWidget):
                 widget_item.setData(42, item[14])
                 widget_item.setData(43, item[15])
                 widget_item.setData(44, item[16])
+                widget_item.setData(45, item[17])
 
                 widget_item.setData(24, ['', item[0], text])
                 self.custom_list.addItem(widget_item)
@@ -933,22 +934,6 @@ class MediaWidget(QTabWidget):
             self.gui.main.settings['default_bible'] = self.bible_selector_combobox.itemData(
                 self.bible_selector_combobox.currentIndex(), Qt.ItemDataRole.UserRole)
             self.gui.main.save_settings()
-
-    def add_scripture_to_service(self):
-        """
-        Method to add the scripture passage contained in the bible widget's scripture_text_edit to the order of
-        service's QListWidget
-        :return:
-        """
-        if self.formatted_reference:
-            reference = self.formatted_reference
-            version = self.bible_selector_combobox.currentText()
-            self.gui.add_scripture_item(reference, self.passages[1], version)
-            self.formatted_reference = None
-            self.gui.changes = True
-        elif len(self.scripture_text_edit.toPlainText()) > 0:
-            self.gui.add_scripture_item(None, self.scripture_text_edit.toPlainText(), None)
-            self.gui.changes = True
 
     def send_scripture_to_live(self):
         """
@@ -1298,34 +1283,20 @@ class MediaWidget(QTabWidget):
             self.gui.oos_widget.oos_list_widget.addItem(widget_item)
             self.gui.oos_widget.oos_list_widget.setItemWidget(widget_item, widget)
 
-    def add_image_to_service(self, item=None, row=None):
+    def add_scripture_to_service(self):
         """
-        Method to add an image QListWidgetItem to the order of service's QListWidget
-        :param QListWidgetItem item: Optional: a specific image item
-        :param int row: Optional: a specific row of the image widget's QListWidget
+        Method to add the scripture passage contained in the bible widget's scripture_text_edit to the order of
+        service's QListWidget
+        :return:
         """
-        add_item = False
-        if self.image_list.currentItem():
-            if not item:
-                item = QListWidgetItem()
-                add_item = True
-
-            for i in range(20, 41):
-                item.setData(i, self.image_list.currentItem().data(i))
-
-            pixmap = QPixmap()
-            pixmap.loadFromData(self.image_list.currentItem().data(21), 'JPG')
-            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                   Qt.TransformationMode.SmoothTransformation)
-
-            widget = StandardItemWidget(self.gui, item.data(20), 'Image', pixmap)
-
-            item.setSizeHint(widget.sizeHint())
-            if add_item:
-                self.gui.oos_widget.oos_list_widget.addItem(item)
-            else:
-                self.gui.oos_widget.oos_list_widget.insertItem(row, item)
-            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        if self.formatted_reference:
+            reference = self.formatted_reference
+            version = self.bible_selector_combobox.currentText()
+            self.gui.add_scripture_item(reference, self.passages[1], version)
+            self.formatted_reference = None
+            self.gui.changes = True
+        elif len(self.scripture_text_edit.toPlainText()) > 0:
+            self.gui.add_scripture_item(None, self.scripture_text_edit.toPlainText(), None)
             self.gui.changes = True
 
     def add_custom_to_service(self, item=None, row=None):
@@ -1336,7 +1307,7 @@ class MediaWidget(QTabWidget):
         """
         if not item and self.custom_list.currentItem():
             item = QListWidgetItem()
-            for i in range(20, 44):
+            for i in range(20, 46):
                 item.setData(i, self.custom_list.currentItem().data(i))
         elif not item and not self.custom_list.currentItem():
             return
@@ -1369,6 +1340,36 @@ class MediaWidget(QTabWidget):
             self.gui.oos_widget.oos_list_widget.insertItem(row, item)
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
         self.gui.changes = True
+
+    def add_image_to_service(self, item=None, row=None):
+        """
+        Method to add an image QListWidgetItem to the order of service's QListWidget
+        :param QListWidgetItem item: Optional: a specific image item
+        :param int row: Optional: a specific row of the image widget's QListWidget
+        """
+        add_item = False
+        if self.image_list.currentItem():
+            if not item:
+                item = QListWidgetItem()
+                add_item = True
+
+            for i in range(20, 41):
+                item.setData(i, self.image_list.currentItem().data(i))
+
+            pixmap = QPixmap()
+            pixmap.loadFromData(self.image_list.currentItem().data(21), 'JPG')
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                   Qt.TransformationMode.SmoothTransformation)
+
+            widget = StandardItemWidget(self.gui, item.data(20), 'Image', pixmap)
+
+            item.setSizeHint(widget.sizeHint())
+            if add_item:
+                self.gui.oos_widget.oos_list_widget.addItem(item)
+            else:
+                self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+            self.gui.changes = True
 
     def add_web_to_service(self, item=None, row=None):
         """

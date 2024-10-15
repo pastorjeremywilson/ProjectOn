@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.4.1.003
+ProjectOn v.1.4.1.004
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -169,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.4.1.003')
+        version_label = QLabel('v.1.4.1.004')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -449,18 +449,19 @@ class ProjectOn(QObject):
                        'use_shade="' + custom_data[13] + '", '
                        'shade_color="' + custom_data[14] + '", '
                        'shade_opacity="' + custom_data[15] + '" ,'
-                       'audio_file="' + custom_data[16] + '" '
+                       'audio_file="' + custom_data[16] + '" ,'
+                       'loop_audio="' + custom_data[17] + '" '
                        'WHERE title="' + old_title + '"')
             else:
                 sql = ('INSERT INTO customSlides (title, text, font, fontColor, background, font_size, use_shadow, '
                        'shadow_color, shadow_offset, use_outline, outline_color, outline_width, override_global, '
-                       'use_shade, shade_color, shade_opacity, audio_file)'
+                       'use_shade, shade_color, shade_opacity, audio_file, loop_audio)'
                        ' VALUES ("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2] + '","'
                        + custom_data[3] + '","' + custom_data[4] + '","' + custom_data[5] + '","' + custom_data[6]
                        + '","' + custom_data[7] + '","' + custom_data[8] + '","' + custom_data[9]
                        + '","' + custom_data[10] + '","' + custom_data[11] + '","' + custom_data[12]
-                       + '","' + custom_data[13] + '","' + custom_data[14] + '","' + custom_data[15] + custom_data[16]
-                       + '")')
+                       + '","' + custom_data[13] + '","' + custom_data[14] + '","' + custom_data[15]
+                       + custom_data[16] + '","' + custom_data[17] + '")')
 
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
@@ -1308,6 +1309,7 @@ class ProjectOn(QObject):
                 'shade_color': 'TEXT',
                 'shade_opacity': 'TEXT',
                 'audio_file': 'TEXT',
+                'loop_audio': 'TEXT'
             },
             'imageThumbnails': {
                 'fileName': 'TEXT',

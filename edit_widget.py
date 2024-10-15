@@ -2,7 +2,7 @@ import os.path
 import re
 
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QApplication
@@ -270,11 +270,24 @@ class EditWidget(QDialog):
             audio_layout.addWidget(self.audio_line_edit)
             audio_layout.addSpacing(20)
 
-            self.choose_file_button = QPushButton('Choose Audio File')
+            self.choose_file_button = QPushButton()
             self.choose_file_button.setObjectName('choose_file_button')
+            self.choose_file_button.setIcon(QIcon('resources/gui_icons/open.svg'))
+            self.choose_file_button.setIconSize(QSize(24, 24))
             self.choose_file_button.setFont(self.gui.standard_font)
+            self.choose_file_button.setToolTip('Choose an audio file')
             self.choose_file_button.pressed.connect(self.get_audio_file)
             audio_layout.addWidget(self.choose_file_button)
+
+            self.loop_audio_button = QPushButton()
+            self.loop_audio_button.setObjectName('loop_audio_button')
+            self.loop_audio_button.setCheckable(True)
+            self.loop_audio_button.setIcon(QIcon('resources/gui_icons/repeat.svg'))
+            self.loop_audio_button.setIconSize(QSize(24, 24))
+            self.loop_audio_button.setFont(self.gui.standard_font)
+            self.loop_audio_button.setToolTip('Play this audio on a continual loop so long as this slide is showing')
+            self.loop_audio_button.hide()
+            audio_layout.addWidget(self.loop_audio_button)
             audio_layout.addStretch()
 
             self.audio_line_edit.hide()
@@ -453,6 +466,7 @@ class EditWidget(QDialog):
     def add_audio_changed(self):
         self.audio_line_edit.setHidden(not self.add_audio_checkbox.isChecked())
         self.choose_file_button.setHidden(not self.add_audio_checkbox.isChecked())
+        self.loop_audio_button.setHidden(not self.add_audio_checkbox.isChecked())
         if not self.add_audio_checkbox.isChecked():
             self.audio_line_edit.clear()
 
@@ -462,7 +476,7 @@ class EditWidget(QDialog):
             self,
             'Choose Audio File',
             os.path.expanduser('~'),
-            'Audio Files (*.mp3 *.wav *.wma)'
+            'Audio Files (*.mp3 *.wav *.wma *.flac)'
         )
         if len(result[0]) > 0:
             self.audio_line_edit.setText(result[0])
@@ -807,6 +821,10 @@ class EditWidget(QDialog):
         if custom_data[16] and len(custom_data[6]) > 0:
             self.add_audio_checkbox.setChecked(True)
             self.audio_line_edit.setText(custom_data[16])
+        if custom_data[17] == 'True':
+            self.loop_audio_button.setChecked(True)
+        else:
+            self.loop_audio_button.setChecked(False)
 
         self.font_widget.blockSignals(False)
 
@@ -1152,6 +1170,10 @@ class EditWidget(QDialog):
         audio_file = ''
         if len(self.audio_line_edit.text()) > 0:
             audio_file = self.audio_line_edit.text()
+        if self.loop_audio_button.isChecked():
+            loop_audio = 'True'
+        else:
+            loop_audio = 'False'
 
         custom_data = [
             self.title_line_edit.text(),
@@ -1170,7 +1192,8 @@ class EditWidget(QDialog):
             use_shade,
             shade_color,
             shade_opacity,
-            audio_file
+            audio_file,
+            loop_audio
         ]
 
         if self.new_custom:

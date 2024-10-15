@@ -386,7 +386,8 @@ class CustomMainWindow(QMainWindow):
                 if self.gui.media_player.state() == QMediaPlayer.State.PlayingState:
                     self.gui.media_player.stop()
                 self.gui.media_player.deleteLater()
-                self.gui.video_widget.deleteLater()
+                if self.gui.video_widget:
+                    self.gui.video_widget.deleteLater()
                 self.gui.media_player = None
                 self.gui.video_widget = None
                 self.gui.audio_output = None
