@@ -160,7 +160,7 @@ class OpenLPImport:
         lyrics = root.find('lyrics')
         converted_lyrics = ''
         for element in lyrics:
-            text = re.sub('\{.*?\}', '', element.text).rstrip()
+            text = re.sub('\{.*?\}', '', element.text).strip()
             text = text.replace('[---]\n', '')
             text = text.replace('\n', '<br />')
             type = element.attrib['type'][0].lower()

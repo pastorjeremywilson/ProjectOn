@@ -408,7 +408,9 @@ class CustomMainWindow(QMainWindow):
                 print("Shutdown Error " + e.__str__())
 
             if self.gui.timed_update:
-                self.gui.timed_update.stop = True
+                self.gui.timed_update.keep_running = False
+            if self.gui.slide_auto_play:
+                self.gui.slide_auto_play.keep_running = False
             evt.accept()
 
 

@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QApplication
+    QApplication, QSpinBox
 
 from formattable_text_edit import FormattableTextEdit
 from simple_splash import SimpleSplash
@@ -286,12 +286,41 @@ class EditWidget(QDialog):
             self.loop_audio_button.setIconSize(QSize(24, 24))
             self.loop_audio_button.setFont(self.gui.standard_font)
             self.loop_audio_button.setToolTip('Play this audio on a continual loop so long as this slide is showing')
-            self.loop_audio_button.hide()
             audio_layout.addWidget(self.loop_audio_button)
             audio_layout.addStretch()
 
+            self.loop_audio_button.hide()
             self.audio_line_edit.hide()
             self.choose_file_button.hide()
+
+            auto_play_widget = QWidget()
+            auto_play_layout = QHBoxLayout(auto_play_widget)
+            main_layout.addWidget(auto_play_widget)
+
+            self.auto_play_spinbox = QSpinBox()
+
+            self.auto_play_checkbox = QCheckBox('Auto-Play Slide Text')
+            self.auto_play_checkbox.setObjectName('auto_play_checkbox')
+            self.auto_play_checkbox.setToolTip(
+                'Use blank lines to create separate slides that will be scrolled through automatically')
+            self.auto_play_checkbox.setFont(self.gui.bold_font)
+            self.auto_play_checkbox.setChecked(False)
+            self.auto_play_checkbox.stateChanged.connect(self.auto_play_changed)
+            auto_play_layout.addWidget(self.auto_play_checkbox)
+            auto_play_layout.addSpacing(20)
+
+            self.auto_play_spinbox_label = QLabel('Secs. Between Slides:')
+            self.auto_play_spinbox_label.setFont(self.gui.standard_font)
+            auto_play_layout.addWidget(self.auto_play_spinbox_label)
+
+            self.auto_play_spinbox.setFont(self.gui.standard_font)
+            self.auto_play_spinbox.setRange(1, 60)
+            self.auto_play_spinbox.setValue(6)
+            auto_play_layout.addWidget(self.auto_play_spinbox)
+            auto_play_layout.addStretch()
+
+            self.auto_play_spinbox_label.hide()
+            self.auto_play_spinbox.hide()
 
         self.advanced_options_widget = QWidget()
         advanced_options_layout = QVBoxLayout(self.advanced_options_widget)
@@ -464,11 +493,15 @@ class EditWidget(QDialog):
         self.font_widget.font_sample.paint_font()
 
     def add_audio_changed(self):
-        self.audio_line_edit.setHidden(not self.add_audio_checkbox.isChecked())
-        self.choose_file_button.setHidden(not self.add_audio_checkbox.isChecked())
-        self.loop_audio_button.setHidden(not self.add_audio_checkbox.isChecked())
+        self.audio_line_edit.setVisible(self.add_audio_checkbox.isChecked())
+        self.choose_file_button.setVisible(self.add_audio_checkbox.isChecked())
+        self.loop_audio_button.setVisible(self.add_audio_checkbox.isChecked())
         if not self.add_audio_checkbox.isChecked():
             self.audio_line_edit.clear()
+
+    def auto_play_changed(self):
+        self.auto_play_spinbox_label.setVisible(self.auto_play_checkbox.isChecked())
+        self.auto_play_spinbox.setVisible(self.auto_play_checkbox.isChecked())
 
     def get_audio_file(self):
         file_dialog = QFileDialog()
@@ -826,6 +859,14 @@ class EditWidget(QDialog):
         else:
             self.loop_audio_button.setChecked(False)
 
+        # set auto-play
+        if custom_data[18] == 'True':
+            self.auto_play_checkbox.setChecked(True)
+        else:
+            self.auto_play_checkbox.setChecked(False)
+        if custom_data[19]:
+            self.auto_play_spinbox.setValue(int(custom_data[19]))
+
         self.font_widget.blockSignals(False)
 
     def show_hide_advanced_options(self):
@@ -1175,6 +1216,12 @@ class EditWidget(QDialog):
         else:
             loop_audio = 'False'
 
+        if self.auto_play_checkbox.isChecked():
+            auto_play = 'True'
+        else:
+            auto_play = 'False'
+        slide_delay = str(self.auto_play_spinbox.value())
+
         custom_data = [
             self.title_line_edit.text(),
             text,
@@ -1193,7 +1240,9 @@ class EditWidget(QDialog):
             shade_color,
             shade_opacity,
             audio_file,
-            loop_audio
+            loop_audio,
+            auto_play,
+            slide_delay
         ]
 
         if self.new_custom:

@@ -60,6 +60,7 @@ class GUI(QObject):
     video_widget = None
     media_player = None
     timed_update = None
+    slide_auto_play = None
     central_widget = None
     central_layout = None
     edit_widget = None
@@ -86,6 +87,7 @@ class GUI(QObject):
     display_logo_screen_signal = pyqtSignal()
     grab_display_signal = pyqtSignal()
     server_alert_signal = pyqtSignal()
+    change_lyric_widget_text_signal = pyqtSignal(str)
 
     def __init__(self, main):
         """
@@ -102,6 +104,7 @@ class GUI(QObject):
         self.display_logo_screen_signal.connect(self.display_logo_screen)
         self.grab_display_signal.connect(self.grab_display)
         self.server_alert_signal.connect(self.show_server_alert)
+        self.change_lyric_widget_text_signal.connect(self.change_lyric_widget_text)
         self.shadow_color = 0
         self.shadow_offset = 6
         self.widget_item_background_color = 'white'
@@ -588,7 +591,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.4.1.004'
+        current_version = 'v.1.4.1.010'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -825,7 +828,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.4.1.004')
+        title_label = QLabel('ProjectOn v.1.4.1.010')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1206,7 +1209,7 @@ class GUI(QObject):
                 if item.data(24):
                     for i in range(len(item.data(24))):
                         list_item = QListWidgetItem()
-                        for j in range(20, 44):
+                        for j in range(20, 50):
                             list_item.setData(j, item.data(j))
 
                         list_item.setData(24, [item.data(24)[i][0], item.data(24)[i][1], item.data(24)[i][2]])
@@ -1224,7 +1227,7 @@ class GUI(QObject):
                 slide_texts = item.data(21)
                 for i in range(len(slide_texts)):
                     list_item = QListWidgetItem()
-                    for j in range(20, 41):
+                    for j in range(20, 50):
                         list_item.setData(j, item.data(j))
                     list_item.setData(20, title)
                     list_item.setData(21, slide_texts[i])
@@ -1283,7 +1286,7 @@ class GUI(QObject):
             elif item.data(40) == 'image':
                 lyric_widget = StandardItemWidget(self, item.data(20))
                 list_item = QListWidgetItem()
-                for j in range(20, 41):
+                for j in range(20, 50):
                     list_item.setData(j, item.data(j))
                 list_item.setSizeHint(lyric_widget.sizeHint())
                 self.preview_widget.slide_list.addItem(list_item)
@@ -1292,7 +1295,7 @@ class GUI(QObject):
             elif item.data(40) == 'custom':
                 lyric_widget = StandardItemWidget(self, item.data(20), item.data(21))
                 list_item = QListWidgetItem()
-                for j in range(20, 46):
+                for j in range(20, 50):
                     list_item.setData(j, item.data(j))
                 list_item.setSizeHint(lyric_widget.sizeHint())
                 self.preview_widget.slide_list.addItem(list_item)
@@ -1301,7 +1304,7 @@ class GUI(QObject):
             elif item.data(40) == 'web':
                 lyric_widget = StandardItemWidget(self, item.data(20), item.data(21))
                 list_item = QListWidgetItem()
-                for j in range(20, 41):
+                for j in range(20, 50):
                     list_item.setData(j, item.data(j))
                 list_item.setSizeHint(lyric_widget.sizeHint())
                 self.preview_widget.slide_list.addItem(list_item)
@@ -1343,7 +1346,7 @@ class GUI(QObject):
                 original_item = self.preview_widget.slide_list.item(i)
                 size_hint = original_item.sizeHint()
                 item = QListWidgetItem()
-                for j in range(20, 46):
+                for j in range(20, 50):
                     item.setData(j, original_item.data(j))
 
                 if item.data(40) == 'image':
@@ -1429,6 +1432,7 @@ class GUI(QObject):
         display_widget = None
         lyric_widget = None
         current_item = None
+        auto_play_text = None
 
         if widget == 'live':
             # handle stopping the media player carefully to avoid an Access Violation
@@ -1437,14 +1441,21 @@ class GUI(QObject):
                     self.media_player.stop()
                     if self.timed_update:
                         self.timed_update.stop = True
-                #self.media_player.media().clear()
                 self.media_player.deleteLater()
                 if self.video_widget:
                     self.video_widget.deleteLater()
                 self.media_player = None
                 self.video_widget = None
                 self.audio_output = None
+                
+            # stop timed update and auto-play runnables
+            if self.timed_update:
+                self.timed_update.keep_running = False
                 self.timed_update = None
+            if self.slide_auto_play:
+                print('stopping slide auto play')
+                self.slide_auto_play.keep_running = False
+                self.slide_auto_play = None
 
             display_widget = self.display_widget
             lyric_widget = self.lyric_widget
@@ -1522,7 +1533,18 @@ class GUI(QObject):
             elif current_item.data(40) == 'image':
                 lyrics_html = ''
             elif current_item.data(40) == 'custom':
-                lyrics_html = current_item.data(21)
+                # check if auto-play is enabled for this slide and parse the text if so
+                if current_item.data(46) and current_item.data(46) == 'True':
+                    print('parsing auto play text')
+                    auto_play_text = current_item.data(21)
+                    auto_play_text = re.sub('<p.*?>', '', auto_play_text)
+                    auto_play_text = re.sub('</p>', '', auto_play_text)
+                    auto_play_text = re.sub('(<br />)+', '\n', auto_play_text)
+                    auto_play_text = re.split('\n', auto_play_text)
+                    lyrics_html = auto_play_text[0]
+                else:
+                    print('standard custom slide')
+                    lyrics_html = current_item.data(21)
             elif current_item.data(40) == 'web':
                 if widget == 'sample':
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
@@ -1636,6 +1658,7 @@ class GUI(QObject):
                     lyric_widget.fill_color = QColor(
                         int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
 
+            print('setting lyrics_html')
             lyric_widget.text = lyrics_html
 
             # set the footer text
@@ -1684,8 +1707,10 @@ class GUI(QObject):
                         self.logo_widget.hide()
                     if self.lyric_widget.isHidden():
                         self.lyric_widget.show()
+                        self.lyric_widget.repaint()
                     if current_item.data(40) == 'image':
                         self.lyric_widget.hide()
+
                 elif current_item.data(40) == 'video':
                     self.make_video_widget()
                     self.video_widget.show()
@@ -1742,9 +1767,18 @@ class GUI(QObject):
 
                     self.media_player.play()
 
+                # cycle through text paragraphs if auto-play is enabled for this slide
+                if auto_play_text:
+                    print(auto_play_text)
+                    self.slide_auto_play = SlideAutoPlay(self, lyric_widget, auto_play_text, current_item.data(47))
+                    self.main.thread_pool.start(self.slide_auto_play)
+
+                    self.timed_update = TimedPreviewUpdate(self)
+                    self.main.thread_pool.start(self.timed_update)
+
             # change the preview image
             if widget == 'live':
-                if not current_item.data(40) == 'web' and not current_item.data(40) == 'video':
+                if not current_item.data(40) == 'web' and not current_item.data(40) == 'video' and not auto_play_text:
                     pixmap = display_widget.grab(display_widget.rect())
                     pixmap = pixmap.scaled(
                         int(display_widget.width() / 5), int(display_widget.height() / 5),
@@ -1756,11 +1790,11 @@ class GUI(QObject):
                     stage_html = stage_html.replace('</p>', '')
                     self.main.remote_server.socketio.emit(
                         'update_stage', [stage_html, self.main.settings['stage_font_size']])
-                elif current_item.data(40) == 'web':
-                    lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
+                elif auto_play_text:
+                    lyrics_html = '<p style="align-text: center;">' + auto_play_text[0] + '</p>'
                     self.main.remote_server.socketio.emit(
                         'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
-                elif current_item.data(40) == 'video':
+                else:
                     lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
                     self.main.remote_server.socketio.emit(
                         'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
@@ -1772,6 +1806,12 @@ class GUI(QObject):
                     Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
+
+            print('change_display finished')
+
+    def change_lyric_widget_text(self, text):
+        self.lyric_widget.text = text
+        self.lyric_widget.repaint()
 
     def make_special_display_widgets(self):
         """
@@ -2177,9 +2217,28 @@ class TimedPreviewUpdate(QRunnable):
         """
         super().__init__()
         self.gui = gui
-        self.stop = False
+        self.keep_running = True
 
     def run(self):
-        while not self.stop:
+        while self.keep_running:
             self.gui.grab_display_signal.emit()
             time.sleep(0.1)
+
+
+class SlideAutoPlay(QRunnable):
+    def __init__(self, gui, lyric_widget, text, interval):
+        super().__init__()
+        self.gui = gui
+        self.lyric_widget = lyric_widget
+        self.interval = interval
+        self.text = text
+        self.keep_running = True
+
+    def run(self):
+        index = 0
+        while self.keep_running:
+            self.gui.change_lyric_widget_text_signal.emit(self.text[index].strip())
+            time.sleep(float(self.interval))
+            index += 1
+            if index == len(self.text):
+                index = 0

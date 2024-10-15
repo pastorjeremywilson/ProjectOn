@@ -548,7 +548,7 @@ class MediaWidget(QTabWidget):
                 segment_title = 'Ending ' + ''.join(item_num)
 
             try:
-                segment_text = self.lyric_dictionary[segment].rstrip()
+                segment_text = self.lyric_dictionary[segment].strip()
                 segment_text = re.sub('<p.*?>', '', segment_text)
                 segment_text = segment_text.replace('</p>', '')
                 segment_text = segment_text.replace('\n', '<br />')
@@ -732,11 +732,8 @@ class MediaWidget(QTabWidget):
                 for i in range(2, 13):
                     widget_item.setData(25 + i, item[i])
                 widget_item.setData(40, 'custom')
-                widget_item.setData(41, item[13])
-                widget_item.setData(42, item[14])
-                widget_item.setData(43, item[15])
-                widget_item.setData(44, item[16])
-                widget_item.setData(45, item[17])
+                for i in range(13, 20):
+                    widget_item.setData(28 + i, item[i])
 
                 widget_item.setData(24, ['', item[0], text])
                 self.custom_list.addItem(widget_item)
@@ -1212,7 +1209,7 @@ class MediaWidget(QTabWidget):
         """
         if not item and self.song_list.currentItem():
             item = QListWidgetItem()
-            for i in range(20, 44):
+            for i in range(20, 50):
                 item.setData(i, self.song_list.currentItem().data(i))
 
         if item and not from_load_service:
@@ -1253,7 +1250,7 @@ class MediaWidget(QTabWidget):
         if item and from_load_service:
             # handle this differently if it's being created while loading a service file
             widget_item = QListWidgetItem()
-            for i in range(20, 44):
+            for i in range(20, 50):
                 widget_item.setData(i, item.data(i))
             widget_item.setData(24, self.parse_song_data(item))
 
@@ -1307,7 +1304,7 @@ class MediaWidget(QTabWidget):
         """
         if not item and self.custom_list.currentItem():
             item = QListWidgetItem()
-            for i in range(20, 46):
+            for i in range(20, 50):
                 item.setData(i, self.custom_list.currentItem().data(i))
         elif not item and not self.custom_list.currentItem():
             return
@@ -1353,7 +1350,7 @@ class MediaWidget(QTabWidget):
                 item = QListWidgetItem()
                 add_item = True
 
-            for i in range(20, 41):
+            for i in range(20, 50):
                 item.setData(i, self.image_list.currentItem().data(i))
 
             pixmap = QPixmap()

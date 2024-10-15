@@ -1,6 +1,6 @@
 Future Releases:
 Add auto-play slide feature
-Simple audio slide
+Change QListWidgetItem data types to a singular dictionary
 Video backgrounds
 Move parsers into their own file
 Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
