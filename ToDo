@@ -1,6 +1,8 @@
 Future Releases:
 Add auto-play slide feature
+Parse song text in one method rather than formatting then parsing
 Change QListWidgetItem data types to a singular dictionary
 Video backgrounds
 Move parsers into their own file
+Put runnables into their own file
 Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?

@@ -160,7 +160,7 @@ class CustomListWidget(QListWidget):
 
     def dropEvent(self, evt):
         """
-        Overrides dropEvent to properly add a QListWidget item to this widget based on the type stored in data(40).
+        Overrides dropEvent to properly add a QListWidget item to this widget based on the type.
         :param QDropEvent evt: dropEvent
         :return:
         """
@@ -173,27 +173,28 @@ class CustomListWidget(QListWidget):
         if row == -1:
             row = self.count()
 
-        if evt.source().currentItem().data(40) == 'song':
+        if evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.add_song_to_service(item, row)
-        elif evt.source().currentItem().data(40) == 'custom':
+        elif evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
             self.gui.media_widget.add_custom_to_service(item, row)
-        elif evt.source().currentItem().data(40) == 'image':
+        elif evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'image':
             self.gui.media_widget.add_image_to_service(item, row)
-        elif evt.source().currentItem().data(40) == 'video':
+        elif evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'video':
             self.gui.media_widget.add_video_to_service(item, row)
-        elif evt.source().currentItem().data(40) == 'web':
+        elif evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'web':
             self.gui.media_widget.add_web_to_service(item, row)
 
         remote_oos_buttons = ''
         for i in range(self.count()):
-            title = self.item(i).data(20)
-            remote_oos_buttons += f"""
-                <button id="{title}" type="submit" name="oos_button" value="{title}">
-                    <span class="title">
-                        {title}
-                    </span>
-                </button>
-                <br />"""
+            if self.item(i).data(Qt.ItemDataRole.UserRole): # a placeholder item in oos will not have any data
+                title = self.item(i).data(Qt.ItemDataRole.UserRole)['title']
+                remote_oos_buttons += f"""
+                    <button id="{title}" type="submit" name="oos_button" value="{title}">
+                        <span class="title">
+                            {title}
+                        </span>
+                    </button>
+                    <br />"""
         if self.gui.main.remote_server:
             self.gui.main.remote_server.socketio.emit('update_oos', remote_oos_buttons)
 
@@ -208,10 +209,11 @@ class CustomListWidget(QListWidget):
 
         edit_text = None
         if self.itemAt(self.item_pos):
-            if self.itemAt(self.item_pos).data(40) == 'song':
-                edit_text = 'Edit Song'
-            elif self.itemAt(self.item_pos).data(40) == 'custom':
-                edit_text = 'Edit Custom Slide'
+            if self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole):
+                if self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+                    edit_text = 'Edit Song'
+                elif self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                    edit_text = 'Edit Custom Slide'
 
             if edit_text:
                 edit_song_action = QAction('Edit Song')
@@ -230,12 +232,12 @@ class CustomListWidget(QListWidget):
         :return:
         """
         if self.itemAt(self.item_pos):
-            if self.itemAt(self.item_pos).data(40) == 'song':
-                item_text = self.itemAt(self.item_pos).data(20)
+            if self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+                item_text = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['title']
                 song_info = self.gui.main.get_song_data(item_text)
                 song_edit = EditWidget(self.gui, 'song', song_info, item_text)
-            elif self.itemAt(self.item_pos).data(40) == 'custom':
-                item_text = self.itemAt(self.item_pos).data(20)
+            elif self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                item_text = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['title']
                 custom_info = self.gui.main.get_custom_data(item_text)
                 song_edit = EditWidget(self.gui, 'custom', custom_info, item_text)
 
@@ -243,8 +245,8 @@ class CustomListWidget(QListWidget):
         """
         Method to remove an item from the order of service.
         """
-        if self.currentItem().data(20):
-            title = self.currentItem().data(20)
+        if self.currentItem().data(Qt.ItemDataRole.UserRole):
+            title = self.currentItem().data(Qt.ItemDataRole.UserRole)['title']
         else:
             title = self.currentItem().text()
         result = QMessageBox.question(

@@ -4,7 +4,7 @@ import sqlite3
 import requests
 from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint
 from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
-    QImage
+    QImage, QFontMetrics
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
@@ -121,7 +121,8 @@ class ImageCombobox(QComboBox):
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 item = self.gui.oos_widget.oos_list_widget.item(i)
-                if item.data(29) == 'global_song' or item.data(40) == 'song':
+                if (item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_song'
+                        or item.data(Qt.ItemDataRole.UserRole)['type'] == 'song'):
                     item = self.gui.oos_widget.oos_list_widget.item(i)
                     widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
                     pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
@@ -134,7 +135,8 @@ class ImageCombobox(QComboBox):
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 item = self.gui.oos_widget.oos_list_widget.item(i)
-                if item.data(29) == 'global_bible' or item.data(40) == 'bible':
+                if (item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_bible'
+                        or item.data(Qt.ItemDataRole.UserRole)['type'] == 'bible'):
                     item = self.gui.oos_widget.oos_list_widget.item(i)
                     widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
                     pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
@@ -557,6 +559,7 @@ class LyricDisplayWidget(QWidget):
         """
         Method to paint the text onto the widget, using the prescribed outline and shadow values
         """
+        # TODO: Fix spacing between bold and regular font items
         self.path.clear()
         self.shadow_path.clear()
         self.text = re.sub('<p.*?>', '', self.text)
@@ -565,15 +568,13 @@ class LyricDisplayWidget(QWidget):
         self.text = re.sub('<br/>', '<br />', self.text)
 
         text_lines = self.text.split('<br />')
-        metrics = self.fontMetrics()
-        line_height = metrics.boundingRect('Way').height()
-        space_width = metrics.boundingRect('m m').width() - metrics.boundingRect('mm').width()
+        line_height = self.fontMetrics().boundingRect('Way').height()
         lines = []
         for this_line in text_lines:
             this_line = this_line.strip()
 
             # split the lines according to their drawn length
-            if (metrics.boundingRect(this_line).adjusted(
+            if (self.fontMetrics().boundingRect(this_line).adjusted(
                     0, 0, self.outline_width, self.outline_width).width()
                     < self.gui.display_widget.width() - 20):
                 lines.append(this_line)
@@ -584,7 +585,7 @@ class LyricDisplayWidget(QWidget):
                 while split_more:
                     new_splits = []
                     for line in splitted_lines:
-                        if (metrics.boundingRect(line).adjusted(
+                        if (self.fontMetrics().boundingRect(line).adjusted(
                                 0, 0, self.outline_width, self.outline_width).width()
                                 > self.gui.display_widget.width() - 20):
                             line_split = line.split(' ')
@@ -612,7 +613,7 @@ class LyricDisplayWidget(QWidget):
                     split_more = False
                     splitted_lines = new_splits
                     for line in splitted_lines:
-                        if (metrics.boundingRect(line).adjusted(
+                        if (self.fontMetrics().boundingRect(line).adjusted(
                                 0, 0, self.outline_width, self.outline_width).width()
                                 > self.gui.display_widget.width() - 20):
                             split_more = True
@@ -627,7 +628,6 @@ class LyricDisplayWidget(QWidget):
             this_line = lines[i]
 
             # check for any html formatting in this line
-            formatted_line = []
             if '<i>' in this_line or '<b>' in this_line or '<u>' in this_line:
                 index = 0
                 line_parts = ['']
@@ -655,23 +655,11 @@ class LyricDisplayWidget(QWidget):
                     else:
                         line_parts[index] += this_line[j]
                         j += 1
-
-                line_split = re.split('<i>|<b>|<u>', this_line)
-                for item in line_split:
-                    formatting_markers = ''
-                    if '/i' in item:
-                        formatting_markers += 'i'
-                    if '/b' in item:
-                        formatting_markers += 'b'
-                    if '/u' in item:
-                        formatting_markers += 'u'
-                    formatted_line.append([formatting_markers, re.sub('<.*?>', '', item)])
             else:
-                formatted_line.append(['', this_line])
                 line_parts = [this_line]
 
             this_line = re.sub('<.*?>', '', this_line)
-            line_width = metrics.boundingRect(this_line).adjusted(
+            line_width = self.fontMetrics().boundingRect(this_line).adjusted(
                 0, 0, self.outline_width, self.outline_width).width()
             x = (self.width() - line_width) / 2
             y = (self.gui.display_widget.height() / 2) - (line_height * len(lines) / 2) + (line_height / 1.5) + (i * line_height)
@@ -688,10 +676,14 @@ class LyricDisplayWidget(QWidget):
                 part = re.sub('<.*?>', '', part)
                 if self.use_shadow:
                     self.shadow_path.addText(QPointF(x + self.shadow_offset, y + self.shadow_offset), font, part)
+                    x += self.shadow_offset
                 self.path.addText(QPointF(x, y), font, part)
-                x += metrics.boundingRect(part).width()
+
+                x += QFontMetrics(font).boundingRect(part).width()
+
+                # addText seems to strip trailing spaces, so adjust x based on the current font metrics
                 if part.endswith(' '):
-                    x += space_width
+                    x += QFontMetrics(font).boundingRect('m m').width() - QFontMetrics(font).boundingRect('mm').width()
 
         painter = QPainter(self)
         brush = QBrush()
@@ -770,6 +762,8 @@ class StandardItemWidget(QWidget):
 
         if not wrap_subtitle:
             layout.addStretch()
+
+        self.adjustSize()
 
 
 class AutoSelectLineEdit(QLineEdit):

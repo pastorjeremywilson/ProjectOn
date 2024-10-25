@@ -10,6 +10,8 @@ from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, QAction
 
+import declarations
+import parsers
 from edit_widget import EditWidget
 from get_scripture import GetScripture
 from simple_splash import SimpleSplash
@@ -210,9 +212,6 @@ class MediaWidget(QTabWidget):
         self.bible_search_status_label = QLabel()
         self.bible_search_status_label.setFont(QFont('Helvetica', 8))
         fm = bible_search_label.fontMetrics()
-        label_width = fm.boundingRect('Enter Passage:').width()
-        #self.bible_search_status_label.setStyleSheet(
-        #    'color: white; padding-left: ' + str(label_width + (bible_search_layout.spacing() * 2)) + 'px;')
         scripture_layout.addWidget(self.bible_search_status_label)
 
         button_widget = QWidget()
@@ -465,14 +464,14 @@ class MediaWidget(QTabWidget):
             for item in songs:
                 if self.gui.main.initial_startup:
                     self.gui.main.update_status_signal.emit('Loading Songs - ' + item[0], 'info')
-                list_item = QListWidgetItem(item[0])
+
+                slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
                 for i in range(len(item)):
-                    list_item.setData(i + 20, item[i])
-                list_item.setData(24, self.gui.format_display_lyrics(list_item.data(24)))
-                list_item.setData(40, 'song')
-                list_item.setData(41, item[18])
-                list_item.setData(42, item[19])
-                list_item.setData(43, item[20])
+                    slide_data['type'] = 'song'
+                    slide_data[declarations.SQL_COLUMN_TO_DICTIONARY_SONG[i]] = item[i]
+
+                list_item = QListWidgetItem(slide_data['title'])
+                list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
                 self.song_list.addItem(list_item)
         """
@@ -500,210 +499,6 @@ class MediaWidget(QTabWidget):
         data 43: Shade Opacity
         """
 
-    def parse_song_data(self, item):
-        """
-        Method that takes the raw song lyric data associated with this song and parses it into individual sections,
-        based on verse/chorus/etc tags or blank lines.
-        :param QListWidgetItem item: The item containing the song data
-        :return list of str segments: The song's individual segments
-        """
-        self.lyric_dictionary = item.data(24)
-        new_dict = {}
-        for key in self.lyric_dictionary:
-            if ' ' in key:
-                key_text = key.replace('[', '').replace(']', '')
-                new_key = key_text.split(' ')[0][0].lower() + key_text.split(' ')[1]
-                new_dict['[' + new_key + ']'] = self.lyric_dictionary[key]
-            else:
-                new_dict[key] = self.lyric_dictionary[key]
-        self.lyric_dictionary = new_dict
-        segments = []
-
-        if len(item.data(25)) > 0:
-            song_order = item.data(25)
-            if ',' in song_order:
-                song_order = song_order.replace(', ', ' ')
-                song_order = song_order.replace(',', ' ')
-            song_order = re.sub(' +', ' ', song_order)
-            iterable = song_order.split(' ')
-            for i in range(len(iterable)):
-                iterable[i] = '[' + iterable[i] + ']'
-        else:
-            iterable = self.lyric_dictionary
-
-        for segment in iterable:
-            item_num = [i for i in segment if i.isdigit()]
-
-            if 'v' in segment:
-                segment_title = 'Verse ' + ''.join(item_num)
-            elif 'c' in segment:
-                segment_title = 'Chorus ' + ''.join(item_num)
-            elif 'p' in segment:
-                segment_title = 'Pre-Chorus ' + ''.join(item_num)
-            elif 'b' in segment:
-                segment_title = 'Bridge ' + ''.join(item_num)
-            elif 't' in segment:
-                segment_title = 'Tag ' + ''.join(item_num)
-            else:
-                segment_title = 'Ending ' + ''.join(item_num)
-
-            try:
-                segment_text = self.lyric_dictionary[segment].strip()
-                segment_text = re.sub('<p.*?>', '', segment_text)
-                segment_text = segment_text.replace('</p>', '')
-                segment_text = segment_text.replace('\n', '<br />')
-                segment_text = segment_text.replace('&quot;', '"')
-            except Exception:
-                segment_text = ''
-                pass
-
-            while segment_text.startswith('<br />'):
-                segment_text = segment_text[6:]
-            while segment_text.endswith('<br />'):
-                segment_text = segment_text[:len(segment_text) - 6]
-
-            if 'span' in segment_text and 'italic' in segment_text:
-                italicized_text = re.findall('<span style=" font-style:italic;">.*?</span>', segment_text)
-                for text in italicized_text:
-                    new_text = re.sub('<span.*?italic.*?>', '<i>', text)
-                    new_text = re.sub('</span>', '</i>', new_text)
-                    segment_text = segment_text.replace(text, new_text)
-
-            if 'span' in segment_text and 'font-weight' in segment_text:
-                bold_text = re.findall('<span style=" font-weight:700;">.*?</span>', segment_text)
-                for text in bold_text:
-                    new_text = re.sub('<span.*?font-weight.*?>', '<b>', text)
-                    new_text = re.sub('</span>', '</b>', new_text)
-                    segment_text = segment_text.replace(text, new_text)
-
-            if 'span' in segment_text and 'text-decoration' in segment_text:
-                underline_text = re.findall('<span.*?text-decoration.*?5px;">.*?</span>', segment_text)
-                for text in underline_text:
-                    new_text = re.sub('<span.*?text-decoration.*?>', '<u>', text)
-                    new_text = re.sub('</span>', '</u>', new_text)
-                    segment_text = segment_text.replace(text, new_text)
-
-            # set the font, using the song's font data if override_global is True
-            if item.data(37) == 'True':
-                font_face = item.data(27)
-                font_size = int(item.data(30))
-                font_color = item.data(28)
-                use_shadow = False
-                if item.data(31) == 'True':
-                    use_shadow = True
-                if item.data(32) and not item.data(32) == 'None':
-                    shadow_color = int(item.data(32))
-                else:
-                    shadow_color = self.gui.main.settings['shadow_color']
-                if item.data(33) and not item.data(33) == 'None':
-                    shadow_offset = int(item.data(33))
-                else:
-                    shadow_offset = self.gui.main.settings['shadow_offset']
-                use_outline = False
-                if item.data(34) == 'True':
-                    use_outline = True
-                if item.data(35) and not item.data(35) == 'None':
-                    outline_color = int(item.data(35))
-                else:
-                    outline_color = self.gui.main.settings['outline_color']
-                if item.data(36) and not item.data(36) == 'None':
-                    outline_width = int(item.data(36))
-                else:
-                    outline_width = self.gui.main.settings['outline_width']
-            else:
-                font_face = self.gui.main.settings['song_font_face']
-                font_size = self.gui.main.settings['song_font_size']
-                font_color = self.gui.main.settings['song_font_color']
-                use_shadow = self.gui.main.settings['song_use_shadow']
-                shadow_color = self.gui.main.settings['song_shadow_color']
-                shadow_offset = self.gui.main.settings['song_shadow_offset']
-                use_outline = self.gui.main.settings['song_use_outline']
-                outline_color = self.gui.main.settings['song_outline_color']
-                outline_width = self.gui.main.settings['song_outline_width']
-
-            lyric_widget = self.gui.sample_lyric_widget
-
-            lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
-            lyric_widget.footer_label.setFont(QFont(font_face, self.gui.global_footer_font_size))
-            lyric_widget.use_shadow = use_shadow
-            lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
-            lyric_widget.shadow_offset = shadow_offset
-            lyric_widget.use_outline = use_outline
-            lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
-            lyric_widget.outline_width = outline_width
-
-            segment_text = '<p style="text-align: center; line-height: 120%;">' + segment_text + '</p>'
-
-            segment_text = re.sub('<span.*?>', '', segment_text)
-            segment_text = re.sub('</span>', '', segment_text)
-            self.gui.sample_lyric_widget.setText(segment_text)
-
-            segment_count = 1
-
-            footer_text = ''
-            if item.data(26) and item.data(26) == 'true':
-                if len(item.data(21)) > 0:
-                    footer_text += item.data(21)
-                if len(item.data(22)) > 0:
-                    footer_text += '\n\u00A9' + item.data(22).replace('\n', ' ')
-                if len(item.data(23)) > 0:
-                    footer_text += '\nCCLI Song #: ' + item.data(23)
-                if len(self.gui.main.settings['ccli_num']) > 0:
-                    footer_text += '\nCCLI License #: ' + self.gui.main.settings['ccli_num']
-                self.gui.sample_lyric_widget.footer_label.setText(footer_text)
-
-            if len(self.gui.sample_lyric_widget.footer_label.text()) > 0:
-                footer_height = self.gui.sample_lyric_widget.footer_label.height()
-            else:
-                footer_height = 0
-            self.gui.sample_lyric_widget.paint_text()
-            lyric_widget_height = self.gui.sample_lyric_widget.path.boundingRect().height()
-            secondary_screen_height = self.gui.secondary_screen.size().height()
-            preferred_height = secondary_screen_height - footer_height
-
-            if lyric_widget_height > preferred_height:
-                segment_text_split = re.split('<br.*?/>', segment_text)
-                half_lines = int(len(segment_text_split) / 2)
-
-                halves = [[], []]
-                for i in range(half_lines):
-                    halves[0].append(segment_text_split[i])
-
-                for i in range(half_lines, len(segment_text_split)):
-                    halves[1].append(segment_text_split[i])
-
-                half_num = 1
-                for half in halves:
-                    text = '<br />'.join(half)
-
-                    if text.startswith('<p'):
-                        text = text + '</p>'
-                    else:
-                        text = '<p style="text-align: center; line-height: 120%;">' + text
-
-                    segment_count += 1
-
-                    if '</b>' in text and '<b>' not in text:
-                        text = '<b>' + text
-                    if '</i>' in text and '<i>' not in text:
-                        text = '<i>' + text
-                    if '</u>' in text and '<u>' not in text:
-                        text = '<u>' + text
-
-                    if '<b>' in text and '</b>' not in text:
-                        text = text + '</b>'
-                    if '<i>' in text and '</i>' not in text:
-                        text = text + '</i>'
-                    if '<u>' in text and '</u>' not in text:
-                        text = text + '</u>'
-
-                    segments.append([segment, segment_title + ' - ' + str(half_num), text])
-                    half_num += 1
-            else:
-                segments.append([segment, segment_title, segment_text])
-
-        return segments
-
     def populate_custom_list(self):
         """
         Method that uses the data contained in the custom slide table of the database to create QListWidgetItems in the
@@ -713,29 +508,14 @@ class MediaWidget(QTabWidget):
         slides = self.gui.main.get_all_custom_slides()
         if len(slides) > 0:
             for item in slides:
-                text = item[1]
-                text = re.sub('<p.*?>', '', text)
-                text = text.replace('</p>', '')
+                slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+                slide_data['type'] = 'custom'
+                for i in range(len(item)):
+                    slide_data[declarations.SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = item[i]
 
-                if text.startswith('<br />'):
-                    text = text[6:]
-                if text.endswith('<br />'):
-                    text = text[:len(text) - 6]
+                widget_item = QListWidgetItem(slide_data['title'])
+                widget_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-                text = text.replace('\n', '<br />')
-                text = '<p style="text-align: center; line-height: 120%;">' + text + '</p>'
-
-                widget_item = QListWidgetItem(item[0])
-                widget_item.setData(20, item[0])
-                widget_item.setData(21, text)
-
-                for i in range(2, 13):
-                    widget_item.setData(25 + i, item[i])
-                widget_item.setData(40, 'custom')
-                for i in range(13, 20):
-                    widget_item.setData(28 + i, item[i])
-
-                widget_item.setData(24, ['', item[0], text])
                 self.custom_list.addItem(widget_item)
 
         """
@@ -760,6 +540,7 @@ class MediaWidget(QTabWidget):
         data 45: Loop Audio
         data 46: Auto Play
         data 47: Slide Delay (for Auto Play)
+        data 48: Split Slides
         """
 
     def populate_image_list(self):
@@ -775,16 +556,20 @@ class MediaWidget(QTabWidget):
             thumbnails = cursor.execute('SELECT * FROM imageThumbnails ORDER BY fileName').fetchall()
 
             for record in thumbnails:
+                file_name = record[0]
+                thumbnail_data = record[1]
                 pixmap = QPixmap()
-                pixmap.loadFromData(record[1])
+                pixmap.loadFromData(thumbnail_data)
 
-                widget = StandardItemWidget(self.gui, record[0], '', pixmap)
+                widget = StandardItemWidget(self.gui, file_name, '', pixmap)
+                slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+                slide_data['type'] = 'image'
+                slide_data['title'] = file_name
+                slide_data['file_name'] = file_name
+                slide_data['thumbnail'] = pixmap
 
                 item = QListWidgetItem()
-                item.setData(20, record[0])
-                item.setData(21, record[1])
-                item.setData(40, 'image')
-                item.setData(24, ['', record[0], record[1]])
+                item.setData(Qt.ItemDataRole.UserRole, slide_data)
                 item.setSizeHint(widget.sizeHint())
                 self.image_list.addItem(item)
                 self.image_list.setItemWidget(item, widget)
@@ -814,10 +599,13 @@ class MediaWidget(QTabWidget):
                         pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
                         widget = StandardItemWidget(self.gui, video_file.split('.')[0], '', pixmap)
+                        slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+                        slide_data['type'] = 'video'
+                        slide_data['title'] = video_file
+                        slide_data['file_name'] = video_file
 
                         item = QListWidgetItem()
-                        item.setData(20, video_file)
-                        item.setData(40, 'video')
+                        item.setData(Qt.ItemDataRole.UserRole, slide_data)
                         item.setSizeHint(widget.sizeHint())
 
                         self.video_list.addItem(item)
@@ -840,13 +628,16 @@ class MediaWidget(QTabWidget):
 
             if len(results) > 0:
                 for record in results:
+                    title = record[0]
+                    url = record[1]
                     item = QListWidgetItem()
-                    item.setData(20, record[0])
-                    item.setData(21, record[1])
-                    item.setData(40, 'web')
-                    item.setData(24, ['', record[0], record[1]])
+                    slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+                    slide_data['type'] = 'web'
+                    slide_data['title'] = title
+                    slide_data['url'] = url
+                    item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-                    widget = StandardItemWidget(self.gui, record[0], record[1])
+                    widget = StandardItemWidget(self.gui, title, url)
 
                     self.web_list.addItem(item)
                     item.setSizeHint(widget.sizeHint())
@@ -949,11 +740,13 @@ class MediaWidget(QTabWidget):
             version = self.bible_selector_combobox.currentText()
 
             item = QListWidgetItem()
-            item.setData(20, reference)
-            item.setData(21, self.gui.parse_scripture_by_verse(self.passages[1]))
-            item.setData(23, version)
-            item.setData(40, 'bible')
-            item.setData(24, ['', reference, self.passages[1]])
+            slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+            slide_data['type'] = 'bible'
+            slide_data['title'] = reference
+            slide_data['text'] = self.passages[1]
+            slide_data['parsed_text'] = parsers.parse_scripture_by_verse(self.gui, self.passages[1])
+            slide_data['author'] = version
+            item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
             self.gui.send_to_preview(item)
             self.gui.preview_widget.slide_list.setCurrentRow(0)
@@ -1005,7 +798,7 @@ class MediaWidget(QTabWidget):
         Method to remove an image from the program's database and data directory. Creates a QMessageBox to
         ask for confirmation, then deletes the file from the data directory and reindexes the images in the database.
         """
-        file_name = self.image_list.currentItem().data(20)
+        file_name = self.image_list.currentItem().data(Qt.ItemDataRole.UserRole)['file_name']
         response = QMessageBox.question(
             self.gui.main_window,
             'Really Delete',
@@ -1144,7 +937,11 @@ class MediaWidget(QTabWidget):
                 thumbnail_list.setObjectName('thumbnail_list')
                 thumbnail_list.currentItem()
                 thumbnail_list.itemClicked.connect(
-                    lambda: self.copy_video(file_name, thumbnail_list.currentItem().data(20), thumbnail_widget))
+                    lambda: self.copy_video(
+                        file_name, thumbnail_list.currentItem().data(Qt.ItemDataRole.UserRole)['title'],
+                        thumbnail_widget
+                    )
+                )
                 thumbnail_layout.addWidget(thumbnail_list)
 
                 file_list = os.listdir(os.path.expanduser("~/AppData/Roaming/ProjectOn"))
@@ -1223,16 +1020,19 @@ class MediaWidget(QTabWidget):
             item.setText(None)
 
             # Create a thumbnail of either the global song background or the custom background associated with this song
-            if not item.data(37) or item.data(37) == 'False' or item.data(37) == 'global_song':
+            item_data = item.data(Qt.ItemDataRole.UserRole)
+            if (not item_data['background']
+                    or item_data['background'] == 'False'
+                    or item_data['background'] == 'global_song'):
                 pixmap = self.gui.global_song_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif item.data(29) == 'global_bible':
+            elif item_data['background'] == 'global_bible':
                 pixmap = self.gui.global_bible_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif 'rgb(' in item.data(29):
+            elif 'rgb(' in item_data['background']:
                 pixmap = QPixmap(50, 27)
                 painter = QPainter(pixmap)
-                rgb = item.data(29).replace('rgb(', '')
+                rgb = item_data['background'].replace('rgb(', '')
                 rgb = rgb.replace(')', '')
                 rgb_split = rgb.split(',')
                 brush = QBrush(QColor.fromRgb(
@@ -1241,10 +1041,10 @@ class MediaWidget(QTabWidget):
                 painter.fillRect(pixmap.rect(), brush)
                 painter.end()
             else:
-                pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
+                pixmap = QPixmap(self.gui.main.background_dir + '/' + item_data['background'])
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-            widget = StandardItemWidget(self.gui, item.data(20), 'Song', pixmap)
+            widget = StandardItemWidget(self.gui, item_data['title'], 'Song', pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if not row:
@@ -1257,31 +1057,31 @@ class MediaWidget(QTabWidget):
         if item and from_load_service:
             # handle this differently if it's being created while loading a service file
             widget_item = QListWidgetItem()
-            for i in range(20, 50):
-                widget_item.setData(i, item.data(i))
-            widget_item.setData(24, self.parse_song_data(item))
+            slide_data = item.data(Qt.ItemDataRole.UserRole).copy()
+            slide_data['parsed_text'] = (parsers.parse_song_data(self.gui, slide_data))
+            widget_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-            if not item.data(37) or item.data(37) == 'False' or item.data(37) == 'global_song':
+            if not slide_data['background'] or slide_data['background'] == 'False' or slide_data['background'] == 'global_song':
                 pixmap = self.gui.global_song_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                        Qt.TransformationMode.SmoothTransformation)
-            elif item.data(29) == 'global_bible':
+            elif slide_data['background'] == 'global_bible':
                 pixmap = self.gui.global_bible_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                        Qt.TransformationMode.SmoothTransformation)
-            elif 'rgb(' in widget_item.data(29):
+            elif 'rgb(' in slide_data['background']:
                 pixmap = QPixmap(50, 27)
                 painter = QPainter(pixmap)
-                brush = QBrush(QColor(widget_item.data(29)))
+                brush = QBrush(QColor(slide_data['background']))
                 painter.setBrush(brush)
                 painter.fillRect(pixmap.rect(), brush)
                 painter.end()
             else:
-                pixmap = QPixmap(self.gui.main.background_dir + '/' + widget_item.data(29))
+                pixmap = QPixmap(self.gui.main.background_dir + '/' + slide_data['background'])
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                        Qt.TransformationMode.SmoothTransformation)
 
-            widget = StandardItemWidget(self.gui, item.data(20), 'Song', pixmap)
+            widget = StandardItemWidget(self.gui, slide_data['title'], 'Song', pixmap)
 
             widget_item.setSizeHint(widget.sizeHint())
             self.gui.oos_widget.oos_list_widget.addItem(widget_item)
@@ -1311,31 +1111,33 @@ class MediaWidget(QTabWidget):
         """
         if not item and self.custom_list.currentItem():
             item = QListWidgetItem()
+            item.setData(Qt.ItemDataRole.UserRole, self.custom_list.currentItem().data(Qt.ItemDataRole.UserRole))
             for i in range(20, 50):
                 item.setData(i, self.custom_list.currentItem().data(i))
         elif not item and not self.custom_list.currentItem():
             return
 
-        if not item.data(29):
+        item_data = item.data(Qt.ItemDataRole.UserRole)
+        if not item_data['background']:
             pixmap = self.gui.global_bible_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        elif item.data(29) == 'global_song':
+        elif item_data['background'] == 'global_song':
             pixmap = self.gui.global_song_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        elif item.data(29) == 'global_bible':
+        elif item_data['background'] == 'global_bible':
             pixmap = self.gui.global_bible_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        elif 'rgb(' in item.data(29):
+        elif 'rgb(' in item_data['background']:
             pixmap = QPixmap(50, 27)
             painter = QPainter(pixmap)
-            brush = QBrush(QColor(item.data(29)))
+            brush = QBrush(QColor(item_data['background']))
             painter.fillRect(pixmap.rect(), brush)
             painter.end()
         else:
-            pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
+            pixmap = QPixmap(self.gui.main.background_dir + '/' + item_data['background'])
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-        widget = StandardItemWidget(self.gui, item.data(20), 'Custom Slide', pixmap)
+        widget = StandardItemWidget(self.gui, item_data['title'], 'Custom Slide', pixmap)
         item.setText(None)
         item.setSizeHint(widget.sizeHint())
         if not row:
@@ -1357,15 +1159,13 @@ class MediaWidget(QTabWidget):
                 item = QListWidgetItem()
                 add_item = True
 
-            for i in range(20, 50):
-                item.setData(i, self.image_list.currentItem().data(i))
+            slide_data = self.image_list.currentItem().data(Qt.ItemDataRole.UserRole).copy()
+            item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-            pixmap = QPixmap()
-            pixmap.loadFromData(self.image_list.currentItem().data(21), 'JPG')
+            pixmap = slide_data['thumbnail']
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
-
-            widget = StandardItemWidget(self.gui, item.data(20), 'Image', pixmap)
+            widget = StandardItemWidget(self.gui, slide_data['title'], 'Image', pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if add_item:
@@ -1386,10 +1186,7 @@ class MediaWidget(QTabWidget):
             if not item:
                 item = QListWidgetItem()
                 add_item = True
-            item.setData(20, self.web_list.currentItem().data(20))
-            item.setData(21, self.web_list.currentItem().data(21))
-            item.setData(40, 'web')
-            item.setData(24, ['', self.web_list.currentItem().data(20), self.web_list.currentItem().data(21)])
+            item.setData(Qt.ItemDataRole.UserRole, self.web_list.currentItem().data(Qt.ItemDataRole.UserRole).copy())
 
             pixmap = QPixmap(50, 27)
             painter = QPainter(pixmap)
@@ -1404,7 +1201,8 @@ class MediaWidget(QTabWidget):
             painter.end()
 
             widget = StandardItemWidget(
-                self.gui, item.data(20), self.web_list.currentItem().data(21), pixmap)
+                self.gui, item.data(
+                    Qt.ItemDataRole.UserRole)['title'], item.data(Qt.ItemDataRole.UserRole)['url'], pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if add_item:
@@ -1425,15 +1223,16 @@ class MediaWidget(QTabWidget):
             if not item:
                 item = QListWidgetItem()
                 add_item = True
-            item.setData(20,  self.video_list.currentItem().data(20))
-            item.setData(40, 'video')
+            slide_data = self.video_list.currentItem().data(Qt.ItemDataRole.UserRole).copy()
+            item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
             pixmap = QPixmap(
-                self.gui.main.video_dir + '/' + self.video_list.currentItem().data(20).split('.')[0] + '.jpg')
-            pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                self.gui.main.video_dir + '/' + slide_data['file_name'].split('.')[0] + '.jpg')
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                   Qt.TransformationMode.SmoothTransformation)
 
             widget = StandardItemWidget(
-                self.gui, self.video_list.currentItem().data(20).split('.')[0], 'Video', pixmap)
+                self.gui, slide_data['title'].split('.')[0], 'Video', pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if add_item:
@@ -1521,15 +1320,16 @@ class CustomListWidget(QListWidget):
         Overrides mouseDoubleClickEvent to provide the ability to add an item to the order of service upon double-click.
         :param QMouseEvent evt: mouseEvent
         """
-        if self.currentItem().data(40) == 'song':
+        # TODO: Change this to work with new data structure
+        if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.add_song_to_service()
-        elif self.currentItem().data(40) == 'custom':
+        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
             self.gui.media_widget.add_custom_to_service()
-        elif self.currentItem().data(40) == 'web':
+        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'web':
             self.gui.media_widget.add_web_to_service()
-        elif self.currentItem().data(40) == 'image':
+        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'image':
             self.gui.media_widget.add_image_to_service()
-        elif self.currentItem().data(40) == 'video':
+        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'video':
             self.gui.media_widget.add_video_to_service()
 
         self.gui.oos_widget.oos_list_widget.setCurrentRow(self.gui.oos_widget.oos_list_widget.count() - 1)
@@ -1540,8 +1340,10 @@ class CustomListWidget(QListWidget):
         Method to send the current item to the preview widget upon the current item being changed.
         """
         if self.currentItem():
-            if self.currentItem().data(40) == 'song' and isinstance(self.currentItem().data(24), dict):
-                self.currentItem().setData(24, self.gui.media_widget.parse_song_data(self.currentItem()))
+            if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+                item_data = self.currentItem().data(Qt.ItemDataRole.UserRole)
+                item_data['parsed_text'] = parsers.parse_song_data(self.gui, item_data)
+                self.currentItem().setData(Qt.ItemDataRole.UserRole, item_data)
             self.gui.send_to_preview(self.currentItem())
 
     def edit_song(self):
@@ -1549,11 +1351,11 @@ class CustomListWidget(QListWidget):
         Method to create a EditWidget for a song or custom slide.
         """
         if self.itemAt(self.item_pos):
-            if self.currentItem().data(40) == 'song':
+            if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
                 item_text = self.itemAt(self.item_pos).text()
                 song_info = self.gui.main.get_song_data(item_text)
                 self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text)
-            elif self.currentItem().data(40) == 'custom':
+            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 item_text = self.itemAt(self.item_pos).text()
                 custom_info = self.gui.main.get_custom_data(item_text)
                 self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text)
@@ -1565,22 +1367,24 @@ class CustomListWidget(QListWidget):
         response = QMessageBox.question(
             self.gui.main_window,
             'Really Delete',
-            'Really delete ' + self.currentItem().data(20) + '? This action cannot be undone.',
+            'Really delete '
+                + self.currentItem().data(Qt.ItemDataRole.UserRole)['type']
+                + '? This action cannot be undone.',
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
         )
 
         if response == QMessageBox.StandardButton.Yes:
             self.gui.main.delete_item(self.currentItem())
 
-        if self.currentItem().data(40) == 'song':
+        if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.populate_song_list()
-        elif self.currentItem().data(40) == 'custom':
+        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
             self.gui.media_widget.populate_custom_list()
-        elif self.currentItem().data(40) == 'image':
+        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'image':
             self.gui.media_widget.populate_image_list()
-        elif self.currentItem().data(40) == 'video':
+        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'video':
             self.gui.media_widget.populate_video_list()
-        elif self.currentItem().data(40) == 'web':
+        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'web':
             self.gui.media_widget.populate_web_list()
 
         self.gui.preview_widget.slide_list.clear()

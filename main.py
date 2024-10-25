@@ -40,6 +40,8 @@ from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QAction, QDialog, QLineEdit, QPushButton
 
+import declarations
+from declarations import DB_STRUCTURE
 from gui import GUI
 from simple_splash import SimpleSplash
 from web_remote import RemoteServer
@@ -452,19 +454,20 @@ class ProjectOn(QObject):
                        'audio_file="' + custom_data[16] + '", '
                        'loop_audio="' + custom_data[17] + '", '
                        'auto_play="' + custom_data[18] + '", '
-                       'slide_delay="' + custom_data[19] + '" '
+                       'slide_delay="' + custom_data[19] + '", '
+                       'split_slides="' + custom_data[20] + '" '
                        'WHERE title="' + old_title + '";')
             else:
                 sql = ('INSERT INTO customSlides (title, text, font, fontColor, background, font_size, use_shadow, '
                        'shadow_color, shadow_offset, use_outline, outline_color, outline_width, override_global, '
-                       'use_shade, shade_color, shade_opacity, audio_file, loop_audio, auto_play, slide_delay)'
-                       ' VALUES ("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2]
+                       'use_shade, shade_color, shade_opacity, audio_file, loop_audio, auto_play, slide_delay, '
+                       'split_slides) VALUES ("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2]
                        + '","' + custom_data[3] + '","' + custom_data[4] + '","' + custom_data[5]
                        + '","' + custom_data[6] + '","' + custom_data[7] + '","' + custom_data[8]
                        + '","' + custom_data[9] + '","' + custom_data[10] + '","' + custom_data[11]
                        + '","' + custom_data[12] + '","' + custom_data[13] + '","' + custom_data[14]
                        + '","' + custom_data[15] + '","' + custom_data[16] + '","' + custom_data[17]
-                       + '","' + custom_data[18] + '","' + custom_data[19] + '");')
+                       + '","' + custom_data[18] + '","' + custom_data[19] + '","' + custom_data[20] + '");')
 
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
@@ -511,19 +514,20 @@ class ProjectOn(QObject):
         """
         connection = None
         try:
-            if item.data(40) == 'song':
+            if item.data(Qt.ItemDataRole.UserRole)['type'] == 'song':
                 table = 'songs'
                 description = 'Song'
-            elif item.data(40) == 'custom':
+            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 table = 'customSlides'
                 description = 'Custom Slide'
-            elif item.data(40) == 'video':
-                os.remove(self.video_dir + '/' + item.data(20))
-                filename_split = item.data(20).split('.')
+            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
+                file_name = item.data(Qt.ItemDataRole.UserRole)['file_name']
+                os.remove(self.video_dir + '/' + file_name)
+                filename_split = file_name.split('.')
                 thumbnail_filename = '.'.join(filename_split[:len(filename_split) - 1]) + '.jpg'
                 os.remove(self.video_dir + '/' + thumbnail_filename)
                 return
-            elif item.data(40) == 'web':
+            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
                 table = 'web'
                 description = 'Web Page'
             else:
@@ -531,14 +535,14 @@ class ProjectOn(QObject):
 
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
-            cursor.execute('DELETE FROM ' + table + ' WHERE title="' + item.data(20) + '"')
+            cursor.execute('DELETE FROM ' + table + ' WHERE title="' + item.data(Qt.ItemDataRole.UserRole)['title'] + '"')
             connection.commit()
             connection.close()
 
             QMessageBox.information(
                 self.gui.main_window,
                 description + 'Removed',
-                item.data(20) + ' has been removed.',
+                item.data(Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
                 QMessageBox.StandardButton.Ok
             )
         except Exception:
@@ -654,14 +658,15 @@ class ProjectOn(QObject):
             }
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
+                item_data = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
                 service_items[i] = {
-                    'title': self.gui.oos_widget.oos_list_widget.item(i).data(20),
-                    'type': self.gui.oos_widget.oos_list_widget.item(i).data(40)
+                    'title': item_data['title'],
+                    'type': item_data['type']
                 }
-                if self.gui.oos_widget.oos_list_widget.item(i).data(20) == 'custom_scripture':
-                    service_items[i]['text'] = self.gui.oos_widget.oos_list_widget.item(i).data(24)[2]
-                elif self.gui.oos_widget.oos_list_widget.item(i).data(40) == 'custom':
-                    service_items[i]['text'] = self.gui.oos_widget.oos_list_widget.item(i).data(24)[2]
+                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_scripture':
+                    service_items[i]['text'] = item_data['parsed_text']
+                elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                    service_items[i]['text'] = item_data['parsed_text']
 
             dialog_needed = True
             if self.gui.current_file:
@@ -886,32 +891,30 @@ class ProjectOn(QObject):
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
                             widget_item = QListWidgetItem()
-                            for i in range(20, 50):
-                                widget_item.setData(i, custom_item.data(i))
+                            widget_item.setData(Qt.ItemDataRole.UserRole, custom_item.data(Qt.ItemDataRole.UserRole).copy())
 
-                            if 'text' in service_dict[key].keys():
-                                slide_text = widget_item.data(24)
-                                slide_text[2] = service_dict[key]['text']
-                                widget_item.setData(21, service_dict[key]['text'])
-                                widget_item.setData(24, slide_text)
-
-                            if widget_item.data(29) == 'global_song':
+                            if widget_item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_song':
                                 pixmap = self.gui.global_song_background_pixmap
-                                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            elif widget_item.data(29) == 'global_bible':
+                                pixmap = pixmap.scaled(
+                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                            elif widget_item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_bible':
                                 pixmap = self.gui.global_bible_background_pixmap
-                                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            elif 'rgb(' in widget_item.data(29):
+                                pixmap = pixmap.scaled(
+                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                            elif 'rgb(' in widget_item.data(Qt.ItemDataRole.UserRole)['background']:
                                 pixmap = QPixmap(50, 27)
                                 painter = QPainter(pixmap)
-                                brush = QBrush(QColor(widget_item.data(29)))
+                                brush = QBrush(QColor(widget_item.data(Qt.ItemDataRole.UserRole)['background']))
                                 painter.fillRect(pixmap.rect(), brush)
                                 painter.end()
                             else:
-                                pixmap = QPixmap(self.gui.main.background_dir + '/' + widget_item.data(29))
-                                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                                pixmap = QPixmap(
+                                    self.gui.main.background_dir + '/' + widget_item.data(Qt.ItemDataRole.UserRole)['background'])
+                                pixmap = pixmap.scaled(
+                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-                            widget = StandardItemWidget(self.gui, widget_item.data(20), 'Custom', pixmap)
+                            widget = StandardItemWidget(
+                                self.gui, widget_item.data(Qt.ItemDataRole.UserRole)['title'], 'Custom', pixmap)
 
                             widget_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(widget_item)
@@ -920,8 +923,10 @@ class ProjectOn(QObject):
                     elif service_dict[key]['type'] == 'image':
                         image_item = None
                         for i in range(self.gui.media_widget.image_list.count()):
-                            if self.gui.media_widget.image_list.item(i).data(20) == service_dict[key]['title']:
+                            if (self.gui.media_widget.image_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
+                                    == service_dict[key]['title']):
                                 image_item = self.gui.media_widget.image_list.item(i).clone()
+                                break
 
                         if not image_item:
                             title = service_dict[key]['title']
@@ -935,12 +940,12 @@ class ProjectOn(QObject):
                             item = QListWidgetItem('Missing image slide: ' + service_dict[key]['title'])
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
-                            pixmap = QPixmap()
-                            pixmap.loadFromData(image_item.data(21), 'JPG')
+                            pixmap = QPixmap(image_item.data(Qt.ItemDataRole.UserRole)['thumbnail'])
                             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                                    Qt.TransformationMode.SmoothTransformation)
 
-                            widget = StandardItemWidget(self.gui, image_item.data(20), 'Image', pixmap)
+                            widget = StandardItemWidget(
+                                self.gui, image_item.data(Qt.ItemDataRole.UserRole)['title'], 'Image', pixmap)
 
                             image_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(image_item)
@@ -949,7 +954,8 @@ class ProjectOn(QObject):
                     elif service_dict[key]['type'] == 'video':
                         video_item = None
                         for i in range(self.gui.media_widget.video_list.count()):
-                            if self.gui.media_widget.video_list.item(i).data(20) == service_dict[key]['title']:
+                            if (self.gui.media_widget.video_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
+                                    == service_dict[key]['title']):
                                 video_item = self.gui.media_widget.video_list.item(i).clone()
 
                         if not video_item:
@@ -965,12 +971,13 @@ class ProjectOn(QObject):
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
                             pixmap = QPixmap(
-                                self.gui.main.video_dir + '/' + video_item.data(20).split('.')[
+                                self.gui.main.video_dir + '/' + video_item.data(Qt.ItemDataRole.UserRole)['file_name'].split('.')[
                                     0] + '.jpg')
-                            pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio,
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                                    Qt.TransformationMode.SmoothTransformation)
 
-                            widget = StandardItemWidget(self.gui, video_item.data(20), 'Video', pixmap)
+                            widget = StandardItemWidget(
+                                self.gui, video_item.data(Qt.ItemDataRole.UserRole)['title'], 'Video', pixmap)
 
                             video_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(video_item)
@@ -979,7 +986,8 @@ class ProjectOn(QObject):
                     elif service_dict[key]['type'] == 'web':
                         web_item = None
                         for i in range(self.gui.media_widget.web_list.count()):
-                            if self.gui.media_widget.web_list.item(i).data(20) == service_dict[key]['title']:
+                            if (self.gui.media_widget.web_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
+                                    == service_dict[key]['title']):
                                 web_item = self.gui.media_widget.web_list.item(i)
 
                         if not web_item:
@@ -995,11 +1003,7 @@ class ProjectOn(QObject):
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
                             item = QListWidgetItem()
-                            item.setData(20, web_item.data(20))
-                            item.setData(21, web_item.data(21))
-                            item.setData(40, 'web')
-                            item.setData(24, ['', web_item.data(20),
-                                              web_item.data(21)])
+                            item.setData(Qt.ItemDataRole.UserRole, web_item.data(Qt.ItemDataRole.UserRole).copy())
 
                             pixmap = QPixmap(50, 27)
                             painter = QPainter(pixmap)
@@ -1013,7 +1017,8 @@ class ProjectOn(QObject):
                             painter.drawText(QPoint(2, 20), 'WWW')
                             painter.end()
 
-                            widget = StandardItemWidget(self.gui, web_item.data(21), 'Web', pixmap)
+                            widget = StandardItemWidget(
+                                self.gui, web_item.data(Qt.ItemDataRole.UserRole)['title'], 'Web', pixmap)
 
                             item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(item)
@@ -1241,7 +1246,7 @@ class ProjectOn(QObject):
             try:
                 zf.extract(file, destination)
             except Exception as ex:
-                print(str(ex))
+                self.error_log()
 
         QMessageBox.information(
             self.gui.main_window,
@@ -1256,7 +1261,9 @@ class ProjectOn(QObject):
         """
         tb = traceback.walk_tb(sys.exc_info()[2])
         for frame, line_no in tb:
-            clss = str(frame.f_locals['self']).split('<')[1].split(' ')[0].split('.')[1]
+            clss = ''
+            if 'self' in frame.f_locals.keys():
+                clss = str(frame.f_locals['self']).split('<')[1].split(' ')[0].split('.')[1]
             file_name = frame.f_code.co_filename
             method = frame.f_code.co_name
             line_num = line_no
@@ -1289,66 +1296,7 @@ class ProjectOn(QObject):
         message_box.exec()
 
     def check_db(self, db_file):
-        db_structure = {
-            'backgroundThumbnails': {
-                'fileName': 'TEXT',
-                'image': 'BLOB'
-            },
-            'customSlides': {
-                'title': 'TEXT',
-                'text': 'TEXT',
-                'font': 'TEXT',
-                'fontColor': 'TEXT',
-                'background': 'TEXT',
-                'font_size': 'TEXT',
-                'use_shadow': 'TEXT',
-                'shadow_color': 'TEXT',
-                'shadow_offset': 'TEXT',
-                'use_outline': 'TEXT',
-                'outline_color': 'TEXT',
-                'outline_width': 'TEXT',
-                'override_global': 'TEXT',
-                'use_shade': 'TEXT',
-                'shade_color': 'TEXT',
-                'shade_opacity': 'TEXT',
-                'audio_file': 'TEXT',
-                'loop_audio': 'TEXT',
-                'auto_play': 'TEXT',
-                'slide_delay': 'TEXT'
-            },
-            'imageThumbnails': {
-                'fileName': 'TEXT',
-                'image': 'BLOB'
-            },
-            'songs': {
-                'title': 'TEXT',
-                'author': 'TEXT',
-                'copyright': 'TEXT',
-                'ccliNum': 'TEXT',
-                'lyrics': 'TEXT',
-                'vorder': 'TEXT',
-                'footer': 'TEXT',
-                'font': 'TEXT',
-                'fontColor': 'TEXT',
-                'background': 'TEXT',
-                'font_size': 'TEXT',
-                'use_shadow': 'TEXT',
-                'shadow_color': 'TEXT',
-                'shadow_offset': 'TEXT',
-                'use_outline': 'TEXT',
-                'outline_color': 'TEXT',
-                'outline_width': 'TEXT',
-                'override_global': 'TEXT',
-                'use_shade': 'TEXT',
-                'shade_color': 'TEXT',
-                'shade_opacity': 'TEXT'
-            },
-            'web': {
-                'title': 'TEXT',
-                'url': 'TEXT'
-            }
-        }
-
+        db_structure = declarations.DB_STRUCTURE.copy()
         connection = sqlite3.connect(db_file)
         cursor = connection.cursor()
         changes_made = False
@@ -1429,7 +1377,6 @@ class CheckFiles(QRunnable):
                 self.main.data_dir = device_specific_settings['data_dir']
 
             if exists(self.main.data_dir):
-                print('data dir found')
                 data_dir = True
 
         if not data_dir:

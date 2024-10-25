@@ -15,8 +15,11 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QSound, QAudioOutput
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction, QProgressBar, QCheckBox
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction, QProgressBar, QCheckBox, \
+    QListWidget
 
+import declarations
+import parsers
 from help import Help
 from importers import Importers
 from live_widget import LiveWidget
@@ -87,7 +90,7 @@ class GUI(QObject):
     display_logo_screen_signal = pyqtSignal()
     grab_display_signal = pyqtSignal()
     server_alert_signal = pyqtSignal()
-    change_lyric_widget_text_signal = pyqtSignal(str)
+    change_current_live_item_signal = pyqtSignal()
 
     def __init__(self, main):
         """
@@ -104,7 +107,7 @@ class GUI(QObject):
         self.display_logo_screen_signal.connect(self.display_logo_screen)
         self.grab_display_signal.connect(self.grab_display)
         self.server_alert_signal.connect(self.show_server_alert)
-        self.change_lyric_widget_text_signal.connect(self.change_lyric_widget_text)
+        self.change_current_live_item_signal.connect(self.change_current_live_item)
         self.shadow_color = 0
         self.shadow_offset = 6
         self.widget_item_background_color = 'white'
@@ -1202,134 +1205,152 @@ class GUI(QObject):
         Provides a method for sending an item, selected in the order of service list widget, to the preview list widget.
         :param QListWidgetItem item: The item selected
         """
-        if item:
-            self.preview_widget.slide_list.clear()
+        if not item or not item.data(Qt.ItemDataRole.UserRole): # don't continue if there is no item or data dictionary
+            return
+        slide_data = item.data(Qt.ItemDataRole.UserRole).copy()
+        self.preview_widget.slide_list.clear()
 
-            if item.data(40) == 'song':
-                if item.data(24):
-                    for i in range(len(item.data(24))):
-                        list_item = QListWidgetItem()
-                        for j in range(20, 50):
-                            list_item.setData(j, item.data(j))
-
-                        list_item.setData(24, [item.data(24)[i][0], item.data(24)[i][1], item.data(24)[i][2]])
-                        lyric_widget = StandardItemWidget(self, list_item.data(24)[1], list_item.data(24)[2])
-                        list_item.setSizeHint(lyric_widget.sizeHint())
-                        self.preview_widget.slide_list.addItem(list_item)
-                        self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
-
-            elif item.data(40) == 'bible':
-                title = item.data(20)
-                book_chapter = title.split(':')[0]
-                book = ' '.join(book_chapter.split(' ')[:-1]).strip()
-                current_chapter = book_chapter.replace(book, '').strip()
-
-                slide_texts = item.data(21)
-                for i in range(len(slide_texts)):
+        if slide_data['type'] == 'song':
+            if len(slide_data['parsed_text']) > 0:
+                for segment in slide_data['parsed_text']:
+                    # reduce parsed text for this item to only this item's title and text
+                    slide_data['parsed_text'] = {
+                        'title': segment['title'],
+                        'text': segment['text']
+                    }
                     list_item = QListWidgetItem()
-                    for j in range(20, 50):
-                        list_item.setData(j, item.data(j))
-                    list_item.setData(20, title)
-                    list_item.setData(21, slide_texts[i])
-                    list_item.setData(22, item.text())
-                    list_item.setData(40, 'bible')
+                    list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-                    first_num_found = False
-                    first_num = ''
-                    last_num = ''
-                    skip_next = False
-
-                    # find the verse range for each segment of scripture
-                    scripture_text = re.sub('<.*?>', '', list_item.data(21))
-                    next_chapter = False
-                    for j in range(len(scripture_text)):
-                        data = scripture_text[j]
-                        next_data = None
-                        if j < len(scripture_text) - 1:
-                            next_data = scripture_text[j + 1]
-                        num = ''
-                        if not skip_next:
-                            if data.isnumeric():
-                                num += data
-                                if next_data.isnumeric():
-                                    num += next_data
-                                    skip_next = True
-                                if not first_num_found:
-                                    first_num = num
-                                    first_num_found = True
-                                else:
-                                    last_num = num
-
-                                if i > 0 and num == '1':
-                                    next_chapter = True
-                        else:
-                            skip_next = False
-
-                    if next_chapter:
-                        current_chapter = str(int(current_chapter) + 1)
-
-                    if last_num == '':
-                        new_title = f'{book} {current_chapter}:{first_num}'
-                    else:
-                        if int(first_num) > int(last_num):
-                            new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
-                        else:
-                            new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
-
-                    list_item.setData(24, ['', new_title, slide_texts[i]])
-
-                    lyric_widget = StandardItemWidget(self, new_title, slide_texts[i], None, True)
+                    lyric_widget = StandardItemWidget(
+                        self, slide_data['parsed_text']['title'], slide_data['parsed_text']['text'])
                     list_item.setSizeHint(lyric_widget.sizeHint())
                     self.preview_widget.slide_list.addItem(list_item)
                     self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            elif item.data(40) == 'image':
-                lyric_widget = StandardItemWidget(self, item.data(20))
+        elif slide_data['type'] == 'custom':
+            # parse the text if we're splitting it into individual slides
+            slide_text = slide_data['text']
+            if (slide_data['split_slides']
+                    and slide_data['split_slides'] == 'True'):
+                slide_text = re.sub('<p.*?>', '', slide_text)
+                slide_text = re.sub('</p>', '', slide_text)
+                slide_text = re.sub('(<br />)+', '\n', slide_text)
+                slide_data['parsed_text'] = re.split('\n', slide_text)
+            else:
+                slide_data['parsed_text'] = [slide_text]
+            item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+            for text in slide_data['parsed_text']:
+                if len(text.strip()) > 0:
+                    lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
+                    list_item = QListWidgetItem()
+                    slide_data['parsed_text'] = text
+                    list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                    list_item.setSizeHint(lyric_widget.sizeHint())
+                    self.preview_widget.slide_list.addItem(list_item)
+                    self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+
+        elif slide_data['type'] == 'bible':
+            title = slide_data['title']
+            book_chapter = title.split(':')[0]
+            book = ' '.join(book_chapter.split(' ')[:-1]).strip()
+            current_chapter = book_chapter.replace(book, '').strip()
+
+            slide_texts = slide_data['parsed_text']
+            for i in range(len(slide_texts)):
                 list_item = QListWidgetItem()
-                for j in range(20, 50):
-                    list_item.setData(j, item.data(j))
+
+                first_num_found = False
+                first_num = ''
+                last_num = ''
+                skip_next = False
+
+                # find the verse range for each segment of scripture
+                scripture_text = re.sub(
+                    '<.*?>', '', slide_texts[i])
+                next_chapter = False
+                for j in range(len(scripture_text)):
+                    data = scripture_text[j]
+                    next_data = None
+                    if j < len(scripture_text) - 1:
+                        next_data = scripture_text[j + 1]
+                    num = ''
+                    if not skip_next:
+                        if data.isnumeric():
+                            num += data
+                            if next_data.isnumeric():
+                                num += next_data
+                                skip_next = True
+                            if not first_num_found:
+                                first_num = num
+                                first_num_found = True
+                            else:
+                                last_num = num
+
+                            if i > 0 and num == '1':
+                                next_chapter = True
+                    else:
+                        skip_next = False
+
+                if next_chapter:
+                    current_chapter = str(int(current_chapter) + 1)
+
+                if last_num == '':
+                    new_title = f'{book} {current_chapter}:{first_num}'
+                else:
+                    if int(first_num) > int(last_num):
+                        new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                    else:
+                        new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
+
+                list_item.setData(24, ['', new_title, slide_texts[i]])
+                slide_data['type'] = 'bible'
+                slide_data['title'] = new_title
+                slide_data['parsed_text'] = slide_texts[i]
+                slide_data['author'] = slide_data['author']
+                list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+                lyric_widget = StandardItemWidget(self, new_title, slide_texts[i], None, True)
                 list_item.setSizeHint(lyric_widget.sizeHint())
                 self.preview_widget.slide_list.addItem(list_item)
                 self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            elif item.data(40) == 'custom':
-                lyric_widget = StandardItemWidget(self, item.data(20), item.data(21))
-                list_item = QListWidgetItem()
-                for j in range(20, 50):
-                    list_item.setData(j, item.data(j))
-                list_item.setSizeHint(lyric_widget.sizeHint())
-                self.preview_widget.slide_list.addItem(list_item)
-                self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+        elif slide_data['type'] == 'image':
+            lyric_widget = StandardItemWidget(self, slide_data['file_name'])
+            list_item = QListWidgetItem()
+            list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+            list_item.setSizeHint(lyric_widget.sizeHint())
+            self.preview_widget.slide_list.addItem(list_item)
+            self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            elif item.data(40) == 'web':
-                lyric_widget = StandardItemWidget(self, item.data(20), item.data(21))
-                list_item = QListWidgetItem()
-                for j in range(20, 50):
-                    list_item.setData(j, item.data(j))
-                list_item.setSizeHint(lyric_widget.sizeHint())
-                self.preview_widget.slide_list.addItem(list_item)
-                self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+        elif slide_data['type'] == 'video':
+            self.preview_widget.slide_list.clear()
 
-            elif item.data(40) == 'video':
-                self.preview_widget.slide_list.clear()
+            pixmap = QPixmap(
+                self.main.video_dir + '/' + slide_data['file_name'].split('.')[0] + '.jpg')
+            pixmap = pixmap.scaled(
+                96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-                pixmap = QPixmap(
-                    self.main.video_dir + '/' + item.data(20).split('.')[0] + '.jpg')
-                pixmap = pixmap.scaled(
-                    96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            widget = StandardItemWidget(
+                self, slide_data['file_name'].split('.')[0], '', pixmap)
 
-                widget = StandardItemWidget(self, item.data(20).split('.')[0], '', pixmap)
+            list_item = QListWidgetItem()
+            list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+            list_item.setSizeHint(widget.sizeHint())
 
-                list_item = QListWidgetItem()
-                list_item.setData(20, item.data(20))
-                list_item.setData(40, 'video')
-                list_item.setSizeHint(widget.sizeHint())
+            self.preview_widget.slide_list.addItem(list_item)
+            self.preview_widget.slide_list.setItemWidget(list_item, widget)
 
-                self.preview_widget.slide_list.addItem(list_item)
-                self.preview_widget.slide_list.setItemWidget(list_item, widget)
+        elif slide_data['type'] == 'web':
+            lyric_widget = StandardItemWidget(self, slide_data['title'], slide_data['url'])
+            list_item = QListWidgetItem()
+            list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+            list_item.setSizeHint(lyric_widget.sizeHint())
+            self.preview_widget.slide_list.addItem(list_item)
+            self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-            self.preview_widget.slide_list.setFocus()
-            self.preview_widget.slide_list.setCurrentRow(0)
+        self.preview_widget.slide_list.setFocus()
+        self.preview_widget.slide_list.setCurrentRow(0)
 
     def send_to_live(self):
         """
@@ -1342,25 +1363,45 @@ class GUI(QObject):
             self.live_widget.slide_list.clear()
 
             item_index = self.preview_widget.slide_list.currentRow()
+            item_data = declarations.SLIDE_DATA_DEFAULTS.copy()
             for i in range(self.preview_widget.slide_list.count()):
                 original_item = self.preview_widget.slide_list.item(i)
-                size_hint = original_item.sizeHint()
+                item_data = original_item.data(Qt.ItemDataRole.UserRole).copy()
                 item = QListWidgetItem()
-                for j in range(20, 50):
-                    item.setData(j, original_item.data(j))
+                item.setData(Qt.ItemDataRole.UserRole, item_data)
 
-                if item.data(40) == 'image':
-                    lyric_widget = StandardItemWidget(self, original_item.data(20), '')
-                elif item.data(40) == 'video':
-                    lyric_widget = StandardItemWidget(self, item.data(20), '')
-                elif item.data(40) == 'song':
-                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2], wrap_subtitle=True)
+                if item_data['type'] == 'song':
+                    lyric_widget = StandardItemWidget(
+                        self,
+                        item_data['parsed_text']['title'],
+                        item_data['parsed_text']['text'],
+                        wrap_subtitle=True
+                    )
+                elif item_data['type'] == 'bible':
+                    lyric_widget = StandardItemWidget(
+                        self,
+                        item_data['title'],
+                        item_data['parsed_text'],
+                        wrap_subtitle=True
+                    )
+                elif item_data['type'] == 'custom':
+                    lyric_widget = StandardItemWidget(
+                        self,
+                        item_data['title'],
+                        item_data['parsed_text'],
+                        wrap_subtitle=True
+                    )
+                elif item_data['type'] == 'image':
+                    lyric_widget = StandardItemWidget(
+                        self, item_data['file_name'], '')
+                elif item_data['type'] == 'video':
+                    lyric_widget = StandardItemWidget(self, item_data['file_name'], '')
                 else:
-                    lyric_widget = StandardItemWidget(self, item.data(24)[1], item.data(24)[2], wrap_subtitle=True)
+                    lyric_widget = StandardItemWidget(self, item_data['title'], item_data['url'], wrap_subtitle=True)
 
+                item.setSizeHint(lyric_widget.sizeHint())
                 self.live_widget.slide_list.addItem(item)
                 self.live_widget.slide_list.setItemWidget(item, lyric_widget)
-                item.setSizeHint(size_hint)
 
             if item_index:
                 self.live_widget.slide_list.setCurrentRow(item_index)
@@ -1370,22 +1411,14 @@ class GUI(QObject):
             # create the slide buttons to be sent to the remote web page
             slide_buttons = ''
             for i in range(self.live_widget.slide_list.count()):
-                if self.live_widget.slide_list.item(i).data(40) == 'video':
-                    title = self.live_widget.slide_list.item(i).data(20)
-                elif self.live_widget.slide_list.item(i).data(40) == 'song':
-                    title = self.live_widget.slide_list.item(i).data(24)[1]
+                slide_data = self.live_widget.slide_list.item(i).data(Qt.ItemDataRole.UserRole)
+                if isinstance(slide_data['parsed_text'], dict):
+                    title = slide_data['parsed_text']['title']
+                    text = slide_data['parsed_text']['text']
                 else:
-                    title = self.live_widget.slide_list.item(i).data(24)[1]
-                if (not self.live_widget.slide_list.item(i).data(40) == 'image'
-                        and not self.live_widget.slide_list.item(i).data(40) == 'video'):
-                    if self.live_widget.slide_list.item(i).data(40) == 'song':
-                        text = self.live_widget.slide_list.item(i).data(24)[2]
-                    else:
-                        text = self.live_widget.slide_list.item(i).data(24)[2]
-                    text = re.sub('<p.*?>', '', text)
-                    text = text.replace('</p>', '')
-                else:
-                    text = ''
+                    title = slide_data['title']
+                    text = slide_data['parsed_text']
+                text = text.replace('text-align: center', 'text-align: left')
 
                 if i == 0:
                     class_tag = 'class="current"'
@@ -1403,16 +1436,16 @@ class GUI(QObject):
             self.main.remote_server.socketio.emit(
                 'change_current_oos', str(self.oos_widget.oos_list_widget.currentRow()))
 
+            # send the next item in the order of service to the preview so the user can see what's next
             if self.oos_widget.oos_list_widget.currentRow() < self.oos_widget.oos_list_widget.count() - 1:
                 self.send_to_preview(
                     self.oos_widget.oos_list_widget.item(self.oos_widget.oos_list_widget.currentRow() + 1))
             elif self.oos_widget.oos_list_widget.currentRow() == self.oos_widget.oos_list_widget.count() - 1:
                 self.send_to_preview(self.oos_widget.oos_list_widget.currentItem())
 
-            if (self.live_widget.slide_list.item(0).data(40) == 'video'
-                    or (self.live_widget.slide_list.item(0).data(40) == 'custom'
-                        and self.live_widget.slide_list.item(0).data(44)
-                        and len(self.live_widget.slide_list.item(0).data(44)) > 0)):
+            # show the play/pause/stop controls if this is a video or a custom slide with audio
+            if (item_data['type'] == 'video'
+                    or (item_data['type'] == 'custom' and item_data['audio_file'] and len(item_data['audio_file']) > 0)):
                 self.live_widget.player_controls.show()
             else:
                 self.live_widget.player_controls.hide()
@@ -1452,9 +1485,6 @@ class GUI(QObject):
             if self.timed_update:
                 self.timed_update.keep_running = False
                 self.timed_update = None
-            if self.slide_auto_play:
-                self.slide_auto_play.keep_running = False
-                self.slide_auto_play = None
 
             display_widget = self.display_widget
             lyric_widget = self.lyric_widget
@@ -1481,114 +1511,106 @@ class GUI(QObject):
         display_widget.background_label.clear()
 
         if current_item:
+            item_data = current_item.data(Qt.ItemDataRole.UserRole).copy()
+            # stop slide auto-play if the current item is not also auto-play
+            if self.slide_auto_play:
+                if not item_data['auto_play'] or not item_data['auto_play'] == 'True':
+                    self.slide_auto_play.keep_running = False
+                    self.slide_auto_play = None
+
             # set the background
-            if current_item.data(40) == 'song' or current_item.data(40) == 'custom':
-                if not current_item.data(37) or current_item.data(37) == 'False':
-                    if current_item.data(40) == 'song':
-                        display_widget.background_label.clear()
-                        display_widget.setStyleSheet('#display_widget { background-color: none }')
-                        display_widget.background_label.setPixmap(self.global_song_background_pixmap)
-                    else:
-                        display_widget.background_label.clear()
-                        display_widget.setStyleSheet('#display_widget { background-color: none }')
-                        display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
-                elif current_item.data(29) == 'global_song':
-                    display_widget.background_label.clear()
-                    display_widget.setStyleSheet('#display_widget { background-color: none } ')
+            display_widget.background_label.clear()
+            display_widget.setStyleSheet('#display_widget { background-color: none } ')
+            if item_data['type'] == 'song' or item_data['type'] == 'custom':
+                if item_data['background'] == 'global_song':
                     display_widget.background_label.setPixmap(self.global_song_background_pixmap)
-                elif current_item.data(29) == 'global_bible':
-                    display_widget.background_label.clear()
-                    display_widget.setStyleSheet('#display_widget { background-color: none } ')
+                elif item_data['background'] == 'global_bible':
                     display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
-                elif 'rgb(' in current_item.data(29):
-                    display_widget.background_label.clear()
+                elif 'rgb(' in item_data['background']:
                     display_widget.setStyleSheet(
-                        '#display_widget { background-color: ' + current_item.data(29) + '}')
-                else:
-                    display_widget.background_label.clear()
-                    display_widget.setStyleSheet('#display_widget { background-color: none } ')
-                    self.custom_pixmap = QPixmap(self.main.background_dir + '/' + current_item.data(29))
+                        '#display_widget { background-color: ' + item_data['background'] + '}')
+                elif exists(self.main.background_dir + '/' + item_data['background']):
+                    self.custom_pixmap = QPixmap(self.main.background_dir + '/' + item_data['background'])
                     display_widget.background_label.setPixmap(self.custom_pixmap)
-            elif current_item.data(40) == 'bible':
+                else:
+                    display_widget.background_label.setPixmap(self.global_song_background_pixmap)
+            elif item_data['type'] == 'bible':
                 display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
-            elif current_item.data(40) == 'image':
-                pixmap = QPixmap(self.main.image_dir + '/' + current_item.data(20))
-                display_widget.background_label.setPixmap(pixmap)
-            elif current_item.data(40) == 'web':
-                display_widget.background_label.setStyleSheet('background: black;')
-            elif current_item.data(40) == 'video':
+            elif item_data['type'] == 'image':
+                if exists(self.main.image_dir + '/' + item_data['file_name']):
+                    pixmap = QPixmap(self.main.image_dir + '/' + item_data['file_name'])
+                    display_widget.background_label.setPixmap(pixmap)
+            elif item_data['type'] == 'video':
                 display_widget.background_label.setStyleSheet('background: black;')
                 display_widget.background_label.clear()
-                pixmap = QPixmap(self.main.video_dir + '/' + current_item.data(20).split('.')[0] + '.jpg')
+                pixmap = QPixmap(self.main.video_dir + '/' + item_data['file_name'].split('.')[0] + '.jpg')
                 pixmap = pixmap.scaled(
-                    display_widget.width(), display_widget.height(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                    display_widget.width(),
+                    display_widget.height(),
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
                 display_widget.background_label.setPixmap(pixmap)
+            elif item_data['type'] == 'web':
+                display_widget.background_label.setStyleSheet('background: black;')
 
             # set the lyrics html
-            if current_item.data(40) == 'song':
-                lyrics_html = current_item.data(24)[2]
-            elif current_item.data(40) == 'bible' or current_item.data(23) == 'custom':
-                lyrics_html = current_item.data(21)
-            elif current_item.data(40) == 'image':
+            lyrics_html = ''
+            if current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+                lyrics_html = current_item.data(Qt.ItemDataRole.UserRole)['parsed_text']['text']
+            elif current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                lyrics_html = current_item.data(Qt.ItemDataRole.UserRole)['parsed_text']
+            elif item_data['type'] == 'bible' or item_data['type'] == 'custom':
+                lyrics_html = current_item.data(Qt.ItemDataRole.UserRole)['parsed_text']
+            elif item_data['type'] == 'image':
                 lyrics_html = ''
-            elif current_item.data(40) == 'custom':
-                # check if auto-play is enabled for this slide and parse the text if so
-                if current_item.data(46) and current_item.data(46) == 'True':
-                    auto_play_text = current_item.data(21)
-                    auto_play_text = re.sub('<p.*?>', '', auto_play_text)
-                    auto_play_text = re.sub('</p>', '', auto_play_text)
-                    auto_play_text = re.sub('(<br />)+', '\n', auto_play_text)
-                    auto_play_text = re.split('\n', auto_play_text)
-                    lyrics_html = auto_play_text[0]
-                else:
-                    lyrics_html = current_item.data(21)
-            elif current_item.data(40) == 'web':
+            elif item_data['type'] == 'video':
                 if widget == 'sample':
-                    lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
+                    lyrics_html = '<p style="align-text: center;">' + item_data['title'] + '</p>'
                 else:
                     lyrics_html = ''
-                    self.web_view.load(QUrl(current_item.data(21)))
-            elif current_item.data(40) == 'video':
+            elif item_data['type'] == 'web':
                 if widget == 'sample':
-                    lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
+                    lyrics_html = '<p style="align-text: center;">' + item_data['title'] + '</p>'
                 else:
                     lyrics_html = ''
+                    self.web_view.load(QUrl(item_data['url']))
 
-            #set the font, using the song's font data if override_global is True
-            if current_item.data(37) == 'True':
-                font_face = current_item.data(27)
-                font_size = int(current_item.data(30))
-                font_color = current_item.data(28)
+            # set the font
+            if 'override_global' in item_data.keys() and item_data['override_global'] == 'True':
+                font_face = item_data['font_family']
+                font_size = int(item_data['font_size'])
+                font_color = item_data['font_color']
                 use_shadow = False
-                if current_item.data(31) == 'True':
+                if item_data['use_shadow'] == 'True':
                     use_shadow = True
-                if current_item.data(32) and not current_item.data(32) == 'None':
-                    shadow_color = int(current_item.data(32))
+                if item_data['shadow_color'] and not item_data['shadow_color'] == 'None':
+                    shadow_color = int(item_data['shadow_color'])
                 else:
                     shadow_color = self.main.settings['shadow_color']
-                if current_item.data(33) and not current_item.data(33) == 'None':
-                    shadow_offset = int(current_item.data(33))
+                if item_data['shadow_offset'] and not item_data['shadow_offset'] == 'None':
+                    shadow_offset = int(item_data['shadow_offset'])
                 else:
                     shadow_offset = self.main.settings['shadow_offset']
                 use_outline = False
-                if current_item.data(34) == 'True':
+                if item_data['use_outline'] == 'True':
                     use_outline = True
-                if current_item.data(35) and not current_item.data(35) == 'None':
-                    outline_color = int(current_item.data(35))
+                if item_data['outline_color'] and not item_data['outline_color'] == 'None':
+                    outline_color = int(item_data['outline_color'])
                 else:
                     outline_color = self.main.settings['outline_color']
-                if current_item.data(36) and not current_item.data(36) == 'None':
-                    outline_width = int(current_item.data(36))
+                if item_data['outline_width'] and not item_data['outline_width'] == 'None':
+                    outline_width = int(item_data['outline_width'])
                 else:
                     outline_width = self.main.settings['outline_width']
-                if current_item.data(41) == 'True':
+                if item_data['use_shade'] == 'True':
                     use_shade = True
                 else:
                     use_shade = False
-                shade_color = int(current_item.data(42))
-                shade_opacity = int(current_item.data(43))
+                shade_color = int(item_data['shade_color'])
+                shade_opacity = int(item_data['shade_opacity'])
             else:
-                if current_item.data(40) == 'bible' or current_item.data(40) == 'custom':
+                if item_data['type'] == 'bible' or item_data['type'] == 'custom':
                     font_face = self.main.settings['bible_font_face']
                     font_size = self.main.settings['bible_font_size']
                     font_color = self.main.settings['bible_font_color']
@@ -1660,22 +1682,24 @@ class GUI(QObject):
             # set the footer text
             lyric_widget.footer_label.show()
             footer_text = ''
-            if current_item.data(26) and current_item.data(26) == 'true':
-                if len(current_item.data(21)) > 0:
-                    footer_text += current_item.data(21)
-                if len(current_item.data(22)) > 0:
-                    footer_text += '\n\u00A9' + current_item.data(22).replace('\n', ' ')
-                if len(current_item.data(23)) > 0:
-                    footer_text += '\nCCLI Song #: ' + current_item.data(23)
+            if 'use_footer' in item_data.keys() and item_data['use_footer'] == 'True':
+                if len(item_data['author']) > 0:
+                    footer_text += item_data['author']
+                if len(item_data['copyright']) > 0:
+                    footer_text += '\n\u00A9' + item_data['copyright'].replace('\n', ' ')
+                if len(item_data['ccli_song_num']) > 0:
+                    footer_text += '\nCCLI Song #: ' + item_data['ccli_song_num']
                 if len(self.main.settings['ccli_num']) > 0:
                     footer_text += '\nCCLI License #: ' + self.main.settings['ccli_num']
                 lyric_widget.footer_label.setText(footer_text)
-            elif current_item.data(40) == 'bible':
-                if current_item.data(20) == 'custom_scripture':
-                    lyric_widget.footer_label.setText('')
-                else:
-                    lyric_widget.footer_label.setText(
-                        current_item.data(20) + ' (' + current_item.data(23) + ')')
+            elif item_data['type'] == 'bible':
+                lyric_widget.footer_label.setText(
+                    current_item.data(
+                        Qt.ItemDataRole.UserRole)['title']
+                        + ' ('
+                        + current_item.data(Qt.ItemDataRole.UserRole)['author']
+                        + ')'
+                    )
             else:
                 lyric_widget.footer_label.clear()
 
@@ -1694,7 +1718,7 @@ class GUI(QObject):
 
             # hide or show the appropriate widgets.py
             if widget == 'live':
-                if not current_item.data(40) == 'video' and not current_item.data(40) == 'web':
+                if not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video' and not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
                     if not self.web_view.isHidden():
                         self.web_view.hide()
                     if not self.blackout_widget.isHidden():
@@ -1704,13 +1728,13 @@ class GUI(QObject):
                     if self.lyric_widget.isHidden():
                         self.lyric_widget.show()
                         self.lyric_widget.repaint()
-                    if current_item.data(40) == 'image':
+                    if current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'image':
                         self.lyric_widget.hide()
 
-                elif current_item.data(40) == 'video':
+                elif current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
                     self.make_video_widget()
                     self.video_widget.show()
-                    media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + current_item.data(20)))
+                    media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name']))
                     self.media_player.setMedia(media_content)
                     self.media_player.play()
 
@@ -1726,7 +1750,7 @@ class GUI(QObject):
                     if not self.logo_widget.isHidden():
                         self.logo_widget.hide()
 
-                elif current_item.data(40) == 'web':
+                elif item_data['type'] == 'web':
                     if not self.lyric_widget.isHidden():
                         self.lyric_widget.hide()
                     if not self.blackout_widget.isHidden():
@@ -1740,9 +1764,9 @@ class GUI(QObject):
                     self.live_widget.slide_list.setFocus()
 
                 # start playing audio if this is a custom slide with audio
-                if current_item.data(40) == 'custom' and current_item.data(44) and len(current_item.data(44)) > 0:
-                    if not exists(current_item.data(44)):
-                        file_name = current_item.data(44)
+                if item_data['type'] == 'custom' and item_data['audio_file'] and len(item_data['audio_file']) > 0:
+                    if not exists(item_data['file_name']):
+                        file_name = item_data['file_name']
                         file_name = file_name.replace('/', '\\')
                         QMessageBox.critical(
                             self.main_window,
@@ -1752,10 +1776,10 @@ class GUI(QObject):
                         )
                         return
 
-                    media_content = QMediaContent(QUrl.fromLocalFile(current_item.data(44)))
+                    media_content = QMediaContent(QUrl.fromLocalFile(item_data['audio_file']))
                     self.media_player = QMediaPlayer()
                     self.media_player.setMedia(media_content)
-                    if current_item.data(45) == 'True':
+                    if item_data['loop_audio'] == 'True':
                         def repeat_media():
                             if self.media_player.mediaStatus() == QMediaPlayer.MediaStatus.EndOfMedia:
                                 self.media_player.play()
@@ -1764,16 +1788,13 @@ class GUI(QObject):
                     self.media_player.play()
 
                 # cycle through text paragraphs if auto-play is enabled for this slide
-                if auto_play_text:
-                    self.slide_auto_play = SlideAutoPlay(self, auto_play_text, current_item.data(47))
+                if item_data['auto_play'] == 'True' and not self.slide_auto_play:
+                    self.slide_auto_play = SlideAutoPlay(self, auto_play_text, item_data['slide_delay'])
                     self.main.thread_pool.start(self.slide_auto_play)
-
-                    self.timed_update = TimedPreviewUpdate(self)
-                    self.main.thread_pool.start(self.timed_update)
 
             # change the preview image
             if widget == 'live':
-                if not current_item.data(40) == 'web' and not current_item.data(40) == 'video' and not auto_play_text:
+                if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
                     pixmap = display_widget.grab(display_widget.rect())
                     pixmap = pixmap.scaled(
                         int(display_widget.width() / 5), int(display_widget.height() / 5),
@@ -1790,7 +1811,7 @@ class GUI(QObject):
                     self.main.remote_server.socketio.emit(
                         'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
                 else:
-                    lyrics_html = '<p style="align-text: center;">' + current_item.data(20) + '</p>'
+                    lyrics_html = '<p style="align-text: center;">' + item_data['parsed_text'] + '</p>'
                     self.main.remote_server.socketio.emit(
                         'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
 
@@ -1802,14 +1823,16 @@ class GUI(QObject):
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
 
-    def change_lyric_widget_text(self, text):
+    def change_current_live_item(self):
         """
         slot for the change_lyric_widget_text_signal
         changes the text of the lyric widget and repaints
         :param str text: the text to change to
         """
-        self.lyric_widget.text = text
-        self.lyric_widget.repaint()
+        if self.live_widget.slide_list.currentRow() + 1 == self.live_widget.slide_list.count():
+            self.live_widget.slide_list.setCurrentRow(0)
+        else:
+            self.live_widget.slide_list.setCurrentRow(self.live_widget.slide_list.currentRow() + 1)
 
     def make_special_display_widgets(self):
         """
@@ -1948,36 +1971,6 @@ class GUI(QObject):
                 self.tool_bar.logo_screen_button.setChecked(True)
         self.live_widget.slide_list.setFocus()
 
-    def format_display_lyrics(self, lyrics):
-        """
-        Method to take the stored lyrics of a song and parse them out according to their segment markers (i.e. [V1])
-        :param str lyrics: The raw lyrics data
-        """
-        lyric_dictionary = {}
-        if lyrics:
-            if '<body' in lyrics:
-                lyrics_split = re.split('<body.*?>', lyrics)
-                lyrics = lyrics_split[1].split('</body>')[0].strip()
-                lyrics = re.sub('<p.*?>', '<p style="text-align: center;">', lyrics)
-
-            segment_markers = re.findall('\[.*?\]', lyrics)
-            segment_split = re.split('\[.*?\]', lyrics)
-
-            if len(segment_markers) > 0:
-                for i in range(len(segment_markers)):
-                    try:
-                        this_segment = segment_split[i + 1]
-                        lyric_dictionary.update({segment_markers[i]: this_segment.strip()})
-                    except IndexError:
-                        lyric_dictionary.update({segment_markers[i]: segment_split[i + 1].strip()})
-            else:
-                lyrics_split = lyrics.split('<br /><br />')
-                for i in range(len(lyrics_split)):
-                    if len(lyrics_split[i].strip()) > 0:
-                        lyric_dictionary.update({f'[Verse {i + 1}]': lyrics_split[i].strip()})
-
-        return lyric_dictionary
-
     def add_scripture_item(self, reference, text, version):
         if not reference:
             reference = 'custom_scripture'
@@ -1991,13 +1984,15 @@ class GUI(QObject):
         :return:
         """
         item = QListWidgetItem()
-        item.setData(20, reference)
-        item.setData(21, self.parse_scripture_by_verse(text))
-        item.setData(23, version)
-        item.setData(40, 'bible')
-        item.setData(24, ['', reference, text])
+        slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+        slide_data['type'] = 'bible'
+        slide_data['title'] = reference
+        slide_data['text'] = text
+        slide_data['parsed_text'] = parsers.parse_scripture_by_verse(self, text)
+        slide_data['author'] = version
+        item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-        if len(item.data(21)) == 0:
+        if len(slide_data['parsed_text']) == 0:
             QMessageBox.information(
                 self.main_window,
                 'No Verses',
@@ -2012,195 +2007,6 @@ class GUI(QObject):
         item.setSizeHint(widget.sizeHint())
         self.oos_widget.oos_list_widget.addItem(item)
         self.oos_widget.oos_list_widget.setItemWidget(item, widget)
-
-    def parse_scripture_item(self, text):
-        """
-        Method to take a scripture passage and divide it up according to what will fit on the screen given the current
-        font and size.
-        :param str text: The scripture text to be parsed
-        """
-        self.sample_lyric_widget.lyric_label.setFont(
-            QFont(self.global_font_face, self.global_font_size, QFont.Weight.Bold))
-        self.sample_lyric_widget.lyric_label.setText(
-            '<p style="text-align: center; line-height: 120%;">' + text + '<p>')
-        self.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
-        self.sample_lyric_widget.lyric_label.adjustSize()
-
-        slide_texts = []
-        if self.sample_lyric_widget.lyric_label.sizeHint().height() > 920:
-            words = text.split(' ')
-
-            self.sample_lyric_widget.lyric_label.setText('<p style="text-align: center; line-height: 120%;">')
-            self.sample_lyric_widget.lyric_label.adjustSize()
-            count = 0
-            word_index = 0
-            segment_indices = []
-            current_segment_index = 0
-            while word_index < len(words) - 1:
-                segment_indices.append([])
-                while (self.sample_lyric_widget.lyric_label.sizeHint().height() <= 920 and word_index < len(words) - 1):
-                    if count > 0:
-                        self.sample_lyric_widget.lyric_label.setText(
-                            self.sample_lyric_widget.lyric_label.text().replace(
-                                '</p>', '') + ' ' + words[word_index].strip() + ' </p>')
-                    else:
-                        self.sample_lyric_widget.lyric_label.setText(
-                            '<p style="text-align: center; line-height: 120%;">' + words[
-                                word_index].strip() + ' </p>')
-                    self.sample_lyric_widget.lyric_label.adjustSize()
-                    segment_indices[current_segment_index].append(word_index)
-                    word_index += 1
-                    count += 1
-
-                if len(segment_indices[current_segment_index]) > 1 and word_index < len(words) - 1:
-                    segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
-                    word_index -= 1
-                    current_segment_index += 1
-                elif word_index == len(words) - 1:
-                    segment_indices[current_segment_index].append(word_index)
-
-                self.sample_lyric_widget.lyric_label.setText('<p style="text-align: center; line-height: 120%;">')
-                self.sample_lyric_widget.lyric_label.adjustSize()
-                count = 0
-
-            for indices in segment_indices:
-                if len(indices) > 0:
-                    current_segment = ''
-                    for index in indices:
-                        current_segment += words[index] + ' '
-                    slide_texts.append(current_segment)
-        else:
-            slide_texts.append(f'<p style="text-align: center; line-height: 120%;">{text}</p>')
-
-        return slide_texts
-
-    def parse_scripture_by_verse(self, text):
-        """
-        Take a passage of scripture and split it according to how many verses will fit on the display screen, given
-        the current font and size.
-        :param list of str text: The bible passage to be split
-        """
-        # configure the hidden sample widget according to the current font
-        self.sample_lyric_widget.setFont(
-            QFont(self.main.settings['bible_font_face'], self.main.settings['bible_font_size'], QFont.Weight.Bold))
-        self.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
-        self.sample_lyric_widget.footer_label.adjustSize()
-        self.sample_lyric_widget.paint_text()
-
-        # get the size values for the lyric widget, footer label, and font metrics
-        slide_texts = []
-        lyric_widget_height = self.sample_lyric_widget.path.boundingRect().adjusted(
-            0, 0, self.sample_lyric_widget.outline_width, self.sample_lyric_widget.outline_width).height()
-        secondary_screen_height = self.secondary_screen.size().height()
-        font_height = self.sample_lyric_widget.fontMetrics().height()
-        footer_label_height = self.sample_lyric_widget.footer_label.height()
-        preferred_height = secondary_screen_height - footer_label_height
-
-        # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
-        # that needs to be parsed into verses and their corresponding verse numbers
-        if type(text) is str:
-            verse_numbers = []
-            skip_next = False
-            for i in range(len(text)):
-                if text[i].isnumeric() and not skip_next:
-                    verse_number = text[i]
-                    if i < len(text) - 1 and text[i + 1].isnumeric():
-                        verse_number += text[i + 1]
-                        skip_next = True
-                    verse_numbers.append(verse_number)
-                else:
-                    skip_next = False
-
-            text_split = []
-            for i in range(len(verse_numbers)):
-                verse_index = text.index(verse_numbers[i])
-                number_length = len(verse_numbers[i])
-                if i < len(verse_numbers) - 1:
-                    text_split.append(
-                        [
-                            verse_numbers[i],
-                            text[verse_index + number_length:text.index(verse_numbers[i + 1])]
-                        ]
-                    )
-                else:
-                    text_split.append([verse_numbers[i], text[verse_index + number_length:]])
-            text = text_split
-
-        verse_index = 0
-        segment_indices = []
-        current_segment_index = 0
-        recursion_count = 0
-        parse_failed = False
-        while verse_index < len(text):
-            recursion_count += 1
-            if recursion_count > len(text):
-                parse_failed = True
-                break
-
-            # keep adding verses until the text overflows its widget, remove the last verse, and add to the slide texts
-            segment_indices.append([])
-            lyric_widget_height = 0
-            count = 0
-            while lyric_widget_height < preferred_height:
-                if count > 0:
-                    if verse_index < len(text):
-                        self.sample_lyric_widget.setText(
-                            self.sample_lyric_widget.text + ' ' + text[verse_index][0] + ' ' + text[verse_index][1])
-                        self.sample_lyric_widget.paint_text()
-
-                        lyric_widget_height = self.sample_lyric_widget.path.boundingRect().adjusted(
-                            0,
-                            0,
-                            self.sample_lyric_widget.outline_width,
-                            self.sample_lyric_widget.outline_width
-                        ).height()
-                    else:
-                        break
-                else:
-                    self.sample_lyric_widget.setText(text[verse_index][0] + ' ' + text[verse_index][1])
-                    self.sample_lyric_widget.paint_text()
-
-                    lyric_widget_height = self.sample_lyric_widget.path.boundingRect().adjusted(
-                    0, 0, self.sample_lyric_widget.outline_width,
-                        self.sample_lyric_widget.outline_width).height()
-
-                segment_indices[current_segment_index].append(verse_index)
-                count += 1
-                verse_index += 1
-
-            if len(segment_indices[current_segment_index]) > 1:
-                if not verse_index == len(text):
-                    segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
-                    verse_index -= 1
-                elif verse_index == len(text) and lyric_widget_height > preferred_height:
-                    segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
-                    verse_index -= 1
-
-            elif not verse_index == len(text):
-                verse_index -= 1
-            current_segment_index += 1
-
-        # show an error message should parsing fail
-        if parse_failed:
-            QMessageBox.information(
-                self.main_window,
-                'Scripture parsing failed',
-                'A verse in this passage is too long to fit on the display screen. Consider decreasing the font '
-                'size or use a higher resolution display.',
-                QMessageBox.StandardButton.Ok
-            )
-            for verse in text:
-                if len(verse[1].strip()) > 0:
-                    slide_texts.append(verse[0] + ' ' + verse[1])
-        else:
-            for indices in segment_indices:
-                if len(indices) > 0:
-                    current_segment = ''
-                    for index in indices:
-                        current_segment += text[index][0] + ' ' + text[index][1] + ' '
-                    slide_texts.append(current_segment.strip())
-
-        return slide_texts
 
 
 class TimedPreviewUpdate(QRunnable):
@@ -2238,11 +2044,8 @@ class SlideAutoPlay(QRunnable):
         self.keep_running = True
 
     def run(self):
-        index = 0
         while self.keep_running:
-            if len(self.text[index].strip()) > 0:
-                self.gui.change_lyric_widget_text_signal.emit(self.text[index].strip())
-                time.sleep(float(self.interval))
-            index += 1
-            if index == len(self.text):
-                index = 0
+            time.sleep(float(self.interval))
+            # don't emit the signal if keep_running was changed during sleep
+            if self.keep_running:
+                self.gui.change_current_live_item_signal.emit()

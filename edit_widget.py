@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, 
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QApplication, QSpinBox
 
+import parsers
 from formattable_text_edit import FormattableTextEdit
 from simple_splash import SimpleSplash
 from widgets import StandardItemWidget, FontWidget
@@ -299,13 +300,22 @@ class EditWidget(QDialog):
 
             self.auto_play_spinbox = QSpinBox()
 
+            self.split_slides_checkbox = QCheckBox('Split Into Multiple Slides')
+            self.split_slides_checkbox.setObjectName('split_slides_checkbox')
+            self.split_slides_checkbox.setToolTip(
+                'Split the above text into individual slides wherever there is a blank line')
+            self.split_slides_checkbox.setFont(self.gui.bold_font)
+            self.split_slides_checkbox.setChecked(False)
+            self.split_slides_checkbox.stateChanged.connect(self.split_slides_changed)
+            auto_play_layout.addWidget(self.split_slides_checkbox)
+            auto_play_layout.addSpacing(20)
+
             self.auto_play_checkbox = QCheckBox('Auto-Play Slide Text')
             self.auto_play_checkbox.setObjectName('auto_play_checkbox')
             self.auto_play_checkbox.setToolTip(
                 'Use blank lines to create separate slides that will be scrolled through automatically')
             self.auto_play_checkbox.setFont(self.gui.bold_font)
             self.auto_play_checkbox.setChecked(False)
-            self.auto_play_checkbox.stateChanged.connect(self.auto_play_changed)
             auto_play_layout.addWidget(self.auto_play_checkbox)
             auto_play_layout.addSpacing(20)
 
@@ -319,13 +329,13 @@ class EditWidget(QDialog):
             auto_play_layout.addWidget(self.auto_play_spinbox)
             auto_play_layout.addStretch()
 
+            self.auto_play_checkbox.hide()
             self.auto_play_spinbox_label.hide()
             self.auto_play_spinbox.hide()
 
         self.advanced_options_widget = QWidget()
         advanced_options_layout = QVBoxLayout(self.advanced_options_widget)
         main_layout.addWidget(self.advanced_options_widget)
-        #self.advanced_options_widget.hide()
 
         self.override_global_checkbox = QCheckBox('Override Global Settings')
         self.override_global_checkbox.setObjectName('override_global_checkbox')
@@ -455,7 +465,8 @@ class EditWidget(QDialog):
             slide_type = 'bible'
 
         for i in range(self.font_widget.font_list_widget.count()):
-            if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings[slide_type + '_font_face']:
+            if (self.font_widget.font_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type']
+                    == self.gui.main.settings[slide_type + '_font_face']):
                 self.font_widget.font_list_widget.setCurrentRow(i)
                 break
 
@@ -499,9 +510,10 @@ class EditWidget(QDialog):
         if not self.add_audio_checkbox.isChecked():
             self.audio_line_edit.clear()
 
-    def auto_play_changed(self):
-        self.auto_play_spinbox_label.setVisible(self.auto_play_checkbox.isChecked())
-        self.auto_play_spinbox.setVisible(self.auto_play_checkbox.isChecked())
+    def split_slides_changed(self):
+        self.auto_play_checkbox.setVisible(self.split_slides_checkbox.isChecked())
+        self.auto_play_spinbox_label.setVisible(self.split_slides_checkbox.isChecked())
+        self.auto_play_spinbox.setVisible(self.split_slides_checkbox.isChecked())
 
     def get_audio_file(self):
         file_dialog = QFileDialog()
@@ -867,6 +879,11 @@ class EditWidget(QDialog):
         if custom_data[19]:
             self.auto_play_spinbox.setValue(int(custom_data[19]))
 
+        if custom_data[20] == 'True':
+            self.split_slides_checkbox.setChecked(True)
+        else:
+            self.split_slides_checkbox.setChecked(False)
+
         self.font_widget.blockSignals(False)
 
     def show_hide_advanced_options(self):
@@ -1136,10 +1153,12 @@ class EditWidget(QDialog):
 
         if self.old_title:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(20) == self.old_title:
+                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title'] == self.old_title:
                     new_item = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)[
                         0].clone()
-                    new_item.setData(24, self.gui.media_widget.parse_song_data(new_item))
+                    new_data = new_item.data(Qt.ItemDataRole.UserRole).copy()
+                    new_data['parsed_text'] = parsers.parse_song_data(self.gui, new_data)
+                    new_item.setData(Qt.ItemDataRole.UserRole, new_data)
                     self.gui.oos_widget.oos_list_widget.takeItem(i)
                     self.gui.media_widget.add_song_to_service(new_item, i)
                     self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
@@ -1222,6 +1241,11 @@ class EditWidget(QDialog):
             auto_play = 'False'
         slide_delay = str(self.auto_play_spinbox.value())
 
+        if self.split_slides_checkbox.isChecked():
+            split_slides = 'True'
+        else:
+            split_slides = 'False'
+
         custom_data = [
             self.title_line_edit.text(),
             text,
@@ -1242,7 +1266,8 @@ class EditWidget(QDialog):
             audio_file,
             loop_audio,
             auto_play,
-            slide_delay
+            slide_delay,
+            split_slides
         ]
 
         if self.new_custom:
@@ -1291,7 +1316,8 @@ class EditWidget(QDialog):
 
         if self.old_title:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(20) == self.old_title:
+                item_data = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+                if item_data['title'] == self.old_title:
                     self.change_thumbnail(self.gui.oos_widget.oos_list_widget.item(i))
                     new_item = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)[
                         0].clone()
@@ -1314,18 +1340,18 @@ class EditWidget(QDialog):
         :param QListWidgetItem item: The edited song/custom slide's QListWidgetItem
         :return:
         """
-        if item.data(29) == 'global_song':
+        if item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_song':
             pixmap = self.gui.global_song_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
-        elif item.data(29) == 'global_bible':
+        elif item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_bible':
             pixmap = self.gui.global_bible_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
-        elif 'rgb(' in item.data(29):
+        elif 'rgb(' in item.data(Qt.ItemDataRole.UserRole)['background']:
             pixmap = QPixmap(50, 27)
             painter = QPainter(pixmap)
-            rgb = item.data(29).replace('rgb(', '')
+            rgb = item.data(Qt.ItemDataRole.UserRole)['background'].replace('rgb(', '')
             rgb = rgb.replace(')', '')
             rgb_split = rgb.split(',')
             brush = QBrush(QColor.fromRgb(
@@ -1334,11 +1360,11 @@ class EditWidget(QDialog):
             painter.fillRect(pixmap.rect(), brush)
             painter.end()
         else:
-            pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
+            pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(Qt.ItemDataRole.UserRole)['background'])
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
 
-        item_widget = StandardItemWidget(self.gui, item.data(20), '', pixmap)
+        item_widget = StandardItemWidget(self.gui, item.data(Qt.ItemDataRole.UserRole)['text'], '', pixmap)
         item.setSizeHint(item_widget.sizeHint())
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, item_widget)
 
