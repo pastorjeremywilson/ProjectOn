@@ -1,13 +1,13 @@
 import os.path
+import shutil
 
 from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QFont, QPainterPath
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
-    QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, \
-    QSizePolicy, QAbstractScrollArea
+    QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit
 
 from simple_splash import SimpleSplash
-from widgets import FontWidget, FontSample
+from widgets import FontWidget
 
 
 class SettingsWidget(QDialog):
@@ -248,10 +248,10 @@ class SettingsWidget(QDialog):
         song_background_layout.addWidget(self.song_background_combobox)
         song_background_layout.addSpacing(20)
 
-        add_song_button = QPushButton('Import a Background')
-        add_song_button.setFont(self.gui.standard_font)
-        add_song_button.clicked.connect(self.gui.tool_bar.import_background)
-        song_background_layout.addWidget(add_song_button)
+        add_background_button = QPushButton('Import a Background')
+        add_background_button.setFont(self.gui.standard_font)
+        add_background_button.clicked.connect(self.import_background)
+        song_background_layout.addWidget(add_background_button)
         song_background_layout.addSpacing(20)
 
         delete_background_button = QPushButton('Delete a Background')
@@ -363,6 +363,50 @@ class SettingsWidget(QDialog):
             self.gui.main.copy_image(file[0])
         self.background_image_radio_button.setChecked(True)
 
+    def import_background(self):
+        result = QFileDialog.getOpenFileName(
+            self.gui.main_window, 'Choose Background Image', os.path.expanduser('~') + '/Pictures')
+        if len(result[0]) > 0:
+            try:
+                file_name_split = result[0].split('/')
+                file_name = file_name_split[len(file_name_split) - 1]
+                shutil.copy(result[0], self.gui.main.background_dir + '/' + file_name)
+            except Exception:
+                self.gui.main.error_log()
+
+            from main import IndexImages
+            ii = IndexImages(self.gui.main, 'backgrounds')
+            ii.add_image_index(self.gui.main.background_dir + '/' + file_name, 'background')
+
+            self.song_background_combobox.refresh()
+            self.bible_background_combobox.refresh()
+            self.gui.tool_bar.song_background_combobox.refresh()
+            self.gui.tool_bar.bible_background_combobox.refresh()
+
+            self.song_background_combobox.update()
+            self.bible_background_combobox.update()
+            self.gui.tool_bar.song_background_combobox.update()
+            self.gui.tool_bar.bible_background_combobox.update()
+
+            self.song_background_combobox.setCurrentIndex(
+                self.song_background_combobox.findData(
+                    self.gui.main.settings['global_song_background'])
+            )
+            self.bible_background_combobox.setCurrentIndex(
+                self.bible_background_combobox.findData(
+                    self.gui.main.settings['global_bible_background'])
+            )
+            self.gui.tool_bar.song_background_combobox.setCurrentIndex(
+                self.gui.tool_bar.song_background_combobox.findData(
+                    self.gui.main.settings['global_song_background'])
+            )
+            self.gui.tool_bar.bible_background_combobox.setCurrentIndex(
+                self.gui.tool_bar.bible_background_combobox.findData(
+                    self.gui.main.settings['global_bible_background'])
+            )
+
+            self.gui.apply_settings()
+
     def delete_background(self):
         dialog = QDialog()
         layout = QVBoxLayout()
@@ -403,6 +447,7 @@ class SettingsWidget(QDialog):
                 QMessageBox.information(
                     self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
 
+            splash = SimpleSplash(self.gui, 'Reindexing Images. Please Wait...')
             from main import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             self.gui.main.thread_pool.start(ii)
@@ -413,10 +458,29 @@ class SettingsWidget(QDialog):
             self.gui.tool_bar.song_background_combobox.refresh()
             self.gui.tool_bar.bible_background_combobox.refresh()
 
-            self.song_background_combobox.setCurrentText(self.gui.main.settings['global_song_background'])
-            self.bible_background_combobox.setCurrentText(self.gui.main.settings['global_bible_background'])
-            self.gui.tool_bar.song_background_combobox.setCurrentText(self.gui.main.settings['global_song_background'])
-            self.gui.tool_bar.bible_background_combobox.setCurrentText(self.gui.main.settings['global_bible_background'])
+            self.song_background_combobox.update()
+            self.bible_background_combobox.update()
+            self.gui.tool_bar.song_background_combobox.update()
+            self.gui.tool_bar.bible_background_combobox.update()
+
+            self.song_background_combobox.setCurrentIndex(
+                self.song_background_combobox.findData(
+                    self.gui.main.settings['global_song_background'])
+            )
+            self.bible_background_combobox.setCurrentIndex(
+                self.bible_background_combobox.findData(
+                    self.gui.main.settings['global_bible_background'])
+            )
+            self.gui.tool_bar.song_background_combobox.setCurrentIndex(
+                self.gui.tool_bar.song_background_combobox.findData(
+                    self.gui.main.settings['global_song_background'])
+            )
+            self.gui.tool_bar.bible_background_combobox.setCurrentIndex(
+                self.gui.tool_bar.bible_background_combobox.findData(
+                    self.gui.main.settings['global_bible_background'])
+            )
+
+            splash.widget.deleteLater()
 
             QMessageBox.information(
                 self,

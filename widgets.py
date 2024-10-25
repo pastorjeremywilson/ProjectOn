@@ -113,6 +113,8 @@ class ImageCombobox(QComboBox):
 
     def index_changed(self):
         file_name = self.itemData(self.currentIndex(), Qt.ItemDataRole.UserRole)
+        if not file_name:
+            return
         if self.type == 'logo':
             self.gui.main.settings['logo_image'] = file_name
         elif self.type == 'song':

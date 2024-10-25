@@ -952,11 +952,21 @@ class GUI(QObject):
         Provides a method to apply all of the settings obtained from the settings json file.
         """
         try:
-            # if/else all the settings because things occur
-            if 'global_song_background' in self.main.settings.keys():
+            # if/else the settings because things occur
+            if 'global_song_background' in self.main.settings.keys() and self.main.settings['global_song_background']:
                 self.global_song_background_pixmap = QPixmap(
                     self.main.image_dir + '/' + self.main.settings['global_song_background'])
-            if 'global_bible_background' in self.main.settings.keys():
+            else:
+                self.main.settings['global_song_background'] = self.tool_bar.song_background_combobox.itemData(
+                    2, Qt.ItemDataRole.UserRole)
+                self.global_song_background_pixmap = QPixmap(
+                    self.main.image_dir + '/' + self.main.settings['global_song_background'])
+            if 'global_bible_background' in self.main.settings.keys() and self.main.settings['global_bible_background']:
+                self.global_bible_background_pixmap = QPixmap(
+                    self.main.image_dir + '/' + self.main.settings['global_bible_background'])
+            else:
+                self.main.settings['global_bible_background'] = self.tool_bar.bible_background_combobox.itemData(
+                    2, Qt.ItemDataRole.UserRole)
                 self.global_bible_background_pixmap = QPixmap(
                     self.main.image_dir + '/' + self.main.settings['global_bible_background'])
 

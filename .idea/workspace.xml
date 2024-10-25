@@ -4,19 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added documentation&#10;Removed default to bold in lyric widget text label">
-      <change afterPath="$PROJECT_DIR$/declarations.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/parsers.py" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Prior to this change, the data needed to properly display any given song, bible passage, custom slide, etc. were all stored in individual data slots in QListWidgetItem.data(int). This was getting to be overly complicated as more features were added. Now, a singular dictionary is created for each slide, with the data being stored as key:value pairs and that dictionary is stored in QListWidgetItem.data(Qt.ItemDataRole.UserRole). Or, slot number 256. All code has been changed to pull the data from this dictionary rather than the individual data slots.&#10;&#10;It appears that loading and displaying slides, as well as loading a saved service works fine. Further testing is needed in creating new items for each of the media categories, as well as deleting items.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/get_scripture.py" beforeDir="false" afterPath="$PROJECT_DIR$/get_scripture.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parse_scripture_reference.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -166,22 +157,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00033" summary="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install">
-      <option name="closed" value="true" />
-      <created>1723069148627</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1723069148627</updated>
-    </task>
-    <task id="LOCAL-00034" summary="Fixed Custom slides not properly handling unchecked override global&#10;Fixed wrong chapter number when bible passage spans chapters&#10;Updated default files for first install">
-      <option name="closed" value="true" />
-      <created>1723069257803</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1723069257803</updated>
     </task>
     <task id="LOCAL-00035" summary="Fixed problem with not handling 'global' in custom slide settings&#10;Prevented custom bible passage with no verses from being added to OOS">
       <option name="closed" value="true" />
@@ -559,7 +534,23 @@
       <option name="project" value="LOCAL" />
       <updated>1729026600450</updated>
     </task>
-    <option name="localTasksCounter" value="82" />
+    <task id="LOCAL-00082" summary="Prior to this change, the data needed to properly display any given song, bible passage, custom slide, etc. were all stored in individual data slots in QListWidgetItem.data(int). This was getting to be overly complicated as more features were added. Now, a singular dictionary is created for each slide, with the data being stored as key:value pairs and that dictionary is stored in QListWidgetItem.data(Qt.ItemDataRole.UserRole). Or, slot number 256. All code has been changed to pull the data from this dictionary rather than the individual data slots.&#10;&#10;It appears that loading and displaying slides, as well as loading a saved service works fine. Further testing is needed in creating new items for each of the media categories, as well as deleting items.">
+      <option name="closed" value="true" />
+      <created>1729875819138</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1729875819139</updated>
+    </task>
+    <task id="LOCAL-00083" summary="Prior to this change, the data needed to properly display any given song, bible passage, custom slide, etc. were all stored in individual data slots in QListWidgetItem.data(int). This was getting to be overly complicated as more features were added. Now, a singular dictionary is created for each slide, with the data being stored as key:value pairs and that dictionary is stored in QListWidgetItem.data(Qt.ItemDataRole.UserRole). Or, slot number 256. All code has been changed to pull the data from this dictionary rather than the individual data slots.&#10;&#10;It appears that loading and displaying slides, as well as loading a saved service works fine. Further testing is needed in creating new items for each of the media categories, as well as deleting items.">
+      <option name="closed" value="true" />
+      <created>1729875895752</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1729875895752</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -580,7 +571,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Prevented screen repositioning if screen settings not changed." />
     <MESSAGE value="Changed FontWidget's WindowType to a popup to facilitate auto-hide when clicked outside" />
     <MESSAGE value="Added the FontSample widget directly to the FontSettings widget, delaying updating the rest of the GUI until settings are saved." />
     <MESSAGE value="Fixed font sample background not loading correctly when first run." />
@@ -605,6 +595,7 @@
     <MESSAGE value="Added loop option to audio&#10;Changed edit widget audio buttons to icons" />
     <MESSAGE value="Added auto-play option to custom slides. Auto-play parses user's text based on blank lines." />
     <MESSAGE value="Added documentation&#10;Removed default to bold in lyric widget text label" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added documentation&#10;Removed default to bold in lyric widget text label" />
+    <MESSAGE value="Prior to this change, the data needed to properly display any given song, bible passage, custom slide, etc. were all stored in individual data slots in QListWidgetItem.data(int). This was getting to be overly complicated as more features were added. Now, a singular dictionary is created for each slide, with the data being stored as key:value pairs and that dictionary is stored in QListWidgetItem.data(Qt.ItemDataRole.UserRole). Or, slot number 256. All code has been changed to pull the data from this dictionary rather than the individual data slots.&#10;&#10;It appears that loading and displaying slides, as well as loading a saved service works fine. Further testing is needed in creating new items for each of the media categories, as well as deleting items." />
+    <option name="LAST_COMMIT_MESSAGE" value="Prior to this change, the data needed to properly display any given song, bible passage, custom slide, etc. were all stored in individual data slots in QListWidgetItem.data(int). This was getting to be overly complicated as more features were added. Now, a singular dictionary is created for each slide, with the data being stored as key:value pairs and that dictionary is stored in QListWidgetItem.data(Qt.ItemDataRole.UserRole). Or, slot number 256. All code has been changed to pull the data from this dictionary rather than the individual data slots.&#10;&#10;It appears that loading and displaying slides, as well as loading a saved service works fine. Further testing is needed in creating new items for each of the media categories, as well as deleting items." />
   </component>
 </project>
