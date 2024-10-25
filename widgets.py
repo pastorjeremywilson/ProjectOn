@@ -559,7 +559,6 @@ class LyricDisplayWidget(QWidget):
         """
         Method to paint the text onto the widget, using the prescribed outline and shadow values
         """
-        # TODO: Fix spacing between bold and regular font items
         self.path.clear()
         self.shadow_path.clear()
         self.text = re.sub('<p.*?>', '', self.text)

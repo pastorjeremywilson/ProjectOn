@@ -1320,7 +1320,6 @@ class CustomListWidget(QListWidget):
         Overrides mouseDoubleClickEvent to provide the ability to add an item to the order of service upon double-click.
         :param QMouseEvent evt: mouseEvent
         """
-        # TODO: Change this to work with new data structure
         if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.add_song_to_service()
         elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
