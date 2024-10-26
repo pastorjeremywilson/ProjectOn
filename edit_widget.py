@@ -72,6 +72,7 @@ class EditWidget(QDialog):
         """
         Create and add the necessary widgets.py to this dialog
         """
+        button_size = QSize(36, 36)
         self.setParent(self.gui.main_window)
         self.setWindowFlag(Qt.WindowType.Window)
         if self.type == 'song':
@@ -197,7 +198,6 @@ class EditWidget(QDialog):
             self.song_order_list_widget.setFont(self.gui.standard_font)
             lyrics_layout.addWidget(self.song_order_list_widget, 1, 2)
 
-        if self.type == 'song':
             tool_bar = QWidget()
             toolbar_layout = QHBoxLayout()
             tool_bar.setLayout(toolbar_layout)
@@ -256,13 +256,19 @@ class EditWidget(QDialog):
             audio_layout = QHBoxLayout(audio_widget)
             main_layout.addWidget(audio_widget)
 
-            self.add_audio_checkbox = QCheckBox('Add audio to this slide')
-            self.add_audio_checkbox.setObjectName('add_audio_checkbox')
-            self.add_audio_checkbox.setToolTip('Add an audio file that will play when this slide is shown')
-            self.add_audio_checkbox.setFont(self.gui.bold_font)
-            self.add_audio_checkbox.setChecked(False)
-            self.add_audio_checkbox.stateChanged.connect(self.add_audio_changed)
-            audio_layout.addWidget(self.add_audio_checkbox)
+            self.add_audio_button = QPushButton()
+            self.add_audio_button.setObjectName('add_audio_button')
+            self.add_audio_button.setCheckable(True)
+            self.add_audio_button.setToolTip('Add an audio file that will play when this slide is shown')
+            self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio.svg'))
+            self.add_audio_button.setIconSize(button_size)
+            self.add_audio_button.setChecked(False)
+            self.add_audio_button.released.connect(self.add_audio_changed)
+            audio_layout.addWidget(self.add_audio_button)
+
+            add_audio_label = QLabel('Add Audio')
+            add_audio_label.setFont(self.gui.bold_font)
+            audio_layout.addWidget(add_audio_label)
             audio_layout.addSpacing(20)
 
             self.audio_line_edit = QLineEdit()
@@ -300,14 +306,21 @@ class EditWidget(QDialog):
 
             self.auto_play_spinbox = QSpinBox()
 
-            self.split_slides_checkbox = QCheckBox('Split Into Multiple Slides')
-            self.split_slides_checkbox.setObjectName('split_slides_checkbox')
-            self.split_slides_checkbox.setToolTip(
+            self.split_slides_button = QPushButton()
+            self.split_slides_button.setObjectName('split_slides_button')
+            self.split_slides_button.setCheckable(True)
+            self.split_slides_button.setToolTip(
                 'Split the above text into individual slides wherever there is a blank line')
-            self.split_slides_checkbox.setFont(self.gui.bold_font)
-            self.split_slides_checkbox.setChecked(False)
-            self.split_slides_checkbox.stateChanged.connect(self.split_slides_changed)
-            auto_play_layout.addWidget(self.split_slides_checkbox)
+            self.split_slides_button.setFont(self.gui.bold_font)
+            self.split_slides_button.setIcon(QIcon('resources/gui_icons/split.svg'))
+            self.split_slides_button.setIconSize(button_size)
+            self.split_slides_button.setChecked(False)
+            self.split_slides_button.released.connect(self.split_slides_changed)
+            auto_play_layout.addWidget(self.split_slides_button)
+
+            split_slides_label = QLabel('Split Slides')
+            split_slides_label.setFont(self.gui.bold_font)
+            auto_play_layout.addWidget(split_slides_label)
             auto_play_layout.addSpacing(20)
 
             self.auto_play_checkbox = QCheckBox('Auto-Play Slide Text')
@@ -333,18 +346,30 @@ class EditWidget(QDialog):
             self.auto_play_spinbox_label.hide()
             self.auto_play_spinbox.hide()
 
+        override_button_widget = QWidget()
+        override_button_layout = QHBoxLayout(override_button_widget)
+        main_layout.addWidget(override_button_widget)
+
+        self.override_global_button = QPushButton()
+        self.override_global_button.setObjectName('override_global_button')
+        self.override_global_button.setCheckable(True)
+        self.override_global_button.setToolTip(
+            'Checking this box will apply all of the below settings to this song/custom slide')
+        self.override_global_button.setFont(self.gui.bold_font)
+        self.override_global_button.setIcon(QIcon('resources/gui_icons/override_global.svg'))
+        self.override_global_button.setIconSize(button_size)
+        self.override_global_button.setChecked(False)
+        self.override_global_button.released.connect(self.override_global_changed)
+        override_button_layout.addWidget(self.override_global_button)
+
+        override_global_label = QLabel('Override Global Settings')
+        override_global_label.setFont(self.gui.bold_font)
+        override_button_layout.addWidget(override_global_label)
+        override_button_layout.addStretch()
+
         self.advanced_options_widget = QWidget()
         advanced_options_layout = QVBoxLayout(self.advanced_options_widget)
         main_layout.addWidget(self.advanced_options_widget)
-
-        self.override_global_checkbox = QCheckBox('Override Global Settings')
-        self.override_global_checkbox.setObjectName('override_global_checkbox')
-        self.override_global_checkbox.setToolTip(
-            'Checking this box will apply all of the below settings to this song/custom slide')
-        self.override_global_checkbox.setFont(self.gui.bold_font)
-        self.override_global_checkbox.setChecked(False)
-        self.override_global_checkbox.stateChanged.connect(self.override_global_changed)
-        advanced_options_layout.addWidget(self.override_global_checkbox)
 
         if self.type == 'song':
             footer_widget = QWidget()
@@ -504,16 +529,16 @@ class EditWidget(QDialog):
         self.font_widget.font_sample.paint_font()
 
     def add_audio_changed(self):
-        self.audio_line_edit.setVisible(self.add_audio_checkbox.isChecked())
-        self.choose_file_button.setVisible(self.add_audio_checkbox.isChecked())
-        self.loop_audio_button.setVisible(self.add_audio_checkbox.isChecked())
-        if not self.add_audio_checkbox.isChecked():
+        self.audio_line_edit.setVisible(self.add_audio_button.isChecked())
+        self.choose_file_button.setVisible(self.add_audio_button.isChecked())
+        self.loop_audio_button.setVisible(self.add_audio_button.isChecked())
+        if not self.add_audio_button.isChecked():
             self.audio_line_edit.clear()
 
     def split_slides_changed(self):
-        self.auto_play_checkbox.setVisible(self.split_slides_checkbox.isChecked())
-        self.auto_play_spinbox_label.setVisible(self.split_slides_checkbox.isChecked())
-        self.auto_play_spinbox.setVisible(self.split_slides_checkbox.isChecked())
+        self.auto_play_checkbox.setVisible(self.split_slides_button.isChecked())
+        self.auto_play_spinbox_label.setVisible(self.split_slides_button.isChecked())
+        self.auto_play_spinbox.setVisible(self.split_slides_button.isChecked())
 
     def get_audio_file(self):
         file_dialog = QFileDialog()
@@ -528,12 +553,11 @@ class EditWidget(QDialog):
 
     def override_global_changed(self):
         for widget in self.advanced_options_widget.findChildren(QWidget):
-            if not widget.objectName() == 'override_global_checkbox':
+            if not widget.objectName() == 'override_global_button':
                 set_enabled = getattr(widget, 'setEnabled', None)
                 hide = getattr(widget, 'hide', None)
                 if callable(hide):
-                    #widget.setEnabled(self.override_global_checkbox.isChecked())
-                    widget.setHidden(not self.override_global_checkbox.isChecked())
+                    widget.setHidden(not self.override_global_button.isChecked())
 
     def populate_song_data(self, song_data):
         """
@@ -597,9 +621,9 @@ class EditWidget(QDialog):
 
         # set the override global checkbox
         if song_data[17] == 'True':
-            self.override_global_checkbox.setChecked(True)
+            self.override_global_button.setChecked(True)
         else:
-            self.override_global_checkbox.setChecked(False)
+            self.override_global_button.setChecked(False)
 
         # set the footer checkbox
         if song_data[6] == 'true':
@@ -738,9 +762,10 @@ class EditWidget(QDialog):
 
         # set the override global checkbox
         if custom_data[12] == 'True':
-            self.override_global_checkbox.setChecked(True)
+            self.override_global_button.setChecked(True)
         else:
-            self.override_global_checkbox.setChecked(False)
+            self.override_global_button.setChecked(False)
+        self.override_global_changed()
 
         # set the font face list widget
         if not custom_data[2] or 'global' in custom_data[2]:
@@ -864,8 +889,9 @@ class EditWidget(QDialog):
 
         # set the audio file
         if custom_data[16] and len(custom_data[6]) > 0:
-            self.add_audio_checkbox.setChecked(True)
+            self.add_audio_button.setChecked(True)
             self.audio_line_edit.setText(custom_data[16])
+        self.add_audio_changed()
         if custom_data[17] == 'True':
             self.loop_audio_button.setChecked(True)
         else:
@@ -880,9 +906,10 @@ class EditWidget(QDialog):
             self.auto_play_spinbox.setValue(int(custom_data[19]))
 
         if custom_data[20] == 'True':
-            self.split_slides_checkbox.setChecked(True)
+            self.split_slides_button.setChecked(True)
         else:
-            self.split_slides_checkbox.setChecked(False)
+            self.split_slides_button.setChecked(False)
+        self.split_slides_changed()
 
         self.font_widget.blockSignals(False)
 
@@ -1001,7 +1028,7 @@ class EditWidget(QDialog):
             )
             return
 
-        if self.override_global_checkbox.isChecked():
+        if self.override_global_button.isChecked():
             override_global = 'True'
         else:
             override_global = 'False'
@@ -1177,7 +1204,7 @@ class EditWidget(QDialog):
         Method to save user's changes for the custom slide type editor.
         """
 
-        if self.override_global_checkbox.isChecked():
+        if self.override_global_button.isChecked():
             override_global = 'True'
         else:
             override_global = 'False'
@@ -1241,7 +1268,7 @@ class EditWidget(QDialog):
             auto_play = 'False'
         slide_delay = str(self.auto_play_spinbox.value())
 
-        if self.split_slides_checkbox.isChecked():
+        if self.split_slides_button.isChecked():
             split_slides = 'True'
         else:
             split_slides = 'False'

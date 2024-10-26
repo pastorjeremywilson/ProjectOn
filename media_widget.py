@@ -474,30 +474,6 @@ class MediaWidget(QTabWidget):
                 list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
                 self.song_list.addItem(list_item)
-        """
-        data 20: Title
-        data 21: Author
-        data 22: Copyright
-        data 23: CCLI Song Num
-        data 24: Lyrics (with <br />)
-        data 25: Verse Order
-        data 26: Footer (bool)
-        data 27: Font (global or name)
-        data 28: Font Color (global or color)
-        data 29: Background (with file type ending)
-        data 30: Font Size
-        data 31: Use Shadow
-        data 32: Shadow Color
-        data 33: Shadow Offset
-        data 34: Use Outline
-        data 35: Outline Color
-        data 36: Outline Width
-        data 37: Override Global
-        data 40: Type
-        data 41: Use Shade
-        data 42: Shade Color
-        data 43: Shade Opacity
-        """
 
     def populate_custom_list(self):
         """
@@ -517,31 +493,6 @@ class MediaWidget(QTabWidget):
                 widget_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
                 self.custom_list.addItem(widget_item)
-
-        """
-        data 20: title
-        data 21: text
-        data 27: Font (global or name)
-        data 28: Font Color (global or color)
-        data 29: Background (with file type ending)
-        data 30: Font Size
-        data 31: Use Shadow
-        data 32: Shadow Color
-        data 33: Shadow Offset
-        data 34: Use Outline
-        data 35: Outline Color
-        data 36: Outline Width
-        data 37: Override Global
-        data 40: Type
-        data 41: Use Shade
-        data 42: Shade Color
-        data 43: Shade Opacity
-        data 44: Audio File
-        data 45: Loop Audio
-        data 46: Auto Play
-        data 47: Slide Delay (for Auto Play)
-        data 48: Split Slides
-        """
 
     def populate_image_list(self):
         """
@@ -1013,8 +964,7 @@ class MediaWidget(QTabWidget):
         """
         if not item and self.song_list.currentItem():
             item = QListWidgetItem()
-            for i in range(20, 50):
-                item.setData(i, self.song_list.currentItem().data(i))
+            item.setData(Qt.ItemDataRole.UserRole, self.song_list.currentItem().data(Qt.ItemDataRole.UserRole).copy())
 
         if item and not from_load_service:
             item.setText(None)
