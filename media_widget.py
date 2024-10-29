@@ -889,7 +889,7 @@ class MediaWidget(QTabWidget):
                 thumbnail_list.currentItem()
                 thumbnail_list.itemClicked.connect(
                     lambda: self.copy_video(
-                        file_name, thumbnail_list.currentItem().data(Qt.ItemDataRole.UserRole)['title'],
+                        file_name, thumbnail_list.currentItem().data(20),
                         thumbnail_widget
                     )
                 )
