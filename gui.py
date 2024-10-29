@@ -6,6 +6,7 @@ import sys
 import tempfile
 import time
 from os.path import exists
+from typing import Union
 
 import requests
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QFileInfo, QIODevice, QFile
@@ -1583,8 +1584,11 @@ class GUI(QObject):
                 if widget == 'sample':
                     lyrics_html = '<p style="align-text: center;">' + item_data['title'] + '</p>'
                 else:
-                    lyrics_html = ''
-                    self.web_view.load(QUrl(item_data['url']))
+                    url_ok, url = self.test_url(item_data['url'])
+                    if url_ok:
+                        self.web_view.load(QUrl(url))
+                    else:
+                        lyrics_html = '<p style="align-text: center;">Unable to load webpage</p>'
 
             # set the font
             if 'override_global' in item_data.keys() and item_data['override_global'] == 'True':
@@ -1761,8 +1765,10 @@ class GUI(QObject):
                         self.logo_widget.hide()
 
                 elif item_data['type'] == 'web':
-                    if not self.lyric_widget.isHidden():
+                    if not self.lyric_widget.isHidden() and 'Unable' not in lyric_widget.text:
                         self.lyric_widget.hide()
+                    elif 'Unable' in lyric_widget.text:
+                        self.lyric_widget.show()
                     if not self.blackout_widget.isHidden():
                         self.blackout_widget.hide()
                     if not self.logo_widget.isHidden():
@@ -1832,6 +1838,52 @@ class GUI(QObject):
                     Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
+
+    def test_url(self, url):
+        response = None
+        try:
+            response = requests.get(url)
+        except requests.exceptions.MissingSchema:
+            pass
+        except requests.exceptions.ConnectionError:
+            pass
+        except requests.exceptions.InvalidSchema:
+            new_url = 'http://' + url.split('//')[1]
+            try:
+                response = requests.get(new_url)
+            except requests.exceptions.ConnectionError:
+                pass
+            if response and response.ok:
+                return True, new_url
+        if response and response.ok:
+            return True, url
+        else:
+            if not '//' in url:
+                new_url = 'http://' + url
+                try:
+                    response = requests.get(new_url)
+                except requests.exceptions.ConnectionError:
+                    pass
+                if response and response.ok:
+                    return True, new_url
+                else:
+                    new_url = 'https://' + url
+                    try:
+                        response = requests.get(new_url)
+                    except requests.exceptions.ConnectionError:
+                        pass
+                    if response and response.ok:
+                        return True, new_url
+            else:
+                new_url = '//www.'.join(url.split('//'))
+                try:
+                    response = requests.get(new_url)
+                except requests.exceptions.ConnectionError:
+                    pass
+                if response and response.ok:
+                    return True, new_url
+
+        return False, url
 
     def change_current_live_item(self):
         """

@@ -1473,27 +1473,28 @@ class IndexImages(QRunnable):
     def run(self):
         connection = sqlite3.connect(self.main.database)
         cursor = connection.cursor()
-        thumbnails = cursor.execute('SELECT fileName FROM ' + self.table).fetchall()
-        file_list = os.listdir(self.directory)
 
+        thumbnails = cursor.execute('SELECT fileName FROM ' + self.table).fetchall()
+        database_list = []
+        for record in thumbnails:
+            database_list.append(record[0])
+
+        file_list = os.listdir(self.directory)
+        file_types = ['jpg', 'png', 'svg', 'bmp']
         filtered_files = []
         for file in file_list:
             file_type = file.split('.')[1]
-            if file_type == 'jpg' or file_type == 'png' or file_type == 'svg':
+            if file_type in file_types:
                 filtered_files.append(file)
 
         reindex = False
-        for record in thumbnails:
-            if not record[0] in file_list:
+        for file in database_list:
+            if file not in filtered_files:
                 reindex = True
                 break
 
         for file in filtered_files:
-            file_found = False
-            for record in thumbnails:
-                if record[0] == file:
-                    file_found = True
-            if not file_found:
+            if file not in database_list:
                 reindex = True
                 break
 
@@ -1504,16 +1505,19 @@ class IndexImages(QRunnable):
         connection.commit()
         for file in file_list:
             file_type = file.split('.')[1]
-            if file_type == 'jpg' or file_type == 'png' or file_type == 'svg':
+            if file_type in file_types:
                 pixmap = QPixmap(self.directory + '/' + file)
-                pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                scaled_pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-                array = QByteArray()
-                buffer = QBuffer(array)
-                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-                pixmap.save(buffer, 'JPG')
-                blob = bytes(array.data())
-                cursor.execute('INSERT INTO ' + self.table + ' (fileName, image) VALUES("' + file + '", ?)', (blob,))
+                thumbnail_array = QByteArray()
+                thumbnail_buffer = QBuffer(thumbnail_array)
+                thumbnail_buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                scaled_pixmap.save(thumbnail_buffer, 'JPG')
+                thumbnail_blob = bytes(thumbnail_array.data())
+                thumbnail_buffer.close()
+
+                cursor.execute(f'INSERT INTO {self.table} (fileName, image) '
+                               f'VALUES("{file}", ?)', (thumbnail_blob,))
 
         connection.commit()
         connection.close()

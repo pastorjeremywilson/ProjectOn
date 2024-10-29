@@ -659,12 +659,14 @@ class LyricDisplayWidget(QWidget):
             else:
                 line_parts = [this_line]
 
-            this_line = re.sub('<.*?>', '', this_line)
-            line_width = self.fontMetrics().boundingRect(this_line).adjusted(
-                0, 0, self.outline_width, self.outline_width).width()
-            x = (self.width() - line_width) / 2
-            y = (self.gui.display_widget.height() / 2) - (line_height * len(lines) / 2) + (line_height / 1.5) + (i * line_height)
-
+            # text doesn't center properly if there is a bolded word, so plot the x value for all words first and
+            # get the total drawn length for this line
+            actual_line_width = 0
+            x = 0
+            y = 0
+            test_path = QPainterPath()
+            former_width = 0
+            part_x_values = []
             for part in line_parts:
                 font = self.font()
                 if '<b>' in part:
@@ -675,16 +677,44 @@ class LyricDisplayWidget(QWidget):
                     font.setUnderline(True)
 
                 part = re.sub('<.*?>', '', part)
+
                 if self.use_shadow:
-                    self.shadow_path.addText(QPointF(x + self.shadow_offset, y + self.shadow_offset), font, part)
+                    test_path.addText(QPointF(x + self.shadow_offset, y + self.shadow_offset), font, part)
                     x += self.shadow_offset
-                self.path.addText(QPointF(x, y), font, part)
+                test_path.addText(QPointF(x, y), font, part)
 
-                x += QFontMetrics(font).boundingRect(part).width()
-
-                # addText seems to strip trailing spaces, so adjust x based on the current font metrics
+                x = test_path.boundingRect().width()
+                additional_width = 0
                 if part.endswith(' '):
                     x += QFontMetrics(font).boundingRect('m m').width() - QFontMetrics(font).boundingRect('mm').width()
+                    additional_width = QFontMetrics(font).boundingRect('m m').width() - QFontMetrics(font).boundingRect('mm').width()
+
+                current_width = test_path.boundingRect().width() + additional_width
+                this_part_width = current_width - former_width
+                part_x_values.append(this_part_width)
+                former_width = current_width
+
+            actual_line_width = test_path.boundingRect().width()
+            starting_x = (self.width() - actual_line_width) / 2
+            x = starting_x
+            y = (self.gui.display_widget.height() / 2) - (line_height * len(lines) / 2) + (line_height / 1.5) + (i * line_height)
+
+            for j in range(len(line_parts)):
+                font = self.font()
+                if '<b>' in line_parts[j]:
+                    font.setWeight(1000)
+                if '<i>' in line_parts[j]:
+                    font.setItalic(True)
+                if '<u>' in line_parts[j]:
+                    font.setUnderline(True)
+
+                line_parts[j] = re.sub('<.*?>', '', line_parts[j])
+
+                if self.use_shadow:
+                    self.shadow_path.addText(QPointF(x + self.shadow_offset, y + self.shadow_offset), font, line_parts[j])
+                self.path.addText(QPointF(x, y), font, line_parts[j])
+
+                x += part_x_values[j]
 
         painter = QPainter(self)
         brush = QBrush()

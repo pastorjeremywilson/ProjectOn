@@ -490,7 +490,7 @@ class EditWidget(QDialog):
             slide_type = 'bible'
 
         for i in range(self.font_widget.font_list_widget.count()):
-            if (self.font_widget.font_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type']
+            if (self.font_widget.font_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
                     == self.gui.main.settings[slide_type + '_font_face']):
                 self.font_widget.font_list_widget.setCurrentRow(i)
                 break
@@ -1246,13 +1246,27 @@ class EditWidget(QDialog):
         text = self.lyrics_edit.text_edit.toHtml()
         text_split = re.split('<body.*?>', text)
         text = text_split[1].replace('</body></html>', '')
-        text = text.replace('"', '""').strip()
-        text = re.sub(
-            '<span style=.*?font-weight.*?>',
-            '<b>',
-            text
-        )
-        text = re.sub('</.*?span>', '</b>', text)
+
+        text = re.sub('<p.*?>', '', text)
+        text = re.sub('</p>', '', text)
+
+        # simplify the formatting tags for bold, italic, and underline
+        style_substrings = re.findall('<span.*?</span>', text)
+        for substring in style_substrings:
+            prefix = ''
+            suffix = ''
+            if 'font-weight' in substring:
+                prefix += '<b>'
+                suffix += '</b>'
+            if 'font-style' in substring:
+                prefix += '<i>'
+                suffix += '</i>'
+            if 'text-decoration' in substring:
+                prefix += '<u>'
+                suffix += '</u>'
+
+            new_substring = prefix + re.sub('<.*?>', '', substring) + suffix
+            text = text.replace(substring, new_substring)
 
         audio_file = ''
         if len(self.audio_line_edit.text()) > 0:
