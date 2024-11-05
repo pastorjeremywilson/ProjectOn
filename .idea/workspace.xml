@@ -6,8 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed text not centering properly when some words are bold.&#10;Fixed problem with underline and italic in Custom Slides.&#10;Added checks and possible corrections for unreachable urls in web items.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/openlp_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlp_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/parsers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +68,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/soundBoard&quot;,
+    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/luther_insulter&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -156,14 +160,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00039" summary="Added &quot;Known Issues&quot; section to README.md">
-      <option name="closed" value="true" />
-      <created>1723307760036</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1723307760036</updated>
     </task>
     <task id="LOCAL-00040" summary="Ensured that files created when importing a video or a SongSelect song are removed afterwards.&#10;Moved the location of the error log file to the appdata folder.">
       <option name="closed" value="true" />
@@ -549,7 +545,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730237306439</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="Fixed text not centering properly when some words are bold.&#10;Fixed problem with underline and italic in Custom Slides.&#10;Added checks and possible corrections for unreachable urls in web items.">
+      <option name="closed" value="true" />
+      <created>1730240545680</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1730240545680</updated>
+    </task>
+    <option name="localTasksCounter" value="89" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

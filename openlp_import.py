@@ -105,7 +105,7 @@ class OpenLPImport:
                 else:
                     author = ''
                 copyright = song[5]
-                ccli_song_num = song[7]
+                ccli_song_number = song[7]
                 song_order = song[4]
                 lyrics = song[3]
 
@@ -116,7 +116,7 @@ class OpenLPImport:
                         title,
                         author,
                         copyright,
-                        ccli_song_num,
+                        ccli_song_number,
                         converted_lyrics,
                         song_order,
                         'true',

@@ -1520,6 +1520,7 @@ class GUI(QObject):
             current_item = self.preview_widget.slide_list.currentItem()
 
         display_widget.background_label.clear()
+        display_widget.background_pixmap = None
 
         if current_item:
             item_data = current_item.data(Qt.ItemDataRole.UserRole).copy()
@@ -1549,8 +1550,7 @@ class GUI(QObject):
                 display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
             elif item_data['type'] == 'image':
                 if exists(self.main.image_dir + '/' + item_data['file_name']):
-                    pixmap = QPixmap(self.main.image_dir + '/' + item_data['file_name'])
-                    display_widget.background_label.setPixmap(pixmap)
+                    display_widget.background_pixmap = QPixmap(self.main.image_dir + '/' + item_data['file_name'])
             elif item_data['type'] == 'video':
                 display_widget.background_label.setStyleSheet('background: black;')
                 display_widget.background_label.clear()
@@ -1696,13 +1696,13 @@ class GUI(QObject):
             # set the footer text
             lyric_widget.footer_label.show()
             footer_text = ''
-            if 'use_footer' in item_data.keys() and item_data['use_footer'] == 'True':
+            if 'use_footer' in item_data.keys() and item_data['use_footer']:
                 if len(item_data['author']) > 0:
                     footer_text += item_data['author']
                 if len(item_data['copyright']) > 0:
                     footer_text += '\n\u00A9' + item_data['copyright'].replace('\n', ' ')
-                if len(item_data['ccli_song_num']) > 0:
-                    footer_text += '\nCCLI Song #: ' + item_data['ccli_song_num']
+                if len(item_data['ccli_song_number']) > 0:
+                    footer_text += '\nCCLI Song #: ' + item_data['ccli_song_number']
                 if len(self.main.settings['ccli_num']) > 0:
                     footer_text += '\nCCLI License #: ' + self.main.settings['ccli_num']
                 lyric_widget.footer_label.setText(footer_text)
@@ -1715,6 +1715,7 @@ class GUI(QObject):
                         + ')'
                     )
             else:
+                lyric_widget.footer_label.setText('')
                 lyric_widget.footer_label.clear()
 
             if not font_color == 'global':

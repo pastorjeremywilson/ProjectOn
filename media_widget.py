@@ -486,6 +486,7 @@ class MediaWidget(QTabWidget):
             for item in slides:
                 slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
                 slide_data['type'] = 'custom'
+                slide_data['use_footer'] = False
                 for i in range(len(item)):
                     slide_data[declarations.SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = item[i]
 
@@ -518,6 +519,7 @@ class MediaWidget(QTabWidget):
                 slide_data['title'] = file_name
                 slide_data['file_name'] = file_name
                 slide_data['thumbnail'] = pixmap
+                slide_data['use_footer'] = False
 
                 item = QListWidgetItem()
                 item.setData(Qt.ItemDataRole.UserRole, slide_data)
@@ -554,6 +556,7 @@ class MediaWidget(QTabWidget):
                         slide_data['type'] = 'video'
                         slide_data['title'] = video_file
                         slide_data['file_name'] = video_file
+                        slide_data['use_footer'] = False
 
                         item = QListWidgetItem()
                         item.setData(Qt.ItemDataRole.UserRole, slide_data)
@@ -586,6 +589,7 @@ class MediaWidget(QTabWidget):
                     slide_data['type'] = 'web'
                     slide_data['title'] = title
                     slide_data['url'] = url
+                    slide_data['use_footer'] = False
                     item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
                     widget = StandardItemWidget(self.gui, title, url)

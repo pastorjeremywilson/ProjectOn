@@ -171,7 +171,7 @@ def parse_song_data(gui, song_data):
 
         footer_text = ''
         footer_height = 0
-        if song_data['use_footer'] and song_data['use_footer'] == 'true':
+        if song_data['use_footer'] or song_data['use_footer'] == 'True':
             if len(song_data['author']) > 0:
                 footer_text += song_data['author']
             if len(song_data['copyright']) > 0:
@@ -184,12 +184,11 @@ def parse_song_data(gui, song_data):
             footer_height = gui.sample_lyric_widget.footer_label.height()
 
         gui.sample_lyric_widget.paint_text()
-        lyric_widget_height = gui.sample_lyric_widget.path.boundingRect().height()
-        secondary_screen_height = gui.secondary_screen.size().height()
-        preferred_height = secondary_screen_height - footer_height
+        lyric_widget_height = gui.sample_lyric_widget.total_height
+        target_height = gui.display_widget.height() - gui.sample_lyric_widget.footer_label.height() - 40
 
         # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
-        if lyric_widget_height > preferred_height:
+        if lyric_widget_height > target_height:
             segment_text_split = re.split('<br.*?/>', segment_text)
             half_lines = int(len(segment_text_split) / 2)
 
@@ -311,12 +310,7 @@ def parse_scripture_by_verse(gui, text):
 
     # get the size values for the lyric widget, footer label, and font metrics
     slide_texts = []
-    lyric_widget_height = gui.sample_lyric_widget.path.boundingRect().adjusted(
-        0, 0, gui.sample_lyric_widget.outline_width, gui.sample_lyric_widget.outline_width).height()
-    secondary_screen_height = gui.secondary_screen.size().height()
-    font_height = gui.sample_lyric_widget.fontMetrics().height()
-    footer_label_height = gui.sample_lyric_widget.footer_label.height()
-    preferred_height = secondary_screen_height - footer_label_height
+    target_height = gui.display_widget.height() - gui.sample_lyric_widget.footer_label.height() - 40
 
     # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
     # that needs to be parsed into verses and their corresponding verse numbers
@@ -363,28 +357,21 @@ def parse_scripture_by_verse(gui, text):
         segment_indices.append([])
         lyric_widget_height = 0
         count = 0
-        while lyric_widget_height < preferred_height:
+        while lyric_widget_height < target_height:
             if count > 0:
                 if verse_index < len(text):
                     gui.sample_lyric_widget.setText(
                         gui.sample_lyric_widget.text + ' ' + text[verse_index][0] + ' ' + text[verse_index][1])
                     gui.sample_lyric_widget.paint_text()
 
-                    lyric_widget_height = gui.sample_lyric_widget.path.boundingRect().adjusted(
-                        0,
-                        0,
-                        gui.sample_lyric_widget.outline_width,
-                        gui.sample_lyric_widget.outline_width
-                    ).height()
+                    lyric_widget_height = gui.sample_lyric_widget.total_height
                 else:
                     break
             else:
                 gui.sample_lyric_widget.setText(text[verse_index][0] + ' ' + text[verse_index][1])
                 gui.sample_lyric_widget.paint_text()
 
-                lyric_widget_height = gui.sample_lyric_widget.path.boundingRect().adjusted(
-                0, 0, gui.sample_lyric_widget.outline_width,
-                    gui.sample_lyric_widget.outline_width).height()
+                lyric_widget_height = gui.sample_lyric_widget.total_height
 
             segment_indices[current_segment_index].append(verse_index)
             count += 1
@@ -394,7 +381,7 @@ def parse_scripture_by_verse(gui, text):
             if not verse_index == len(text):
                 segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
                 verse_index -= 1
-            elif verse_index == len(text) and lyric_widget_height > preferred_height:
+            elif verse_index == len(text) and lyric_widget_height > target_height:
                 segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
                 verse_index -= 1
 
