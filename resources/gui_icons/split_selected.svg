@@ -8,7 +8,7 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
-   sodipodi:docname="split.svg"
+   sodipodi:docname="split_selected.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +101,7 @@
          id="path10" />
     </g>
     <rect
-       style="fill:none;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#00ff00;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
        id="rect1"
        width="15.874999"
        height="15.874999"

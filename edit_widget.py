@@ -2,7 +2,7 @@ import os.path
 import re
 
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QPalette
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QApplication, QSpinBox
@@ -362,7 +362,7 @@ class EditWidget(QDialog):
         self.override_global_button.released.connect(self.override_global_changed)
         override_button_layout.addWidget(self.override_global_button)
 
-        override_global_label = QLabel('Override Global Settings')
+        override_global_label = QLabel('Custom Slide Settings')
         override_global_label.setFont(self.gui.bold_font)
         override_button_layout.addWidget(override_global_label)
         override_button_layout.addStretch()
@@ -532,10 +532,17 @@ class EditWidget(QDialog):
         self.audio_line_edit.setVisible(self.add_audio_button.isChecked())
         self.choose_file_button.setVisible(self.add_audio_button.isChecked())
         self.loop_audio_button.setVisible(self.add_audio_button.isChecked())
-        if not self.add_audio_button.isChecked():
+        if self.add_audio_button.isChecked():
+            self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio_selected.svg'))
+        else:
+            self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio.svg'))
             self.audio_line_edit.clear()
 
     def split_slides_changed(self):
+        if self.split_slides_button.isChecked():
+            self.split_slides_button.setIcon(QIcon('resources/gui_icons/split_selected.svg'))
+        else:
+            self.split_slides_button.setIcon(QIcon('resources/gui_icons/split.svg'))
         self.auto_play_checkbox.setVisible(self.split_slides_button.isChecked())
         self.auto_play_spinbox_label.setVisible(self.split_slides_button.isChecked())
         self.auto_play_spinbox.setVisible(self.split_slides_button.isChecked())
@@ -552,6 +559,10 @@ class EditWidget(QDialog):
             self.audio_line_edit.setText(result[0])
 
     def override_global_changed(self):
+        if self.override_global_button.isChecked():
+            self.override_global_button.setIcon(QIcon('resources/gui_icons/override_global_selected.svg'))
+        else:
+            self.override_global_button.setIcon(QIcon('resources/gui_icons/override_global.svg'))
         for widget in self.advanced_options_widget.findChildren(QWidget):
             if not widget.objectName() == 'override_global_button':
                 set_enabled = getattr(widget, 'setEnabled', None)

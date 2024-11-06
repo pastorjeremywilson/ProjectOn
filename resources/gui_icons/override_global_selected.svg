@@ -8,7 +8,7 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
-   sodipodi:docname="override_global.svg"
+   sodipodi:docname="override_global_selected.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,8 +24,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="4.1877626"
-     inkscape:cx="90.382393"
-     inkscape:cy="59.100772"
+     inkscape:cx="90.382392"
+     inkscape:cy="59.100771"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -81,7 +81,7 @@
        id="path3" />
     <path
        id="rect1"
-       style="fill:none;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round"
+       style="fill:#00ff00;stroke:#6060c0;stroke-width:2.64583;stroke-linecap:round;stroke-linejoin:round"
        d="M 1.3229166,1.3229166 H 17.197916 V 17.197916 H 1.3229166 Z" />
     <text
        xml:space="preserve"
