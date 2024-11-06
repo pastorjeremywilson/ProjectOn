@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.4.1.030
+ProjectOn v.1.4.1.031
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -171,7 +171,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.4.1.030')
+        version_label = QLabel('v.1.4.1.031')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -891,30 +891,35 @@ class ProjectOn(QObject):
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
                             widget_item = QListWidgetItem()
-                            widget_item.setData(Qt.ItemDataRole.UserRole, custom_item.data(Qt.ItemDataRole.UserRole).copy())
+                            item_data = custom_item.data(Qt.ItemDataRole.UserRole).copy()
+                            widget_item.setData(Qt.ItemDataRole.UserRole, item_data)
 
-                            if widget_item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_song':
+                            if item_data['override_global'] == 'False' or not item_data['background']:
+                                pixmap = self.gui.global_bible_background_pixmap
+                                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                       Qt.TransformationMode.SmoothTransformation)
+                            elif item_data['background'] == 'global_song':
                                 pixmap = self.gui.global_song_background_pixmap
                                 pixmap = pixmap.scaled(
                                     50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            elif widget_item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_bible':
+                            elif item_data['background'] == 'global_bible':
                                 pixmap = self.gui.global_bible_background_pixmap
                                 pixmap = pixmap.scaled(
                                     50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            elif 'rgb(' in widget_item.data(Qt.ItemDataRole.UserRole)['background']:
+                            elif 'rgb(' in item_data['background']:
                                 pixmap = QPixmap(50, 27)
                                 painter = QPainter(pixmap)
-                                brush = QBrush(QColor(widget_item.data(Qt.ItemDataRole.UserRole)['background']))
+                                brush = QBrush(QColor(item_data['background']))
                                 painter.fillRect(pixmap.rect(), brush)
                                 painter.end()
                             else:
                                 pixmap = QPixmap(
-                                    self.gui.main.background_dir + '/' + widget_item.data(Qt.ItemDataRole.UserRole)['background'])
+                                    self.gui.main.background_dir + '/' + item_data['background'])
                                 pixmap = pixmap.scaled(
                                     50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
                             widget = StandardItemWidget(
-                                self.gui, widget_item.data(Qt.ItemDataRole.UserRole)['title'], 'Custom', pixmap)
+                                self.gui, item_data['title'], 'Custom', pixmap)
 
                             widget_item.setSizeHint(widget.sizeHint())
                             self.gui.oos_widget.oos_list_widget.addItem(widget_item)

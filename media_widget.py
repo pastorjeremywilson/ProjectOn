@@ -1015,7 +1015,10 @@ class MediaWidget(QTabWidget):
             slide_data['parsed_text'] = (parsers.parse_song_data(self.gui, slide_data))
             widget_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-            if not slide_data['background'] or slide_data['background'] == 'False' or slide_data['background'] == 'global_song':
+            if (slide_data['override_global'] == 'False'
+                or not slide_data['background']
+                or slide_data['background'] == 'False'
+                or slide_data['background'] == 'global_song'):
                 pixmap = self.gui.global_song_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                        Qt.TransformationMode.SmoothTransformation)
@@ -1072,7 +1075,7 @@ class MediaWidget(QTabWidget):
             return
 
         item_data = item.data(Qt.ItemDataRole.UserRole)
-        if not item_data['background']:
+        if item_data['override_global'] == 'False' or not item_data['background']:
             pixmap = self.gui.global_bible_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
         elif item_data['background'] == 'global_song':

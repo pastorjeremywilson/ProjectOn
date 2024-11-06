@@ -595,7 +595,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.4.1.030'
+        current_version = 'v.1.4.1.031'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -832,7 +832,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.4.1.030')
+        title_label = QLabel('ProjectOn v.1.4.1.031')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1534,7 +1534,12 @@ class GUI(QObject):
             display_widget.background_label.clear()
             display_widget.setStyleSheet('#display_widget { background-color: none } ')
             if item_data['type'] == 'song' or item_data['type'] == 'custom':
-                if item_data['background'] == 'global_song':
+                if item_data['override_global'] == 'False':
+                    if item_data['type'] == 'song':
+                        display_widget.background_label.setPixmap(self.global_song_background_pixmap)
+                    else:
+                        display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
+                elif item_data['background'] == 'global_song':
                     display_widget.background_label.setPixmap(self.global_song_background_pixmap)
                 elif item_data['background'] == 'global_bible':
                     display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
