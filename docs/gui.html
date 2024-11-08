@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module gui</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>gui</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/jeremy/Documents/Python%20Workspace/project_on/gui.py">/home/jeremy/Documents/Python Workspace/project_on/gui.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="declarations.html">declarations</a><br>
+<a href="json.html">json</a><br>
+<a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="parsers.html">parsers</a><br>
+<a href="re.html">re</a><br>
+<a href="requests.html">requests</a><br>
+</td><td width="25%" valign=top><a href="shutil.html">shutil</a><br>
+<a href="sys.html">sys</a><br>
+<a href="tempfile.html">tempfile</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a>(<a href="PyQt5.sip.html#wrapper">sip.wrapper</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="gui.html#GUI">GUI</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a>(<a href="PyQt5.sip.html#wrapper">sip.wrapper</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="gui.html#SlideAutoPlay">SlideAutoPlay</a>
+</font></dt><dt><font face="helvetica, arial"><a href="gui.html#TimedPreviewUpdate">TimedPreviewUpdate</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="GUI">class <strong>GUI</strong></a>(<a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#GUI">GUI</a>(main)<br>
+&nbsp;<br>
+Creates&nbsp;the&nbsp;user&nbsp;interface&nbsp;and&nbsp;handles&nbsp;user&nbsp;input&nbsp;that&nbsp;will&nbsp;change&nbsp;the&nbsp;interface&nbsp;or&nbsp;the&nbsp;display&nbsp;widget.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="gui.html#GUI">GUI</a></dd>
+<dd><a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a></dd>
+<dd><a href="PyQt5.sip.html#wrapper">sip.wrapper</a></dd>
+<dd><a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="GUI-__init__"><strong>__init__</strong></a>(self, main)</dt><dd><tt>:param&nbsp;ProjectOn&nbsp;main:&nbsp;The&nbsp;current&nbsp;instance&nbsp;of&nbsp;ProjectOn</tt></dd></dl>
+
+<dl><dt><a name="GUI-add_scripture_item"><strong>add_scripture_item</strong></a>(self, reference, text, version)</dt></dl>
+
+<dl><dt><a name="GUI-add_widgets"><strong>add_widgets</strong></a>(self)</dt><dd><tt>Adds&nbsp;all&nbsp;the&nbsp;necessary&nbsp;widgets.py&nbsp;to&nbsp;the&nbsp;main&nbsp;window,&nbsp;display&nbsp;screen,&nbsp;and&nbsp;sample&nbsp;widget</tt></dd></dl>
+
+<dl><dt><a name="GUI-apply_settings"><strong>apply_settings</strong></a>(self, theme_too=True)</dt><dd><tt>Provides&nbsp;a&nbsp;method&nbsp;to&nbsp;apply&nbsp;all&nbsp;of&nbsp;the&nbsp;settings&nbsp;obtained&nbsp;from&nbsp;the&nbsp;settings&nbsp;json&nbsp;file.</tt></dd></dl>
+
+<dl><dt><a name="GUI-block_unblock_remote"><strong>block_unblock_remote</strong></a>(self)</dt><dd><tt>Provides&nbsp;a&nbsp;method&nbsp;for&nbsp;blocking&nbsp;signals&nbsp;coming&nbsp;in&nbsp;through&nbsp;the&nbsp;remote&nbsp;interface.&nbsp;Needed&nbsp;during&nbsp;live&nbsp;situations<br>
+when&nbsp;someone&nbsp;on&nbsp;the&nbsp;remote&nbsp;may&nbsp;perform&nbsp;undesired&nbsp;clicks.</tt></dd></dl>
+
+<dl><dt><a name="GUI-ccli_import"><strong>ccli_import</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-change_current_live_item"><strong>change_current_live_item</strong></a>(self)</dt><dd><tt>slot&nbsp;for&nbsp;the&nbsp;change_lyric_widget_text_signal<br>
+changes&nbsp;the&nbsp;text&nbsp;of&nbsp;the&nbsp;lyric&nbsp;widget&nbsp;and&nbsp;repaints<br>
+:param&nbsp;str&nbsp;text:&nbsp;the&nbsp;text&nbsp;to&nbsp;change&nbsp;to</tt></dd></dl>
+
+<strong>change_current_live_item_signal</strong> = &lt;unbound PYQT_SIGNAL change_current_live_item_signal()&gt;
+<dl><dt><a name="GUI-change_display"><strong>change_display</strong></a>(self, widget)</dt><dd><tt>Method&nbsp;to&nbsp;change&nbsp;what&nbsp;it&nbsp;being&nbsp;displayed&nbsp;in&nbsp;the&nbsp;display&nbsp;widget&nbsp;or&nbsp;the&nbsp;hidden&nbsp;sample&nbsp;widget.<br>
+:param&nbsp;str&nbsp;widget:&nbsp;'live'&nbsp;or&nbsp;'sample'&nbsp;widget&nbsp;that&nbsp;is&nbsp;being&nbsp;changed</tt></dd></dl>
+
+<dl><dt><a name="GUI-check_files"><strong>check_files</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-check_update"><strong>check_update</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-chord_pro_import"><strong>chord_pro_import</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-create_menu_bar"><strong>create_menu_bar</strong></a>(self)</dt><dd><tt>Creates&nbsp;the&nbsp;main&nbsp;window's&nbsp;menu&nbsp;bar</tt></dd></dl>
+
+<dl><dt><a name="GUI-display_black_screen"><strong>display_black_screen</strong></a>(self)</dt><dd><tt>Method&nbsp;to&nbsp;toggle&nbsp;a&nbsp;black&nbsp;screen&nbsp;on&nbsp;and&nbsp;off</tt></dd></dl>
+
+<strong>display_black_screen_signal</strong> = &lt;unbound PYQT_SIGNAL display_black_screen_signal()&gt;
+<dl><dt><a name="GUI-display_logo_screen"><strong>display_logo_screen</strong></a>(self)</dt><dd><tt>Method&nbsp;to&nbsp;toggle&nbsp;the&nbsp;logo&nbsp;widget&nbsp;on&nbsp;and&nbsp;off</tt></dd></dl>
+
+<strong>display_logo_screen_signal</strong> = &lt;unbound PYQT_SIGNAL display_logo_screen_signal()&gt;
+<dl><dt><a name="GUI-grab_display"><strong>grab_display</strong></a>(self)</dt><dd><tt>Provides&nbsp;a&nbsp;method&nbsp;to&nbsp;grab&nbsp;the&nbsp;display&nbsp;widget&nbsp;and&nbsp;scale&nbsp;it&nbsp;down&nbsp;as&nbsp;a&nbsp;preview.</tt></dd></dl>
+
+<strong>grab_display_signal</strong> = &lt;unbound PYQT_SIGNAL grab_display_signal()&gt;
+<dl><dt><a name="GUI-init_components"><strong>init_components</strong></a>(self)</dt><dd><tt>Creates&nbsp;and&nbsp;positions&nbsp;the&nbsp;main&nbsp;window,&nbsp;the&nbsp;display&nbsp;widget,&nbsp;and&nbsp;the&nbsp;hidden&nbsp;sample_widget&nbsp;needed&nbsp;for&nbsp;properly<br>
+formatting&nbsp;the&nbsp;display&nbsp;widget.</tt></dd></dl>
+
+<dl><dt><a name="GUI-live_from_remote"><strong>live_from_remote</strong></a>(self, num)</dt><dd><tt>Takes&nbsp;a&nbsp;row&nbsp;number&nbsp;from&nbsp;remote&nbsp;input's&nbsp;order&nbsp;of&nbsp;service&nbsp;and&nbsp;sets&nbsp;the&nbsp;order&nbsp;of&nbsp;service&nbsp;list&nbsp;widget&nbsp;to&nbsp;that&nbsp;row,<br>
+then&nbsp;calls&nbsp;send_to_live.<br>
+:param&nbsp;int&nbsp;num:&nbsp;The&nbsp;row&nbsp;number&nbsp;signaled&nbsp;from&nbsp;the&nbsp;web&nbsp;remote</tt></dd></dl>
+
+<strong>live_from_remote_signal</strong> = &lt;unbound PYQT_SIGNAL live_from_remote_signal(int)&gt;
+<dl><dt><a name="GUI-live_slide_from_remote"><strong>live_slide_from_remote</strong></a>(self, num)</dt><dd><tt>Takes&nbsp;a&nbsp;row&nbsp;number&nbsp;from&nbsp;the&nbsp;remote&nbsp;input's&nbsp;live&nbsp;slides&nbsp;and&nbsp;sets&nbsp;the&nbsp;live&nbsp;widget&nbsp;to&nbsp;that&nbsp;row.<br>
+:param&nbsp;int&nbsp;num:&nbsp;The&nbsp;row&nbsp;number&nbsp;signaled&nbsp;from&nbsp;the&nbsp;web&nbsp;remote</tt></dd></dl>
+
+<strong>live_slide_from_remote_signal</strong> = &lt;unbound PYQT_SIGNAL live_slide_from_remote_signal(int)&gt;
+<dl><dt><a name="GUI-make_special_display_widgets"><strong>make_special_display_widgets</strong></a>(self)</dt><dd><tt>Create&nbsp;all&nbsp;the&nbsp;widgets.py&nbsp;that&nbsp;could&nbsp;be&nbsp;used&nbsp;on&nbsp;the&nbsp;display&nbsp;widget.</tt></dd></dl>
+
+<dl><dt><a name="GUI-make_video_widget"><strong>make_video_widget</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-media_error"><strong>media_error</strong></a>(self)</dt><dd><tt>Show&nbsp;a&nbsp;message&nbsp;box&nbsp;letting&nbsp;the&nbsp;user&nbsp;know&nbsp;that&nbsp;an&nbsp;error&nbsp;occurred&nbsp;playing&nbsp;the&nbsp;video.</tt></dd></dl>
+
+<dl><dt><a name="GUI-media_playing_change"><strong>media_playing_change</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-new_service"><strong>new_service</strong></a>(self)</dt><dd><tt>Provides&nbsp;a&nbsp;function&nbsp;for&nbsp;clearing&nbsp;the&nbsp;order&nbsp;of&nbsp;service,&nbsp;preview,&nbsp;and&nbsp;live&nbsp;list&nbsp;widgets.py&nbsp;when<br>
+the&nbsp;user&nbsp;wants&nbsp;to&nbsp;create&nbsp;a&nbsp;new&nbsp;service.&nbsp;Checks&nbsp;for&nbsp;changes&nbsp;first.</tt></dd></dl>
+
+<dl><dt><a name="GUI-open_lyrics_import"><strong>open_lyrics_import</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-position_screens"><strong>position_screens</strong></a>(self, primary_screen, secondary_screen=None)</dt><dd><tt>Correctly&nbsp;sizes&nbsp;and&nbsp;positions&nbsp;the&nbsp;<a href="#GUI">GUI</a>&nbsp;and&nbsp;display&nbsp;widgets.py&nbsp;according&nbsp;to&nbsp;the&nbsp;screen&nbsp;layout<br>
+:param&nbsp;primary_screen:&nbsp;The&nbsp;main&nbsp;screen&nbsp;from&nbsp;the&nbsp;settings&nbsp;or&nbsp;from&nbsp;discovery<br>
+:param&nbsp;secondary_screen:&nbsp;The&nbsp;second&nbsp;screen&nbsp;if&nbsp;it&nbsp;exists,&nbsp;the&nbsp;main&nbsp;screen&nbsp;if&nbsp;not<br>
+:return:</tt></dd></dl>
+
+<dl><dt><a name="GUI-print_oos"><strong>print_oos</strong></a>(self)</dt><dd><tt>Provides&nbsp;a&nbsp;method&nbsp;to&nbsp;create&nbsp;a&nbsp;printout&nbsp;of&nbsp;the&nbsp;current&nbsp;order&nbsp;of&nbsp;service</tt></dd></dl>
+
+<dl><dt><a name="GUI-save_ccli_password"><strong>save_ccli_password</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-send_to_live"><strong>send_to_live</strong></a>(self)</dt><dd><tt>Method&nbsp;to&nbsp;send&nbsp;the&nbsp;current&nbsp;order&nbsp;of&nbsp;service&nbsp;item&nbsp;to&nbsp;live,&nbsp;using&nbsp;the&nbsp;current&nbsp;index&nbsp;of&nbsp;the&nbsp;preview&nbsp;widget,<br>
+if&nbsp;available.</tt></dd></dl>
+
+<dl><dt><a name="GUI-send_to_preview"><strong>send_to_preview</strong></a>(self, item)</dt><dd><tt>Provides&nbsp;a&nbsp;method&nbsp;for&nbsp;sending&nbsp;an&nbsp;item,&nbsp;selected&nbsp;in&nbsp;the&nbsp;order&nbsp;of&nbsp;service&nbsp;list&nbsp;widget,&nbsp;to&nbsp;the&nbsp;preview&nbsp;list&nbsp;widget.<br>
+:param&nbsp;QListWidgetItem&nbsp;item:&nbsp;The&nbsp;item&nbsp;selected</tt></dd></dl>
+
+<strong>server_alert_signal</strong> = &lt;unbound PYQT_SIGNAL server_alert_signal()&gt;
+<dl><dt><a name="GUI-set_bible_background"><strong>set_bible_background</strong></a>(self, file)</dt><dd><tt>Provides&nbsp;a&nbsp;method&nbsp;for&nbsp;setting&nbsp;the&nbsp;global_bible_background_pixmap&nbsp;variable,&nbsp;scaling&nbsp;it&nbsp;to&nbsp;the&nbsp;display&nbsp;size<br>
+:param&nbsp;str&nbsp;file:&nbsp;The&nbsp;location&nbsp;of&nbsp;the&nbsp;background&nbsp;image&nbsp;file</tt></dd></dl>
+
+<dl><dt><a name="GUI-set_logo_image"><strong>set_logo_image</strong></a>(self, file)</dt><dd><tt>Provides&nbsp;a&nbsp;method&nbsp;for&nbsp;setting&nbsp;the&nbsp;logo_pixmap&nbsp;variable,&nbsp;scaling&nbsp;it&nbsp;to&nbsp;the&nbsp;display&nbsp;size<br>
+:param&nbsp;str&nbsp;file:&nbsp;The&nbsp;location&nbsp;of&nbsp;the&nbsp;background&nbsp;image&nbsp;file</tt></dd></dl>
+
+<dl><dt><a name="GUI-set_song_background"><strong>set_song_background</strong></a>(self, file)</dt><dd><tt>Provides&nbsp;a&nbsp;method&nbsp;for&nbsp;setting&nbsp;the&nbsp;global_song_background_pixmap&nbsp;variable,&nbsp;scaling&nbsp;it&nbsp;to&nbsp;the&nbsp;display&nbsp;size<br>
+:param&nbsp;str&nbsp;file:&nbsp;The&nbsp;location&nbsp;of&nbsp;the&nbsp;background&nbsp;image&nbsp;file</tt></dd></dl>
+
+<dl><dt><a name="GUI-set_theme"><strong>set_theme</strong></a>(self, theme)</dt></dl>
+
+<dl><dt><a name="GUI-show_about"><strong>show_about</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-show_help"><strong>show_help</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="GUI-show_hide_display_screen"><strong>show_hide_display_screen</strong></a>(self)</dt><dd><tt>Method&nbsp;to&nbsp;toggle&nbsp;between&nbsp;showing&nbsp;and&nbsp;hiding&nbsp;the&nbsp;display&nbsp;screen.</tt></dd></dl>
+
+<dl><dt><a name="GUI-show_server_alert"><strong>show_server_alert</strong></a>(self)</dt><dd><tt>Provides&nbsp;a&nbsp;message&nbsp;box&nbsp;if&nbsp;the&nbsp;server&nbsp;check&nbsp;has&nbsp;failed.</tt></dd></dl>
+
+<dl><dt><a name="GUI-test_url"><strong>test_url</strong></a>(self, url)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>black_display</strong> = False</dl>
+
+<dl><dt><strong>blackout_widget</strong> = None</dl>
+
+<dl><dt><strong>block_remote_input</strong> = False</dl>
+
+<dl><dt><strong>bold_font</strong> = &lt;PyQt5.QtGui.QFont object&gt;</dl>
+
+<dl><dt><strong>central_layout</strong> = None</dl>
+
+<dl><dt><strong>central_widget</strong> = None</dl>
+
+<dl><dt><strong>changes</strong> = False</dl>
+
+<dl><dt><strong>current_background</strong> = None</dl>
+
+<dl><dt><strong>current_display_background_color</strong> = None</dl>
+
+<dl><dt><strong>current_file</strong> = None</dl>
+
+<dl><dt><strong>custom_pixmap</strong> = None</dl>
+
+<dl><dt><strong>default_bible</strong> = None</dl>
+
+<dl><dt><strong>display_widget</strong> = None</dl>
+
+<dl><dt><strong>edit_widget</strong> = None</dl>
+
+<dl><dt><strong>global_bible_background_pixmap</strong> = None</dl>
+
+<dl><dt><strong>global_font_color</strong> = 'rgb(255, 255, 255)'</dl>
+
+<dl><dt><strong>global_font_face</strong> = 'Helvetica'</dl>
+
+<dl><dt><strong>global_font_size</strong> = 48</dl>
+
+<dl><dt><strong>global_footer_font_face</strong> = 'Helvetica'</dl>
+
+<dl><dt><strong>global_footer_font_size</strong> = 24</dl>
+
+<dl><dt><strong>global_song_background_pixmap</strong> = None</dl>
+
+<dl><dt><strong>last_pixmap</strong> = None</dl>
+
+<dl><dt><strong>list_font</strong> = &lt;PyQt5.QtGui.QFont object&gt;</dl>
+
+<dl><dt><strong>list_title_font</strong> = &lt;PyQt5.QtGui.QFont object&gt;</dl>
+
+<dl><dt><strong>live_widget</strong> = None</dl>
+
+<dl><dt><strong>logo_widget</strong> = None</dl>
+
+<dl><dt><strong>lyric_label</strong> = None</dl>
+
+<dl><dt><strong>lyric_widget</strong> = None</dl>
+
+<dl><dt><strong>media_player</strong> = None</dl>
+
+<dl><dt><strong>media_widget</strong> = None</dl>
+
+<dl><dt><strong>oos_widget</strong> = None</dl>
+
+<dl><dt><strong>preview_display_widget</strong> = None</dl>
+
+<dl><dt><strong>preview_widget</strong> = None</dl>
+
+<dl><dt><strong>sample_lyric_widget</strong> = None</dl>
+
+<dl><dt><strong>sample_widget</strong> = None</dl>
+
+<dl><dt><strong>slide_auto_play</strong> = None</dl>
+
+<dl><dt><strong>stage_font_size</strong> = 60</dl>
+
+<dl><dt><strong>standard_font</strong> = &lt;PyQt5.QtGui.QFont object&gt;</dl>
+
+<dl><dt><strong>timed_update</strong> = None</dl>
+
+<dl><dt><strong>video_widget</strong> = None</dl>
+
+<dl><dt><strong>web_view</strong> = None</dl>
+
+<hr>
+Methods inherited from <a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a>:<br>
+<dl><dt><a name="GUI-__getattr__"><strong>__getattr__</strong></a>(...)</dt><dd><tt><a href="#GUI-__getattr__">__getattr__</a>(self,&nbsp;str)&nbsp;-&gt;&nbsp;object</tt></dd></dl>
+
+<dl><dt><a name="GUI-blockSignals"><strong>blockSignals</strong></a>(...)</dt><dd><tt><a href="#GUI-blockSignals">blockSignals</a>(self,&nbsp;bool)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-childEvent"><strong>childEvent</strong></a>(...)</dt><dd><tt><a href="#GUI-childEvent">childEvent</a>(self,&nbsp;QChildEvent)</tt></dd></dl>
+
+<dl><dt><a name="GUI-children"><strong>children</strong></a>(...)</dt><dd><tt><a href="#GUI-children">children</a>(self)&nbsp;-&gt;&nbsp;List[<a href="PyQt5.QtCore.html#QObject">QObject</a>]</tt></dd></dl>
+
+<dl><dt><a name="GUI-connectNotify"><strong>connectNotify</strong></a>(...)</dt><dd><tt><a href="#GUI-connectNotify">connectNotify</a>(self,&nbsp;QMetaMethod)</tt></dd></dl>
+
+<dl><dt><a name="GUI-customEvent"><strong>customEvent</strong></a>(...)</dt><dd><tt><a href="#GUI-customEvent">customEvent</a>(self,&nbsp;QEvent)</tt></dd></dl>
+
+<dl><dt><a name="GUI-deleteLater"><strong>deleteLater</strong></a>(...)</dt><dd><tt><a href="#GUI-deleteLater">deleteLater</a>(self)</tt></dd></dl>
+
+<strong>destroyed</strong> = &lt;unbound PYQT_SIGNAL destroyed(QObject*)&gt;
+<dl><dt><a name="GUI-disconnect"><strong>disconnect</strong></a>(...)</dt><dd><tt><a href="#GUI-disconnect">disconnect</a>(QMetaObject.Connection)&nbsp;-&gt;&nbsp;bool<br>
+<a href="#GUI-disconnect">disconnect</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="GUI-disconnectNotify"><strong>disconnectNotify</strong></a>(...)</dt><dd><tt><a href="#GUI-disconnectNotify">disconnectNotify</a>(self,&nbsp;QMetaMethod)</tt></dd></dl>
+
+<dl><dt><a name="GUI-dumpObjectInfo"><strong>dumpObjectInfo</strong></a>(...)</dt><dd><tt><a href="#GUI-dumpObjectInfo">dumpObjectInfo</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="GUI-dumpObjectTree"><strong>dumpObjectTree</strong></a>(...)</dt><dd><tt><a href="#GUI-dumpObjectTree">dumpObjectTree</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="GUI-dynamicPropertyNames"><strong>dynamicPropertyNames</strong></a>(...)</dt><dd><tt><a href="#GUI-dynamicPropertyNames">dynamicPropertyNames</a>(self)&nbsp;-&gt;&nbsp;List[QByteArray]</tt></dd></dl>
+
+<dl><dt><a name="GUI-event"><strong>event</strong></a>(...)</dt><dd><tt><a href="#GUI-event">event</a>(self,&nbsp;QEvent)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-eventFilter"><strong>eventFilter</strong></a>(...)</dt><dd><tt><a href="#GUI-eventFilter">eventFilter</a>(self,&nbsp;<a href="PyQt5.QtCore.html#QObject">QObject</a>,&nbsp;QEvent)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-findChild"><strong>findChild</strong></a>(...)</dt><dd><tt><a href="#GUI-findChild">findChild</a>(self,&nbsp;type,&nbsp;name:&nbsp;str&nbsp;=&nbsp;'',&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;<a href="PyQt5.QtCore.html#QObject">QObject</a><br>
+<a href="#GUI-findChild">findChild</a>(self,&nbsp;Tuple,&nbsp;name:&nbsp;str&nbsp;=&nbsp;'',&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;<a href="PyQt5.QtCore.html#QObject">QObject</a></tt></dd></dl>
+
+<dl><dt><a name="GUI-findChildren"><strong>findChildren</strong></a>(...)</dt><dd><tt><a href="#GUI-findChildren">findChildren</a>(self,&nbsp;type,&nbsp;name:&nbsp;str&nbsp;=&nbsp;'',&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[<a href="PyQt5.QtCore.html#QObject">QObject</a>]<br>
+<a href="#GUI-findChildren">findChildren</a>(self,&nbsp;Tuple,&nbsp;name:&nbsp;str&nbsp;=&nbsp;'',&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[<a href="PyQt5.QtCore.html#QObject">QObject</a>]<br>
+<a href="#GUI-findChildren">findChildren</a>(self,&nbsp;type,&nbsp;QRegExp,&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[<a href="PyQt5.QtCore.html#QObject">QObject</a>]<br>
+<a href="#GUI-findChildren">findChildren</a>(self,&nbsp;Tuple,&nbsp;QRegExp,&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[<a href="PyQt5.QtCore.html#QObject">QObject</a>]<br>
+<a href="#GUI-findChildren">findChildren</a>(self,&nbsp;type,&nbsp;QRegularExpression,&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[<a href="PyQt5.QtCore.html#QObject">QObject</a>]<br>
+<a href="#GUI-findChildren">findChildren</a>(self,&nbsp;Tuple,&nbsp;QRegularExpression,&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[<a href="PyQt5.QtCore.html#QObject">QObject</a>]</tt></dd></dl>
+
+<dl><dt><a name="GUI-inherits"><strong>inherits</strong></a>(...)</dt><dd><tt><a href="#GUI-inherits">inherits</a>(self,&nbsp;str)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-installEventFilter"><strong>installEventFilter</strong></a>(...)</dt><dd><tt><a href="#GUI-installEventFilter">installEventFilter</a>(self,&nbsp;<a href="PyQt5.QtCore.html#QObject">QObject</a>)</tt></dd></dl>
+
+<dl><dt><a name="GUI-isSignalConnected"><strong>isSignalConnected</strong></a>(...)</dt><dd><tt><a href="#GUI-isSignalConnected">isSignalConnected</a>(self,&nbsp;QMetaMethod)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-isWidgetType"><strong>isWidgetType</strong></a>(...)</dt><dd><tt><a href="#GUI-isWidgetType">isWidgetType</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-isWindowType"><strong>isWindowType</strong></a>(...)</dt><dd><tt><a href="#GUI-isWindowType">isWindowType</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-killTimer"><strong>killTimer</strong></a>(...)</dt><dd><tt><a href="#GUI-killTimer">killTimer</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="GUI-metaObject"><strong>metaObject</strong></a>(...)</dt><dd><tt><a href="#GUI-metaObject">metaObject</a>(self)&nbsp;-&gt;&nbsp;QMetaObject</tt></dd></dl>
+
+<dl><dt><a name="GUI-moveToThread"><strong>moveToThread</strong></a>(...)</dt><dd><tt><a href="#GUI-moveToThread">moveToThread</a>(self,&nbsp;QThread)</tt></dd></dl>
+
+<dl><dt><a name="GUI-objectName"><strong>objectName</strong></a>(...)</dt><dd><tt><a href="#GUI-objectName">objectName</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<strong>objectNameChanged</strong> = &lt;unbound PYQT_SIGNAL objectNameChanged(QString)&gt;
+<dl><dt><a name="GUI-parent"><strong>parent</strong></a>(...)</dt><dd><tt><a href="#GUI-parent">parent</a>(self)&nbsp;-&gt;&nbsp;<a href="PyQt5.QtCore.html#QObject">QObject</a></tt></dd></dl>
+
+<dl><dt><a name="GUI-property"><strong>property</strong></a>(...)</dt><dd><tt><a href="#GUI-property">property</a>(self,&nbsp;str)&nbsp;-&gt;&nbsp;Any</tt></dd></dl>
+
+<dl><dt><a name="GUI-pyqtConfigure"><strong>pyqtConfigure</strong></a>(...)</dt><dd><tt><a href="PyQt5.QtCore.html#QObject">QObject</a>.<a href="#GUI-pyqtConfigure">pyqtConfigure</a>(...)<br>
+&nbsp;<br>
+Each&nbsp;keyword&nbsp;argument&nbsp;is&nbsp;either&nbsp;the&nbsp;name&nbsp;of&nbsp;a&nbsp;Qt&nbsp;property&nbsp;or&nbsp;a&nbsp;Qt&nbsp;signal.<br>
+For&nbsp;properties&nbsp;the&nbsp;property&nbsp;is&nbsp;set&nbsp;to&nbsp;the&nbsp;given&nbsp;value&nbsp;which&nbsp;should&nbsp;be&nbsp;of&nbsp;an<br>
+appropriate&nbsp;type.<br>
+For&nbsp;signals&nbsp;the&nbsp;signal&nbsp;is&nbsp;connected&nbsp;to&nbsp;the&nbsp;given&nbsp;value&nbsp;which&nbsp;should&nbsp;be&nbsp;a<br>
+callable.</tt></dd></dl>
+
+<dl><dt><a name="GUI-receivers"><strong>receivers</strong></a>(...)</dt><dd><tt><a href="#GUI-receivers">receivers</a>(self,&nbsp;PYQT_SIGNAL)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="GUI-removeEventFilter"><strong>removeEventFilter</strong></a>(...)</dt><dd><tt><a href="#GUI-removeEventFilter">removeEventFilter</a>(self,&nbsp;<a href="PyQt5.QtCore.html#QObject">QObject</a>)</tt></dd></dl>
+
+<dl><dt><a name="GUI-sender"><strong>sender</strong></a>(...)</dt><dd><tt><a href="#GUI-sender">sender</a>(self)&nbsp;-&gt;&nbsp;<a href="PyQt5.QtCore.html#QObject">QObject</a></tt></dd></dl>
+
+<dl><dt><a name="GUI-senderSignalIndex"><strong>senderSignalIndex</strong></a>(...)</dt><dd><tt><a href="#GUI-senderSignalIndex">senderSignalIndex</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="GUI-setObjectName"><strong>setObjectName</strong></a>(...)</dt><dd><tt><a href="#GUI-setObjectName">setObjectName</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="GUI-setParent"><strong>setParent</strong></a>(...)</dt><dd><tt><a href="#GUI-setParent">setParent</a>(self,&nbsp;<a href="PyQt5.QtCore.html#QObject">QObject</a>)</tt></dd></dl>
+
+<dl><dt><a name="GUI-setProperty"><strong>setProperty</strong></a>(...)</dt><dd><tt><a href="#GUI-setProperty">setProperty</a>(self,&nbsp;str,&nbsp;Any)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-signalsBlocked"><strong>signalsBlocked</strong></a>(...)</dt><dd><tt><a href="#GUI-signalsBlocked">signalsBlocked</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="GUI-startTimer"><strong>startTimer</strong></a>(...)</dt><dd><tt><a href="#GUI-startTimer">startTimer</a>(self,&nbsp;int,&nbsp;timerType:&nbsp;Qt.TimerType&nbsp;=&nbsp;Qt.CoarseTimer)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="GUI-thread"><strong>thread</strong></a>(...)</dt><dd><tt><a href="#GUI-thread">thread</a>(self)&nbsp;-&gt;&nbsp;QThread</tt></dd></dl>
+
+<dl><dt><a name="GUI-timerEvent"><strong>timerEvent</strong></a>(...)</dt><dd><tt><a href="#GUI-timerEvent">timerEvent</a>(self,&nbsp;QTimerEvent)</tt></dd></dl>
+
+<dl><dt><a name="GUI-tr"><strong>tr</strong></a>(...)</dt><dd><tt><a href="#GUI-tr">tr</a>(self,&nbsp;str,&nbsp;disambiguation:&nbsp;str&nbsp;=&nbsp;None,&nbsp;n:&nbsp;int&nbsp;=&nbsp;-1)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a>:<br>
+<dl><dt><strong>staticMetaObject</strong> = &lt;PyQt5.QtCore.QMetaObject object&gt;</dl>
+
+<hr>
+Static methods inherited from <a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a>:<br>
+<dl><dt><a name="GUI-__new__"><strong>__new__</strong></a>(*args, **kwargs)<font color="#909090"><font face="helvetica, arial"> from <a href="PyQt5.sip.html#wrappertype">sip.wrappertype</a></font></font></dt><dd><tt>Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;object.&nbsp;&nbsp;See&nbsp;help(type)&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SlideAutoPlay">class <strong>SlideAutoPlay</strong></a>(<a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#SlideAutoPlay">SlideAutoPlay</a>(gui,&nbsp;text,&nbsp;interval)<br>
+&nbsp;<br>
+<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="gui.html#SlideAutoPlay">SlideAutoPlay</a></dd>
+<dd><a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a></dd>
+<dd><a href="PyQt5.sip.html#wrapper">sip.wrapper</a></dd>
+<dd><a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SlideAutoPlay-__init__"><strong>__init__</strong></a>(self, gui, text, interval)</dt><dd><tt>Cycles&nbsp;through&nbsp;the&nbsp;text&nbsp;in&nbsp;a&nbsp;list&nbsp;of&nbsp;strings,&nbsp;changing&nbsp;the&nbsp;display&nbsp;widget's&nbsp;lyrics&nbsp;based&nbsp;on&nbsp;a&nbsp;given&nbsp;interval<br>
+:param&nbsp;gui:&nbsp;the&nbsp;current&nbsp;instance&nbsp;of&nbsp;<a href="#GUI">GUI</a><br>
+:param&nbsp;text:&nbsp;list&nbsp;of&nbsp;strings&nbsp;to&nbsp;be&nbsp;displayed<br>
+:param&nbsp;interval:&nbsp;number&nbsp;of&nbsp;seconds&nbsp;between&nbsp;each&nbsp;lyric&nbsp;change</tt></dd></dl>
+
+<dl><dt><a name="SlideAutoPlay-run"><strong>run</strong></a>(self)</dt><dd><tt><a href="#SlideAutoPlay-run">run</a>(self)</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a>:<br>
+<dl><dt><a name="SlideAutoPlay-autoDelete"><strong>autoDelete</strong></a>(...)</dt><dd><tt><a href="#SlideAutoPlay-autoDelete">autoDelete</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SlideAutoPlay-create"><strong>create</strong></a>(...)</dt><dd><tt><a href="#SlideAutoPlay-create">create</a>(Callable[[],&nbsp;None])&nbsp;-&gt;&nbsp;<a href="PyQt5.QtCore.html#QRunnable">QRunnable</a></tt></dd></dl>
+
+<dl><dt><a name="SlideAutoPlay-setAutoDelete"><strong>setAutoDelete</strong></a>(...)</dt><dd><tt><a href="#SlideAutoPlay-setAutoDelete">setAutoDelete</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Static methods inherited from <a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a>:<br>
+<dl><dt><a name="SlideAutoPlay-__new__"><strong>__new__</strong></a>(*args, **kwargs)<font color="#909090"><font face="helvetica, arial"> from <a href="PyQt5.sip.html#wrappertype">sip.wrappertype</a></font></font></dt><dd><tt>Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;object.&nbsp;&nbsp;See&nbsp;help(type)&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TimedPreviewUpdate">class <strong>TimedPreviewUpdate</strong></a>(<a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#TimedPreviewUpdate">TimedPreviewUpdate</a>(gui)<br>
+&nbsp;<br>
+Used&nbsp;to&nbsp;update&nbsp;the&nbsp;preview&nbsp;image&nbsp;in&nbsp;the&nbsp;live&nbsp;widget&nbsp;when&nbsp;a&nbsp;video&nbsp;is&nbsp;playing.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="gui.html#TimedPreviewUpdate">TimedPreviewUpdate</a></dd>
+<dd><a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a></dd>
+<dd><a href="PyQt5.sip.html#wrapper">sip.wrapper</a></dd>
+<dd><a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="TimedPreviewUpdate-__init__"><strong>__init__</strong></a>(self, gui)</dt><dd><tt>Used&nbsp;to&nbsp;update&nbsp;the&nbsp;preview&nbsp;image&nbsp;in&nbsp;the&nbsp;live&nbsp;widget&nbsp;when&nbsp;a&nbsp;video&nbsp;is&nbsp;playing.<br>
+:param&nbsp;gui.<a href="#GUI">GUI</a>&nbsp;gui:&nbsp;The&nbsp;current&nbsp;instance&nbsp;of&nbsp;<a href="#GUI">GUI</a></tt></dd></dl>
+
+<dl><dt><a name="TimedPreviewUpdate-run"><strong>run</strong></a>(self)</dt><dd><tt><a href="#TimedPreviewUpdate-run">run</a>(self)</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>gui</strong> = None</dl>
+
+<hr>
+Methods inherited from <a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a>:<br>
+<dl><dt><a name="TimedPreviewUpdate-autoDelete"><strong>autoDelete</strong></a>(...)</dt><dd><tt><a href="#TimedPreviewUpdate-autoDelete">autoDelete</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="TimedPreviewUpdate-create"><strong>create</strong></a>(...)</dt><dd><tt><a href="#TimedPreviewUpdate-create">create</a>(Callable[[],&nbsp;None])&nbsp;-&gt;&nbsp;<a href="PyQt5.QtCore.html#QRunnable">QRunnable</a></tt></dd></dl>
+
+<dl><dt><a name="TimedPreviewUpdate-setAutoDelete"><strong>setAutoDelete</strong></a>(...)</dt><dd><tt><a href="#TimedPreviewUpdate-setAutoDelete">setAutoDelete</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="PyQt5.QtCore.html#QRunnable">PyQt5.QtCore.QRunnable</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Static methods inherited from <a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a>:<br>
+<dl><dt><a name="TimedPreviewUpdate-__new__"><strong>__new__</strong></a>(*args, **kwargs)<font color="#909090"><font face="helvetica, arial"> from <a href="PyQt5.sip.html#wrappertype">sip.wrappertype</a></font></font></dt><dd><tt>Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;object.&nbsp;&nbsp;See&nbsp;help(type)&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>__warningregistry__</strong> = {'version': 6}</td></tr></table>
+</body></html>

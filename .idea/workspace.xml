@@ -7,16 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Tweaked edit widget button icons.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Optimized imports">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/help.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +63,8 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Python.main.executor": "Debug",
+    "Python.generate_pydocs.executor": "Run",
+    "Python.main.executor": "Run",
     "Python.powerpoint_viewer.executor": "Debug",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -92,11 +85,12 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="X:\Documents\Python Workspace\project_on\pydocs" />
       <recent name="X:\Documents\Python Workspace\project_on\resources\gui_icons" />
       <recent name="X:\Documents\Python Workspace\project_on\resources\branding" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager">
     <configuration name="linecount" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="project_on" />
       <option name="ENV_FILES" value="" />
@@ -170,14 +164,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00044" summary="Custom slide text needs to be saved in the service file for when multiple services are being prepared ahead of time.&#10;Fixed proper file not being loaded from recent files menu.">
-      <option name="closed" value="true" />
-      <created>1723429407658</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1723429407658</updated>
     </task>
     <task id="LOCAL-00045" summary="Fixed setting style of entire line when only one word of a line has a style set.">
       <option name="closed" value="true" />
@@ -563,7 +549,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730936532999</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="Optimized imports">
+      <option name="closed" value="true" />
+      <created>1731100448060</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1731100448061</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -584,7 +578,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed shade data not making it into the preview list items. Fixed resizing of advanced options widget when resizing font in edit widget." />
     <MESSAGE value="Fixed how widget values in the edit widget's advanced options area are set.&#10;Improved the layout of the advanced options, set a minimum height for the lyric area, and stopped hiding the advanced options." />
     <MESSAGE value="Fixed slider pixel values not correct when editing widget first opened" />
     <MESSAGE value="Set self.main.settings to default_settings in case of JSONDecodeError.&#10;&#10;In GUI.check_files, checked for individual files/directories in case only one got deleted.&#10;&#10;Fixed crash in update_font when creating a new song/custom slide.&#10;&#10;Fixed crash in edit widget when no global background(s) have been chosen or when background image is missing.&#10;&#10;Ensured font widget is re-shown after custom color dialog is done." />
@@ -609,6 +602,7 @@
     <MESSAGE value="Improved the way words are drawn for songs and custom slides.&#10;&#10;Centered and/or resized pixmaps for image slides." />
     <MESSAGE value="Fixed wrong background on slides with 'background' key but 'override_global' = 'False'." />
     <MESSAGE value="Tweaked edit widget button icons." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tweaked edit widget button icons." />
+    <MESSAGE value="Optimized imports" />
+    <option name="LAST_COMMIT_MESSAGE" value="Optimized imports" />
   </component>
 </project>
