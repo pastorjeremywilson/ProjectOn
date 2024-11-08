@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 import sqlite3
 from os.path import exists

@@ -2,10 +2,10 @@ import os.path
 import re
 
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QPalette
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QApplication, QSpinBox
+    QSpinBox
 
 import parsers
 from formattable_text_edit import FormattableTextEdit

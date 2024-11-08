@@ -6,18 +6,15 @@ import sys
 import tempfile
 import time
 from os.path import exists
-from typing import Union
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QFileInfo, QIODevice, QFile
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QPalette
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QSound, QAudioOutput, QAudioDeviceInfo, QAudioFormat, \
-    QAudio, QMediaPlaylist
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction, QProgressBar, QCheckBox, \
-    QListWidget
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction, QProgressBar, QCheckBox
 
 import declarations
 import parsers

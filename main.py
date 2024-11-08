@@ -32,16 +32,15 @@ import zipfile
 from datetime import datetime
 from os.path import exists
 from xml.etree import ElementTree
-from gevent import monkey
 
 import requests
 from PyQt5.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QAction, QDialog, QLineEdit, QPushButton
+from gevent import monkey
 
 import declarations
-from declarations import DB_STRUCTURE
 from gui import GUI
 from simple_splash import SimpleSplash
 from web_remote import RemoteServer
