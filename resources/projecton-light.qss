@@ -67,7 +67,7 @@ QPushButton:disabled {
     color: grey;
 }
 QPushButton:checked {
-    background: #5555aa;
+    background: #aaaaff;
     border-style: inset;
 }
 QPushButton:unchecked {

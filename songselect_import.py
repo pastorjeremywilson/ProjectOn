@@ -6,7 +6,7 @@ from os.path import exists
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineDownloadItem
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
     QMessageBox, QDialog
 from cryptography.fernet import Fernet
@@ -285,11 +285,11 @@ class SongselectImport(QDialog):
                 song_text = re.sub('<br.*?>', '', song_text)
 
                 paragraphs = song_text.split('\n\n')
-                song_title = paragraphs[0].rstrip()
+                song_title = paragraphs[0].strip()
 
                 copyright_info = paragraphs[-1]
                 copyright_lines = copyright_info.split('\n')
-                author = copyright_lines[0].rstrip()
+                author = copyright_lines[0].strip()
                 copyright = copyright_lines[2]
                 song_number = copyright_lines[1].split('#')[-1]
 
@@ -317,14 +317,14 @@ class SongselectImport(QDialog):
                 order = []
                 while index < len(song_text_split):
                     if index in segment_marker_indices:
-                        marker = song_text_split[index].rstrip()
+                        marker = song_text_split[index].strip()
                         formatted_marker = f'[{marker}]\n'
                         marker_split = marker.split(' ')
                         if len(marker_split) < 2:
                             marker_split.append('1')
                             formatted_marker = f'[{marker} 1]\n'
                         formatted_song_text += formatted_marker
-                        marker_split[0] = marker_split[0].lower().rstrip()[0]
+                        marker_split[0] = marker_split[0].lower().strip()[0]
                         marker = ''.join(marker_split)
                         order.append(marker)
                     else:

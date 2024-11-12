@@ -1,0 +1,861 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module songselect_import</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>songselect_import</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/jeremy/Documents/Python%20Workspace/project_on/songselect_import.py">/home/jeremy/Documents/Python Workspace/project_on/songselect_import.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="PyQt5.QtCore.html">PyQt5.QtCore</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="re.html">re</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="PyQt5.QtWidgets.html#QDialog">PyQt5.QtWidgets.QDialog</a>(<a href="PyQt5.QtWidgets.html#QWidget">PyQt5.QtWidgets.QWidget</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="songselect_import.html#SongselectImport">SongselectImport</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SongselectImport">class <strong>SongselectImport</strong></a>(<a href="PyQt5.QtWidgets.html#QDialog">PyQt5.QtWidgets.QDialog</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#SongselectImport">SongselectImport</a>(gui,&nbsp;suppress_browser=False)<br>
+&nbsp;<br>
+<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="songselect_import.html#SongselectImport">SongselectImport</a></dd>
+<dd><a href="PyQt5.QtWidgets.html#QDialog">PyQt5.QtWidgets.QDialog</a></dd>
+<dd><a href="PyQt5.QtWidgets.html#QWidget">PyQt5.QtWidgets.QWidget</a></dd>
+<dd><a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a></dd>
+<dd><a href="PyQt5.sip.html#wrapper">sip.wrapper</a></dd>
+<dd><a href="PyQt5.QtGui.html#QPaintDevice">PyQt5.QtGui.QPaintDevice</a></dd>
+<dd><a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SongselectImport-__init__"><strong>__init__</strong></a>(self, gui, suppress_browser=False)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-download_finished"><strong>download_finished</strong></a>(self)</dt><dd><tt>Callback&nbsp;for&nbsp;when&nbsp;download&nbsp;has&nbsp;finished.&nbsp;Parses&nbsp;the&nbsp;downloaded&nbsp;file&nbsp;into&nbsp;song&nbsp;data&nbsp;to&nbsp;be&nbsp;saved&nbsp;to&nbsp;the&nbsp;database.</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-download_requested"><strong>download_requested</strong></a>(self, download_item)</dt></dl>
+
+<dl><dt><a name="SongselectImport-enable_ok"><strong>enable_ok</strong></a>(self, user_line_edit, password_line_edit, ok_button)</dt></dl>
+
+<dl><dt><a name="SongselectImport-get_page_type"><strong>get_page_type</strong></a>(self)</dt><dd><tt>Get&nbsp;the&nbsp;type&nbsp;of&nbsp;page&nbsp;the&nbsp;user&nbsp;is&nbsp;currently&nbsp;ono<br>
+&nbsp;<br>
+:return:&nbsp;The&nbsp;page&nbsp;the&nbsp;user&nbsp;is&nbsp;on</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-get_song_number_from_url"><strong>get_song_number_from_url</strong></a>(self, url)</dt><dd><tt>Gets&nbsp;the&nbsp;ccli&nbsp;song&nbsp;number&nbsp;for&nbsp;a&nbsp;song&nbsp;from&nbsp;the&nbsp;url<br>
+&nbsp;<br>
+:return:&nbsp;String&nbsp;containing&nbsp;ccli&nbsp;song&nbsp;number,&nbsp;None&nbsp;is&nbsp;returned&nbsp;if&nbsp;not&nbsp;found</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-init_components"><strong>init_components</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="SongselectImport-page_loaded"><strong>page_loaded</strong></a>(self, successful)</dt></dl>
+
+<dl><dt><a name="SongselectImport-signin_page_loaded"><strong>signin_page_loaded</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="SongselectImport-store_credentials"><strong>store_credentials</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="SongselectImport-update_url"><strong>update_url</strong></a>(self, new_url)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>BASE_URL</strong> = 'https://songselect.ccli.com'</dl>
+
+<dl><dt><strong>LOGIN_PAGE</strong> = 'https://profile.ccli.com/Account/Signin?appConte...ct&amp;returnUrl=https%3A%2F%2Fsongselect.ccli.com%2F'</dl>
+
+<dl><dt><strong>LOGIN_URL</strong> = 'https://profile.ccli.com'</dl>
+
+<dl><dt><strong>LOGOUT_URL</strong> = 'https://songselect.ccli.com/account/logout'</dl>
+
+<dl><dt><strong>SEARCH_URL</strong> = 'https://songselect.ccli.com/search/results'</dl>
+
+<dl><dt><strong>SONG_PAGE</strong> = 'https://songselect.ccli.com/Songs/'</dl>
+
+<hr>
+Methods inherited from <a href="PyQt5.QtWidgets.html#QDialog">PyQt5.QtWidgets.QDialog</a>:<br>
+<dl><dt><a name="SongselectImport-accept"><strong>accept</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-accept">accept</a>(self)</tt></dd></dl>
+
+<strong>accepted</strong> = &lt;unbound PYQT_SIGNAL accepted()&gt;
+<dl><dt><a name="SongselectImport-closeEvent"><strong>closeEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-closeEvent">closeEvent</a>(self,&nbsp;QCloseEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-contextMenuEvent"><strong>contextMenuEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-contextMenuEvent">contextMenuEvent</a>(self,&nbsp;QContextMenuEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-done"><strong>done</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-done">done</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-eventFilter"><strong>eventFilter</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-eventFilter">eventFilter</a>(self,&nbsp;QObject,&nbsp;QEvent)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-exec"><strong>exec</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-exec">exec</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-exec_"><strong>exec_</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-exec_">exec_</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<strong>finished</strong> = &lt;unbound PYQT_SIGNAL finished(int)&gt;
+<dl><dt><a name="SongselectImport-isSizeGripEnabled"><strong>isSizeGripEnabled</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isSizeGripEnabled">isSizeGripEnabled</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-keyPressEvent"><strong>keyPressEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-keyPressEvent">keyPressEvent</a>(self,&nbsp;QKeyEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-minimumSizeHint"><strong>minimumSizeHint</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-minimumSizeHint">minimumSizeHint</a>(self)&nbsp;-&gt;&nbsp;QSize</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-open"><strong>open</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-open">open</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-reject"><strong>reject</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-reject">reject</a>(self)</tt></dd></dl>
+
+<strong>rejected</strong> = &lt;unbound PYQT_SIGNAL rejected()&gt;
+<dl><dt><a name="SongselectImport-resizeEvent"><strong>resizeEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-resizeEvent">resizeEvent</a>(self,&nbsp;QResizeEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-result"><strong>result</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-result">result</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setModal"><strong>setModal</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setModal">setModal</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setResult"><strong>setResult</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setResult">setResult</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setSizeGripEnabled"><strong>setSizeGripEnabled</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setSizeGripEnabled">setSizeGripEnabled</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setVisible"><strong>setVisible</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setVisible">setVisible</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-showEvent"><strong>showEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-showEvent">showEvent</a>(self,&nbsp;QShowEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-sizeHint"><strong>sizeHint</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-sizeHint">sizeHint</a>(self)&nbsp;-&gt;&nbsp;QSize</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="PyQt5.QtWidgets.html#QDialog">PyQt5.QtWidgets.QDialog</a>:<br>
+<dl><dt><strong>Accepted</strong> = 1</dl>
+
+<dl><dt><strong>DialogCode</strong> = &lt;class 'PyQt5.QtWidgets.QDialog.DialogCode'&gt;</dl>
+
+<dl><dt><strong>Rejected</strong> = 0</dl>
+
+<hr>
+Methods inherited from <a href="PyQt5.QtWidgets.html#QWidget">PyQt5.QtWidgets.QWidget</a>:<br>
+<dl><dt><a name="SongselectImport-acceptDrops"><strong>acceptDrops</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-acceptDrops">acceptDrops</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-accessibleDescription"><strong>accessibleDescription</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-accessibleDescription">accessibleDescription</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-accessibleName"><strong>accessibleName</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-accessibleName">accessibleName</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-actionEvent"><strong>actionEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-actionEvent">actionEvent</a>(self,&nbsp;QActionEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-actions"><strong>actions</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-actions">actions</a>(self)&nbsp;-&gt;&nbsp;List[QAction]</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-activateWindow"><strong>activateWindow</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-activateWindow">activateWindow</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-addAction"><strong>addAction</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-addAction">addAction</a>(self,&nbsp;QAction)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-addActions"><strong>addActions</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-addActions">addActions</a>(self,&nbsp;Iterable[QAction])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-adjustSize"><strong>adjustSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-adjustSize">adjustSize</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-autoFillBackground"><strong>autoFillBackground</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-autoFillBackground">autoFillBackground</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-backgroundRole"><strong>backgroundRole</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-backgroundRole">backgroundRole</a>(self)&nbsp;-&gt;&nbsp;QPalette.ColorRole</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-baseSize"><strong>baseSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-baseSize">baseSize</a>(self)&nbsp;-&gt;&nbsp;QSize</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-changeEvent"><strong>changeEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-changeEvent">changeEvent</a>(self,&nbsp;QEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-childAt"><strong>childAt</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-childAt">childAt</a>(self,&nbsp;QPoint)&nbsp;-&gt;&nbsp;QWidget<br>
+<a href="#SongselectImport-childAt">childAt</a>(self,&nbsp;int,&nbsp;int)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-childrenRect"><strong>childrenRect</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-childrenRect">childrenRect</a>(self)&nbsp;-&gt;&nbsp;QRect</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-childrenRegion"><strong>childrenRegion</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-childrenRegion">childrenRegion</a>(self)&nbsp;-&gt;&nbsp;QRegion</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-clearFocus"><strong>clearFocus</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-clearFocus">clearFocus</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-clearMask"><strong>clearMask</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-clearMask">clearMask</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-close"><strong>close</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-close">close</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-contentsMargins"><strong>contentsMargins</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-contentsMargins">contentsMargins</a>(self)&nbsp;-&gt;&nbsp;QMargins</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-contentsRect"><strong>contentsRect</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-contentsRect">contentsRect</a>(self)&nbsp;-&gt;&nbsp;QRect</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-contextMenuPolicy"><strong>contextMenuPolicy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-contextMenuPolicy">contextMenuPolicy</a>(self)&nbsp;-&gt;&nbsp;Qt.ContextMenuPolicy</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-create"><strong>create</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-create">create</a>(self,&nbsp;window:&nbsp;PyQt5.sip.voidptr&nbsp;=&nbsp;0,&nbsp;initializeWindow:&nbsp;bool&nbsp;=&nbsp;True,&nbsp;destroyOldWindow:&nbsp;bool&nbsp;=&nbsp;True)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-createWindowContainer"><strong>createWindowContainer</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-createWindowContainer">createWindowContainer</a>(QWindow,&nbsp;parent:&nbsp;QWidget&nbsp;=&nbsp;None,&nbsp;flags:&nbsp;Union[Qt.WindowFlags,&nbsp;Qt.WindowType]&nbsp;=&nbsp;0)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-cursor"><strong>cursor</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-cursor">cursor</a>(self)&nbsp;-&gt;&nbsp;QCursor</tt></dd></dl>
+
+<strong>customContextMenuRequested</strong> = &lt;unbound PYQT_SIGNAL customContextMenuRequested(QPoint)&gt;
+<dl><dt><a name="SongselectImport-destroy"><strong>destroy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-destroy">destroy</a>(self,&nbsp;destroyWindow:&nbsp;bool&nbsp;=&nbsp;True,&nbsp;destroySubWindows:&nbsp;bool&nbsp;=&nbsp;True)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-devType"><strong>devType</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-devType">devType</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-dragEnterEvent"><strong>dragEnterEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-dragEnterEvent">dragEnterEvent</a>(self,&nbsp;QDragEnterEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-dragLeaveEvent"><strong>dragLeaveEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-dragLeaveEvent">dragLeaveEvent</a>(self,&nbsp;QDragLeaveEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-dragMoveEvent"><strong>dragMoveEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-dragMoveEvent">dragMoveEvent</a>(self,&nbsp;QDragMoveEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-dropEvent"><strong>dropEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-dropEvent">dropEvent</a>(self,&nbsp;QDropEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-effectiveWinId"><strong>effectiveWinId</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-effectiveWinId">effectiveWinId</a>(self)&nbsp;-&gt;&nbsp;PyQt5.sip.voidptr</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-ensurePolished"><strong>ensurePolished</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-ensurePolished">ensurePolished</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-enterEvent"><strong>enterEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-enterEvent">enterEvent</a>(self,&nbsp;QEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-event"><strong>event</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-event">event</a>(self,&nbsp;QEvent)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-find"><strong>find</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-find">find</a>(PyQt5.sip.voidptr)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-focusInEvent"><strong>focusInEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-focusInEvent">focusInEvent</a>(self,&nbsp;QFocusEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-focusNextChild"><strong>focusNextChild</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-focusNextChild">focusNextChild</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-focusNextPrevChild"><strong>focusNextPrevChild</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-focusNextPrevChild">focusNextPrevChild</a>(self,&nbsp;bool)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-focusOutEvent"><strong>focusOutEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-focusOutEvent">focusOutEvent</a>(self,&nbsp;QFocusEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-focusPolicy"><strong>focusPolicy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-focusPolicy">focusPolicy</a>(self)&nbsp;-&gt;&nbsp;Qt.FocusPolicy</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-focusPreviousChild"><strong>focusPreviousChild</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-focusPreviousChild">focusPreviousChild</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-focusProxy"><strong>focusProxy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-focusProxy">focusProxy</a>(self)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-focusWidget"><strong>focusWidget</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-focusWidget">focusWidget</a>(self)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-font"><strong>font</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-font">font</a>(self)&nbsp;-&gt;&nbsp;QFont</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-fontInfo"><strong>fontInfo</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-fontInfo">fontInfo</a>(self)&nbsp;-&gt;&nbsp;QFontInfo</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-fontMetrics"><strong>fontMetrics</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-fontMetrics">fontMetrics</a>(self)&nbsp;-&gt;&nbsp;QFontMetrics</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-foregroundRole"><strong>foregroundRole</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-foregroundRole">foregroundRole</a>(self)&nbsp;-&gt;&nbsp;QPalette.ColorRole</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-frameGeometry"><strong>frameGeometry</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-frameGeometry">frameGeometry</a>(self)&nbsp;-&gt;&nbsp;QRect</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-frameSize"><strong>frameSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-frameSize">frameSize</a>(self)&nbsp;-&gt;&nbsp;QSize</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-geometry"><strong>geometry</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-geometry">geometry</a>(self)&nbsp;-&gt;&nbsp;QRect</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-getContentsMargins"><strong>getContentsMargins</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-getContentsMargins">getContentsMargins</a>(self)&nbsp;-&gt;&nbsp;Tuple[int,&nbsp;int,&nbsp;int,&nbsp;int]</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-grab"><strong>grab</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-grab">grab</a>(self,&nbsp;rectangle:&nbsp;QRect&nbsp;=&nbsp;QRect(QPoint(0,0),QSize(-1,-1)))&nbsp;-&gt;&nbsp;QPixmap</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-grabGesture"><strong>grabGesture</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-grabGesture">grabGesture</a>(self,&nbsp;Qt.GestureType,&nbsp;flags:&nbsp;Union[Qt.GestureFlags,&nbsp;Qt.GestureFlag]&nbsp;=&nbsp;Qt.GestureFlags())</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-grabKeyboard"><strong>grabKeyboard</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-grabKeyboard">grabKeyboard</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-grabMouse"><strong>grabMouse</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-grabMouse">grabMouse</a>(self)<br>
+<a href="#SongselectImport-grabMouse">grabMouse</a>(self,&nbsp;Union[QCursor,&nbsp;Qt.CursorShape])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-grabShortcut"><strong>grabShortcut</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-grabShortcut">grabShortcut</a>(self,&nbsp;Union[QKeySequence,&nbsp;QKeySequence.StandardKey,&nbsp;str,&nbsp;int],&nbsp;context:&nbsp;Qt.ShortcutContext&nbsp;=&nbsp;Qt.WindowShortcut)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-graphicsEffect"><strong>graphicsEffect</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-graphicsEffect">graphicsEffect</a>(self)&nbsp;-&gt;&nbsp;QGraphicsEffect</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-graphicsProxyWidget"><strong>graphicsProxyWidget</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-graphicsProxyWidget">graphicsProxyWidget</a>(self)&nbsp;-&gt;&nbsp;QGraphicsProxyWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-hasFocus"><strong>hasFocus</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-hasFocus">hasFocus</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-hasHeightForWidth"><strong>hasHeightForWidth</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-hasHeightForWidth">hasHeightForWidth</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-hasMouseTracking"><strong>hasMouseTracking</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-hasMouseTracking">hasMouseTracking</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-hasTabletTracking"><strong>hasTabletTracking</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-hasTabletTracking">hasTabletTracking</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-height"><strong>height</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-height">height</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-heightForWidth"><strong>heightForWidth</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-heightForWidth">heightForWidth</a>(self,&nbsp;int)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-hide"><strong>hide</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-hide">hide</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-hideEvent"><strong>hideEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-hideEvent">hideEvent</a>(self,&nbsp;QHideEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-initPainter"><strong>initPainter</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-initPainter">initPainter</a>(self,&nbsp;QPainter)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-inputMethodEvent"><strong>inputMethodEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-inputMethodEvent">inputMethodEvent</a>(self,&nbsp;QInputMethodEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-inputMethodHints"><strong>inputMethodHints</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-inputMethodHints">inputMethodHints</a>(self)&nbsp;-&gt;&nbsp;Qt.InputMethodHints</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-inputMethodQuery"><strong>inputMethodQuery</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-inputMethodQuery">inputMethodQuery</a>(self,&nbsp;Qt.InputMethodQuery)&nbsp;-&gt;&nbsp;Any</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-insertAction"><strong>insertAction</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-insertAction">insertAction</a>(self,&nbsp;QAction,&nbsp;QAction)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-insertActions"><strong>insertActions</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-insertActions">insertActions</a>(self,&nbsp;QAction,&nbsp;Iterable[QAction])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isActiveWindow"><strong>isActiveWindow</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isActiveWindow">isActiveWindow</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isAncestorOf"><strong>isAncestorOf</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isAncestorOf">isAncestorOf</a>(self,&nbsp;QWidget)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isEnabled"><strong>isEnabled</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isEnabled">isEnabled</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isEnabledTo"><strong>isEnabledTo</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isEnabledTo">isEnabledTo</a>(self,&nbsp;QWidget)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isFullScreen"><strong>isFullScreen</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isFullScreen">isFullScreen</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isHidden"><strong>isHidden</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isHidden">isHidden</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isLeftToRight"><strong>isLeftToRight</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isLeftToRight">isLeftToRight</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isMaximized"><strong>isMaximized</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isMaximized">isMaximized</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isMinimized"><strong>isMinimized</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isMinimized">isMinimized</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isModal"><strong>isModal</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isModal">isModal</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isRightToLeft"><strong>isRightToLeft</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isRightToLeft">isRightToLeft</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isVisible"><strong>isVisible</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isVisible">isVisible</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isVisibleTo"><strong>isVisibleTo</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isVisibleTo">isVisibleTo</a>(self,&nbsp;QWidget)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isWindow"><strong>isWindow</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isWindow">isWindow</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isWindowModified"><strong>isWindowModified</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isWindowModified">isWindowModified</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-keyReleaseEvent"><strong>keyReleaseEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-keyReleaseEvent">keyReleaseEvent</a>(self,&nbsp;QKeyEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-keyboardGrabber"><strong>keyboardGrabber</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-keyboardGrabber">keyboardGrabber</a>()&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-layout"><strong>layout</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-layout">layout</a>(self)&nbsp;-&gt;&nbsp;QLayout</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-layoutDirection"><strong>layoutDirection</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-layoutDirection">layoutDirection</a>(self)&nbsp;-&gt;&nbsp;Qt.LayoutDirection</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-leaveEvent"><strong>leaveEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-leaveEvent">leaveEvent</a>(self,&nbsp;QEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-locale"><strong>locale</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-locale">locale</a>(self)&nbsp;-&gt;&nbsp;QLocale</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-lower"><strong>lower</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-lower">lower</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mapFrom"><strong>mapFrom</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mapFrom">mapFrom</a>(self,&nbsp;QWidget,&nbsp;QPoint)&nbsp;-&gt;&nbsp;QPoint</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mapFromGlobal"><strong>mapFromGlobal</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mapFromGlobal">mapFromGlobal</a>(self,&nbsp;QPoint)&nbsp;-&gt;&nbsp;QPoint</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mapFromParent"><strong>mapFromParent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mapFromParent">mapFromParent</a>(self,&nbsp;QPoint)&nbsp;-&gt;&nbsp;QPoint</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mapTo"><strong>mapTo</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mapTo">mapTo</a>(self,&nbsp;QWidget,&nbsp;QPoint)&nbsp;-&gt;&nbsp;QPoint</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mapToGlobal"><strong>mapToGlobal</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mapToGlobal">mapToGlobal</a>(self,&nbsp;QPoint)&nbsp;-&gt;&nbsp;QPoint</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mapToParent"><strong>mapToParent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mapToParent">mapToParent</a>(self,&nbsp;QPoint)&nbsp;-&gt;&nbsp;QPoint</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mask"><strong>mask</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mask">mask</a>(self)&nbsp;-&gt;&nbsp;QRegion</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-maximumHeight"><strong>maximumHeight</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-maximumHeight">maximumHeight</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-maximumSize"><strong>maximumSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-maximumSize">maximumSize</a>(self)&nbsp;-&gt;&nbsp;QSize</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-maximumWidth"><strong>maximumWidth</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-maximumWidth">maximumWidth</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-metric"><strong>metric</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-metric">metric</a>(self,&nbsp;QPaintDevice.PaintDeviceMetric)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-minimumHeight"><strong>minimumHeight</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-minimumHeight">minimumHeight</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-minimumSize"><strong>minimumSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-minimumSize">minimumSize</a>(self)&nbsp;-&gt;&nbsp;QSize</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-minimumWidth"><strong>minimumWidth</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-minimumWidth">minimumWidth</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mouseDoubleClickEvent"><strong>mouseDoubleClickEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mouseDoubleClickEvent">mouseDoubleClickEvent</a>(self,&nbsp;QMouseEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mouseGrabber"><strong>mouseGrabber</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mouseGrabber">mouseGrabber</a>()&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mouseMoveEvent"><strong>mouseMoveEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mouseMoveEvent">mouseMoveEvent</a>(self,&nbsp;QMouseEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mousePressEvent"><strong>mousePressEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mousePressEvent">mousePressEvent</a>(self,&nbsp;QMouseEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-mouseReleaseEvent"><strong>mouseReleaseEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-mouseReleaseEvent">mouseReleaseEvent</a>(self,&nbsp;QMouseEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-move"><strong>move</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-move">move</a>(self,&nbsp;QPoint)<br>
+<a href="#SongselectImport-move">move</a>(self,&nbsp;int,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-moveEvent"><strong>moveEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-moveEvent">moveEvent</a>(self,&nbsp;QMoveEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-nativeEvent"><strong>nativeEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-nativeEvent">nativeEvent</a>(self,&nbsp;Union[QByteArray,&nbsp;bytes,&nbsp;bytearray],&nbsp;PyQt5.sip.voidptr)&nbsp;-&gt;&nbsp;Tuple[bool,&nbsp;int]</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-nativeParentWidget"><strong>nativeParentWidget</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-nativeParentWidget">nativeParentWidget</a>(self)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-nextInFocusChain"><strong>nextInFocusChain</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-nextInFocusChain">nextInFocusChain</a>(self)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-normalGeometry"><strong>normalGeometry</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-normalGeometry">normalGeometry</a>(self)&nbsp;-&gt;&nbsp;QRect</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-overrideWindowFlags"><strong>overrideWindowFlags</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-overrideWindowFlags">overrideWindowFlags</a>(self,&nbsp;Union[Qt.WindowFlags,&nbsp;Qt.WindowType])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-overrideWindowState"><strong>overrideWindowState</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-overrideWindowState">overrideWindowState</a>(self,&nbsp;Union[Qt.WindowStates,&nbsp;Qt.WindowState])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-paintEngine"><strong>paintEngine</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-paintEngine">paintEngine</a>(self)&nbsp;-&gt;&nbsp;QPaintEngine</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-paintEvent"><strong>paintEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-paintEvent">paintEvent</a>(self,&nbsp;QPaintEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-palette"><strong>palette</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-palette">palette</a>(self)&nbsp;-&gt;&nbsp;QPalette</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-parentWidget"><strong>parentWidget</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-parentWidget">parentWidget</a>(self)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-pos"><strong>pos</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-pos">pos</a>(self)&nbsp;-&gt;&nbsp;QPoint</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-previousInFocusChain"><strong>previousInFocusChain</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-previousInFocusChain">previousInFocusChain</a>(self)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-raise_"><strong>raise_</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-raise_">raise_</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-rect"><strong>rect</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-rect">rect</a>(self)&nbsp;-&gt;&nbsp;QRect</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-releaseKeyboard"><strong>releaseKeyboard</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-releaseKeyboard">releaseKeyboard</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-releaseMouse"><strong>releaseMouse</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-releaseMouse">releaseMouse</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-releaseShortcut"><strong>releaseShortcut</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-releaseShortcut">releaseShortcut</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-removeAction"><strong>removeAction</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-removeAction">removeAction</a>(self,&nbsp;QAction)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-render"><strong>render</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-render">render</a>(self,&nbsp;QPaintDevice,&nbsp;targetOffset:&nbsp;QPoint&nbsp;=&nbsp;QPoint(),&nbsp;sourceRegion:&nbsp;QRegion&nbsp;=&nbsp;QRegion(),&nbsp;flags:&nbsp;Union[QWidget.RenderFlags,&nbsp;QWidget.RenderFlag]&nbsp;=&nbsp;QWidget.<a href="#SongselectImport-RenderFlags">RenderFlags</a>(QWidget.RenderFlag.DrawWindowBackground|QWidget.RenderFlag.DrawChildren))<br>
+<a href="#SongselectImport-render">render</a>(self,&nbsp;QPainter,&nbsp;targetOffset:&nbsp;QPoint&nbsp;=&nbsp;QPoint(),&nbsp;sourceRegion:&nbsp;QRegion&nbsp;=&nbsp;QRegion(),&nbsp;flags:&nbsp;Union[QWidget.RenderFlags,&nbsp;QWidget.RenderFlag]&nbsp;=&nbsp;QWidget.<a href="#SongselectImport-RenderFlags">RenderFlags</a>(QWidget.RenderFlag.DrawWindowBackground|QWidget.RenderFlag.DrawChildren))</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-repaint"><strong>repaint</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-repaint">repaint</a>(self)<br>
+<a href="#SongselectImport-repaint">repaint</a>(self,&nbsp;int,&nbsp;int,&nbsp;int,&nbsp;int)<br>
+<a href="#SongselectImport-repaint">repaint</a>(self,&nbsp;QRect)<br>
+<a href="#SongselectImport-repaint">repaint</a>(self,&nbsp;QRegion)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-resize"><strong>resize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-resize">resize</a>(self,&nbsp;QSize)<br>
+<a href="#SongselectImport-resize">resize</a>(self,&nbsp;int,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-restoreGeometry"><strong>restoreGeometry</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-restoreGeometry">restoreGeometry</a>(self,&nbsp;Union[QByteArray,&nbsp;bytes,&nbsp;bytearray])&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-saveGeometry"><strong>saveGeometry</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-saveGeometry">saveGeometry</a>(self)&nbsp;-&gt;&nbsp;QByteArray</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-screen"><strong>screen</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-screen">screen</a>(self)&nbsp;-&gt;&nbsp;QScreen</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-scroll"><strong>scroll</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-scroll">scroll</a>(self,&nbsp;int,&nbsp;int)<br>
+<a href="#SongselectImport-scroll">scroll</a>(self,&nbsp;int,&nbsp;int,&nbsp;QRect)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setAcceptDrops"><strong>setAcceptDrops</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setAcceptDrops">setAcceptDrops</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setAccessibleDescription"><strong>setAccessibleDescription</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setAccessibleDescription">setAccessibleDescription</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setAccessibleName"><strong>setAccessibleName</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setAccessibleName">setAccessibleName</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setAttribute"><strong>setAttribute</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setAttribute">setAttribute</a>(self,&nbsp;Qt.WidgetAttribute,&nbsp;on:&nbsp;bool&nbsp;=&nbsp;True)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setAutoFillBackground"><strong>setAutoFillBackground</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setAutoFillBackground">setAutoFillBackground</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setBackgroundRole"><strong>setBackgroundRole</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setBackgroundRole">setBackgroundRole</a>(self,&nbsp;QPalette.ColorRole)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setBaseSize"><strong>setBaseSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setBaseSize">setBaseSize</a>(self,&nbsp;int,&nbsp;int)<br>
+<a href="#SongselectImport-setBaseSize">setBaseSize</a>(self,&nbsp;QSize)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setContentsMargins"><strong>setContentsMargins</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setContentsMargins">setContentsMargins</a>(self,&nbsp;int,&nbsp;int,&nbsp;int,&nbsp;int)<br>
+<a href="#SongselectImport-setContentsMargins">setContentsMargins</a>(self,&nbsp;QMargins)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setContextMenuPolicy"><strong>setContextMenuPolicy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setContextMenuPolicy">setContextMenuPolicy</a>(self,&nbsp;Qt.ContextMenuPolicy)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setCursor"><strong>setCursor</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setCursor">setCursor</a>(self,&nbsp;Union[QCursor,&nbsp;Qt.CursorShape])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setDisabled"><strong>setDisabled</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setDisabled">setDisabled</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setEnabled"><strong>setEnabled</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setEnabled">setEnabled</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setFixedHeight"><strong>setFixedHeight</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setFixedHeight">setFixedHeight</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setFixedSize"><strong>setFixedSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setFixedSize">setFixedSize</a>(self,&nbsp;QSize)<br>
+<a href="#SongselectImport-setFixedSize">setFixedSize</a>(self,&nbsp;int,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setFixedWidth"><strong>setFixedWidth</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setFixedWidth">setFixedWidth</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setFocus"><strong>setFocus</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setFocus">setFocus</a>(self)<br>
+<a href="#SongselectImport-setFocus">setFocus</a>(self,&nbsp;Qt.FocusReason)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setFocusPolicy"><strong>setFocusPolicy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setFocusPolicy">setFocusPolicy</a>(self,&nbsp;Qt.FocusPolicy)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setFocusProxy"><strong>setFocusProxy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setFocusProxy">setFocusProxy</a>(self,&nbsp;QWidget)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setFont"><strong>setFont</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setFont">setFont</a>(self,&nbsp;QFont)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setForegroundRole"><strong>setForegroundRole</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setForegroundRole">setForegroundRole</a>(self,&nbsp;QPalette.ColorRole)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setGeometry"><strong>setGeometry</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setGeometry">setGeometry</a>(self,&nbsp;QRect)<br>
+<a href="#SongselectImport-setGeometry">setGeometry</a>(self,&nbsp;int,&nbsp;int,&nbsp;int,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setGraphicsEffect"><strong>setGraphicsEffect</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setGraphicsEffect">setGraphicsEffect</a>(self,&nbsp;QGraphicsEffect)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setHidden"><strong>setHidden</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setHidden">setHidden</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setInputMethodHints"><strong>setInputMethodHints</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setInputMethodHints">setInputMethodHints</a>(self,&nbsp;Union[Qt.InputMethodHints,&nbsp;Qt.InputMethodHint])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setLayout"><strong>setLayout</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setLayout">setLayout</a>(self,&nbsp;QLayout)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setLayoutDirection"><strong>setLayoutDirection</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setLayoutDirection">setLayoutDirection</a>(self,&nbsp;Qt.LayoutDirection)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setLocale"><strong>setLocale</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setLocale">setLocale</a>(self,&nbsp;QLocale)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setMask"><strong>setMask</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setMask">setMask</a>(self,&nbsp;QBitmap)<br>
+<a href="#SongselectImport-setMask">setMask</a>(self,&nbsp;QRegion)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setMaximumHeight"><strong>setMaximumHeight</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setMaximumHeight">setMaximumHeight</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setMaximumSize"><strong>setMaximumSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setMaximumSize">setMaximumSize</a>(self,&nbsp;int,&nbsp;int)<br>
+<a href="#SongselectImport-setMaximumSize">setMaximumSize</a>(self,&nbsp;QSize)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setMaximumWidth"><strong>setMaximumWidth</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setMaximumWidth">setMaximumWidth</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setMinimumHeight"><strong>setMinimumHeight</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setMinimumHeight">setMinimumHeight</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setMinimumSize"><strong>setMinimumSize</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setMinimumSize">setMinimumSize</a>(self,&nbsp;int,&nbsp;int)<br>
+<a href="#SongselectImport-setMinimumSize">setMinimumSize</a>(self,&nbsp;QSize)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setMinimumWidth"><strong>setMinimumWidth</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setMinimumWidth">setMinimumWidth</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setMouseTracking"><strong>setMouseTracking</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setMouseTracking">setMouseTracking</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setPalette"><strong>setPalette</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setPalette">setPalette</a>(self,&nbsp;QPalette)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setParent"><strong>setParent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setParent">setParent</a>(self,&nbsp;QWidget)<br>
+<a href="#SongselectImport-setParent">setParent</a>(self,&nbsp;QWidget,&nbsp;Union[Qt.WindowFlags,&nbsp;Qt.WindowType])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setShortcutAutoRepeat"><strong>setShortcutAutoRepeat</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setShortcutAutoRepeat">setShortcutAutoRepeat</a>(self,&nbsp;int,&nbsp;enabled:&nbsp;bool&nbsp;=&nbsp;True)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setShortcutEnabled"><strong>setShortcutEnabled</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setShortcutEnabled">setShortcutEnabled</a>(self,&nbsp;int,&nbsp;enabled:&nbsp;bool&nbsp;=&nbsp;True)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setSizeIncrement"><strong>setSizeIncrement</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setSizeIncrement">setSizeIncrement</a>(self,&nbsp;int,&nbsp;int)<br>
+<a href="#SongselectImport-setSizeIncrement">setSizeIncrement</a>(self,&nbsp;QSize)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setSizePolicy"><strong>setSizePolicy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setSizePolicy">setSizePolicy</a>(self,&nbsp;QSizePolicy)<br>
+<a href="#SongselectImport-setSizePolicy">setSizePolicy</a>(self,&nbsp;QSizePolicy.Policy,&nbsp;QSizePolicy.Policy)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setStatusTip"><strong>setStatusTip</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setStatusTip">setStatusTip</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setStyle"><strong>setStyle</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setStyle">setStyle</a>(self,&nbsp;QStyle)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setStyleSheet"><strong>setStyleSheet</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setStyleSheet">setStyleSheet</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setTabOrder"><strong>setTabOrder</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setTabOrder">setTabOrder</a>(QWidget,&nbsp;QWidget)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setTabletTracking"><strong>setTabletTracking</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setTabletTracking">setTabletTracking</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setToolTip"><strong>setToolTip</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setToolTip">setToolTip</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setToolTipDuration"><strong>setToolTipDuration</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setToolTipDuration">setToolTipDuration</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setUpdatesEnabled"><strong>setUpdatesEnabled</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setUpdatesEnabled">setUpdatesEnabled</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWhatsThis"><strong>setWhatsThis</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWhatsThis">setWhatsThis</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowFilePath"><strong>setWindowFilePath</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowFilePath">setWindowFilePath</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowFlag"><strong>setWindowFlag</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowFlag">setWindowFlag</a>(self,&nbsp;Qt.WindowType,&nbsp;on:&nbsp;bool&nbsp;=&nbsp;True)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowFlags"><strong>setWindowFlags</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowFlags">setWindowFlags</a>(self,&nbsp;Union[Qt.WindowFlags,&nbsp;Qt.WindowType])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowIcon"><strong>setWindowIcon</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowIcon">setWindowIcon</a>(self,&nbsp;QIcon)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowIconText"><strong>setWindowIconText</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowIconText">setWindowIconText</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowModality"><strong>setWindowModality</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowModality">setWindowModality</a>(self,&nbsp;Qt.WindowModality)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowModified"><strong>setWindowModified</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowModified">setWindowModified</a>(self,&nbsp;bool)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowOpacity"><strong>setWindowOpacity</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowOpacity">setWindowOpacity</a>(self,&nbsp;float)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowRole"><strong>setWindowRole</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowRole">setWindowRole</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowState"><strong>setWindowState</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowState">setWindowState</a>(self,&nbsp;Union[Qt.WindowStates,&nbsp;Qt.WindowState])</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setWindowTitle"><strong>setWindowTitle</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setWindowTitle">setWindowTitle</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-sharedPainter"><strong>sharedPainter</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-sharedPainter">sharedPainter</a>(self)&nbsp;-&gt;&nbsp;QPainter</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-show"><strong>show</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-show">show</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-showFullScreen"><strong>showFullScreen</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-showFullScreen">showFullScreen</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-showMaximized"><strong>showMaximized</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-showMaximized">showMaximized</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-showMinimized"><strong>showMinimized</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-showMinimized">showMinimized</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-showNormal"><strong>showNormal</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-showNormal">showNormal</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-size"><strong>size</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-size">size</a>(self)&nbsp;-&gt;&nbsp;QSize</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-sizeIncrement"><strong>sizeIncrement</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-sizeIncrement">sizeIncrement</a>(self)&nbsp;-&gt;&nbsp;QSize</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-sizePolicy"><strong>sizePolicy</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-sizePolicy">sizePolicy</a>(self)&nbsp;-&gt;&nbsp;QSizePolicy</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-stackUnder"><strong>stackUnder</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-stackUnder">stackUnder</a>(self,&nbsp;QWidget)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-statusTip"><strong>statusTip</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-statusTip">statusTip</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-style"><strong>style</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-style">style</a>(self)&nbsp;-&gt;&nbsp;QStyle</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-styleSheet"><strong>styleSheet</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-styleSheet">styleSheet</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-tabletEvent"><strong>tabletEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-tabletEvent">tabletEvent</a>(self,&nbsp;QTabletEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-testAttribute"><strong>testAttribute</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-testAttribute">testAttribute</a>(self,&nbsp;Qt.WidgetAttribute)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-toolTip"><strong>toolTip</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-toolTip">toolTip</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-toolTipDuration"><strong>toolTipDuration</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-toolTipDuration">toolTipDuration</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-underMouse"><strong>underMouse</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-underMouse">underMouse</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-ungrabGesture"><strong>ungrabGesture</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-ungrabGesture">ungrabGesture</a>(self,&nbsp;Qt.GestureType)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-unsetCursor"><strong>unsetCursor</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-unsetCursor">unsetCursor</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-unsetLayoutDirection"><strong>unsetLayoutDirection</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-unsetLayoutDirection">unsetLayoutDirection</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-unsetLocale"><strong>unsetLocale</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-unsetLocale">unsetLocale</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-update"><strong>update</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-update">update</a>(self)<br>
+<a href="#SongselectImport-update">update</a>(self,&nbsp;QRect)<br>
+<a href="#SongselectImport-update">update</a>(self,&nbsp;QRegion)<br>
+<a href="#SongselectImport-update">update</a>(self,&nbsp;int,&nbsp;int,&nbsp;int,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-updateGeometry"><strong>updateGeometry</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-updateGeometry">updateGeometry</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-updateMicroFocus"><strong>updateMicroFocus</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-updateMicroFocus">updateMicroFocus</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-updatesEnabled"><strong>updatesEnabled</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-updatesEnabled">updatesEnabled</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-visibleRegion"><strong>visibleRegion</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-visibleRegion">visibleRegion</a>(self)&nbsp;-&gt;&nbsp;QRegion</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-whatsThis"><strong>whatsThis</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-whatsThis">whatsThis</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-wheelEvent"><strong>wheelEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-wheelEvent">wheelEvent</a>(self,&nbsp;QWheelEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-width"><strong>width</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-width">width</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-winId"><strong>winId</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-winId">winId</a>(self)&nbsp;-&gt;&nbsp;PyQt5.sip.voidptr</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-window"><strong>window</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-window">window</a>(self)&nbsp;-&gt;&nbsp;QWidget</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-windowFilePath"><strong>windowFilePath</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowFilePath">windowFilePath</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-windowFlags"><strong>windowFlags</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowFlags">windowFlags</a>(self)&nbsp;-&gt;&nbsp;Qt.WindowFlags</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-windowHandle"><strong>windowHandle</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowHandle">windowHandle</a>(self)&nbsp;-&gt;&nbsp;QWindow</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-windowIcon"><strong>windowIcon</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowIcon">windowIcon</a>(self)&nbsp;-&gt;&nbsp;QIcon</tt></dd></dl>
+
+<strong>windowIconChanged</strong> = &lt;unbound PYQT_SIGNAL windowIconChanged(QIcon)&gt;
+<dl><dt><a name="SongselectImport-windowIconText"><strong>windowIconText</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowIconText">windowIconText</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<strong>windowIconTextChanged</strong> = &lt;unbound PYQT_SIGNAL windowIconTextChanged(QString)&gt;
+<dl><dt><a name="SongselectImport-windowModality"><strong>windowModality</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowModality">windowModality</a>(self)&nbsp;-&gt;&nbsp;Qt.WindowModality</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-windowOpacity"><strong>windowOpacity</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowOpacity">windowOpacity</a>(self)&nbsp;-&gt;&nbsp;float</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-windowRole"><strong>windowRole</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowRole">windowRole</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-windowState"><strong>windowState</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowState">windowState</a>(self)&nbsp;-&gt;&nbsp;Qt.WindowStates</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-windowTitle"><strong>windowTitle</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowTitle">windowTitle</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<strong>windowTitleChanged</strong> = &lt;unbound PYQT_SIGNAL windowTitleChanged(QString)&gt;
+<dl><dt><a name="SongselectImport-windowType"><strong>windowType</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-windowType">windowType</a>(self)&nbsp;-&gt;&nbsp;Qt.WindowType</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-x"><strong>x</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-x">x</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-y"><strong>y</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-y">y</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="PyQt5.QtWidgets.html#QWidget">PyQt5.QtWidgets.QWidget</a>:<br>
+<dl><dt><strong>DrawChildren</strong> = 2</dl>
+
+<dl><dt><strong>DrawWindowBackground</strong> = 1</dl>
+
+<dl><dt><strong>IgnoreMask</strong> = 4</dl>
+
+<dl><dt><strong>RenderFlag</strong> = &lt;class 'PyQt5.QtWidgets.QWidget.RenderFlag'&gt;</dl>
+
+<dl><dt><strong>RenderFlags</strong> = &lt;class 'PyQt5.QtWidgets.QWidget.RenderFlags'&gt;<dd><tt>QWidget.<a href="#SongselectImport-RenderFlags">RenderFlags</a>()<br>
+QWidget.<a href="#SongselectImport-RenderFlags">RenderFlags</a>(Union[QWidget.RenderFlags,&nbsp;QWidget.RenderFlag])<br>
+QWidget.<a href="#SongselectImport-RenderFlags">RenderFlags</a>(QWidget.RenderFlags)</tt></dl>
+
+<hr>
+Methods inherited from <a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a>:<br>
+<dl><dt><a name="SongselectImport-__getattr__"><strong>__getattr__</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-__getattr__">__getattr__</a>(self,&nbsp;str)&nbsp;-&gt;&nbsp;object</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-blockSignals"><strong>blockSignals</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-blockSignals">blockSignals</a>(self,&nbsp;bool)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-childEvent"><strong>childEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-childEvent">childEvent</a>(self,&nbsp;QChildEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-children"><strong>children</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-children">children</a>(self)&nbsp;-&gt;&nbsp;List[QObject]</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-connectNotify"><strong>connectNotify</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-connectNotify">connectNotify</a>(self,&nbsp;QMetaMethod)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-customEvent"><strong>customEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-customEvent">customEvent</a>(self,&nbsp;QEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-deleteLater"><strong>deleteLater</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-deleteLater">deleteLater</a>(self)</tt></dd></dl>
+
+<strong>destroyed</strong> = &lt;unbound PYQT_SIGNAL destroyed(QObject*)&gt;
+<dl><dt><a name="SongselectImport-disconnect"><strong>disconnect</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-disconnect">disconnect</a>(QMetaObject.Connection)&nbsp;-&gt;&nbsp;bool<br>
+<a href="#SongselectImport-disconnect">disconnect</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-disconnectNotify"><strong>disconnectNotify</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-disconnectNotify">disconnectNotify</a>(self,&nbsp;QMetaMethod)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-dumpObjectInfo"><strong>dumpObjectInfo</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-dumpObjectInfo">dumpObjectInfo</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-dumpObjectTree"><strong>dumpObjectTree</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-dumpObjectTree">dumpObjectTree</a>(self)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-dynamicPropertyNames"><strong>dynamicPropertyNames</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-dynamicPropertyNames">dynamicPropertyNames</a>(self)&nbsp;-&gt;&nbsp;List[QByteArray]</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-findChild"><strong>findChild</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-findChild">findChild</a>(self,&nbsp;type,&nbsp;name:&nbsp;str&nbsp;=&nbsp;'',&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;QObject<br>
+<a href="#SongselectImport-findChild">findChild</a>(self,&nbsp;Tuple,&nbsp;name:&nbsp;str&nbsp;=&nbsp;'',&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;QObject</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-findChildren"><strong>findChildren</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-findChildren">findChildren</a>(self,&nbsp;type,&nbsp;name:&nbsp;str&nbsp;=&nbsp;'',&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[QObject]<br>
+<a href="#SongselectImport-findChildren">findChildren</a>(self,&nbsp;Tuple,&nbsp;name:&nbsp;str&nbsp;=&nbsp;'',&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[QObject]<br>
+<a href="#SongselectImport-findChildren">findChildren</a>(self,&nbsp;type,&nbsp;QRegExp,&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[QObject]<br>
+<a href="#SongselectImport-findChildren">findChildren</a>(self,&nbsp;Tuple,&nbsp;QRegExp,&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[QObject]<br>
+<a href="#SongselectImport-findChildren">findChildren</a>(self,&nbsp;type,&nbsp;QRegularExpression,&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[QObject]<br>
+<a href="#SongselectImport-findChildren">findChildren</a>(self,&nbsp;Tuple,&nbsp;QRegularExpression,&nbsp;options:&nbsp;Union[Qt.FindChildOptions,&nbsp;Qt.FindChildOption]&nbsp;=&nbsp;Qt.FindChildrenRecursively)&nbsp;-&gt;&nbsp;List[QObject]</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-inherits"><strong>inherits</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-inherits">inherits</a>(self,&nbsp;str)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-installEventFilter"><strong>installEventFilter</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-installEventFilter">installEventFilter</a>(self,&nbsp;QObject)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isSignalConnected"><strong>isSignalConnected</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isSignalConnected">isSignalConnected</a>(self,&nbsp;QMetaMethod)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isWidgetType"><strong>isWidgetType</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isWidgetType">isWidgetType</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-isWindowType"><strong>isWindowType</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-isWindowType">isWindowType</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-killTimer"><strong>killTimer</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-killTimer">killTimer</a>(self,&nbsp;int)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-metaObject"><strong>metaObject</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-metaObject">metaObject</a>(self)&nbsp;-&gt;&nbsp;QMetaObject</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-moveToThread"><strong>moveToThread</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-moveToThread">moveToThread</a>(self,&nbsp;QThread)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-objectName"><strong>objectName</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-objectName">objectName</a>(self)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<strong>objectNameChanged</strong> = &lt;unbound PYQT_SIGNAL objectNameChanged(QString)&gt;
+<dl><dt><a name="SongselectImport-parent"><strong>parent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-parent">parent</a>(self)&nbsp;-&gt;&nbsp;QObject</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-property"><strong>property</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-property">property</a>(self,&nbsp;str)&nbsp;-&gt;&nbsp;Any</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-pyqtConfigure"><strong>pyqtConfigure</strong></a>(...)</dt><dd><tt>QObject.<a href="#SongselectImport-pyqtConfigure">pyqtConfigure</a>(...)<br>
+&nbsp;<br>
+Each&nbsp;keyword&nbsp;argument&nbsp;is&nbsp;either&nbsp;the&nbsp;name&nbsp;of&nbsp;a&nbsp;Qt&nbsp;property&nbsp;or&nbsp;a&nbsp;Qt&nbsp;signal.<br>
+For&nbsp;properties&nbsp;the&nbsp;property&nbsp;is&nbsp;set&nbsp;to&nbsp;the&nbsp;given&nbsp;value&nbsp;which&nbsp;should&nbsp;be&nbsp;of&nbsp;an<br>
+appropriate&nbsp;type.<br>
+For&nbsp;signals&nbsp;the&nbsp;signal&nbsp;is&nbsp;connected&nbsp;to&nbsp;the&nbsp;given&nbsp;value&nbsp;which&nbsp;should&nbsp;be&nbsp;a<br>
+callable.</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-receivers"><strong>receivers</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-receivers">receivers</a>(self,&nbsp;PYQT_SIGNAL)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-removeEventFilter"><strong>removeEventFilter</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-removeEventFilter">removeEventFilter</a>(self,&nbsp;QObject)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-sender"><strong>sender</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-sender">sender</a>(self)&nbsp;-&gt;&nbsp;QObject</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-senderSignalIndex"><strong>senderSignalIndex</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-senderSignalIndex">senderSignalIndex</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setObjectName"><strong>setObjectName</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setObjectName">setObjectName</a>(self,&nbsp;str)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-setProperty"><strong>setProperty</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-setProperty">setProperty</a>(self,&nbsp;str,&nbsp;Any)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-signalsBlocked"><strong>signalsBlocked</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-signalsBlocked">signalsBlocked</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-startTimer"><strong>startTimer</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-startTimer">startTimer</a>(self,&nbsp;int,&nbsp;timerType:&nbsp;Qt.TimerType&nbsp;=&nbsp;Qt.CoarseTimer)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-thread"><strong>thread</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-thread">thread</a>(self)&nbsp;-&gt;&nbsp;QThread</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-timerEvent"><strong>timerEvent</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-timerEvent">timerEvent</a>(self,&nbsp;QTimerEvent)</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-tr"><strong>tr</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-tr">tr</a>(self,&nbsp;str,&nbsp;disambiguation:&nbsp;str&nbsp;=&nbsp;None,&nbsp;n:&nbsp;int&nbsp;=&nbsp;-1)&nbsp;-&gt;&nbsp;str</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="PyQt5.QtCore.html#QObject">PyQt5.QtCore.QObject</a>:<br>
+<dl><dt><strong>staticMetaObject</strong> = &lt;PyQt5.QtCore.QMetaObject object&gt;</dl>
+
+<hr>
+Methods inherited from <a href="PyQt5.QtGui.html#QPaintDevice">PyQt5.QtGui.QPaintDevice</a>:<br>
+<dl><dt><a name="SongselectImport-colorCount"><strong>colorCount</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-colorCount">colorCount</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-depth"><strong>depth</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-depth">depth</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-devicePixelRatio"><strong>devicePixelRatio</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-devicePixelRatio">devicePixelRatio</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-devicePixelRatioF"><strong>devicePixelRatioF</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-devicePixelRatioF">devicePixelRatioF</a>(self)&nbsp;-&gt;&nbsp;float</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-devicePixelRatioFScale"><strong>devicePixelRatioFScale</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-devicePixelRatioFScale">devicePixelRatioFScale</a>()&nbsp;-&gt;&nbsp;float</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-heightMM"><strong>heightMM</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-heightMM">heightMM</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-logicalDpiX"><strong>logicalDpiX</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-logicalDpiX">logicalDpiX</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-logicalDpiY"><strong>logicalDpiY</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-logicalDpiY">logicalDpiY</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-paintingActive"><strong>paintingActive</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-paintingActive">paintingActive</a>(self)&nbsp;-&gt;&nbsp;bool</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-physicalDpiX"><strong>physicalDpiX</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-physicalDpiX">physicalDpiX</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-physicalDpiY"><strong>physicalDpiY</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-physicalDpiY">physicalDpiY</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<dl><dt><a name="SongselectImport-widthMM"><strong>widthMM</strong></a>(...)</dt><dd><tt><a href="#SongselectImport-widthMM">widthMM</a>(self)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="PyQt5.QtGui.html#QPaintDevice">PyQt5.QtGui.QPaintDevice</a>:<br>
+<dl><dt><strong>PaintDeviceMetric</strong> = &lt;class 'PyQt5.QtGui.QPaintDevice.PaintDeviceMetric'&gt;</dl>
+
+<dl><dt><strong>PdmDepth</strong> = 6</dl>
+
+<dl><dt><strong>PdmDevicePixelRatio</strong> = 11</dl>
+
+<dl><dt><strong>PdmDevicePixelRatioScaled</strong> = 12</dl>
+
+<dl><dt><strong>PdmDpiX</strong> = 7</dl>
+
+<dl><dt><strong>PdmDpiY</strong> = 8</dl>
+
+<dl><dt><strong>PdmHeight</strong> = 2</dl>
+
+<dl><dt><strong>PdmHeightMM</strong> = 4</dl>
+
+<dl><dt><strong>PdmNumColors</strong> = 5</dl>
+
+<dl><dt><strong>PdmPhysicalDpiX</strong> = 9</dl>
+
+<dl><dt><strong>PdmPhysicalDpiY</strong> = 10</dl>
+
+<dl><dt><strong>PdmWidth</strong> = 1</dl>
+
+<dl><dt><strong>PdmWidthMM</strong> = 3</dl>
+
+<hr>
+Static methods inherited from <a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a>:<br>
+<dl><dt><a name="SongselectImport-__new__"><strong>__new__</strong></a>(*args, **kwargs)<font color="#909090"><font face="helvetica, arial"> from <a href="PyQt5.sip.html#wrappertype">sip.wrappertype</a></font></font></dt><dd><tt>Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;object.&nbsp;&nbsp;See&nbsp;help(type)&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="PyQt5.sip.html#simplewrapper">sip.simplewrapper</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>__warningregistry__</strong> = {'version': 6}</td></tr></table>
+</body></html>

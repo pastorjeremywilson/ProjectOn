@@ -58,6 +58,7 @@ class FormattableTextEdit(QWidget):
         Method to set/unset and merge the current selection or cursor's charFormat to bold.
         """
         cursor = self.text_edit.textCursor()
+        current_position = cursor.position()
         if cursor.hasSelection():
             selection_start = cursor.selectionStart()
             selection_end = cursor.selectionEnd()
@@ -80,8 +81,7 @@ class FormattableTextEdit(QWidget):
                 self.text_edit.setCurrentFont(font)
 
         self.text_edit.setFocus()
-        if self.cursor_position:
-            self.text_edit.textCursor().setPosition(self.cursor_position)
+        self.text_edit.textCursor().setPosition(current_position)
 
     def set_italic(self):
         """
@@ -131,7 +131,8 @@ class FormattableTextEdit(QWidget):
                 self.text_edit.setCurrentFont(font)
 
         self.text_edit.setFocus()
-        self.text_edit.textCursor().setPosition(self.cursor_position)
+        if self.cursor_position:
+            self.text_edit.textCursor().setPosition(self.cursor_position)
             
     def set_style_buttons(self):
         """

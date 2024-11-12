@@ -1,11 +1,13 @@
+import os.path
 import re
 
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QApplication
+    QSpinBox
 
+import parsers
 from formattable_text_edit import FormattableTextEdit
 from simple_splash import SimpleSplash
 from widgets import StandardItemWidget, FontWidget
@@ -70,6 +72,7 @@ class EditWidget(QDialog):
         """
         Create and add the necessary widgets.py to this dialog
         """
+        button_size = QSize(36, 36)
         self.setParent(self.gui.main_window)
         self.setWindowFlag(Qt.WindowType.Window)
         if self.type == 'song':
@@ -195,7 +198,6 @@ class EditWidget(QDialog):
             self.song_order_list_widget.setFont(self.gui.standard_font)
             lyrics_layout.addWidget(self.song_order_list_widget, 1, 2)
 
-        if self.type == 'song':
             tool_bar = QWidget()
             toolbar_layout = QHBoxLayout()
             tool_bar.setLayout(toolbar_layout)
@@ -249,34 +251,125 @@ class EditWidget(QDialog):
             toolbar_layout.addWidget(ending_button)
             toolbar_layout.addStretch()
 
-        """show_hide_advanced_widget = QWidget()
-        show_hide_advanced_layout = QHBoxLayout(show_hide_advanced_widget)
-        main_layout.addWidget(show_hide_advanced_widget)
+        if self.type == 'custom':
+            audio_widget = QWidget()
+            audio_layout = QHBoxLayout(audio_widget)
+            main_layout.addWidget(audio_widget)
 
-        self.show_hide_advanced_button = QPushButton('+')
-        self.show_hide_advanced_button.setFont(self.gui.bold_font)
-        self.show_hide_advanced_button.setFixedSize(40, 40)
-        self.show_hide_advanced_button.pressed.connect(self.show_hide_advanced_options)
-        show_hide_advanced_layout.addWidget(self.show_hide_advanced_button)
+            self.add_audio_button = QPushButton()
+            self.add_audio_button.setObjectName('add_audio_button')
+            self.add_audio_button.setCheckable(True)
+            self.add_audio_button.setToolTip('Add an audio file that will play when this slide is shown')
+            self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio.svg'))
+            self.add_audio_button.setIconSize(button_size)
+            self.add_audio_button.setChecked(False)
+            self.add_audio_button.released.connect(self.add_audio_changed)
+            audio_layout.addWidget(self.add_audio_button)
 
-        show_hide_advanced_label = QLabel('Advanced Options')
-        show_hide_advanced_label.setFont(self.gui.standard_font)
-        show_hide_advanced_layout.addWidget(show_hide_advanced_label)
-        show_hide_advanced_layout.addStretch()"""
+            add_audio_label = QLabel('Add Audio')
+            add_audio_label.setFont(self.gui.bold_font)
+            audio_layout.addWidget(add_audio_label)
+            audio_layout.addSpacing(20)
+
+            self.audio_line_edit = QLineEdit()
+            self.audio_line_edit.setObjectName('audio_line_edit')
+            self.audio_line_edit.setFont(self.gui.standard_font)
+            audio_layout.addWidget(self.audio_line_edit)
+            audio_layout.addSpacing(20)
+
+            self.choose_file_button = QPushButton()
+            self.choose_file_button.setObjectName('choose_file_button')
+            self.choose_file_button.setIcon(QIcon('resources/gui_icons/open.svg'))
+            self.choose_file_button.setIconSize(QSize(24, 24))
+            self.choose_file_button.setFont(self.gui.standard_font)
+            self.choose_file_button.setToolTip('Choose an audio file')
+            self.choose_file_button.pressed.connect(self.get_audio_file)
+            audio_layout.addWidget(self.choose_file_button)
+
+            self.loop_audio_button = QPushButton()
+            self.loop_audio_button.setObjectName('loop_audio_button')
+            self.loop_audio_button.setCheckable(True)
+            self.loop_audio_button.setIcon(QIcon('resources/gui_icons/repeat.svg'))
+            self.loop_audio_button.setIconSize(QSize(24, 24))
+            self.loop_audio_button.setFont(self.gui.standard_font)
+            self.loop_audio_button.setToolTip('Play this audio on a continual loop so long as this slide is showing')
+            audio_layout.addWidget(self.loop_audio_button)
+            audio_layout.addStretch()
+
+            self.loop_audio_button.hide()
+            self.audio_line_edit.hide()
+            self.choose_file_button.hide()
+
+            auto_play_widget = QWidget()
+            auto_play_layout = QHBoxLayout(auto_play_widget)
+            main_layout.addWidget(auto_play_widget)
+
+            self.auto_play_spinbox = QSpinBox()
+
+            self.split_slides_button = QPushButton()
+            self.split_slides_button.setObjectName('split_slides_button')
+            self.split_slides_button.setCheckable(True)
+            self.split_slides_button.setToolTip(
+                'Split the above text into individual slides wherever there is a blank line')
+            self.split_slides_button.setFont(self.gui.bold_font)
+            self.split_slides_button.setIcon(QIcon('resources/gui_icons/split.svg'))
+            self.split_slides_button.setIconSize(button_size)
+            self.split_slides_button.setChecked(False)
+            self.split_slides_button.released.connect(self.split_slides_changed)
+            auto_play_layout.addWidget(self.split_slides_button)
+
+            split_slides_label = QLabel('Split Slides')
+            split_slides_label.setFont(self.gui.bold_font)
+            auto_play_layout.addWidget(split_slides_label)
+            auto_play_layout.addSpacing(20)
+
+            self.auto_play_checkbox = QCheckBox('Auto-Play Slide Text')
+            self.auto_play_checkbox.setObjectName('auto_play_checkbox')
+            self.auto_play_checkbox.setToolTip(
+                'Use blank lines to create separate slides that will be scrolled through automatically')
+            self.auto_play_checkbox.setFont(self.gui.bold_font)
+            self.auto_play_checkbox.setChecked(False)
+            auto_play_layout.addWidget(self.auto_play_checkbox)
+            auto_play_layout.addSpacing(20)
+
+            self.auto_play_spinbox_label = QLabel('Secs. Between Slides:')
+            self.auto_play_spinbox_label.setFont(self.gui.standard_font)
+            auto_play_layout.addWidget(self.auto_play_spinbox_label)
+
+            self.auto_play_spinbox.setFont(self.gui.standard_font)
+            self.auto_play_spinbox.setRange(1, 60)
+            self.auto_play_spinbox.setValue(6)
+            auto_play_layout.addWidget(self.auto_play_spinbox)
+            auto_play_layout.addStretch()
+
+            self.auto_play_checkbox.hide()
+            self.auto_play_spinbox_label.hide()
+            self.auto_play_spinbox.hide()
+
+        override_button_widget = QWidget()
+        override_button_layout = QHBoxLayout(override_button_widget)
+        main_layout.addWidget(override_button_widget)
+
+        self.override_global_button = QPushButton()
+        self.override_global_button.setObjectName('override_global_button')
+        self.override_global_button.setCheckable(True)
+        self.override_global_button.setToolTip(
+            'Checking this box will apply all of the below settings to this song/custom slide')
+        self.override_global_button.setFont(self.gui.bold_font)
+        self.override_global_button.setIcon(QIcon('resources/gui_icons/override_global.svg'))
+        self.override_global_button.setIconSize(button_size)
+        self.override_global_button.setChecked(False)
+        self.override_global_button.released.connect(self.override_global_changed)
+        override_button_layout.addWidget(self.override_global_button)
+
+        override_global_label = QLabel('Custom Slide Settings')
+        override_global_label.setFont(self.gui.bold_font)
+        override_button_layout.addWidget(override_global_label)
+        override_button_layout.addStretch()
 
         self.advanced_options_widget = QWidget()
         advanced_options_layout = QVBoxLayout(self.advanced_options_widget)
         main_layout.addWidget(self.advanced_options_widget)
-        #self.advanced_options_widget.hide()
-
-        self.override_global_checkbox = QCheckBox('Override Global Settings')
-        self.override_global_checkbox.setObjectName('override_global_checkbox')
-        self.override_global_checkbox.setToolTip(
-            'Checking this box will apply all of the below settings to this song/custom slide')
-        self.override_global_checkbox.setFont(self.gui.bold_font)
-        self.override_global_checkbox.setChecked(False)
-        self.override_global_checkbox.stateChanged.connect(self.override_global_changed)
-        advanced_options_layout.addWidget(self.override_global_checkbox)
 
         if self.type == 'song':
             footer_widget = QWidget()
@@ -397,7 +490,8 @@ class EditWidget(QDialog):
             slide_type = 'bible'
 
         for i in range(self.font_widget.font_list_widget.count()):
-            if self.font_widget.font_list_widget.item(i).data(20) == self.gui.main.settings[slide_type + '_font_face']:
+            if (self.font_widget.font_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+                    == self.gui.main.settings[slide_type + '_font_face']):
                 self.font_widget.font_list_widget.setCurrentRow(i)
                 break
 
@@ -434,14 +528,47 @@ class EditWidget(QDialog):
         self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole))
         self.font_widget.font_sample.paint_font()
 
+    def add_audio_changed(self):
+        self.audio_line_edit.setVisible(self.add_audio_button.isChecked())
+        self.choose_file_button.setVisible(self.add_audio_button.isChecked())
+        self.loop_audio_button.setVisible(self.add_audio_button.isChecked())
+        if self.add_audio_button.isChecked():
+            self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio_selected.svg'))
+        else:
+            self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio.svg'))
+            self.audio_line_edit.clear()
+
+    def split_slides_changed(self):
+        if self.split_slides_button.isChecked():
+            self.split_slides_button.setIcon(QIcon('resources/gui_icons/split_selected.svg'))
+        else:
+            self.split_slides_button.setIcon(QIcon('resources/gui_icons/split.svg'))
+        self.auto_play_checkbox.setVisible(self.split_slides_button.isChecked())
+        self.auto_play_spinbox_label.setVisible(self.split_slides_button.isChecked())
+        self.auto_play_spinbox.setVisible(self.split_slides_button.isChecked())
+
+    def get_audio_file(self):
+        file_dialog = QFileDialog()
+        result = file_dialog.getOpenFileName(
+            self,
+            'Choose Audio File',
+            os.path.expanduser('~'),
+            'Audio Files (*.mp3 *.wav *.wma *.flac)'
+        )
+        if len(result[0]) > 0:
+            self.audio_line_edit.setText(result[0])
+
     def override_global_changed(self):
+        if self.override_global_button.isChecked():
+            self.override_global_button.setIcon(QIcon('resources/gui_icons/override_global_selected.svg'))
+        else:
+            self.override_global_button.setIcon(QIcon('resources/gui_icons/override_global.svg'))
         for widget in self.advanced_options_widget.findChildren(QWidget):
-            if not widget.objectName() == 'override_global_checkbox':
+            if not widget.objectName() == 'override_global_button':
                 set_enabled = getattr(widget, 'setEnabled', None)
                 hide = getattr(widget, 'hide', None)
                 if callable(hide):
-                    #widget.setEnabled(self.override_global_checkbox.isChecked())
-                    widget.setHidden(not self.override_global_checkbox.isChecked())
+                    widget.setHidden(not self.override_global_button.isChecked())
 
     def populate_song_data(self, song_data):
         """
@@ -505,9 +632,9 @@ class EditWidget(QDialog):
 
         # set the override global checkbox
         if song_data[17] == 'True':
-            self.override_global_checkbox.setChecked(True)
+            self.override_global_button.setChecked(True)
         else:
-            self.override_global_checkbox.setChecked(False)
+            self.override_global_button.setChecked(False)
 
         # set the footer checkbox
         if song_data[6] == 'true':
@@ -646,9 +773,10 @@ class EditWidget(QDialog):
 
         # set the override global checkbox
         if custom_data[12] == 'True':
-            self.override_global_checkbox.setChecked(True)
+            self.override_global_button.setChecked(True)
         else:
-            self.override_global_checkbox.setChecked(False)
+            self.override_global_button.setChecked(False)
+        self.override_global_changed()
 
         # set the font face list widget
         if not custom_data[2] or 'global' in custom_data[2]:
@@ -770,6 +898,30 @@ class EditWidget(QDialog):
         else:
             self.font_widget.shade_opacity_slider.color_slider.setValue(int(custom_data[15]))
 
+        # set the audio file
+        if custom_data[16] and len(custom_data[6]) > 0:
+            self.add_audio_button.setChecked(True)
+            self.audio_line_edit.setText(custom_data[16])
+        self.add_audio_changed()
+        if custom_data[17] == 'True':
+            self.loop_audio_button.setChecked(True)
+        else:
+            self.loop_audio_button.setChecked(False)
+
+        # set auto-play
+        if custom_data[18] == 'True':
+            self.auto_play_checkbox.setChecked(True)
+        else:
+            self.auto_play_checkbox.setChecked(False)
+        if custom_data[19]:
+            self.auto_play_spinbox.setValue(int(custom_data[19]))
+
+        if custom_data[20] == 'True':
+            self.split_slides_button.setChecked(True)
+        else:
+            self.split_slides_button.setChecked(False)
+        self.split_slides_changed()
+
         self.font_widget.blockSignals(False)
 
     def show_hide_advanced_options(self):
@@ -887,7 +1039,7 @@ class EditWidget(QDialog):
             )
             return
 
-        if self.override_global_checkbox.isChecked():
+        if self.override_global_button.isChecked():
             override_global = 'True'
         else:
             override_global = 'False'
@@ -1039,10 +1191,12 @@ class EditWidget(QDialog):
 
         if self.old_title:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(20) == self.old_title:
+                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title'] == self.old_title:
                     new_item = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)[
                         0].clone()
-                    new_item.setData(24, self.gui.media_widget.parse_song_data(new_item))
+                    new_data = new_item.data(Qt.ItemDataRole.UserRole).copy()
+                    new_data['parsed_text'] = parsers.parse_song_data(self.gui, new_data)
+                    new_item.setData(Qt.ItemDataRole.UserRole, new_data)
                     self.gui.oos_widget.oos_list_widget.takeItem(i)
                     self.gui.media_widget.add_song_to_service(new_item, i)
                     self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
@@ -1061,7 +1215,7 @@ class EditWidget(QDialog):
         Method to save user's changes for the custom slide type editor.
         """
 
-        if self.override_global_checkbox.isChecked():
+        if self.override_global_button.isChecked():
             override_global = 'True'
         else:
             override_global = 'False'
@@ -1103,13 +1257,46 @@ class EditWidget(QDialog):
         text = self.lyrics_edit.text_edit.toHtml()
         text_split = re.split('<body.*?>', text)
         text = text_split[1].replace('</body></html>', '')
-        text = text.replace('"', '""').strip()
-        text = re.sub(
-            '<span style=.*?font-weight.*?>',
-            '<b>',
-            text
-        )
-        text = re.sub('</.*?span>', '</b>', text)
+
+        text = re.sub('<p.*?>', '', text)
+        text = re.sub('</p>', '', text)
+
+        # simplify the formatting tags for bold, italic, and underline
+        style_substrings = re.findall('<span.*?</span>', text)
+        for substring in style_substrings:
+            prefix = ''
+            suffix = ''
+            if 'font-weight' in substring:
+                prefix += '<b>'
+                suffix += '</b>'
+            if 'font-style' in substring:
+                prefix += '<i>'
+                suffix += '</i>'
+            if 'text-decoration' in substring:
+                prefix += '<u>'
+                suffix += '</u>'
+
+            new_substring = prefix + re.sub('<.*?>', '', substring) + suffix
+            text = text.replace(substring, new_substring)
+
+        audio_file = ''
+        if len(self.audio_line_edit.text()) > 0:
+            audio_file = self.audio_line_edit.text()
+        if self.loop_audio_button.isChecked():
+            loop_audio = 'True'
+        else:
+            loop_audio = 'False'
+
+        if self.auto_play_checkbox.isChecked():
+            auto_play = 'True'
+        else:
+            auto_play = 'False'
+        slide_delay = str(self.auto_play_spinbox.value())
+
+        if self.split_slides_button.isChecked():
+            split_slides = 'True'
+        else:
+            split_slides = 'False'
 
         custom_data = [
             self.title_line_edit.text(),
@@ -1127,7 +1314,12 @@ class EditWidget(QDialog):
             override_global,
             use_shade,
             shade_color,
-            shade_opacity
+            shade_opacity,
+            audio_file,
+            loop_audio,
+            auto_play,
+            slide_delay,
+            split_slides
         ]
 
         if self.new_custom:
@@ -1176,7 +1368,8 @@ class EditWidget(QDialog):
 
         if self.old_title:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(20) == self.old_title:
+                item_data = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+                if item_data['title'] == self.old_title:
                     self.change_thumbnail(self.gui.oos_widget.oos_list_widget.item(i))
                     new_item = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)[
                         0].clone()
@@ -1199,18 +1392,18 @@ class EditWidget(QDialog):
         :param QListWidgetItem item: The edited song/custom slide's QListWidgetItem
         :return:
         """
-        if item.data(29) == 'global_song':
+        if item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_song':
             pixmap = self.gui.global_song_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
-        elif item.data(29) == 'global_bible':
+        elif item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_bible':
             pixmap = self.gui.global_bible_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
-        elif 'rgb(' in item.data(29):
+        elif 'rgb(' in item.data(Qt.ItemDataRole.UserRole)['background']:
             pixmap = QPixmap(50, 27)
             painter = QPainter(pixmap)
-            rgb = item.data(29).replace('rgb(', '')
+            rgb = item.data(Qt.ItemDataRole.UserRole)['background'].replace('rgb(', '')
             rgb = rgb.replace(')', '')
             rgb_split = rgb.split(',')
             brush = QBrush(QColor.fromRgb(
@@ -1219,11 +1412,11 @@ class EditWidget(QDialog):
             painter.fillRect(pixmap.rect(), brush)
             painter.end()
         else:
-            pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(29))
+            pixmap = QPixmap(self.gui.main.background_dir + '/' + item.data(Qt.ItemDataRole.UserRole)['background'])
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
 
-        item_widget = StandardItemWidget(self.gui, item.data(20), '', pixmap)
+        item_widget = StandardItemWidget(self.gui, item.data(Qt.ItemDataRole.UserRole)['text'], '', pixmap)
         item.setSizeHint(item_widget.sizeHint())
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, item_widget)
 

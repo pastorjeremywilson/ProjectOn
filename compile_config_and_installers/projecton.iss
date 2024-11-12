@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ProjectOn"
-#define MyAppVersion "1.4.1"
+#define MyAppVersion "1.5.0"
 #define MyAppPublisher "Wilson's Widgets"
 #define MyAppExeName "ProjectOn.exe"
 #define MyAppAssocName MyAppName + " File"
@@ -28,7 +28,7 @@ SourceDir={#ResourceLocation}\resources
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\Users\pasto\Desktop\output
 OutputBaseFilename=Setup Projecton v.{#MyAppVersion}
-SetupIconFile=logo.ico
+SetupIconFile=C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern

@@ -8,8 +8,7 @@ from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPa
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
-    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QSizePolicy, QGraphicsScene, QGraphicsRectItem, \
-    QGraphicsWidget, QGraphicsPixmapItem, QGraphicsView
+    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem
 
 
 class FontFaceListWidget(QListWidget):
@@ -113,6 +112,8 @@ class ImageCombobox(QComboBox):
 
     def index_changed(self):
         file_name = self.itemData(self.currentIndex(), Qt.ItemDataRole.UserRole)
+        if not file_name:
+            return
         if self.type == 'logo':
             self.gui.main.settings['logo_image'] = file_name
         elif self.type == 'song':
@@ -121,7 +122,8 @@ class ImageCombobox(QComboBox):
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 item = self.gui.oos_widget.oos_list_widget.item(i)
-                if item.data(29) == 'global_song' or item.data(40) == 'song':
+                if (item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_song'
+                        or item.data(Qt.ItemDataRole.UserRole)['type'] == 'song'):
                     item = self.gui.oos_widget.oos_list_widget.item(i)
                     widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
                     pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
@@ -134,7 +136,8 @@ class ImageCombobox(QComboBox):
 
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
                 item = self.gui.oos_widget.oos_list_widget.item(i)
-                if item.data(29) == 'global_bible' or item.data(40) == 'bible':
+                if (item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_bible'
+                        or item.data(Qt.ItemDataRole.UserRole)['type'] == 'bible'):
                     item = self.gui.oos_widget.oos_list_widget.item(i)
                     widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
                     pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
@@ -386,7 +389,8 @@ class CustomMainWindow(QMainWindow):
                 if self.gui.media_player.state() == QMediaPlayer.State.PlayingState:
                     self.gui.media_player.stop()
                 self.gui.media_player.deleteLater()
-                self.gui.video_widget.deleteLater()
+                if self.gui.video_widget:
+                    self.gui.video_widget.deleteLater()
                 self.gui.media_player = None
                 self.gui.video_widget = None
                 self.gui.audio_output = None
@@ -407,7 +411,9 @@ class CustomMainWindow(QMainWindow):
                 print("Shutdown Error " + e.__str__())
 
             if self.gui.timed_update:
-                self.gui.timed_update.stop = True
+                self.gui.timed_update.keep_running = False
+            if self.gui.slide_auto_play:
+                self.gui.slide_auto_play.keep_running = False
             evt.accept()
 
 
@@ -449,6 +455,8 @@ class DisplayWidget(QWidget):
         self.background_label.setGeometry(self.geometry())
         self.background_label.move(self.x(), self.y())
 
+        self.background_pixmap = None
+
     def toggle_show_hide(self):
         """
         Convenience method to show/hide this display widget
@@ -457,6 +465,51 @@ class DisplayWidget(QWidget):
             self.showFullScreen()
         else:
             self.hide()
+
+    def paintEvent(self, evt):
+        super().paintEvent(evt)
+        # in the case of a background pixmap, either center it if the pixmap is smaller than the display widget,
+        # or scale it down if it is bigger
+        if self.background_pixmap:
+            #self.background_label.setStyleSheet('border: 5px solid green')
+            p_width = self.background_pixmap.width()
+            p_height = self.background_pixmap.height()
+            if p_width < self.width() or p_height < self.height():
+                x = int((self.width() / 2) - (self.background_pixmap.width() / 2))
+                y = int((self.height() / 2) - (self.background_pixmap.height() / 2))
+            elif p_width > self.width() or p_height > self.height():
+                x_ratio = self.width() / p_width
+                y_ratio = self.height() / p_height
+                if x_ratio < y_ratio:
+                    ratio = x_ratio
+                else:
+                    ratio = y_ratio
+
+                self.background_pixmap = self.background_pixmap.scaled(
+                    int(p_width * ratio),
+                    int(p_height * ratio),
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                x = int((self.width() / 2) - (self.background_pixmap.width() / 2))
+                y = int((self.height() / 2) - (self.background_pixmap.height() / 2))
+            else:
+                x = 0
+                y = 0
+
+            # paint a new pixmap using the new coordinates and/or size
+            pixmap = QPixmap(self.width(), self.height())
+            brush = QBrush()
+            brush.setColor(Qt.GlobalColor.black)
+            brush.setStyle(Qt.BrushStyle.SolidPattern)
+
+            painter = QPainter(pixmap)
+            painter.begin(pixmap)
+            painter.setBackground(brush)
+            painter.drawPixmap(x, y, self.background_pixmap)
+            painter.end()
+
+            self.background_label.setPixmap(pixmap)
 
 
 class LyricDisplayWidget(QWidget):
@@ -504,8 +557,7 @@ class LyricDisplayWidget(QWidget):
         self.shade_opacity = shade_opacity
 
         self.text = ''
-        self.path = QPainterPath()
-        self.shadow_path = QPainterPath()
+        self.total_height = 0
 
         margins = QMargins(0, 0, 0, 0)
         self.setContentsMargins(margins)
@@ -554,142 +606,109 @@ class LyricDisplayWidget(QWidget):
         """
         Method to paint the text onto the widget, using the prescribed outline and shadow values
         """
-        self.path.clear()
-        self.shadow_path.clear()
+        self.total_height = 0
         self.text = re.sub('<p.*?>', '', self.text)
         self.text = re.sub('</p>', '', self.text)
         self.text = re.sub('\n', '<br />', self.text)
         self.text = re.sub('<br/>', '<br />', self.text)
 
-        text_lines = self.text.split('<br />')
-        metrics = self.fontMetrics()
-        line_height = metrics.boundingRect('Way').height()
-        space_width = metrics.boundingRect('m m').width() - metrics.boundingRect('mm').width()
+        BOLD = 0
+        ITALIC = 1
+        UNDERLINE = 2
+
+        """text_lines = self.text.split('<br />')
+        line_height = self.fontMetrics().boundingRect('Way').height()
         lines = []
         for this_line in text_lines:
             this_line = this_line.strip()
 
             # split the lines according to their drawn length
-            if (metrics.boundingRect(this_line).adjusted(
-                    0, 0, self.outline_width, self.outline_width).width()
-                    < self.gui.display_widget.width() - 20):
+            if self.fontMetrics().boundingRect(this_line).width() < self.gui.display_widget.width() - 20:
                 lines.append(this_line)
             else:
-                split_more = True
-                splitted_lines = [this_line]
-                iterations = 0
-                while split_more:
-                    new_splits = []
-                    for line in splitted_lines:
-                        if (metrics.boundingRect(line).adjusted(
-                                0, 0, self.outline_width, self.outline_width).width()
-                                > self.gui.display_widget.width() - 20):
-                            line_split = line.split(' ')
-                            center_index = int(len(line_split) / 2)
-                            new_lines = [' '.join(line_split[:center_index]), ' '.join(line_split[center_index:len(line_split)])]
-                            for i in range(len(new_lines)):
-                                if '</b>' in new_lines[i] and '<b>' not in new_lines[i]:
-                                    new_lines[i] = '<b>' + new_lines[i]
-                                if '</i>' in new_lines[i] and '<i>' not in new_lines[i]:
-                                    new_lines[i] = '<i>' + new_lines[i]
-                                if '</u>' in new_lines[i] and '<u>' not in new_lines[i]:
-                                    new_lines[i] = '<u>' + new_lines[i]
+                this_line_split = this_line.split(' ')
+                current_line = ''
+                for word in this_line_split:
+                    current_line = (current_line + ' ' + word).strip()
+                    print(current_line)
+                    if self.fontMetrics().boundingRect(current_line).width() > self.gui.display_widget.width() - 20:
+                        lines.append(' '.join(current_line.split(' ')[:-1]))
+                        current_line = word
+                lines.append(current_line)"""
 
-                                if '<b>' in new_lines[i] and '</b>' not in new_lines[i]:
-                                    new_lines[i] = new_lines[i] + '</b>'
-                                if '<i>' in new_lines[i] and '</i>' not in new_lines[i]:
-                                    new_lines[i] = new_lines[i] + '</i>'
-                                if '<u>' in new_lines[i] and '</u>' not in new_lines[i]:
-                                    new_lines[i] = new_lines[i] + '</u>'
-                            new_splits.append(new_lines[0])
-                            new_splits.append(new_lines[1])
-                        else:
-                            new_splits.append(line)
+        font = self.font()
+        font_size = font.pointSize() + 2
+        painter_paths = []
+        longest_line = 0
+        self.footer_label.adjustSize()
 
-                    split_more = False
-                    splitted_lines = new_splits
-                    for line in splitted_lines:
-                        if (metrics.boundingRect(line).adjusted(
-                                0, 0, self.outline_width, self.outline_width).width()
-                                > self.gui.display_widget.width() - 20):
-                            split_more = True
-                    iterations += 1
-                    if iterations > 10:
-                        break
+        # build paths for each line, creating a new path whenever the line becomes too long
+        footer_height = self.footer_label.height()
+        if self.footer_label.isHidden() or len(self.footer_label.text().strip()) == 0:
+            footer_height = 0
+        usable_rect = QRect(0, 0, self.gui.display_widget.width(), self.gui.display_widget.height() - footer_height - 40)
+        self.total_height = -1
+        while self.total_height == -1 or self.total_height > usable_rect.height():
+            longest_line = 0
+            painter_paths = []
+            word_path = QPainterPath()
+            path_index = -1
 
-                for line in splitted_lines:
-                    lines.append(line)
+            font_size -= 2
+            font = QFont(font.family(), font_size)
+            self.setFont(font)
+            line_height = self.fontMetrics().boundingRect('Way').height()
+            space_width = self.fontMetrics().boundingRect('w w').width() - self.fontMetrics().boundingRect('ww').width()
 
-        for i in range(len(lines)):
-            this_line = lines[i]
+            lines = self.text.split('<br />')
+            for i in range(len(lines)):
+                if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
+                    x = 0
+                    y = 0
+                    line_words = lines[i].split(' ')
+                    painter_paths.append(QPainterPath())
+                    path_index += 1
+                    for word in line_words:
+                        if len(re.sub('<.*?>', '', word).strip()) > 0:
+                            word_path.clear()
+                            if '<b>' in word:
+                                font.setWeight(1000)
+                            if '<i>' in word:
+                                font.setItalic(True)
+                            if '<u>' in word:
+                                font.setUnderline(True)
 
-            # check for any html formatting in this line
-            formatted_line = []
-            if '<i>' in this_line or '<b>' in this_line or '<u>' in this_line:
-                index = 0
-                line_parts = ['']
-                j = 0
-                while j < len(this_line):
-                    if this_line[j] == '<':
-                        index += 1
-                        line_parts.append('')
-                        while this_line[j] != '/':
-                            line_parts[index] += this_line[j]
-                            j += 1
+                            word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                            if (painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width()
+                                    > self.gui.display_widget.width() - 40):
+                                painter_paths.append(QPainterPath())
+                                x = 0
+                                y = 0
+                                path_index += 1
+                            painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                            x = painter_paths[path_index].boundingRect().width() + space_width
 
-                        if len(this_line) == j + 3 or this_line[j + 3] != '<':
-                            line_parts[index] += this_line[j:j + 3]
-                            j += 3
-                        elif len(this_line) == j + 7 or this_line[j + 7] != '<':
-                            line_parts[index] += this_line[j:j + 7]
-                            j += 7
-                        elif len(this_line) == j + 11 or this_line[j + 11] != '<':
-                            line_parts[index] += this_line[j:j + 11]
-                            j += 11
+                            if '</b>' in word:
+                                font.setWeight(QFont.Weight.Normal)
+                            if '</i>' in word:
+                                font.setItalic(False)
+                            if '</u>' in word:
+                                font.setUnderline(False)
 
-                        index += 1
-                        line_parts.append('')
-                    else:
-                        line_parts[index] += this_line[j]
-                        j += 1
+            self.total_height = 0
+            for path in painter_paths:
+                if path.boundingRect().width() > 0:
+                    self.total_height += line_height
+                if path.boundingRect().width() > longest_line:
+                    longest_line = path.boundingRect().width()
 
-                line_split = re.split('<i>|<b>|<u>', this_line)
-                for item in line_split:
-                    formatting_markers = ''
-                    if '/i' in item:
-                        formatting_markers += 'i'
-                    if '/b' in item:
-                        formatting_markers += 'b'
-                    if '/u' in item:
-                        formatting_markers += 'u'
-                    formatted_line.append([formatting_markers, re.sub('<.*?>', '', item)])
-            else:
-                formatted_line.append(['', this_line])
-                line_parts = [this_line]
+            if self.for_sample:
+                break
 
-            this_line = re.sub('<.*?>', '', this_line)
-            line_width = metrics.boundingRect(this_line).adjusted(
-                0, 0, self.outline_width, self.outline_width).width()
-            x = (self.width() - line_width) / 2
-            y = (self.gui.display_widget.height() / 2) - (line_height * len(lines) / 2) + (line_height / 1.5) + (i * line_height)
-
-            for part in line_parts:
-                font = self.font()
-                if '<b>' in part:
-                    font.setWeight(1000)
-                if '<i>' in part:
-                    font.setItalic(True)
-                if '<u>' in part:
-                    font.setUnderline(True)
-
-                part = re.sub('<.*?>', '', part)
-                if self.use_shadow:
-                    self.shadow_path.addText(QPointF(x + self.shadow_offset, y + self.shadow_offset), font, part)
-                self.path.addText(QPointF(x, y), font, part)
-                x += metrics.boundingRect(part).width()
-                if part.endswith(' '):
-                    x += space_width
-
+        # start the first path at the midpoint of the usable rect, minus half the total height of the paths, plus
+        # the font's ascent (to account for the path's y being the baseline of the text) plus a 20px margin at the top
+        path_y = (usable_rect.height() / 2) - (self.total_height / 2) + self.fontMetrics().ascent() + 20
+        starting_y = path_y
         painter = QPainter(self)
         brush = QBrush()
         painter.setBrush(brush)
@@ -700,25 +719,38 @@ class LyricDisplayWidget(QWidget):
         opacity = self.shade_opacity
         if not self.use_shade:
             opacity = 0
-        path_rect = self.path.boundingRect()
-        shade_rect = QRectF(path_rect.x() - 20, path_rect.y() - 20, path_rect.width() + 40, path_rect.height() + 40)
+        shade_rect = QRectF(
+            int((self.gui.display_widget.width() / 2) - (longest_line / 2)) - 20,
+            starting_y - self.fontMetrics().ascent() - 20,
+            longest_line + 40,
+            self.total_height + 40
+        )
         painter.fillRect(shade_rect, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
 
-        brush.setColor(self.fill_color)
-        brush.setStyle(Qt.BrushStyle.SolidPattern)
-        pen.setColor(self.outline_color)
-        pen.setWidth(self.outline_width)
-        painter.setPen(pen)
+        for path in painter_paths:
+            if path.boundingRect().width() > 0:
+                path_x = (self.gui.display_widget.width() / 2) - (path.boundingRect().width() / 2)
+                path.translate(path_x, path_y)
 
-        if self.use_shadow:
-            shadow_brush = QBrush()
-            shadow_brush.setColor(self.shadow_color)
-            shadow_brush.setStyle(Qt.BrushStyle.SolidPattern)
-            painter.fillPath(self.shadow_path, shadow_brush)
+                if self.use_shadow:
+                    path.translate(self.shadow_offset, self.shadow_offset)
+                    shadow_brush = QBrush()
+                    shadow_brush.setColor(self.shadow_color)
+                    shadow_brush.setStyle(Qt.BrushStyle.SolidPattern)
+                    painter.fillPath(path, shadow_brush)
+                    path.translate(-self.shadow_offset, -self.shadow_offset)
 
-        painter.fillPath(self.path, brush)
-        if self.use_outline:
-            painter.strokePath(self.path, pen)
+                brush.setColor(self.fill_color)
+                brush.setStyle(Qt.BrushStyle.SolidPattern)
+                pen.setColor(self.outline_color)
+                pen.setWidth(self.outline_width)
+                painter.setPen(pen)
+
+                painter.fillPath(path, brush)
+                if self.use_outline:
+                    painter.strokePath(path, pen)
+
+                path_y += line_height
 
 
 class StandardItemWidget(QWidget):
@@ -767,6 +799,8 @@ class StandardItemWidget(QWidget):
 
         if not wrap_subtitle:
             layout.addStretch()
+
+        self.adjustSize()
 
 
 class AutoSelectLineEdit(QLineEdit):

@@ -3,9 +3,9 @@ from engineio.async_drivers import gevent
 
 import logging
 from http.server import BaseHTTPRequestHandler
-from flask import Flask, render_template, request
 
-from PyQt5.QtCore import QRunnable
+from PyQt5.QtCore import QRunnable, Qt
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 
 
@@ -182,7 +182,7 @@ class RemoteServer(QRunnable):
         remote_oos_buttons = ''
         current_row = self.gui.oos_widget.oos_list_widget.currentRow()
         for i in range(self.gui.oos_widget.oos_list_widget.count()):
-            title = self.gui.oos_widget.oos_list_widget.item(i).data(20)
+            title = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title']
 
             if i == current_row:
                 class_tag = 'class="current" '
@@ -199,16 +199,15 @@ class RemoteServer(QRunnable):
 
         slide_buttons = ''
         current_row = self.gui.live_widget.slide_list.currentRow()
+
         for i in range(self.gui.live_widget.slide_list.count()):
-            if self.gui.live_widget.slide_list.item(i).data(40) == 'video':
-                title = self.gui.live_widget.slide_list.item(i).data(20)
+            slide_data = self.gui.live_widget.slide_list.item(i).data(Qt.ItemDataRole.UserRole)
+            if slide_data['type'] == 'video':
+                title = slide_data['title']
                 text = 'Video'
             else:
-                title = self.gui.live_widget.slide_list.item(i).data(24)[1]
-                if type(self.gui.live_widget.slide_list.item(i).data(24)[2]) == bytes:
-                    text = ''
-                else:
-                    text = self.gui.live_widget.slide_list.item(i).data(24)[2]
+                title = slide_data['title']
+                text = slide_data['text']
 
             if i == current_row:
                 class_tag = 'class="current" '
