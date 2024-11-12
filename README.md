@@ -8,7 +8,6 @@
 
 ProjectOn is an open-source multimedia projection program geared towards
 producing and running church services.
-<p>&nbsp;</p>
 
 # Why ProjectOn?
 
@@ -17,33 +16,25 @@ number of open-source church projection programs available, and few
 tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
-<p>&nbsp;</p>
 
-# What's New in Version 1.4.1.032?
+# What's New in Version 1.5.0?
 
-- Global font for Song slides and Bible slides can now be set independently
-from each other.
-- Added a "Shade Behind Text" option to the font menu, allowing for a translucent
-square to be shown behind the text. This can help readability on 'busy' backgrounds.
-- Improved font preview now included in the toolbar font dropdowns.
-- Font dropdowns now disappear when clicking outside of them (no longer
-need to click the font button to make them go away).
-- Added the ability to backup all data to a zip file (found in the 'File' menu)
-- Other minor improvements and bug fixes.
-- Fixed crash when importing from CCLI SongSelect.
+- Added the ability to play an audio file along with a custom slide
+- Added the ability to split custom slides into multiple slides as well as auto-play those slides if desired
+- Fixed wrong background showing on some slides
+- Improvements to the way words are shown for music and custom slides
+- Many improvements and bug-fixes under the hood
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.4.1.032) and run
+system only. Download the current ProjectOn installer (v.1.5.0) and run
 it on your computer.
-<p>&nbsp;</p>
 
 # Using ProjectOn
 
 This information will get you started, but for more in-depth information
 on using ProjectOn, please click “Help” and “Help Contents” in the menu.
-<p>&nbsp;</p>
 
 ### Screen Layout
 
@@ -82,7 +73,6 @@ media that can be displayed:
 The Preview Panel shows you the content of what is coming up next in the
 service, while the Live Panel shows you the content of what is currently
 being displayed.
-<p>&nbsp;</p>
 
 ### Remote Interfaces
 
@@ -106,7 +96,6 @@ showing lyrics to a Praise Team.
 
 The specific web pages for these can be found by choosing “Help” and
 “About” from the menu.
-<p>&nbsp;</p>
 
 ### Settings
 
@@ -145,7 +134,6 @@ background to use when editing a song.
 
 Here, too, you can choose a custom “Logo” image to display when nothing
 else is being shown; for example, a graphic with a welcome message.
-<p>&nbsp;</p>
 
 ### Shortcut Keys
 
@@ -241,11 +229,8 @@ black)</p></td>
 </tr>
 </tbody>
 </table>
-<p>&nbsp;</p>
 
 # Known Issues
-
-Applying bold to a single word in a song or custom slide will result in the whole line being bolded when displayed.
 
 # Technologies and Credits
 
@@ -280,10 +265,8 @@ Many thanks to my wife, who dealt with innumerable crashes and updates
 while this program was being developed.
 
 All trademarks (c) their respective owners.
-<p>&nbsp;</p>
 
 # Licensing
-<br>
 
 <img src='https://github.com/pastorjeremywilson/public/blob/main/gnu-4.svg?raw=true' height=120px align='left' />
 ProjectOn is licensed under the GNU General Public License (GNU GPL)
