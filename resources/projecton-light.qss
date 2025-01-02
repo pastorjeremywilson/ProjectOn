@@ -231,6 +231,9 @@ QMenuBar::item {
     background: #f0f0f0;
     color: #000000;
 }
+QMenuBar::item:hover {
+    background: #aaaaff;
+}
 QMenuBar::item:selected {
     background: #aaaaff;
 }
@@ -246,6 +249,9 @@ QMenu {
 QMenu::item {
     background: #f0f0f0;
     color: #000000;
+}
+QMenuBar::item:hover {
+    background: #aaaaff;
 }
 QMenu::item:selected {
     background: #aaaaff;
