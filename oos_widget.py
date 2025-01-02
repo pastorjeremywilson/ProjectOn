@@ -206,6 +206,46 @@ class CustomListWidget(QListWidget):
         """
         self.item_pos = self.mapFromGlobal(self.cursor().pos())
         menu = QMenu()
+        if self.gui.main.settings['theme'] == 'dark':
+            menu.setStyleSheet(
+                'QMenu {'
+                    'background: #000000;'
+                    'color: #e0e0e0;'
+                '}'
+                'QMenu::item {'
+                    'background: #000000;'
+                    'color: #e0e0e0;'
+                '}'
+                'QMenu::item:hover {'
+                    'background: #555588;'
+                '}'
+                'QMenu::item:selected {'
+                    'background: #444466;'
+                '}'
+                'QMenu::item:pressed {'
+                    'background: #444466;'
+                '}'
+            )
+        else:
+            menu.setStyleSheet(
+                'QMenu {'
+                    'background: #f0f0f0;'
+                    'color: #000000;'
+                '}'
+                'QMenu::item {'
+                    'background: #f0f0f0;'
+                    'color: #000000;'
+                '}'
+                'QMenuBar::item:hover {'
+                    'background: #aaaaff;'
+                '}'
+                'QMenu::item:selected {'
+                    'background: #aaaaff;'
+                '}'
+                'QMenu::item:pressed {'
+                    'background: #aaaaff;'
+                '}'
+            )
 
         edit_text = None
         if self.itemAt(self.item_pos):
