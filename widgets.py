@@ -2,11 +2,11 @@ import re
 import sqlite3
 
 import requests
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint
-from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
-    QImage
-from PyQt5.QtMultimedia import QMediaPlayer
-from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
+from PyQt6.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint
+from PyQt6.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
+    QImage, QFontDatabase
+from PyQt6.QtMultimedia import QMediaPlayer
+from PyQt6.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem
 
@@ -30,8 +30,8 @@ class FontFaceListWidget(QListWidget):
 
     def populate_widget(self):
         try:
-            font_database = QFontDatabase()
-            for font in font_database.families():
+            families = QFontDatabase.families()
+            for font in families:
                 if self.gui.main.initial_startup:
                     self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
                     self.gui.main.update_status_signal.emit(font, 'info')
@@ -65,8 +65,8 @@ class FontFaceComboBox(QComboBox):
         try:
             row = 0
             model = self.model()
-            font_database = QFontDatabase()
-            for font in font_database.families():
+            families = QFontDatabase.families()
+            for font in families:
                 if self.gui.main.initial_startup:
                     self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
                     self.gui.main.update_status_signal.emit(font, 'info')

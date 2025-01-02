@@ -1,9 +1,9 @@
 import os.path
 import re
 
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
-from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
+from PyQt6.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QSpinBox
 
@@ -337,6 +337,7 @@ class EditWidget(QDialog):
             auto_play_layout.addWidget(self.auto_play_spinbox_label)
 
             self.auto_play_spinbox.setFont(self.gui.standard_font)
+            self.auto_play_spinbox.setMinimumSize(60, 30)
             self.auto_play_spinbox.setRange(1, 60)
             self.auto_play_spinbox.setValue(6)
             auto_play_layout.addWidget(self.auto_play_spinbox)
@@ -581,8 +582,8 @@ class EditWidget(QDialog):
         self.copyright_line_edit.setText(song_data[2])
         self.ccli_num_line_edit.setText(song_data[3])
 
-        lyrics = re.sub('<p.*?>', '<p>', song_data[4])
-        lyrics = re.sub('\n', '<br />', lyrics)
+        lyrics = self.get_simplified_text(song_data[4])
+        lyrics = lyrics.replace('[', '\n[') # give an extra space before tags for prettiness
         tag_list = re.findall('\[.*?\]', lyrics)
         for i in range(len(tag_list)):
             if len(tag_list[i]) < 6:
@@ -768,7 +769,7 @@ class EditWidget(QDialog):
         """
         self.old_title = custom_data[0]
         self.title_line_edit.setText(custom_data[0])
-        self.lyrics_edit.text_edit.setHtml(custom_data[1])
+        self.lyrics_edit.text_edit.setHtml(self.get_simplified_text(custom_data[1]))
         self.font_widget.blockSignals(True)
 
         # set the override global checkbox
@@ -1081,36 +1082,7 @@ class EditWidget(QDialog):
         else:
             background = self.background_line_edit.text()
 
-        # remove extraneous html tags from the lyrics
-        lyrics = self.lyrics_edit.text_edit.toHtml()
-        lyrics_split = re.split('<body.*?>', lyrics)
-        lyrics = lyrics_split[1].replace('</body></html>', '')
-
-        lyrics = re.sub('<p.*?>', '', lyrics)
-        lyrics = re.sub('</p>', '', lyrics)
-
-        # simplify the formatting tags for bold, italic, and underline
-        style_substrings = re.findall('<span.*?</span>', lyrics)
-        for substring in style_substrings:
-            prefix = ''
-            suffix = ''
-            if 'font-weight' in substring:
-                prefix += '<b>'
-                suffix += '</b>'
-            if 'font-style' in substring:
-                prefix += '<i>'
-                suffix += '</i>'
-            if 'text-decoration' in substring:
-                prefix += '<u>'
-                suffix += '</u>'
-
-            new_substring = prefix + re.sub('<.*?>', '', substring) + suffix
-            lyrics = lyrics.replace(substring, new_substring)
-
-        if lyrics.startswith('\n'):
-            lyrics = lyrics[1:len(lyrics)]
-
-        lyrics = lyrics.replace('\n', '<br />')
+        lyrics = self.get_simplified_text(self.lyrics_edit.text_edit.toHtml())
 
         song_order = ''
         for i in range(self.song_order_list_widget.count()):
@@ -1210,6 +1182,43 @@ class EditWidget(QDialog):
             self.gui.media_widget.song_list.setCurrentIndex(self.item_index)
             self.gui.media_widget.song_list.scrollTo(self.item_index)
 
+    def get_simplified_text(self, lyrics):
+        break_tag = '<br />'
+
+        # make paragraph tags if none exist
+        if '<br' not in lyrics:
+            lyrics = re.sub('\n', break_tag, lyrics)
+
+        # remove extraneous html tags from the lyrics, make each line its own paragraph
+        if '<body' in lyrics:
+            lyrics_split = re.split('<body.*?>', lyrics)
+            lyrics = lyrics_split[1].replace('</body></html>', '')
+        lyrics = lyrics.replace(']<p>', ']' + break_tag) # fix old paragraph formatting after tags
+        lyrics = re.sub('</p>', break_tag, lyrics)
+        lyrics = re.sub('<p.*?>', '', lyrics)
+        lyrics = re.sub('<br.*?/>', break_tag, lyrics) # format old br tags
+        lyrics = re.sub('\n', '', lyrics)
+
+        # simplify the formatting tags for bold, italic, and underline
+        style_substrings = re.findall('<span.*?</span>', lyrics)
+        for substring in style_substrings:
+            prefix = ''
+            suffix = ''
+            if 'font-weight' in substring:
+                prefix += '<b>'
+                suffix += '</b>'
+            if 'font-style' in substring:
+                prefix += '<i>'
+                suffix += '</i>'
+            if 'text-decoration' in substring:
+                prefix += '<u>'
+                suffix += '</u>'
+
+            new_substring = prefix + re.sub('<.*?>', '', substring) + suffix
+            lyrics = lyrics.replace(substring, new_substring)
+
+        return lyrics
+
     def save_custom(self):
         """
         Method to save user's changes for the custom slide type editor.
@@ -1254,30 +1263,7 @@ class EditWidget(QDialog):
         else:
             background = self.background_line_edit.text()
 
-        text = self.lyrics_edit.text_edit.toHtml()
-        text_split = re.split('<body.*?>', text)
-        text = text_split[1].replace('</body></html>', '')
-
-        text = re.sub('<p.*?>', '', text)
-        text = re.sub('</p>', '', text)
-
-        # simplify the formatting tags for bold, italic, and underline
-        style_substrings = re.findall('<span.*?</span>', text)
-        for substring in style_substrings:
-            prefix = ''
-            suffix = ''
-            if 'font-weight' in substring:
-                prefix += '<b>'
-                suffix += '</b>'
-            if 'font-style' in substring:
-                prefix += '<i>'
-                suffix += '</i>'
-            if 'text-decoration' in substring:
-                prefix += '<u>'
-                suffix += '</u>'
-
-            new_substring = prefix + re.sub('<.*?>', '', substring) + suffix
-            text = text.replace(substring, new_substring)
+        text = self.get_simplified_text(self.lyrics_edit.text_edit.toHtml())
 
         audio_file = ''
         if len(self.audio_line_edit.text()) > 0:

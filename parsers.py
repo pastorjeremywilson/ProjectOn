@@ -1,7 +1,7 @@
 import re
 
-from PyQt5.QtGui import QFont, QColor
-from PyQt5.QtWidgets import QMessageBox
+from PyQt6.QtGui import QFont, QColor
+from PyQt6.QtWidgets import QMessageBox
 
 
 def parse_song_data(gui, song_data):

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.5.0
+ProjectOn v.1.5.0.001
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -34,10 +34,10 @@ from os.path import exists
 from xml.etree import ElementTree
 
 import requests
-from PyQt5.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
-from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
-from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QAction, QDialog, QLineEdit, QPushButton
+from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
+from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon, QAction
+from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
+    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton
 from gevent import monkey
 
 import declarations
@@ -79,7 +79,7 @@ class ProjectOn(QObject):
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         self.app = QApplication(sys.argv)
-        self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
+        #self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
 
         self.thread_pool = QThreadPool()
         self.server_thread_pool = QThreadPool()
@@ -170,7 +170,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.5.0')
+        version_label = QLabel('v.1.5.0.001')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1267,7 +1267,10 @@ class ProjectOn(QObject):
         for frame, line_no in tb:
             clss = ''
             if 'self' in frame.f_locals.keys():
-                clss = str(frame.f_locals['self']).split('<')[1].split(' ')[0].split('.')[1]
+                try:
+                    clss = str(frame.f_locals['self']).split('<')[1].split(' ')[0].split('.')[1]
+                except IndexError:
+                    clss = str(frame.f_locals['self'])
             file_name = frame.f_code.co_filename
             method = frame.f_code.co_name
             line_num = line_no

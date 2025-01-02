@@ -17,7 +17,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.5.0?
+# What's New in Version 1.5.0.001?
 
 - Added the ability to play an audio file along with a custom slide
 - Added the ability to split custom slides into multiple slides as well as auto-play those slides if desired
@@ -28,7 +28,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.5.0) and run
+system only. Download the current ProjectOn installer (v.1.5.0.001) and run
 it on your computer.
 
 # Using ProjectOn
@@ -251,7 +251,7 @@ black)</p></td>
 
 <div>
     <img src='https://github.com/pastorjeremywilson/public/blob/main/Qt-logo-neon.png?raw=true' height=40px align='right' />
-    ProjectOn uses <a href="https://www.qt.io/product/framework" target="_blank">Qt</a> (PyQt5) for the user interface.
+    ProjectOn uses <a href="https://www.qt.io/product/framework" target="_blank">Qt</a> (PyQt6) for the user interface.
 </div>
 <br>
 

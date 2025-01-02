@@ -4,17 +4,19 @@ import re
 import shutil
 import sys
 import tempfile
+import threading
 import time
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QAction, QProgressBar, QCheckBox
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QTimer
+from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QAction
+from PyQt6.QtMultimedia import QMediaPlayer
+from PyQt6.QtMultimediaWidgets import QVideoWidget
+from PyQt6.QtWebEngineCore import QWebEngineSettings
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QApplication
 
 import declarations
 import parsers
@@ -592,7 +594,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.5.0'
+        current_version = 'v.1.5.0.001'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -829,7 +831,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.5.0')
+        title_label = QLabel('ProjectOn v.1.5.0.001')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1587,9 +1589,7 @@ class GUI(QObject):
                     lyrics_html = '<p style="align-text: center;">' + item_data['title'] + '</p>'
                 else:
                     url_ok, url = self.test_url(item_data['url'])
-                    if url_ok:
-                        self.web_view.load(QUrl(url))
-                    else:
+                    if not url_ok:
                         lyrics_html = '<p style="align-text: center;">Unable to load webpage</p>'
 
             # set the font
@@ -1751,8 +1751,9 @@ class GUI(QObject):
                 elif current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
                     self.make_video_widget()
                     self.video_widget.show()
-                    media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name']))
-                    self.media_player.setMedia(media_content)
+                    #media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name']))
+                    #self.media_player.setMedia(media_content)
+                    self.media_player.setSource(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name']))
                     self.media_player.play()
 
                     self.timed_update = TimedPreviewUpdate(self)
@@ -1777,6 +1778,12 @@ class GUI(QObject):
                     if not self.logo_widget.isHidden():
                         self.logo_widget.hide()
                     self.web_view.show()
+                    if url_ok:
+                        self.timeout_timer = QTimer()
+                        timeout_value = 12
+
+                        self.timeout_timer.singleShot(timeout_value * 1000, self.request_timed_out)
+                        self.web_view.load(QUrl(url))
 
                     self.timed_update = TimedPreviewUpdate(self)
                     self.main.thread_pool.start(self.timed_update)
@@ -1795,9 +1802,8 @@ class GUI(QObject):
                         )
                         return
 
-                    media_content = QMediaContent(QUrl.fromLocalFile(item_data['audio_file']))
                     self.media_player = QMediaPlayer()
-                    self.media_player.setMedia(media_content)
+                    self.media_player.setSource(QUrl.fromLocalFile(item_data['audio_file']))
                     if item_data['loop_audio'] == 'True':
                         def repeat_media():
                             if self.media_player.mediaStatus() == QMediaPlayer.MediaStatus.EndOfMedia:
@@ -1888,6 +1894,12 @@ class GUI(QObject):
 
         return False, url
 
+    def request_timed_out(self):
+        print('request timed out')
+        self.timeout_timer.stop()
+        self.web_view.stop()
+        self.web_view.loadFinished.emit(False)
+
     def change_current_live_item(self):
         """
         slot for the change_lyric_widget_text_signal
@@ -1904,6 +1916,19 @@ class GUI(QObject):
         Create all the widgets.py that could be used on the display widget.
         """
         self.web_view = QWebEngineView()
+        """ self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.ErrorPageEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.DnsPrefetchEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.Accelerated2dCanvasEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.AllowWindowActivationFromJavaScript, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.DnsPrefetchEnabled, True)
+        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.AutoLoadImages, True) """
         self.display_layout.addWidget(self.web_view)
 
         self.blackout_widget = QWidget()
