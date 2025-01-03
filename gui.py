@@ -8,13 +8,14 @@ import time
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QTimer
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QTimer, QSizeF
 from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtMultimediaWidgets import QVideoWidget, QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
+    QGraphicsView, QGraphicsScene
 
 import declarations
 import parsers
@@ -181,13 +182,13 @@ class GUI(QObject):
         if len(self.main.settings) > 0:
             self.apply_settings()
 
-        self.main_window.showMaximized()
-
         if len(self.screens) > 1:
             self.display_widget.show()
             self.tool_bar.show_display_button.setChecked(False)
         else:
             self.tool_bar.show_display_button.setChecked(True)
+
+        self.main_window.showMaximized()
 
         self.check_update()
 
@@ -927,14 +928,15 @@ class GUI(QObject):
         """
         Provides a method to grab the display widget and scale it down as a preview.
         """
+        """pixmap = None
         if self.video_widget:
             try:
-                image = self.video_widget.grab(self.video_widget.rect())
-                pixmap = QPixmap(image)
+                pixmap = self.graphics_view.grab()
             except Exception as ex:
+                print(str(ex))
                 self.main.error_log()
-        else:
-            pixmap = self.display_widget.grab(self.display_widget.rect())
+        else:"""
+        pixmap = self.display_widget.grab()
 
         try:
             if pixmap:
@@ -1523,8 +1525,10 @@ class GUI(QObject):
                         self.media_player.deleteLater()
                         if self.video_widget:
                             self.video_widget.deleteLater()
+                            self.graphics_view.deleteLater()
                         self.media_player = None
                         self.video_widget = None
+                        self.graphics_view = None
                         self.audio_output = None
             elif widget == 'live':
                 # handle stopping the media player carefully to avoid an Access Violation
@@ -1536,8 +1540,10 @@ class GUI(QObject):
                     self.media_player.deleteLater()
                     if self.video_widget:
                         self.video_widget.deleteLater()
+                        self.graphics_view.deleteLater()
                     self.media_player = None
                     self.video_widget = None
+                    self.graphics_view = None
                     self.audio_output = None
 
             # set the background
@@ -1967,9 +1973,21 @@ class GUI(QObject):
         self.blackout_widget.hide()
 
     def make_video_widget(self):
-        self.video_widget = QVideoWidget()
-        self.video_widget.setGeometry(self.display_widget.geometry())
-        self.display_layout.addWidget(self.video_widget)
+        """self.video_widget = QVideoWidget()
+        self.video_widget.setGeometry(self.display_widget.geometry())"""
+
+        self.graphics_view = QGraphicsView()
+        self.graphics_view.setGeometry(self.display_widget.geometry())
+        self.graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.display_layout.addWidget(self.graphics_view)
+
+        self.scene = QGraphicsScene(self.graphics_view)
+        self.graphics_view.setScene(self.scene)
+
+        self.video_widget = QGraphicsVideoItem()
+        self.video_widget.setSize(QSizeF(self.display_widget.width(), self.display_widget.height()))
+        self.graphics_view.scene().addItem(self.video_widget)
 
         self.media_player = QMediaPlayer()
         self.media_player.stateChanged.connect(self.media_playing_change)

@@ -386,7 +386,7 @@ class CustomMainWindow(QMainWindow):
         if continue_close:
             # shutdown the media player
             if self.gui.media_player:
-                if self.gui.media_player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
+                if self.gui.media_player.state() == QMediaPlayer.PlayingState:
                     self.gui.media_player.stop()
                 self.gui.media_player.deleteLater()
                 if self.gui.video_widget:
@@ -401,7 +401,6 @@ class CustomMainWindow(QMainWindow):
             except AttributeError:
                 pass
             self.gui.main.save_settings()
-            self.gui.display_widget.deleteLater()
             # shutdown the remote server
             try:
                 requests.get('http://' + self.gui.main.ip + ':15171/shutdown')
@@ -415,6 +414,7 @@ class CustomMainWindow(QMainWindow):
             if self.gui.slide_auto_play:
                 self.gui.slide_auto_play.keep_running = False
             evt.accept()
+            self.gui.display_widget.deleteLater()
 
 
 class CustomScrollArea(QScrollArea):
