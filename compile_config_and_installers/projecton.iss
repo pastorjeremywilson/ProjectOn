@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ProjectOn"
-#define MyAppVersion "1.5.0"
+#define MyAppVersion "1.5.2"
 #define MyAppPublisher "Wilson's Widgets"
 #define MyAppExeName "ProjectOn.exe"
 #define MyAppAssocName MyAppName + " File"
@@ -26,7 +26,7 @@ SourceDir={#ResourceLocation}\resources
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=C:\Users\pasto\Desktop\output
+OutputDir=C:\Users\pasto\Desktop\output\ProjectOn
 OutputBaseFilename=Setup Projecton v.{#MyAppVersion}
 SetupIconFile=C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\logo.ico
 Compression=lzma

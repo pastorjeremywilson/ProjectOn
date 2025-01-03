@@ -53,14 +53,18 @@ QSpinBox {
 QSpinBox::up-button, QSpinBox::down-button {
     background: #e0e0e0;
 }
-QSpinBox::up-button:hover, QSpinBox::down-button:hover {
-    background: #555588
-}
 QSpinBox::up-button {
     image: url('resources/gui_icons/scroll_up_arrow.svg');
+    min-width: 20;
+    min-height: 15;
 }
 QSpinBox::down-button {
     image: url('resources/gui_icons/scroll_down_arrow.svg');
+    min-width: 20;
+    min-height: 15;
+}
+QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+    background: #555588
 }
 
 /*-------------------- QScrollBar --------------------*/
@@ -244,6 +248,9 @@ QMenuBar::item {
     background: #000000;
     color: #e0e0e0;
 }
+QMenuBar::item:hover {
+    background: #444466;
+}
 QMenuBar::item:selected {
     background: #444466;
 }
@@ -259,6 +266,9 @@ QMenu {
 QMenu::item {
     background: #000000;
     color: #e0e0e0;
+}
+QMenu::item:hover {
+    background: #444466;
 }
 QMenu::item:selected {
     background: #444466;

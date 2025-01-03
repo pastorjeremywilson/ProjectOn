@@ -98,7 +98,7 @@ class LiveWidget(QWidget):
             self.gui.media_player.setPosition(0)
         elif sender.objectName() == 'play':
             # pause or play depending on the current mediaStatus
-            if self.gui.media_player.state() == QMediaPlayer.State.PlayingState:
+            if self.gui.media_player.state() == QMediaPlayer.PlayingState:
                 self.gui.media_player.pause()
             else:
                 self.gui.media_player.play()

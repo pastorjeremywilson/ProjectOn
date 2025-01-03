@@ -3,8 +3,8 @@ import sqlite3
 
 import requests
 from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint
-from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
-    QImage
+from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
+    QImage, QFontDatabase
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
@@ -30,8 +30,8 @@ class FontFaceListWidget(QListWidget):
 
     def populate_widget(self):
         try:
-            font_database = QFontDatabase()
-            for font in font_database.families():
+            families = QFontDatabase().families()
+            for font in families:
                 if self.gui.main.initial_startup:
                     self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
                     self.gui.main.update_status_signal.emit(font, 'info')
@@ -65,8 +65,8 @@ class FontFaceComboBox(QComboBox):
         try:
             row = 0
             model = self.model()
-            font_database = QFontDatabase()
-            for font in font_database.families():
+            families = QFontDatabase().families()
+            for font in families:
                 if self.gui.main.initial_startup:
                     self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
                     self.gui.main.update_status_signal.emit(font, 'info')
@@ -386,7 +386,7 @@ class CustomMainWindow(QMainWindow):
         if continue_close:
             # shutdown the media player
             if self.gui.media_player:
-                if self.gui.media_player.state() == QMediaPlayer.State.PlayingState:
+                if self.gui.media_player.state() == QMediaPlayer.PlayingState:
                     self.gui.media_player.stop()
                 self.gui.media_player.deleteLater()
                 if self.gui.video_widget:
@@ -401,7 +401,6 @@ class CustomMainWindow(QMainWindow):
             except AttributeError:
                 pass
             self.gui.main.save_settings()
-            self.gui.display_widget.deleteLater()
             # shutdown the remote server
             try:
                 requests.get('http://' + self.gui.main.ip + ':15171/shutdown')
@@ -415,6 +414,7 @@ class CustomMainWindow(QMainWindow):
             if self.gui.slide_auto_play:
                 self.gui.slide_auto_play.keep_running = False
             evt.accept()
+            self.gui.display_widget.deleteLater()
 
 
 class CustomScrollArea(QScrollArea):

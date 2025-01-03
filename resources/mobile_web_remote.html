@@ -129,7 +129,7 @@
 
 			#oos, #slides {
 				flex: 50%;
-				layout: block;
+				display: block;
 				border: 3px solid #aaaaff;
 				padding: 20px;
 				overflow-y: scroll;
@@ -242,6 +242,7 @@
 			oos_html = oos_html.replace(regex, replacement);
 
 			document.getElementById("oos_form").innerHTML = oos_html;
+			document.getElementById("oos" + num).scrollIntoView({ behavior:"smooth", block:"center" });
 		});
 
 		socket.on('change_current_slide', function(num) {
@@ -253,6 +254,7 @@
 			slide_html = slide_html.replace(regex, replacement);
 
 			document.getElementById("slide_form").innerHTML = slide_html;
+			document.getElementById("slide" + num).scrollIntoView({ behavior: "smooth", block: "start"})
 		});
 
 		form = document.getElementById('oos_form');
@@ -282,39 +284,19 @@
 		}
 
 		async function itemBack() {
-			const response = await fetch('/remote', {method: "POST", body: "item_back"}).then(() => {
-				var last_button_id = document.querySelector('div[id="oos"] button.current').id;
-				var button_num = parseInt(last_button_id.replace('oos', '')) - 2;
-				if(button_num < 0) {
-					button_num = 0;
-				}
-				document.getElementById('oos' + button_num).scrollIntoView(true)
-			});
+			fetch('/remote', {method: "POST", body: "item_back"});
 		}
 
 		async function slideBack() {
-			const response = await fetch('/remote', {method: "POST", body: "slide_back"}).then(() => {
-				var last_button_id = document.querySelector('div[id="slides"] button.current').id;
-				var button_num = parseInt(last_button_id.replace('slide', '')) - 2;
-				if(button_num < 0) {
-					button_num = 0;
-				}
-				document.getElementById('slide' + button_num).scrollIntoView(true)
-			});
+			fetch('/remote', {method: "POST", body: "slide_back"});
 		}
 
 		async function slideForward() {
-			const response = await fetch('/remote', {method: "POST", body: "slide_forward"}).then(() => {
-				var button = document.querySelector('div[id="slides"] button.current');
-				button.scrollIntoView(true);
-			});
+			fetch('/remote', {method: "POST", body: "slide_forward"});
 		}
 
 		async function itemForward() {
-			const response = await fetch('/remote', {method: "POST", body: "item_forward"}).then(() => {
-				var button = document.querySelector('div[id="oos"] button.current');
-				button.scrollIntoView(true);
-			});
+			fetch('/remote', {method: "POST", body: "item_forward"});
 		}
 
 		function oosClick(evt) {
