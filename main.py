@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.5.1
+ProjectOn v.1.5.2
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -25,7 +25,6 @@ import shutil
 import socket
 import sqlite3
 import sys
-import threading
 import time
 import traceback
 import zipfile
@@ -34,10 +33,10 @@ from os.path import exists
 from xml.etree import ElementTree
 
 import requests
-from PyQt6.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
-from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon, QAction
-from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton
+from PyQt5.QtCore import Qt, QByteArray, QBuffer, QIODevice, QRunnable, QThreadPool, pyqtSignal, QObject, QPoint
+from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
+from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
+    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
 from gevent import monkey
 
 import declarations
@@ -57,7 +56,6 @@ class ProjectOn(QObject):
     user_dir = None
     database = None
     bible_dir = None
-    commit_done_event = threading.Event()
     get_scripture = None
     settings = None
     remote_server = None
@@ -170,7 +168,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.5.1')
+        version_label = QLabel('v.1.5.2')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1650,6 +1648,7 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
     message_box.exec()
 
 if __name__ == '__main__':
+    os.environ['QT_DEBUG_PLUGINS'] = '1'
     sys.excepthook = log_unhandled_exception
     monkey.patch_all(ssl=False)
     ProjectOn()

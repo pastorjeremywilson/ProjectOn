@@ -2,7 +2,7 @@ import re
 import xml.etree.ElementTree as ET
 from os.path import exists
 
-from PyQt6.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 
 from parsers import ParseScriptureReference
 

@@ -17,8 +17,9 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.5.1?
+# What's New in Version 1.5.2?
 
+- Reverted to PyQt5 to fix broken audio and video
 - Fixed some buggy behavior in the text editor of songs and custom slides.
 - Fixed the theming of context menus.
 - Fixed the auto-scrolling of items in the web remotes.
@@ -34,7 +35,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.5.1) and run
+system only. Download the current ProjectOn installer (v.1.5.2) and run
 it on your computer.
 
 # Using ProjectOn
@@ -257,7 +258,7 @@ black)</p></td>
 
 <div>
     <img src='https://github.com/pastorjeremywilson/public/blob/main/Qt-logo-neon.png?raw=true' height=40px align='right' />
-    ProjectOn uses <a href="https://www.qt.io/product/framework" target="_blank">Qt</a> (PyQt6) for the user interface.
+    ProjectOn uses <a href="https://www.qt.io/product/framework" target="_blank">Qt</a> (PyQt5) for the user interface.
 </div>
 <br>
 

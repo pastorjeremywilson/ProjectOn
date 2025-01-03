@@ -1,9 +1,9 @@
 import os.path
 import re
 
-from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
-from PyQt6.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
+from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QSpinBox
 
@@ -583,8 +583,12 @@ class EditWidget(QDialog):
         self.ccli_num_line_edit.setText(song_data[3])
 
         lyrics = self.get_simplified_text(song_data[4])
-        lyrics = lyrics.replace('[', '\n[') # give an extra space before tags for prettiness
         tag_list = re.findall('\[.*?\]', lyrics)
+        if self.gui.main.settings['theme'] == 'light':
+            color_tag_start = '<span style="color: #007600;">'
+        else:
+            color_tag_start = '<span style="color: #00ff00;">'
+        color_tag_end = '</span>'
         for i in range(len(tag_list)):
             if len(tag_list[i]) < 6:
                 if 'v' in tag_list[i]:
@@ -594,7 +598,7 @@ class EditWidget(QDialog):
                     new_tag = '[Pre-Chorus ' + tag_list[i].replace('[', '').replace(']', '').replace('p', '') + ']'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 elif 'c' in tag_list[i]:
-                    new_tag = '[Chorus ' + tag_list[i].replace('[', '').replace(']', '').replace('c', '') + ']'
+                    new_tag = '[Chorus ' + tag_list[i].replace('[', '').replace(']', '').replace('v', '') + ']'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 elif 'b' in tag_list[i]:
                     new_tag = '[Bridge ' + tag_list[i].replace('[', '').replace(']', '').replace('b', '') + ']'
@@ -608,6 +612,8 @@ class EditWidget(QDialog):
                 else:
                     new_tag = '[' + tag_list[i][:1] + ' ' + tag_list[i][1:] + ']'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
+        lyrics = lyrics.replace('[', color_tag_start + '[')
+        lyrics = lyrics.replace(']', ']' + color_tag_end)
         self.lyrics_edit.text_edit.setHtml(lyrics)
 
         order_items = song_data[5].split(' ')
@@ -1198,6 +1204,14 @@ class EditWidget(QDialog):
         lyrics = re.sub('<p.*?>', '', lyrics)
         lyrics = re.sub('<br.*?/>', break_tag, lyrics) # format old br tags
         lyrics = re.sub('\n', '', lyrics)
+
+        # remove white space before and after the break tags
+        lyrics_split = lyrics.split(break_tag)
+        lyrics = ''
+        for line in lyrics_split:
+            lyrics += line.strip() + break_tag
+        while lyrics.endswith(break_tag):
+            lyrics = lyrics[:-6]
 
         # simplify the formatting tags for bold, italic, and underline
         style_substrings = re.findall('<span.*?</span>', lyrics)

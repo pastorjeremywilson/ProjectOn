@@ -4,19 +4,17 @@ import re
 import shutil
 import sys
 import tempfile
-import threading
 import time
 from os.path import exists
 
 import requests
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QTimer
-from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QAction
-from PyQt6.QtMultimedia import QMediaPlayer
-from PyQt6.QtMultimediaWidgets import QVideoWidget
-from PyQt6.QtWebEngineCore import QWebEngineSettings
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QApplication
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QTimer
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction
 
 import declarations
 import parsers
@@ -594,7 +592,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.5.1'
+        current_version = 'v.1.5.2'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -831,7 +829,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.5.1')
+        title_label = QLabel('ProjectOn v.1.5.2')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1478,19 +1476,6 @@ class GUI(QObject):
         auto_play_text = None
 
         if widget == 'live':
-            # handle stopping the media player carefully to avoid an Access Violation
-            if self.media_player:
-                if self.media_player.state() == QMediaPlayer.State.PlayingState:
-                    self.media_player.stop()
-                    if self.timed_update:
-                        self.timed_update.stop = True
-                self.media_player.deleteLater()
-                if self.video_widget:
-                    self.video_widget.deleteLater()
-                self.media_player = None
-                self.video_widget = None
-                self.audio_output = None
-                
             # stop timed update and auto-play runnables
             if self.timed_update:
                 self.timed_update.keep_running = False
@@ -1523,11 +1508,37 @@ class GUI(QObject):
 
         if current_item:
             item_data = current_item.data(Qt.ItemDataRole.UserRole).copy()
-            # stop slide auto-play if the current item is not also auto-play
-            if self.slide_auto_play:
+            # stop slide auto-play and media player if the current item is not also auto-play
+            if self.slide_auto_play and widget == 'live':
                 if not item_data['auto_play'] or not item_data['auto_play'] == 'True':
                     self.slide_auto_play.keep_running = False
                     self.slide_auto_play = None
+
+                    # handle stopping the media player carefully to avoid an Access Violation
+                    if self.media_player:
+                        if self.media_player.state() == QMediaPlayer.PlayingState:
+                            self.media_player.stop()
+                            if self.timed_update:
+                                self.timed_update.stop = True
+                        self.media_player.deleteLater()
+                        if self.video_widget:
+                            self.video_widget.deleteLater()
+                        self.media_player = None
+                        self.video_widget = None
+                        self.audio_output = None
+            elif widget == 'live':
+                # handle stopping the media player carefully to avoid an Access Violation
+                if self.media_player:
+                    if self.media_player.state() == QMediaPlayer.PlayingState:
+                        self.media_player.stop()
+                        if self.timed_update:
+                            self.timed_update.stop = True
+                    self.media_player.deleteLater()
+                    if self.video_widget:
+                        self.video_widget.deleteLater()
+                    self.media_player = None
+                    self.video_widget = None
+                    self.audio_output = None
 
             # set the background
             display_widget.background_label.clear()
@@ -1751,9 +1762,8 @@ class GUI(QObject):
                 elif current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
                     self.make_video_widget()
                     self.video_widget.show()
-                    #media_content = QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name']))
-                    #self.media_player.setMedia(media_content)
-                    self.media_player.setSource(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name']))
+                    self.media_player.setMedia(
+                        QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name'])))
                     self.media_player.play()
 
                     self.timed_update = TimedPreviewUpdate(self)
@@ -1789,26 +1799,34 @@ class GUI(QObject):
                     self.main.thread_pool.start(self.timed_update)
                     self.live_widget.slide_list.setFocus()
 
-                # start playing audio if this is a custom slide with audio
-                if item_data['type'] == 'custom' and item_data['audio_file'] and len(item_data['audio_file']) > 0:
-                    if not exists(item_data['file_name']):
-                        file_name = item_data['file_name']
+                # start playing audio if this is a custom slide with audio, but only if audio isn't already playing
+                if (item_data['type'] == 'custom'
+                        and item_data['audio_file']
+                        and len(item_data['audio_file']) > 0
+                        and not self.media_player):
+                    if not exists(item_data['audio_file']):
+                        file_name = item_data['audio_file']
                         file_name = file_name.replace('/', '\\')
                         QMessageBox.critical(
                             self.main_window,
                             'Missing Audio File',
                             f'The audio file at {file_name} is missing. Unable to play sound.',
-                            QMessageBox.Ok
+                            QMessageBox.StandardButton.Ok
                         )
                         return
 
-                    self.media_player = QMediaPlayer()
-                    self.media_player.setSource(QUrl.fromLocalFile(item_data['audio_file']))
+                    self.media_player = QMediaPlayer(self.main_window)
+                    self.media_player.stateChanged.connect(self.media_state_changed)
+                    self.media_player.error.connect(self.media_error)
+                    self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(item_data["audio_file"])))
+
                     if item_data['loop_audio'] == 'True':
-                        def repeat_media():
-                            if self.media_player.mediaStatus() == QMediaPlayer.MediaStatus.EndOfMedia:
+                        def repeat_media(state):
+                            if self.media_player.mediaStatus() == QMediaPlayer.EndOfMedia:
                                 self.media_player.play()
                         self.media_player.mediaStatusChanged.connect(repeat_media)
+                    else:
+                        self.media_player.stateChanged.connect(self.media_playing_change)
 
                     self.media_player.play()
 
@@ -1916,19 +1934,6 @@ class GUI(QObject):
         Create all the widgets.py that could be used on the display widget.
         """
         self.web_view = QWebEngineView()
-        """ self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.ErrorPageEnabled, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.DnsPrefetchEnabled, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.Accelerated2dCanvasEnabled, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.AllowWindowActivationFromJavaScript, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.DnsPrefetchEnabled, True)
-        self.web_view.settings().setAttribute(QWebEngineSettings.WebAttribute.AutoLoadImages, True) """
         self.display_layout.addWidget(self.web_view)
 
         self.blackout_widget = QWidget()
@@ -1971,8 +1976,11 @@ class GUI(QObject):
         self.media_player.error.connect(self.media_error)
         self.media_player.setVideoOutput(self.video_widget)
 
+    def media_state_changed(self, status):
+        print(status)
+
     def media_playing_change(self):
-        if self.media_player.state() == QMediaPlayer.State.StoppedState:
+        if self.media_player.state() == QMediaPlayer.StoppedState:
             self.media_player.setPosition(0)
 
     def media_error(self):
@@ -2087,7 +2095,7 @@ class GUI(QObject):
                 self.main_window,
                 'No Verses',
                 'No verses were found in the passage. Please ensure that your scripture passage includes verse numbers.',
-                QMessageBox.Ok
+                QMessageBox.StandardButton.Ok
             )
             return
 

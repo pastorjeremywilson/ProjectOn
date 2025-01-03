@@ -2,8 +2,8 @@ import os
 import re
 from xml.etree import ElementTree
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QLineEdit, QWidget, QHBoxLayout, \
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QLineEdit, QWidget, QHBoxLayout, \
     QPushButton, QRadioButton, QButtonGroup
 
 from simple_splash import SimpleSplash
