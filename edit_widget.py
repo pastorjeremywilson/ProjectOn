@@ -583,7 +583,9 @@ class EditWidget(QDialog):
         self.ccli_num_line_edit.setText(song_data[3])
 
         lyrics = self.get_simplified_text(song_data[4])
-        tag_list = re.findall('\[.*?\]', lyrics)
+
+        # reformat old tags, add coloring to tags
+        tag_list = re.findall('\[.*?]', lyrics, flags=re.S)
         if self.gui.main.settings['theme'] == 'light':
             color_tag_start = '<span style="color: #007600;">'
         else:
@@ -616,8 +618,11 @@ class EditWidget(QDialog):
                     new_tag = f'{color_tag_start}[Ending {tag_num}]{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 else:
-                    new_tag = f'{color_tag_start}[{tag_list[i][:1]} {tag_list[i][1:]}]{color_tag_end}'
+                    new_tag = f'{color_tag_start}{tag_list[i]}{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
+            else:
+                new_tag = f'{color_tag_start}{tag_list[i]}{color_tag_end}'
+                lyrics = lyrics.replace(tag_list[i], new_tag)
         self.lyrics_edit.text_edit.setHtml(lyrics)
 
         order_items = song_data[5].split(' ')
