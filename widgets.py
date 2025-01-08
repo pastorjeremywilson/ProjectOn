@@ -662,43 +662,46 @@ class LyricDisplayWidget(QWidget):
 
             lines = self.text.split('<br />')
             for i in range(len(lines)):
-                if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
-                    x = 0
-                    y = 0
-                    line_words = lines[i].split(' ')
-                    painter_paths.append(QPainterPath())
-                    path_index += 1
-                    for word in line_words:
-                        if len(re.sub('<.*?>', '', word).strip()) > 0:
-                            word_path.clear()
-                            if '<b>' in word:
-                                font.setWeight(1000)
-                            if '<i>' in word:
-                                font.setItalic(True)
-                            if '<u>' in word:
-                                font.setUnderline(True)
+                #if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
+                x = 0
+                y = 0
+                line_words = lines[i].split(' ')
+                if len(line_words) == 0:
+                    line_words = [' ']
+                painter_paths.append(QPainterPath())
+                path_index += 1
+                for word in line_words:
+                    #if len(re.sub('<.*?>', '', word).strip()) > 0:
+                    word_path.clear()
+                    if '<b>' in word:
+                        font.setWeight(1000)
+                    if '<i>' in word:
+                        font.setItalic(True)
+                    if '<u>' in word:
+                        font.setUnderline(True)
 
-                            word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
-                            if (painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width()
-                                    > self.gui.display_widget.width() - 40):
-                                painter_paths.append(QPainterPath())
-                                x = 0
-                                y = 0
-                                path_index += 1
-                            painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
-                            x = painter_paths[path_index].boundingRect().width() + space_width
+                    word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                    if (painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width()
+                            > self.gui.display_widget.width() - 40):
+                        painter_paths.append(QPainterPath())
+                        x = 0
+                        y = 0
+                        path_index += 1
+                    painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                    x = painter_paths[path_index].boundingRect().width() + space_width
 
-                            if '</b>' in word:
-                                font.setWeight(QFont.Weight.Normal)
-                            if '</i>' in word:
-                                font.setItalic(False)
-                            if '</u>' in word:
-                                font.setUnderline(False)
+                    if '</b>' in word:
+                        font.setWeight(QFont.Weight.Normal)
+                    if '</i>' in word:
+                        font.setItalic(False)
+                    if '</u>' in word:
+                        font.setUnderline(False)
 
+            # get the total size of the paths that will be drawn for creating the shading rectangle
             self.total_height = 0
             for path in painter_paths:
-                if path.boundingRect().width() > 0:
-                    self.total_height += line_height
+                #if path.boundingRect().width() > 0:
+                self.total_height += line_height
                 if path.boundingRect().width() > longest_line:
                     longest_line = path.boundingRect().width()
 
@@ -728,29 +731,29 @@ class LyricDisplayWidget(QWidget):
         painter.fillRect(shade_rect, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
 
         for path in painter_paths:
-            if path.boundingRect().width() > 0:
-                path_x = (self.gui.display_widget.width() / 2) - (path.boundingRect().width() / 2)
-                path.translate(path_x, path_y)
+            #if path.boundingRect().width() > 0:
+            path_x = (self.gui.display_widget.width() / 2) - (path.boundingRect().width() / 2)
+            path.translate(path_x, path_y)
 
-                if self.use_shadow:
-                    path.translate(self.shadow_offset, self.shadow_offset)
-                    shadow_brush = QBrush()
-                    shadow_brush.setColor(self.shadow_color)
-                    shadow_brush.setStyle(Qt.BrushStyle.SolidPattern)
-                    painter.fillPath(path, shadow_brush)
-                    path.translate(-self.shadow_offset, -self.shadow_offset)
+            if self.use_shadow:
+                path.translate(self.shadow_offset, self.shadow_offset)
+                shadow_brush = QBrush()
+                shadow_brush.setColor(self.shadow_color)
+                shadow_brush.setStyle(Qt.BrushStyle.SolidPattern)
+                painter.fillPath(path, shadow_brush)
+                path.translate(-self.shadow_offset, -self.shadow_offset)
 
-                brush.setColor(self.fill_color)
-                brush.setStyle(Qt.BrushStyle.SolidPattern)
-                pen.setColor(self.outline_color)
-                pen.setWidth(self.outline_width)
-                painter.setPen(pen)
+            brush.setColor(self.fill_color)
+            brush.setStyle(Qt.BrushStyle.SolidPattern)
+            pen.setColor(self.outline_color)
+            pen.setWidth(self.outline_width)
+            painter.setPen(pen)
 
-                painter.fillPath(path, brush)
-                if self.use_outline:
-                    painter.strokePath(path, pen)
+            painter.fillPath(path, brush)
+            if self.use_outline:
+                painter.strokePath(path, pen)
 
-                path_y += line_height
+            path_y += line_height
 
 
 class StandardItemWidget(QWidget):

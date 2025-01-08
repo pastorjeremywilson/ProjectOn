@@ -7,11 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="PyQt6 broke audio and video. Reverted to PyQt5.&#10;Added coloring to verse tags in the edit widget.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,22 +166,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00049" summary="Fixed extra space in bible chapter in preview titles.">
-      <option name="closed" value="true" />
-      <created>1724712056945</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1724712056945</updated>
-    </task>
-    <task id="LOCAL-00050" summary="Fixed extra space in bible chapter in preview titles.">
-      <option name="closed" value="true" />
-      <created>1724775044991</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1724775044992</updated>
     </task>
     <task id="LOCAL-00051" summary="Began adding code to set font independently for song and bible slides">
       <option name="closed" value="true" />
@@ -560,7 +543,23 @@
       <option name="project" value="LOCAL" />
       <updated>1735928591822</updated>
     </task>
-    <option name="localTasksCounter" value="98" />
+    <task id="LOCAL-00098" summary="PyQt6 broke audio and video. Reverted to PyQt5.&#10;Added coloring to verse tags in the edit widget.">
+      <option name="closed" value="true" />
+      <created>1735935378331</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1735935378332</updated>
+    </task>
+    <task id="LOCAL-00099" summary="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines.">
+      <option name="closed" value="true" />
+      <created>1736362179378</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1736362179378</updated>
+    </task>
+    <option name="localTasksCounter" value="100" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -581,7 +580,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False.&#10;Fixed wrong oos item icon on non-override song." />
     <MESSAGE value="Fixed default advanced options for new custom slide" />
     <MESSAGE value="Added missing add to service actions (image, video, and web) in the media_widget.py CustomListWidget" />
     <MESSAGE value="Added restore from backup option and corresponding code." />
@@ -606,7 +604,8 @@
     <MESSAGE value="Ready for Release" />
     <MESSAGE value="Improved text handling in the edit widget's QTextEdit" />
     <MESSAGE value="PyQt6 broke audio and video. Reverted to PyQt5.&#10;Added coloring to verse tags in the edit widget." />
-    <option name="LAST_COMMIT_MESSAGE" value="PyQt6 broke audio and video. Reverted to PyQt5.&#10;Added coloring to verse tags in the edit widget." />
+    <MESSAGE value="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines." />
+    <option name="LAST_COMMIT_MESSAGE" value="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

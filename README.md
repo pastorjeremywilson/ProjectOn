@@ -17,9 +17,11 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.5.2?
+# What's New in Version 1.5.3?
 
-- Reverted to PyQt5 to fix broken audio and video
+- A little bug crept in to the Chorus tag on songs.
+- Displayed lyrics/custom slide text now respects blank lines from the editor.
+- Reverted to PyQt5 to fix broken audio and video.
 - Fixed some buggy behavior in the text editor of songs and custom slides.
 - Fixed the theming of context menus.
 - Fixed the auto-scrolling of items in the web remotes.
@@ -35,7 +37,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.5.2) and run
+system only. Download the current ProjectOn installer (v.1.5.3) and run
 it on your computer.
 
 # Using ProjectOn
