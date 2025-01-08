@@ -592,28 +592,32 @@ class EditWidget(QDialog):
         for i in range(len(tag_list)):
             if len(tag_list[i]) < 6:
                 if 'v' in tag_list[i]:
-                    new_tag = '[Verse ' + tag_list[i].replace('[', '').replace(']', '').replace('v', '') + ']'
+                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('v', '').strip()
+                    new_tag = f'{color_tag_start}[Verse {tag_num}]{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 elif 'p' in tag_list[i]:
-                    new_tag = '[Pre-Chorus ' + tag_list[i].replace('[', '').replace(']', '').replace('p', '') + ']'
+                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('p', '').strip()
+                    new_tag = f'{color_tag_start}[Pre-Chorus {tag_num}]{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 elif 'c' in tag_list[i]:
-                    new_tag = '[Chorus ' + tag_list[i].replace('[', '').replace(']', '').replace('v', '') + ']'
+                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('c', '').strip()
+                    new_tag = f'{color_tag_start}[Chorus {tag_num}]{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 elif 'b' in tag_list[i]:
-                    new_tag = '[Bridge ' + tag_list[i].replace('[', '').replace(']', '').replace('b', '') + ']'
+                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('b', '').strip()
+                    new_tag = f'{color_tag_start}[Bridge {tag_num}]{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 elif 't' in tag_list[i]:
-                    new_tag = '[Tag ' + tag_list[i].replace('[', '').replace(']', '').replace('t', '') + ']'
+                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('t', '').strip()
+                    new_tag = f'{color_tag_start}[Tag {tag_num}]{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 elif 'e' in tag_list[i]:
-                    new_tag = '[Ending ' + tag_list[i].replace('[', '').replace(']', '').replace('e', '') + ']'
+                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('e', '').strip()
+                    new_tag = f'{color_tag_start}[Ending {tag_num}]{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
                 else:
-                    new_tag = '[' + tag_list[i][:1] + ' ' + tag_list[i][1:] + ']'
+                    new_tag = f'{color_tag_start}[{tag_list[i][:1]} {tag_list[i][1:]}]{color_tag_end}'
                     lyrics = lyrics.replace(tag_list[i], new_tag)
-        lyrics = lyrics.replace('[', color_tag_start + '[')
-        lyrics = lyrics.replace(']', ']' + color_tag_end)
         self.lyrics_edit.text_edit.setHtml(lyrics)
 
         order_items = song_data[5].split(' ')
