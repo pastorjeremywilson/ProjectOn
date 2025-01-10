@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.5.3
+ProjectOn v.1.5.3.001
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -68,6 +68,7 @@ class ProjectOn(QObject):
     logo_items = None
     thread_pool = None
     status_update_count = 0
+    updating_label = False
 
     def __init__(self):
         super().__init__()
@@ -131,7 +132,8 @@ class ProjectOn(QObject):
         :param str text: The text to be displayed
         :param str type: Use 'status' if this will be an update to the status text under the main text
         """
-        if self.splash_widget:
+        if self.splash_widget and not self.updating_label: # prevent access violation by ensuring processEvents has finished
+            self.updating_label = True
             if type == 'status':
                 self.status_label.setText(text)
             else:
@@ -139,8 +141,8 @@ class ProjectOn(QObject):
 
             self.progress_bar.setValue(self.progress_bar.value() + 1)
             self.app.processEvents()
+            self.updating_label = False
             self.status_update_count += 1
-            self.splash_widget.setFocus()
 
     def make_splash_screen(self, last_status_count):
         """
@@ -149,8 +151,7 @@ class ProjectOn(QObject):
         self.splash_widget = QWidget()
         self.splash_widget.setObjectName('splash_widget')
         self.splash_widget.setMinimumWidth(610)
-        self.splash_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
-        self.splash_widget.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop, True)
+        self.splash_widget.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.splash_widget.setStyleSheet(
             '#splash_widget { background: #6060c0; }')
         splash_layout = QHBoxLayout(self.splash_widget)
@@ -168,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.5.3')
+        version_label = QLabel('v.1.5.3.001')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -595,21 +596,8 @@ class ProjectOn(QObject):
         Saves all of the settings currently stored in the self.settings variable to the settings.json file in the
         program's data directory.
         """
-        try:
-            with open(self.data_dir + '/settings.json', 'w') as file:
-                file.write(json.dumps(self.settings, indent=4))
-
-            device_specific_settings = {}
-            device_specific_settings['used_services'] = self.settings['used_services']
-            device_specific_settings['last_save_dir'] = self.settings['last_save_dir']
-            device_specific_settings['last_status_count'] = self.settings['last_status_count']
-            device_specific_settings['selected_screen_name'] = self.settings['selected_screen_name']
-            device_specific_settings['data_dir'] = self.data_dir
-            with open(self.device_specific_config_file, 'w') as file:
-                file.write(json.dumps(device_specific_settings, indent=4))
-
-        except Exception:
-            self.error_log()
+        save_settings = SaveSettings(self)
+        self.thread_pool.start(save_settings)
 
     def save_service(self):
         """
@@ -1494,11 +1482,15 @@ class IndexImages(QRunnable):
 
         reindex = False
         for file in database_list:
+            if self.main.initial_startup:
+                self.main.update_status_signal.emit(f'Checking Database for {file}', 'info')
             if file not in filtered_files:
                 reindex = True
                 break
 
         for file in filtered_files:
+            if self.main.initial_startup:
+                self.main.update_status_signal.emit(f'Checking Folder for {file}', 'info')
             if file not in database_list:
                 reindex = True
                 break
@@ -1511,6 +1503,8 @@ class IndexImages(QRunnable):
         for file in file_list:
             file_type = file.split('.')[1]
             if file_type in file_types:
+                if self.main.initial_startup:
+                    self.main.update_status_signal.emit(f'Indexing {file}', 'info')
                 pixmap = QPixmap(self.directory + '/' + file)
                 scaled_pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
@@ -1598,6 +1592,33 @@ class ServerCheck(QRunnable):
                     self.gui.server_alert_signal.emit()
 
                 time.sleep(5)
+
+
+class SaveSettings(QRunnable):
+    def __init__(self, main):
+        super().__init__()
+        self.main = main
+
+    def run(self):
+        """
+        Saves all of the settings currently stored in the ProjectOn.settings variable to the settings.json file in the
+        program's data directory.
+        """
+        try:
+            with open(self.main.data_dir + '/settings.json', 'w') as file:
+                file.write(json.dumps(self.main.settings, indent=4))
+
+            device_specific_settings = {}
+            device_specific_settings['used_services'] = self.main.settings['used_services']
+            device_specific_settings['last_save_dir'] = self.main.settings['last_save_dir']
+            device_specific_settings['last_status_count'] = self.main.settings['last_status_count']
+            device_specific_settings['selected_screen_name'] = self.main.settings['selected_screen_name']
+            device_specific_settings['data_dir'] = self.main.data_dir
+            with open(self.main.device_specific_config_file, 'w') as file:
+                file.write(json.dumps(device_specific_settings, indent=4))
+
+        except Exception:
+            self.main.error_log()
 
 
 def log_unhandled_exception(exc_type, exc_value, exc_traceback):

@@ -1,5 +1,6 @@
 import os.path
 import shutil
+import sqlite3
 
 from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent
 from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath
@@ -256,7 +257,7 @@ class SettingsWidget(QDialog):
 
         delete_background_button = QPushButton('Delete a Background')
         delete_background_button.setFont(self.gui.standard_font)
-        delete_background_button.clicked.connect(self.delete_background)
+        delete_background_button.clicked.connect(lambda: self.delete_background('background'))
         song_background_layout.addWidget(delete_background_button)
         song_background_layout.addStretch()
 
@@ -296,7 +297,7 @@ class SettingsWidget(QDialog):
 
         delete_image_button = QPushButton('Delete an Image')
         delete_image_button.setFont(self.gui.standard_font)
-        delete_image_button.clicked.connect(self.gui.media_widget.delete_image)
+        delete_image_button.clicked.connect(lambda: self.delete_background('image'))
         logo_background_layout.addWidget(delete_image_button)
         logo_background_layout.addStretch()
 
@@ -407,17 +408,26 @@ class SettingsWidget(QDialog):
 
             self.gui.apply_settings()
 
-    def delete_background(self):
+    def delete_background(self, type):
         dialog = QDialog()
         layout = QVBoxLayout()
         dialog.setLayout(layout)
 
-        label = QLabel('Choose a background to remove:')
+        if type == 'background':
+            label = QLabel('Choose a background to remove:')
+            current_bible_background = self.bible_background_combobox.currentData(Qt.ItemDataRole.UserRole)
+            current_song_background = self.song_background_combobox.currentData(Qt.ItemDataRole.UserRole)
+        elif type == 'image':
+            label = QLabel('Choose an image item to remove:')
+            current_image = self.logo_background_combobox.currentData(Qt.ItemDataRole.UserRole)
         label.setFont(self.gui.standard_font)
         layout.addWidget(label)
 
         from widgets import ImageCombobox
-        combobox = ImageCombobox(self.gui, 'background')
+        if type == 'background':
+            combobox = ImageCombobox(self.gui, type='delete_background')
+        elif type == 'image':
+            combobox = ImageCombobox(self.gui, type='delete_image')
         combobox.removeItem(1)
         combobox.removeItem(0)
         layout.addWidget(combobox)
@@ -442,7 +452,10 @@ class SettingsWidget(QDialog):
         if response == 0:
             file_name = combobox.currentData(Qt.ItemDataRole.UserRole)
             try:
-                os.remove(self.gui.main.background_dir + '/' + file_name)
+                if type == 'background':
+                    os.remove(self.gui.main.background_dir + '/' + file_name)
+                elif type == 'image':
+                    os.remove(self.gui.main.image_dir + '/' + file_name)
             except FileNotFoundError:
                 QMessageBox.information(
                     self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
@@ -484,10 +497,55 @@ class SettingsWidget(QDialog):
 
             QMessageBox.information(
                 self,
-                'Background Removed',
+                f'{type.capitalize()} Removed',
                 file_name + ' removed.',
                 QMessageBox.StandardButton.Ok
             )
+
+            # remove deleted item from the database thumbnails and refresh the appropriate combobox(es)
+            if type == 'background':
+                connection = sqlite3.connect(self.gui.main.database)
+                cursor = connection.cursor()
+                cursor.execute('DELETE FROM backgroundThumbnails WHERE fileName="' + file_name + '";')
+                connection.commit()
+                connection.close()
+
+                self.song_background_combobox.refresh()
+                self.bible_background_combobox.refresh()
+                self.gui.tool_bar.song_background_combobox.refresh()
+                self.gui.tool_bar.bible_background_combobox.refresh()
+
+                current_song_index = self.song_background_combobox.findData(
+                    current_song_background, Qt.ItemDataRole.UserRole)
+                if current_song_index == -1:
+                    self.song_background_combobox.setCurrentIndex(0)
+                    self.gui.tool_bar.song_background_combobox.setCurrentIndex(0)
+                else:
+                    self.song_background_combobox.setCurrentIndex(current_song_index)
+                    self.gui.tool_bar.song_background_combobox.setCurrentIndex(current_song_index)
+
+                current_bible_index = self.bible_background_combobox.findData(
+                    current_bible_background, Qt.ItemDataRole.UserRole)
+                if current_bible_index == -1:
+                    self.bible_background_combobox.setCurrentIndex(0)
+                    self.gui.tool_bar.bible_background_combobox.setCurrentIndex(0)
+                else:
+                    self.bible_background_combobox.setCurrentIndex(current_bible_index)
+                    self.gui.tool_bar.bible_background_combobox.setCurrentIndex(current_bible_index)
+
+            elif type == 'image':
+                connection = sqlite3.connect(self.gui.main.database)
+                cursor = connection.cursor()
+                cursor.execute('DELETE FROM backgroundThumbnails WHERE fileName="' + file_name + '";')
+                connection.commit()
+                connection.close()
+
+                self.logo_background_combobox.refresh()
+                current_image_index = self.logo_background_combobox.findData(current_image, Qt.ItemDataRole.UserRole)
+                if current_image_index == -1:
+                    self.logo_background_combobox.setCurrentIndex(0)
+                else:
+                    self.logo_background_combobox.setCurrentIndex(current_image_index)
 
     def apply_settings(self):
         if self.gui.main.settings:
