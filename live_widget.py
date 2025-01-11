@@ -142,6 +142,7 @@ class LiveWidget(QWidget):
                 self.gui.preview_widget.slide_list.setCurrentRow(0)
                 self.gui.send_to_live()
 
+
 class CustomListWidget(QListWidget):
     """
     Provides a customized QListWidget that will call changes to the display when items are changed and perform certain

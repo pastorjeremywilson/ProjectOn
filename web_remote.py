@@ -227,6 +227,7 @@ class RemoteServer(QRunnable):
     def slide_button(self, button):
         self.gui.live_widget.web_button_signal.emit(button)
 
+
 class RemoteServerHandler(BaseHTTPRequestHandler):
     html = None
 

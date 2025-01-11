@@ -26,6 +26,7 @@ from media_widget import MediaWidget
 from oos_widget import OOSWidget
 from openlyrics_export import OpenlyricsExport
 from preview_widget import PreviewWidget
+from runnables import TimedPreviewUpdate, SlideAutoPlay
 from simple_splash import SimpleSplash
 from songselect_import import SongselectImport
 from toolbar import Toolbar
@@ -130,7 +131,7 @@ class GUI(QObject):
         self.main.status_label.setText('Indexing Images')
         self.main.app.processEvents()
 
-        from main import IndexImages
+        from runnables import IndexImages
 
         ii = IndexImages(self.main, 'backgrounds')
         self.main.thread_pool.start(ii)
@@ -2123,45 +2124,3 @@ class GUI(QObject):
         item.setSizeHint(widget.sizeHint())
         self.oos_widget.oos_list_widget.addItem(item)
         self.oos_widget.oos_list_widget.setItemWidget(item, widget)
-
-
-class TimedPreviewUpdate(QRunnable):
-    """
-    Used to update the preview image in the live widget when a video is playing.
-    """
-    gui = None
-    def __init__(self, gui):
-        """
-        Used to update the preview image in the live widget when a video is playing.
-        :param gui.GUI gui: The current instance of GUI
-        """
-        super().__init__()
-        self.gui = gui
-        self.keep_running = True
-
-    def run(self):
-        while self.keep_running:
-            self.gui.grab_display_signal.emit()
-            time.sleep(0.1)
-
-
-class SlideAutoPlay(QRunnable):
-    def __init__(self, gui, text, interval):
-        """
-        Cycles through the text in a list of strings, changing the display widget's lyrics based on a given interval
-        :param gui: the current instance of GUI
-        :param text: list of strings to be displayed
-        :param interval: number of seconds between each lyric change
-        """
-        super().__init__()
-        self.gui = gui
-        self.interval = interval
-        self.text = text
-        self.keep_running = True
-
-    def run(self):
-        while self.keep_running:
-            time.sleep(float(self.interval))
-            # don't emit the signal if keep_running was changed during sleep
-            if self.keep_running:
-                self.gui.change_current_live_item_signal.emit()
