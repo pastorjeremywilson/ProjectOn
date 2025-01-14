@@ -159,38 +159,36 @@ class ImageCombobox(QComboBox):
             self.addItem('Choose Logo Image', userData='choose_logo')
             self.addItem('Import a Logo Image', userData='import_logo')
             self.table = 'imageThumbnails'
-            image_list = self.gui.main.logo_items
         elif self.type == 'edit':
             self.addItem('Choose Custom Background', userData='choose_global')
             self.table = 'backgroundThumbnails'
-            image_list = self.gui.main.image_items
+        elif self.type == 'delete_background':
+            self.addItem('Choose Background to Remove')
+            self.table = 'backgroundThumbnails'
+        elif self.type == 'delete_image':
+            self.addItem('Choose Image Item to Remove')
+            self.table = 'imageThumbnails'
         else:
             self.addItem('Choose Global ' + self.type + ' Background', userData='choose_global')
             self.addItem('Import a Background Image', userData='import_global')
             self.table = 'backgroundThumbnails'
-            image_list = self.gui.main.image_items
         connection = None
 
         try:
-            # check if items for this combo box have already been created
-            if not image_list:
-                image_list = []
-                connection = sqlite3.connect(self.gui.main.database)
-                cursor = connection.cursor()
-                thumbnails = cursor.execute('SELECT * FROM ' + self.table).fetchall()
-                for record in thumbnails:
-                    if self.gui.main.initial_startup:
-                        self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')
-                        self.gui.main.update_status_signal.emit(record[0], 'info')
-                    pixmap = QPixmap()
-                    pixmap.loadFromData(record[1], 'JPG')
-                    icon = QIcon(pixmap)
-                    self.addItem(icon, record[0].split('.')[0], userData=record[0])
-                    image_list.append([icon, record[0].split('.')[0], record[0]])
-                connection.close()
-            else:
-                for image in image_list:
-                    self.addItem(image[0], image[1], userData=image[2])
+            image_list = []
+            connection = sqlite3.connect(self.gui.main.database)
+            cursor = connection.cursor()
+            thumbnails = cursor.execute('SELECT * FROM ' + self.table).fetchall()
+            for record in thumbnails:
+                if self.gui.main.initial_startup:
+                    self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')
+                    self.gui.main.update_status_signal.emit(record[0], 'info')
+                pixmap = QPixmap()
+                pixmap.loadFromData(record[1], 'JPG')
+                icon = QIcon(pixmap)
+                self.addItem(icon, record[0].split('.')[0], userData=record[0])
+                image_list.append([icon, record[0].split('.')[0], record[0]])
+            connection.close()
 
             if self.gui.main.initial_startup:
                 self.gui.main.update_status_signal.emit('', 'info')
@@ -1226,14 +1224,25 @@ class FontWidget(QWidget):
         creates a color dialog for the user to select a custom font color
         """
         sender = self.sender()
-        color = QColorDialog.getColor(QColor(Qt.GlobalColor.black), self)
+        current_color = self.gui.main.settings[f'{self.slide_type}_font_color']
+        if current_color == 'white':
+            r, g, b = 255, 255, 255
+        elif current_color == 'black':
+            r, g, b = 0, 0, 0
+        else:
+            color_split = current_color.split(', ')
+            r, g, b = int(color_split[0]), int(color_split[1]), int(color_split[2])
+
+        color = QColorDialog.getColor(QColor(r, g, b), self)
         rgb = color.getRgb()
-        color_string = str(rgb[0]) + ', ' + str(rgb[1]) + ', ' + str(rgb[2])
-        self.custom_font_color_radio_button.setText('Custom: ' + color_string)
-        self.custom_font_color_radio_button.setObjectName(color_string)
-        sender.setChecked(True)
+        if color.isValid():
+            color_string = str(rgb[0]) + ', ' + str(rgb[1]) + ', ' + str(rgb[2])
+            self.custom_font_color_radio_button.setText('Custom: ' + color_string)
+            self.custom_font_color_radio_button.setObjectName(color_string)
+            sender.setChecked(True)
+            self.change_font()
+
         self.show()
-        self.change_font()
 
     def hideEvent(self, evt):
         """

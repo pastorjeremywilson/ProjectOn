@@ -1,3 +1,5 @@
+import re
+
 import geventwebsocket
 from engineio.async_drivers import gevent
 
@@ -206,8 +208,9 @@ class RemoteServer(QRunnable):
                 title = slide_data['title']
                 text = 'Video'
             else:
-                title = slide_data['title']
-                text = slide_data['text']
+                title = slide_data['parsed_text']['title']
+                text = re.sub('<p.*?>', '', slide_data['parsed_text']['text'])
+                text = text.replace('</p>', '')
 
             if i == current_row:
                 class_tag = 'class="current" '
@@ -226,6 +229,7 @@ class RemoteServer(QRunnable):
     
     def slide_button(self, button):
         self.gui.live_widget.web_button_signal.emit(button)
+
 
 class RemoteServerHandler(BaseHTTPRequestHandler):
     html = None
