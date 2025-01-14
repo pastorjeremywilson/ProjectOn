@@ -7,7 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="When selecting a custom font color, ensured that current color is default in the color dialog&#10;Ensured that cancelling the custom font color dialog doesn't change the current color to black&#10;Fixed delete image/background in settings widget to use the same delete function&#10;Ensured image widgets are updated after delete or add&#10;Changed the saving of settings to be threaded to facilitate more often saving of settings" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Moved runnables into their own file">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -162,14 +165,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00055" summary="Changed FontWidget's WindowType to a popup to facilitate auto-hide when clicked outside">
-      <option name="closed" value="true" />
-      <created>1725655659274</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1725655659274</updated>
     </task>
     <task id="LOCAL-00056" summary="Added the FontSample widget directly to the FontSettings widget, delaying updating the rest of the GUI until settings are saved.">
       <option name="closed" value="true" />
@@ -555,7 +550,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736545879044</updated>
     </task>
-    <option name="localTasksCounter" value="104" />
+    <task id="LOCAL-00104" summary="Moved runnables into their own file">
+      <option name="closed" value="true" />
+      <created>1736563370127</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1736563370127</updated>
+    </task>
+    <option name="localTasksCounter" value="105" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -576,7 +579,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added missing add to service actions (image, video, and web) in the media_widget.py CustomListWidget" />
     <MESSAGE value="Added restore from backup option and corresponding code." />
     <MESSAGE value="Returned to bold being the default display widget lyric widget font style" />
     <MESSAGE value="Release v.1.4.0" />
@@ -601,7 +603,8 @@
     <MESSAGE value="PyQt6 broke audio and video. Reverted to PyQt5.&#10;Added coloring to verse tags in the edit widget." />
     <MESSAGE value="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines." />
     <MESSAGE value="When selecting a custom font color, ensured that current color is default in the color dialog&#10;Ensured that cancelling the custom font color dialog doesn't change the current color to black&#10;Fixed delete image/background in settings widget to use the same delete function&#10;Ensured image widgets are updated after delete or add&#10;Changed the saving of settings to be threaded to facilitate more often saving of settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="When selecting a custom font color, ensured that current color is default in the color dialog&#10;Ensured that cancelling the custom font color dialog doesn't change the current color to black&#10;Fixed delete image/background in settings widget to use the same delete function&#10;Ensured image widgets are updated after delete or add&#10;Changed the saving of settings to be threaded to facilitate more often saving of settings" />
+    <MESSAGE value="Moved runnables into their own file" />
+    <option name="LAST_COMMIT_MESSAGE" value="Moved runnables into their own file" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

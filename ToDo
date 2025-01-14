@@ -4,9 +4,9 @@ Done:
     Fixed delete image/background in settings widget to use the same delete function
     Ensured image widgets are updated after delete or add
     Changed the saving of settings to be threaded to facilitate more often saving of settings
+    Put runnables into their own file
 
 Future Releases:
     Video backgrounds
-    Put runnables into their own file
     Further consolodate widgets
     Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
