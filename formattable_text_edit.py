@@ -216,6 +216,11 @@ class CustomTextEdit(QTextEdit):
             parent = self.parent()
             while parent.parent():
                 if parent.objectName() == 'edit_widget':
+                    cursor = self.textCursor()
+                    position = cursor.position()
+                    self.setHtml(parent.renumber_tags('all', self.toHtml()))
+                    cursor.setPosition(position)
+                    self.setTextCursor(cursor)
                     parent.populate_tag_list()
                     break
                 else:
@@ -225,6 +230,11 @@ class CustomTextEdit(QTextEdit):
             parent = self.parent()
             while parent.parent():
                 if parent.objectName() == 'edit_widget':
+                    cursor = self.textCursor()
+                    position = cursor.position()
+                    self.setHtml(parent.renumber_tags('all', self.toHtml()))
+                    cursor.setPosition(position)
+                    self.setTextCursor(cursor)
                     parent.populate_tag_list()
                     break
                 else:
