@@ -1039,6 +1039,12 @@ class EditWidget(QDialog):
         self.lyrics_edit.text_edit.setFocus()
 
     def renumber_tags(self, tag_name, html):
+        """
+        Searches the html of a QTextEdit for a given song tag and renumbers all similar tags
+        :param str tag_name: Verse, Chorus, Pre-Chorus, Bridge, Tag, Ending, or all
+        :param str html: The html from QTextEdit.toHtml()
+        :return str: The modified html
+        """
         if tag_name == 'all':
             tag_names = [
                 'Verse',

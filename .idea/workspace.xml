@@ -7,11 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Moved runnables into their own file&#10;Fixed problem with lyrics on the remote when reloading the page">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,14 +165,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00058" summary="Fixed font sample background not loading correctly when first run.">
-      <option name="closed" value="true" />
-      <created>1725984829000</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1725984829001</updated>
     </task>
     <task id="LOCAL-00059" summary="Added shade behind text option to settings widgets and implemented visual feedback">
       <option name="closed" value="true" />
@@ -560,7 +550,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736888054521</updated>
     </task>
-    <option name="localTasksCounter" value="107" />
+    <task id="LOCAL-00107" summary="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor">
+      <option name="closed" value="true" />
+      <created>1736983822576</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1736983822576</updated>
+    </task>
+    <option name="localTasksCounter" value="108" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -581,7 +579,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Returned to bold being the default display widget lyric widget font style" />
     <MESSAGE value="Release v.1.4.0" />
     <MESSAGE value="Fixed crash when importing from CCLI SongSelect." />
     <MESSAGE value="Built a skeleton for adding audio slides. Might be on the wrong track though and audio can simply be added to custom slides instead of having separate audio slides." />
@@ -606,7 +603,8 @@
     <MESSAGE value="When selecting a custom font color, ensured that current color is default in the color dialog&#10;Ensured that cancelling the custom font color dialog doesn't change the current color to black&#10;Fixed delete image/background in settings widget to use the same delete function&#10;Ensured image widgets are updated after delete or add&#10;Changed the saving of settings to be threaded to facilitate more often saving of settings" />
     <MESSAGE value="Moved runnables into their own file" />
     <MESSAGE value="Moved runnables into their own file&#10;Fixed problem with lyrics on the remote when reloading the page" />
-    <option name="LAST_COMMIT_MESSAGE" value="Moved runnables into their own file&#10;Fixed problem with lyrics on the remote when reloading the page" />
+    <MESSAGE value="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor" />
+    <option name="LAST_COMMIT_MESSAGE" value="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
