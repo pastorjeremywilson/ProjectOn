@@ -1,12 +1,10 @@
 Done:
-    When selecting a custom font color, ensured that current color is default in the color dialog
-    Ensured that cancelling the custom font color dialog doesn't change the current color to black
-    Fixed delete image/background in settings widget to use the same delete function
-    Ensured image widgets are updated after delete or add
-    Changed the saving of settings to be threaded to facilitate more often saving of settings
-    Put runnables into their own file
+    Further refined the usage of blank lines when editing songs or custom slides
+    Improved the adding and deleting of tags in the editor
+    Ensured web remote is getting the correct text for each slide
 
 Future Releases:
+    Import slide audio to data folder
     Video backgrounds
-    Further consolodate widgets
+    Further consolidate widgets
     Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?

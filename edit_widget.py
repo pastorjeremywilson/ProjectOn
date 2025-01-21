@@ -2,10 +2,10 @@ import os.path
 import re
 
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QSpinBox
+    QSpinBox, QTextEdit
 
 import parsers
 from formattable_text_edit import FormattableTextEdit
@@ -1011,25 +1011,66 @@ class EditWidget(QDialog):
             tag_name = self.sender().text()
             lyrics_text = self.lyrics_edit.text_edit.toHtml()
             occurrences = re.findall('\[' + tag_name + '.*?\]', lyrics_text)
+            cursor = self.lyrics_edit.text_edit.textCursor()
+            cursor_pos = cursor.position()
 
             if len(occurrences) == 0:
-                self.lyrics_edit.text_edit.insertPlainText('\n[' + tag_name + ' 1]\n')
+                self.lyrics_edit.text_edit.insertHtml(f'<br \><span style="color:#00ff00;">[{tag_name}]</span><br />')
             else:
-                self.lyrics_edit.text_edit.insertPlainText('\n[' + tag_name + tag_name + ']\n')
-                lyrics_text = self.lyrics_edit.text_edit.toHtml()
-                occurrences = re.findall('\[' + tag_name + '.*?\]', lyrics_text)
+                self.lyrics_edit.text_edit.insertHtml(
+                    f'<br /><span style="color:#00ff00;">[{tag_name + tag_name}]</span><br />')
 
-                count = 1
-                for item in occurrences:
-                    lyrics_text = lyrics_text.replace(item, '\n[' + tag_name + ' ' + str(count) + ']\n', 1)
-                    count += 1
-
-                self.lyrics_edit.text_edit.setHtml(lyrics_text)
+                self.lyrics_edit.text_edit.setHtml(self.renumber_tags(tag_name, self.lyrics_edit.text_edit.toHtml()))
                 self.lyrics_edit.text_edit.setFocus()
+
+                cursor.setPosition(cursor_pos)
+                while True:
+                    cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.KeepAnchor)
+                    if cursor.selectedText() == ']':
+                        break
+                    cursor.clearSelection()
+
+                cursor.clearSelection()
+                cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.MoveAnchor)
+                self.lyrics_edit.text_edit.setTextCursor(cursor)
 
         self.populate_tag_list()
         self.lyrics_edit.text_edit.verticalScrollBar().setSliderPosition(slider_pos)
         self.lyrics_edit.text_edit.setFocus()
+
+    def renumber_tags(self, tag_name, html):
+        """
+        Searches the html of a QTextEdit for a given song tag and renumbers all similar tags
+        :param str tag_name: Verse, Chorus, Pre-Chorus, Bridge, Tag, Ending, or all
+        :param str html: The html from QTextEdit.toHtml()
+        :return str: The modified html
+        """
+        if tag_name == 'all':
+            tag_names = [
+                'Verse',
+                'Chorus',
+                'Pre-Chorus',
+                'Bridge',
+                'Tag',
+                'Ending'
+            ]
+
+            for tag_name in tag_names:
+                occurrences = re.findall('\[' + tag_name + '.*?\]', html)
+                if len(occurrences) > 1:
+                    for i in range(len(occurrences)):
+                        html = html.replace(occurrences[i], f'<<{tag_name} {i + 1}>>', 1)
+                    html = html.replace('<<', '[').replace('>>', ']')
+
+            return html
+        else:
+            occurrences = re.findall('\[' + tag_name + '.*?\]', html)
+
+            for i in range(len(occurrences)):
+                html = html.replace(occurrences[i], f'<<{tag_name} {i + 1}>>', 1)
+            html = html.replace('<<', '[').replace('>>', ']')
+
+            return html
 
     def populate_tag_list(self):
         """
@@ -1200,27 +1241,30 @@ class EditWidget(QDialog):
     def get_simplified_text(self, lyrics):
         break_tag = '<br />'
 
-        # make paragraph tags if none exist
-        if '<br' not in lyrics:
-            lyrics = re.sub('\n', break_tag, lyrics)
-
-        # remove extraneous html tags from the lyrics, make each line its own paragraph
-        if '<body' in lyrics:
+        # 'flatten' the html if this is directly from the QTextEdit's toHtml function
+        if lyrics.startswith('<!'):
+            lyrics.replace('\n', '')
             lyrics_split = re.split('<body.*?>', lyrics)
-            lyrics = lyrics_split[1].replace('</body></html>', '')
-        lyrics = lyrics.replace(']<p>', ']' + break_tag) # fix old paragraph formatting after tags
-        lyrics = re.sub('</p>', break_tag, lyrics)
-        lyrics = re.sub('<p.*?>', '', lyrics)
-        lyrics = re.sub('<br.*?/>', break_tag, lyrics) # format old br tags
-        lyrics = re.sub('\n', '', lyrics)
+            lyrics = lyrics_split[1].replace('</body></html>', '').strip()
 
-        # remove white space before and after the break tags
-        lyrics_split = lyrics.split(break_tag)
-        lyrics = ''
-        for line in lyrics_split:
-            lyrics += line.strip() + break_tag
-        while lyrics.endswith(break_tag):
-            lyrics = lyrics[:-6]
+            # convert paragraphs to lines followed by break
+            paragraphs = re.findall('<p.*?>.*?</p>', lyrics)
+            lyrics = ''
+            for i in range(len(paragraphs)):
+                line = re.sub('<p.*?>', '', paragraphs[i])
+                line = line.replace('</p>', '').strip()
+                if i < len(paragraphs) - 1:
+                    if line != '<br />':
+                        lyrics += line + break_tag
+                    else:
+                        lyrics += line
+                elif line != '<br />':
+                    lyrics += line
+
+        # make paragraph tags if none exist
+        else:
+            lyrics = re.sub('\n', break_tag, lyrics)
+        lyrics = re.sub('<br.*?/>', break_tag, lyrics) # format old br tags
 
         # simplify the formatting tags for bold, italic, and underline
         style_substrings = re.findall('<span.*?</span>', lyrics)

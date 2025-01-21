@@ -4,14 +4,13 @@ import re
 import shutil
 import sys
 import tempfile
-import time
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QRunnable, QTimer, QSizeF
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF
 from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QVideoWidget, QGraphicsVideoItem
+from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
@@ -19,6 +18,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidg
 
 import declarations
 import parsers
+from get_github_events import get_release_notes
 from help import Help
 from importers import Importers
 from live_widget import LiveWidget
@@ -594,7 +594,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.5.4'
+        current_version = 'v.1.5.5'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -634,6 +634,7 @@ class GUI(QObject):
 
             if latest_version[1]:
                 dialog = QDialog()
+                dialog.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
                 layout = QVBoxLayout(dialog)
                 dialog.setWindowTitle('Update ProjectOn')
 
@@ -654,12 +655,18 @@ class GUI(QObject):
                 yes_button.pressed.connect(lambda: dialog.done(1))
                 button_layout.addStretch()
                 button_layout.addWidget(yes_button)
+                button_layout.addSpacing(20)
 
                 no_button = QPushButton('No')
                 no_button.setFont(self.standard_font)
                 no_button.pressed.connect(lambda: dialog.done(0))
-                button_layout.addSpacing(20)
                 button_layout.addWidget(no_button)
+                button_layout.addSpacing(20)
+
+                release_notes_button = QPushButton('View Release Notes')
+                release_notes_button.setFont(self.standard_font)
+                release_notes_button.pressed.connect(get_release_notes)
+                button_layout.addWidget(release_notes_button)
                 button_layout.addStretch()
 
                 response = dialog.exec()
@@ -831,7 +838,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.5.4')
+        title_label = QLabel('ProjectOn v.1.5.5')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -891,6 +898,12 @@ class GUI(QObject):
                     technological distinctiveness, email <a href="mailto:pastorjeremywilson@gmail.com">pastorjeremywilson@gmail.com</a></p>
                 ''')
         widget.layout().addWidget(about_text)
+
+        release_notes_button = QPushButton('View Release Notes')
+        release_notes_button.setFont(self.standard_font)
+        release_notes_button.setStyleSheet('background: none; border: none;')
+        release_notes_button.pressed.connect(get_release_notes)
+        widget.layout().addWidget(release_notes_button)
 
         ok_button = QPushButton('OK')
         ok_button.setFont(self.standard_font)
