@@ -1,8 +1,10 @@
 Done:
     Further refined the usage of blank lines when editing songs or custom slides
     Improved the adding and deleting of tags in the editor
+    Ensured web remote is getting the correct text for each slide
 
 Future Releases:
+    Import slide audio to data folder
     Video backgrounds
-    Further consolodate widgets
+    Further consolidate widgets
     Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
