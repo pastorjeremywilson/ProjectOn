@@ -208,8 +208,13 @@ class RemoteServer(QRunnable):
                 title = slide_data['title']
                 text = 'Video'
             else:
-                title = slide_data['parsed_text']['title']
-                text = re.sub('<p.*?>', '', slide_data['parsed_text']['text'])
+                title = slide_data['title']
+                if 'parsed_text' in slide_data.keys() and type(slide_data['parsed_text']) == dict:
+                    text = re.sub('<p.*?>', '', slide_data['parsed_text']['text'])
+                elif 'parsed_text' in slide_data.keys():
+                    text = re.sub('<p.*?>', '', slide_data['parsed_text'])
+                else:
+                    text = re.sub('<p.*?>', '', slide_data['text'])
                 text = text.replace('</p>', '')
 
             if i == current_row:

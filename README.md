@@ -17,7 +17,13 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.5.4.002?
+# What's New in Version 1.5.5?
+
+- Further refined the usage of blank lines when editing songs or custom slides 
+- Improved the adding and deleting of tags in the editor
+- Ensured web remote is getting the correct text for each slide
+
+# Other Recent Changes
 
 - Fixed a bug with the lyrics when reloading the remote web page.
 - Fixed a little bug that crept in to the Chorus tag on songs.
@@ -26,9 +32,6 @@ projection needs of a church service.
 - Fixed some buggy behavior in the text editor of songs and custom slides.
 - Fixed the theming of context menus.
 - Fixed the auto-scrolling of items in the web remotes.
-
-# What was New in Version 1.5.0?
-
 - Added the ability to play an audio file along with a custom slide
 - Added the ability to split custom slides into multiple slides as well as auto-play those slides if desired
 - Fixed wrong background showing on some slides
@@ -38,7 +41,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.5.4.002) and run
+system only. Download the current ProjectOn installer (v.1.5.5) and run
 it on your computer.
 
 # Using ProjectOn
