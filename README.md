@@ -18,13 +18,11 @@ intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
 # What's New in Version 1.5.5?
-
 - Further refined the usage of blank lines when editing songs or custom slides 
 - Improved the adding and deleting of tags in the editor
 - Ensured web remote is getting the correct text for each slide
 
 # Other Recent Changes
-
 - Fixed a bug with the lyrics when reloading the remote web page.
 - Fixed a little bug that crept in to the Chorus tag on songs.
 - Displayed lyrics/custom slide text now respects blank lines from the editor.
