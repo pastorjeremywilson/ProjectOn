@@ -1003,7 +1003,7 @@ class EditWidget(QDialog):
 
         slider_pos = self.lyrics_edit.text_edit.verticalScrollBar().sliderPosition()
 
-        if type == 'os':
+        if self.sender().text() == 'os':
             self.lyrics_edit.text_edit.insertPlainText('\n#optional split#')
 
         else:
@@ -1015,7 +1015,7 @@ class EditWidget(QDialog):
             cursor_pos = cursor.position()
 
             if len(occurrences) == 0:
-                self.lyrics_edit.text_edit.insertHtml(f'<br \><span style="color:#00ff00;">[{tag_name}]</span><br />')
+                self.lyrics_edit.text_edit.insertHtml(f'<br \><span style="color:#00ff00;">[{tag_name} 1]</span><br />')
             else:
                 self.lyrics_edit.text_edit.insertHtml(
                     f'<br /><span style="color:#00ff00;">[{tag_name + tag_name}]</span><br />')
