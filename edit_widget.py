@@ -1003,7 +1003,7 @@ class EditWidget(QDialog):
 
         slider_pos = self.lyrics_edit.text_edit.verticalScrollBar().sliderPosition()
 
-        if type == 'os':
+        if self.sender().text() == 'os':
             self.lyrics_edit.text_edit.insertPlainText('\n#optional split#')
 
         else:
@@ -1011,14 +1011,26 @@ class EditWidget(QDialog):
             tag_name = self.sender().text()
             lyrics_text = self.lyrics_edit.text_edit.toHtml()
             occurrences = re.findall('\[' + tag_name + '.*?\]', lyrics_text)
+
+            # determine if breaks are needed before or after the tag
+            tag_start = '<br />'
+            tag_end = '<br />'
             cursor = self.lyrics_edit.text_edit.textCursor()
             cursor_pos = cursor.position()
+            cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter, QTextCursor.MoveMode.KeepAnchor)
+            if cursor.selection().toPlainText() == '\n' or cursor.position() == 0:
+                tag_start = ''
+            cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.MoveAnchor)
+            cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.KeepAnchor)
+            if cursor.selection().toPlainText() == '\n':
+                tag_end = ''
 
             if len(occurrences) == 0:
-                self.lyrics_edit.text_edit.insertHtml(f'<br \><span style="color:#00ff00;">[{tag_name}]</span><br />')
+                self.lyrics_edit.text_edit.insertHtml(
+                    f'{tag_start}<span style="color:#00ff00;">[{tag_name} 1]</span>{tag_end}')
             else:
                 self.lyrics_edit.text_edit.insertHtml(
-                    f'<br /><span style="color:#00ff00;">[{tag_name + tag_name}]</span><br />')
+                    f'{tag_start}<span style="color:#00ff00;">[{tag_name + tag_name}]</span>{tag_end}')
 
                 self.lyrics_edit.text_edit.setHtml(self.renumber_tags(tag_name, self.lyrics_edit.text_edit.toHtml()))
                 self.lyrics_edit.text_edit.setFocus()
