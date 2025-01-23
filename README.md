@@ -17,7 +17,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.5.5?
+# What's New in Version 1.5.6?
 - Further refined the usage of blank lines when editing songs or custom slides 
 - Improved the adding and deleting of tags in the editor
 - Ensured web remote is getting the correct text for each slide
@@ -39,7 +39,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.5.5) and run
+system only. Download the current ProjectOn installer (v.1.5.6) and run
 it on your computer.
 
 # Using ProjectOn
