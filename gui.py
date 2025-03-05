@@ -594,7 +594,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.5.6'
+        current_version = 'v.1.5.7'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -838,7 +838,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.5.6')
+        title_label = QLabel('ProjectOn v.1.5.7')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1256,10 +1256,9 @@ class GUI(QObject):
             slide_text = slide_data['text']
             if (slide_data['split_slides']
                     and slide_data['split_slides'] == 'True'):
-                slide_text = re.sub('<p.*?>', '', slide_text)
-                slide_text = re.sub('</p>', '', slide_text)
-                slide_text = re.sub('(<br />)+', '\n', slide_text)
-                slide_data['parsed_text'] = re.split('\n', slide_text)
+                slide_text = re.sub(r'(<br />)\1+', '<split>', slide_text)
+                print(slide_text)
+                slide_data['parsed_text'] = re.split('<split>', slide_text)
             else:
                 slide_data['parsed_text'] = [slide_text]
             item.setData(Qt.ItemDataRole.UserRole, slide_data)
@@ -1625,6 +1624,7 @@ class GUI(QObject):
 
             # set the font
             if 'override_global' in item_data.keys() and item_data['override_global'] == 'True':
+                print(json.dumps(item_data, indent=4))
                 font_face = item_data['font_family']
                 font_size = int(item_data['font_size'])
                 font_color = item_data['font_color']

@@ -34,6 +34,7 @@ class MediaWidget(QTabWidget):
         self.setFont(self.gui.standard_font)
         self.setObjectName('media_widget')
         self.setTabShape(QTabWidget.TabShape.Rounded)
+        self.song_list_items = []
 
         self.formatted_reference = None
 
@@ -443,14 +444,28 @@ class MediaWidget(QTabWidget):
         Method that retrieves the current text in the song widget's search_line_edit and shows/hides songs that do or
         don't contain the text.
         """
-        search_string = self.search_line_edit.text().lower()
+        self.song_list.clear()
+        search_string = self.search_line_edit.text().strip().lower()
+        if len(search_string) == 0:
+            for item in self.song_list_items:
+                self.song_list.addItem(item.clone())
+            return
 
-        for i in reversed(range(self.song_list.count())):
-            if self.song_list.item(i):
-                self.song_list.item(i).setHidden(False)
-                song_title = self.song_list.item(i).text().lower()
-                if search_string not in song_title:
-                    self.song_list.item(i).setHidden(True)
+        show_list_items = []
+        show_list_indices = []
+        for i in range(len(self.song_list_items)):
+            if search_string in self.song_list_items[i].data(Qt.ItemDataRole.UserRole)['title'].strip().lower():
+                #print(f'search string found in {self.song_list_items[i][1]}')
+                show_list_items.append(self.song_list_items[i].clone())
+                show_list_indices.append(i)
+
+        for i in range(len(self.song_list_items)):
+            if search_string in self.song_list_items[i].data(Qt.ItemDataRole.UserRole)['text'].strip().lower() and i not in show_list_indices:
+                #print(f'search string found in {self.song_list_search_index[i][1]}\'s lyrics')
+                show_list_items.append(self.song_list_items[i].clone())
+
+        for item in show_list_items:
+            self.song_list.addItem(item)
 
     def populate_song_list(self):
         """
@@ -472,7 +487,8 @@ class MediaWidget(QTabWidget):
                 list_item = QListWidgetItem(slide_data['title'])
                 list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-                self.song_list.addItem(list_item)
+                self.song_list_items.append(list_item)
+                self.song_list.addItem(list_item.clone())
 
     def populate_custom_list(self):
         """

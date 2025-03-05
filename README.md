@@ -10,36 +10,22 @@ ProjectOn is an open-source multimedia projection program geared towards
 producing and running church services.
 
 # Why ProjectOn?
-
 Working in a smaller church, I was limited by a small budget, the small
 number of open-source church projection programs available, and few
 tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.5.6?
-- Further refined the usage of blank lines when editing songs or custom slides 
-- Improved the adding and deleting of tags in the editor
-- Ensured web remote is getting the correct text for each slide
-
-# Other Recent Changes
-- Fixed a bug with the lyrics when reloading the remote web page.
-- Fixed a little bug that crept in to the Chorus tag on songs.
-- Displayed lyrics/custom slide text now respects blank lines from the editor.
-- Reverted to PyQt5 to fix broken audio and video.
-- Fixed some buggy behavior in the text editor of songs and custom slides.
-- Fixed the theming of context menus.
-- Fixed the auto-scrolling of items in the web remotes.
-- Added the ability to play an audio file along with a custom slide
-- Added the ability to split custom slides into multiple slides as well as auto-play those slides if desired
-- Fixed wrong background showing on some slides
-- Improvements to the way words are shown for music and custom slides
-- Many improvements and bug-fixes under the hood
+# What's New in Version 1.5.7?
+- Fixed an issue where a custom font was not displaying in Custom Slides
+- Song search now includes searching each song's lyrics (search terms found in titles appear first in the results)
+- Ensured that, when a custom slide is to be split into individual slides, the split occurs only at the blank lines
+- Fixed an issue with the CCLI song import where the login button was disabled on CCLI's website
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.5.6) and run
+system only. Download the current ProjectOn installer (v.1.5.7) and run
 it on your computer.
 
 # Using ProjectOn
@@ -140,7 +126,7 @@ size of the font that appears on the Stage View.
 In the Global Background section you can choose the default background
 for songs and for bible passages. These changes can also be made in the
 toolbar at the top of the main window. Songs and bible verses will
-automatically used these backgrounds, unless you specify a custom
+automatically use these backgrounds, unless you specify a custom
 background to use when editing a song.
 
 Here, too, you can choose a custom “Logo” image to display when nothing
