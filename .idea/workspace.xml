@@ -7,9 +7,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed a problem where new tags weren't getting numbered.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added a check to see if an inserted tag needs line breaks before or after">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/declarations.py" beforeDir="false" afterPath="$PROJECT_DIR$/declarations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/main.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/main.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +80,7 @@
     &quot;Python.powerpoint_viewer.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/hymn_helper&quot;,
@@ -166,22 +177,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00065" summary="Set self.main.settings to default_settings in case of JSONDecodeError.&#10;&#10;In GUI.check_files, checked for individual files/directories in case only one got deleted.&#10;&#10;Fixed crash in update_font when creating a new song/custom slide.&#10;&#10;Fixed crash in edit widget when no global background(s) have been chosen or when background image is missing.&#10;&#10;Ensured font widget is re-shown after custom color dialog is done.">
-      <option name="closed" value="true" />
-      <created>1726594201574</created>
-      <option name="number" value="00065" />
-      <option name="presentableId" value="LOCAL-00065" />
-      <option name="project" value="LOCAL" />
-      <updated>1726594201574</updated>
-    </task>
-    <task id="LOCAL-00066" summary="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False.">
-      <option name="closed" value="true" />
-      <created>1726690710968</created>
-      <option name="number" value="00066" />
-      <option name="presentableId" value="LOCAL-00066" />
-      <option name="project" value="LOCAL" />
-      <updated>1726690710969</updated>
     </task>
     <task id="LOCAL-00067" summary="Added backup option to the File menu and applicable code.&#10;Fixed how songs and custom slide data is handled when override global is None or False.&#10;Fixed wrong oos item icon on non-override song.">
       <option name="closed" value="true" />
@@ -559,7 +554,23 @@
       <option name="project" value="LOCAL" />
       <updated>1737579221395</updated>
     </task>
-    <option name="localTasksCounter" value="114" />
+    <task id="LOCAL-00114" summary="Added a check to see if an inserted tag needs line breaks before or after">
+      <option name="closed" value="true" />
+      <created>1737653731154</created>
+      <option name="number" value="00114" />
+      <option name="presentableId" value="LOCAL-00114" />
+      <option name="project" value="LOCAL" />
+      <updated>1737653731155</updated>
+    </task>
+    <task id="LOCAL-00115" summary="Added a check to see if an inserted tag needs line breaks before or after">
+      <option name="closed" value="true" />
+      <created>1737653787419</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1737653787420</updated>
+    </task>
+    <option name="localTasksCounter" value="116" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -580,7 +591,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added audio option to custom slides. Needs to be tested against video slides." />
     <MESSAGE value="Added loop option to audio&#10;Changed edit widget audio buttons to icons" />
     <MESSAGE value="Added auto-play option to custom slides. Auto-play parses user's text based on blank lines." />
     <MESSAGE value="Added documentation&#10;Removed default to bold in lyric widget text label" />
@@ -605,7 +615,8 @@
     <MESSAGE value="Added ability to see release notes from About and update dialog" />
     <MESSAGE value="Ensured web remote is getting correct text for each slide" />
     <MESSAGE value="Fixed a problem where new tags weren't getting numbered." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed a problem where new tags weren't getting numbered." />
+    <MESSAGE value="Added a check to see if an inserted tag needs line breaks before or after" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added a check to see if an inserted tag needs line breaks before or after" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

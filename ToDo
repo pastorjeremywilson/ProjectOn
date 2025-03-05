@@ -1,9 +1,11 @@
 Done:
-    Further refined the usage of blank lines when editing songs or custom slides
-    Improved the adding and deleting of tags in the editor
-    Ensured web remote is getting the correct text for each slide
+    Custom font in Custom Slides
+    Search songs - include words
+    Split Slides - split at double enter
+    CCLI Login Greyed Out
 
 Future Releases:
+    Standardize parsed_text - title - text across all slide types
     Import slide audio to data folder
     Video backgrounds
     Further consolidate widgets

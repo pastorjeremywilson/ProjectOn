@@ -16,8 +16,7 @@ from simple_splash import SimpleSplash
 
 class SongselectImport(QDialog):
     BASE_URL = 'https://songselect.ccli.com'
-    LOGIN_PAGE = ('https://profile.ccli.com/Account/Signin?'
-                  'appContext=SongSelect&returnUrl=https%3A%2F%2Fsongselect.ccli.com%2F')
+    LOGIN_PAGE = ('https://profile.ccli.com/Account/Signin?appContext=SongSelect&returnUrl=https://songselect.ccli.com/&data-callback=enableSubmit')
     LOGIN_URL = 'https://profile.ccli.com'
     LOGOUT_URL = BASE_URL + '/account/logout'
     SEARCH_URL = BASE_URL + '/search/results'
@@ -203,7 +202,8 @@ class SongselectImport(QDialog):
             user_name, password = self.store_credentials()
 
         if not user_name == -1:
-            script_set_login_fields = ('document.getElementById("EmailAddress").value = "{user_name}";'
+            script_set_login_fields = ('document.getElementById("sign-in").disabled = false;'
+                                       'document.getElementById("EmailAddress").value = "{user_name}";'
                                        'document.getElementById("Password").value = "{password}";'
                                        'document.getElementById("sign-in").click();'
                                        ).format(user_name=user_name, password=password)

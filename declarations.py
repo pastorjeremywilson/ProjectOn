@@ -119,7 +119,7 @@ SQL_COLUMN_TO_DICTIONARY_SONG = {
 SQL_COLUMN_TO_DICTIONARY_CUSTOM = {
     0: 'title',
     1: 'text',
-    2: 'font',
+    2: 'font_family',
     3: 'font_color',
     4: 'background',
     5: 'font_size',
