@@ -10,7 +10,7 @@ from os.path import exists
 import requests
 from PIL.ImageQt import QPixmap
 from PyQt5.QtCore import QRunnable, Qt, QByteArray, QBuffer, QIODevice, QTimer
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QFileDialog, QWidget
 
 
 class CheckFiles(QRunnable):
@@ -351,8 +351,9 @@ class CountdownTimer(QTimer):
         start_time (datetime.time): The start time of the service.
         display_time (datetime.time): The time to start showing the countdown widget.
     """
-    def __init__(self, countdown_widget, start_time, display_time):
+    def __init__(self, settings, countdown_widget, start_time, display_time):
         super().__init__()
+        self.settings = settings
         self.countdown_widget = countdown_widget
         self.start_time = start_time
         self.display_time = display_time
@@ -361,16 +362,19 @@ class CountdownTimer(QTimer):
         self.timeout.connect(self.operate_countdown)
 
     def operate_countdown(self):
-        if datetime.now() > self.start_time:
-            self.stop()
-            self.countdown_widget.hide_self_signal.emit()
-        elif datetime.now() >= self.display_time:
-            if self.countdown_widget.isHidden():
-                self.countdown_widget.show_self_signal.emit()
-                self.countdown_widget.raise_()
-            time_remaining = self.start_time - datetime.now()
-            minutes = str(time_remaining.seconds / 60).split('.')[0]
-            seconds = str(time_remaining.seconds % 60)
-            if len(seconds) == 1:
-                seconds = '0' + seconds
-            self.countdown_widget.update_label_signal.emit(f'Service starts in {minutes}:{seconds}')
+        if self.settings['countdown_settings']['use_countdown']:
+            if datetime.now() > self.start_time:
+                self.stop()
+                self.countdown_widget.hide_self_signal.emit()
+            elif datetime.now() >= self.display_time:
+                if self.countdown_widget.isHidden():
+                    self.countdown_widget.show_self_signal.emit()
+                time_remaining = self.start_time - datetime.now()
+                minutes = str(time_remaining.seconds / 60).split('.')[0]
+                seconds = str(time_remaining.seconds % 60)
+                if len(seconds) == 1:
+                    seconds = '0' + seconds
+                self.countdown_widget.update_label_signal.emit(f'Service starts in {minutes}:{seconds}')
+            else:
+                if not self.countdown_widget.isHidden():
+                    self.countdown_widget.hide_self_signal.emit()

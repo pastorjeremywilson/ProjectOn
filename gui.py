@@ -8,8 +8,8 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QAbstractItemModel
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QStandardItem
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -72,6 +72,7 @@ class GUI(QObject):
     edit_widget = None
     countdown_widget = None
     countdown_timer = None
+    font_combobox_model = None
 
     standard_font = QFont('Helvetica', 12)
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
@@ -121,19 +122,19 @@ class GUI(QObject):
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        self.main.status_label.setText('Checking Files')
+        self.main.update_status_signal.emit('Checking Files', 'status')
         self.main.app.processEvents()
 
         # ensure all needed files exist; thread it and wait until done before moving on
         self.check_files()
 
-        self.main.status_label.setText('Checking Database Integrity')
+        self.main.update_status_signal.emit('Checking Database Integrity', 'status')
         self.main.app.processEvents()
         self.main.check_db(self.main.database)
 
         self.main.get_song_titles()
 
-        self.main.status_label.setText('Indexing Images')
+        self.main.update_status_signal.emit('Indexing Images', 'status')
         self.main.app.processEvents()
 
         from runnables import IndexImages
@@ -171,7 +172,6 @@ class GUI(QObject):
                 self.secondary_screen = self.primary_screen
 
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
-        self.preloaded_font_combo_box = FontFaceComboBox(self)
 
         self.init_components()
         self.add_widgets()
@@ -1077,6 +1077,57 @@ class GUI(QObject):
             self.set_logo_image(self.main.image_dir + '/' + self.main.settings['logo_image'])
             self.change_display('live')
             self.change_display('sample')
+
+            if self.main.settings['countdown_settings']['use_countdown']:
+                if self.countdown_widget:
+                    self.countdown_widget.deleteLater()
+                    self.main.app.processEvents()
+                if self.countdown_timer:
+                    self.countdown_timer.stop()
+
+                font = QFont(
+                    self.main.settings['countdown_settings']['font_face'],
+                    self.main.settings['countdown_settings']['font_size']
+                )
+                if self.main.settings['countdown_settings']['font_bold']:
+                    font.setBold(True)
+                self.countdown_widget = CountdownWidget(
+                    self,
+                    font,
+                    self.main.settings['countdown_settings']['position'],
+                    self.main.settings['countdown_settings']['bg_color'],
+                    self.main.settings['countdown_settings']['fg_color']
+                )
+                self.countdown_widget.hide()
+
+                now_time = datetime.now()
+                start_time = datetime(
+                    now_time.year,
+                    now_time.month,
+                    now_time.day,
+                    self.main.settings['countdown_settings']['start_time'][0],
+                    self.main.settings['countdown_settings']['start_time'][1],
+                    0,
+                    0
+                )
+                display_time = datetime(
+                    now_time.year,
+                    now_time.month,
+                    now_time.day,
+                    self.main.settings['countdown_settings']['display_time'][0],
+                    self.main.settings['countdown_settings']['display_time'][1],
+                    0,
+                    0
+                )
+                self.countdown_timer = CountdownTimer(self.main.settings, self.countdown_widget, start_time, display_time)
+                self.countdown_timer.start()
+            else:
+                if self.countdown_widget:
+                    self.countdown_widget.deleteLater()
+                    self.main.app.processEvents()
+                if self.countdown_timer:
+                    self.countdown_timer.stop()
+
         except Exception:
             self.main.error_log()
 
@@ -1269,7 +1320,6 @@ class GUI(QObject):
             if (slide_data['split_slides']
                     and slide_data['split_slides'] == 'True'):
                 slide_text = re.sub(r'(<br />)\1+', '<split>', slide_text)
-                print(slide_text)
                 slide_data['parsed_text'] = re.split('<split>', slide_text)
             else:
                 slide_data['parsed_text'] = [slide_text]
@@ -1636,7 +1686,6 @@ class GUI(QObject):
 
             # set the font
             if 'override_global' in item_data.keys() and item_data['override_global'] == 'True':
-                print(json.dumps(item_data, indent=4))
                 font_face = item_data['font_family']
                 font_size = int(item_data['font_size'])
                 font_color = item_data['font_color']
@@ -1965,16 +2014,13 @@ class GUI(QObject):
         """
         Create all the widgets.py that could be used on the display widget.
         """
-        self.main.update_status_signal.emit('Making Web View', 'info')
         self.web_view = QWebEngineView()
         self.display_layout.addWidget(self.web_view)
 
-        self.main.update_status_signal.emit('Making Blackout Widget', 'info')
         self.blackout_widget = QWidget()
         self.blackout_widget.setStyleSheet('background-color: black;')
         self.display_layout.addWidget(self.blackout_widget)
 
-        self.main.update_status_signal.emit('Making Logo Widget', 'info')
         self.logo_widget = QWidget()
         self.logo_widget.setContentsMargins(0, 0, 0, 0)
         layout = QVBoxLayout()
@@ -2010,44 +2056,9 @@ class GUI(QObject):
             self.main.settings['countdown_settings']['display_time'] = [10, 40]
             self.main.save_settings()
 
-        self.main.update_status_signal.emit('Making Countdown Widget', 'info')
-        self.countdown_widget = CountdownWidget(
-            self,
-            QFont(
-                self.main.settings['countdown_settings']['font_face'],
-                self.main.settings['countdown_settings']['font_size']
-            ),
-            self.main.settings['countdown_settings']['position'],
-            self.main.settings['countdown_settings']['bg_color'],
-            self.main.settings['countdown_settings']['fg_color']
-        )
-
-        now_time = datetime.now()
-        start_time = datetime(
-            now_time.year,
-            now_time.month,
-            now_time.day,
-            self.main.settings['countdown_settings']['start_time'][0],
-            self.main.settings['countdown_settings']['start_time'][1],
-            0,
-            0
-        )
-        display_time = datetime(
-            now_time.year,
-            now_time.month,
-            now_time.day,
-            self.main.settings['countdown_settings']['display_time'][0],
-            self.main.settings['countdown_settings']['display_time'][1],
-            0,
-            0
-        )
-        self.countdown_timer = CountdownTimer(self.countdown_widget, start_time, display_time)
-        self.countdown_timer.start()
-
         self.lyric_widget.hide()
         self.web_view.hide()
         self.blackout_widget.hide()
-        self.countdown_widget.hide()
 
     def make_video_widget(self):
         """self.video_widget = QVideoWidget()

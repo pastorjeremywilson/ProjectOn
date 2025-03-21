@@ -357,7 +357,7 @@ class SettingsWidget(QWidget):
         options_layout = QGridLayout(options_widget)
 
         self.countdown_sample_label = QLabel('Service starts in 3:21')
-        options_layout.addWidget(self.countdown_sample_label, 0, 0)
+        options_layout.addWidget(self.countdown_sample_label, 0, 0, 1, 2)
         font = QFont(
             self.gui.main.settings['countdown_settings']['font_face'],
             self.gui.main.settings['countdown_settings']['font_size']
@@ -375,10 +375,9 @@ class SettingsWidget(QWidget):
         options_layout.addWidget(font_face_label, 1, 0)
 
         self.countdown_font_combobox = FontFaceComboBox(self.gui)
-        for i in range(self.countdown_font_combobox.count()):
-            if self.countdown_font_combobox.itemText(i) == self.gui.main.settings['countdown_settings']['font_face']:
-                self.countdown_font_combobox.setCurrentIndex(i)
-                break
+        self.countdown_font_combobox.setFont(self.gui.standard_font)
+        self.countdown_font_combobox.setCurrentIndex(
+            self.countdown_font_combobox.findText(self.gui.main.settings['countdown_settings']['font_face']))
         self.countdown_font_combobox.currentIndexChanged.connect(self.countdown_changed)
         options_layout.addWidget(self.countdown_font_combobox, 2, 0)
 

@@ -1,14 +1,19 @@
 import re
 import sqlite3
+import sys
+import threading
+from datetime import datetime
+from threading import Thread
 
 import requests
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint
+from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QRunnable, \
+    QAbstractItemModel, QModelIndex
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
-    QImage, QFontDatabase, QFontMetrics
+    QImage, QFontDatabase, QFontMetrics, QStandardItemModel, QStandardItem
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
-    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem
+    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QAbstractItemDelegate
 
 
 class FontFaceListWidget(QListWidget):
@@ -53,6 +58,8 @@ class FontFaceComboBox(QComboBox):
     Creates a custom QComboBox that displays all fonts on the system in their own style.
     :param gui.GUI gui: The current instance of GUI
     """
+    current_font = None
+
     def __init__(self, gui):
         """
         :param gui.GUI gui: The current instance of GUI
@@ -60,27 +67,42 @@ class FontFaceComboBox(QComboBox):
         super().__init__()
         self.setObjectName('FontFaceComboBox')
         self.gui = gui
+        self.setEditable(True)
+        self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        #timer = QTimer()
+        #timer.singleShot(5000, self.populate_widget)
         self.populate_widget()
-        self.view().update()
 
     def populate_widget(self):
+        if self.gui.main.initial_startup:
+            self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
         try:
-            if self.gui.main.initial_startup:
-                self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
-                self.gui.main.update_status_signal.emit('', 'info')
             row = 0
-            model = self.model()
+            #model = self.model()
             families = QFontDatabase().families()
+            model = QStandardItemModel()
             for font in families:
+                #if self.gui.main.initial_startup:
+                #    self.gui.main.update_status_signal.emit(font, 'info')
                 self.addItem(font)
-                model.setData(model.index(row, 0), QFont(font, 14), Qt.ItemDataRole.FontRole)
+                #item = QStandardItem(font)
+                #item.setFont(QFont(font, 14))
+                #model.appendRow(item)
+                #self.addItem(font)
+                #model.setData(model.index(row, 0), QFont(font, 14), Qt.ItemDataRole.FontRole)
                 row += 1
+
+            #self.setModel(model.to)
         except Exception:
             self.gui.main.error_log()
 
+        for i in range(self.count()):
+            if self.itemText(i) == self.current_font:
+                self.setCurrentIndex(i)
+                break
+
     def wheelEvent(self, evt):
         evt.ignore()
-
 
 class ImageCombobox(QComboBox):
     """
@@ -1033,17 +1055,7 @@ class FontWidget(QWidget):
         self.blockSignals(True)
 
         font_face = self.gui.main.settings[f'{self.slide_type}_font_face']
-        font_face_found = False
-        if not len(font_face) > 0:
-            font_face = 'Arial Black'
-        for i in range(self.font_face_combobox.count()):
-            if self.font_face_combobox.itemText(i) == font_face:
-                self.font_face_combobox.setCurrentIndex(i)
-                font_face_found = True
-                break
-
-        if not font_face_found:
-            self.font_face_combobox.setCurrentIndex(0)
+        self.font_face_combobox.setCurrentIndex(self.font_face_combobox.findText(font_face))
 
         self.font_size_spinbox.setValue(self.gui.main.settings[f'{self.slide_type}_font_size'])
 
@@ -1403,7 +1415,8 @@ class CountdownWidget(QWidget):
         self.show_self_signal.connect(self.show_self)
         self.hide_self_signal.connect(self.hide_self)
 
-        self.setParent(self.gui.display_widget)
+        #self.setParent(self.gui.display_widget)
+        self.setWindowFlag(Qt.WindowType.ToolTip)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
         self.setStyleSheet('background-color: ' + bg)
@@ -1435,6 +1448,7 @@ class CountdownWidget(QWidget):
 
     def show_self(self):
         self.show()
+        #self.raise_()
         self.gui.main.app.processEvents()
 
     def hide_self(self):
@@ -1484,7 +1498,6 @@ class ClickableColorSwatch(QLabel):
         image = self.pixmap().toImage()
         current_color = image.pixelColor(10, 10)
         chosen_color = QColorDialog.getColor(current_color, self.gui.main_window, 'Countdown Background Color')
-        print(chosen_color)
         rgb_color = f'rgba({chosen_color.red()}, {chosen_color.green()}, {chosen_color.blue()}, {chosen_color.alpha()})'
         self.make_color_swatch_pixmap(rgb_color)
         self.color_changed.emit()
