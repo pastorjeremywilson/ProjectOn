@@ -1,42 +1,45 @@
+import json
 import os.path
 import shutil
 import sqlite3
 
-from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath
+from PIL.ImageQt import QImage
+from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QRect, QTime
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath, QFont
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
-    QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit
+    QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, QCheckBox, \
+    QComboBox, QTimeEdit, QTabWidget
 
 from simple_splash import SimpleSplash
-from widgets import FontWidget
+from widgets import FontWidget, FontFaceComboBox, ClickableColorSwatch
 
 
-class SettingsWidget(QDialog):
+class SettingsWidget(QWidget):
     wait_widget = None
 
     def __init__(self, gui):
         super().__init__()
         self.accept_font_changes = False
-        self.setObjectName('settings_widget')
+        self.setObjectName('settings_container')
         self.gui = gui
         self.setParent(self.gui.main_window)
         self.min_width = 1000
 
-        self.show_wait_widget()
+        #self.show_wait_widget()
         self.init_components()
         self.gui.main.app.processEvents()
 
-        self.wait_widget.subtitle_label.setText('Applying Settings')
+        #self.wait_widget.subtitle_label.setText('Applying Settings')
         self.apply_settings()
         self.song_font_settings_widget.change_font_sample()
         self.bible_font_settings_widget.change_font_sample()
 
-        self.show()
+        #self.show()
 
         self.accept_font_changes = True
-        self.wait_widget.subtitle_label.setText('Creating Font Sample')
+        #self.wait_widget.subtitle_label.setText('Creating Font Sample')
         self.gui.main.app.processEvents()
-        self.wait_widget.widget.deleteLater()
+        #self.wait_widget.widget.deleteLater()
 
     def show_wait_widget(self):
         self.wait_widget = SimpleSplash(self.gui, 'Please wait...', subtitle=True)
@@ -50,56 +53,48 @@ class SettingsWidget(QDialog):
         layout.setRowStretch(0, 20)
         layout.setRowStretch(1, 1)
 
-        self.settings_container = QWidget()
-        self.settings_container.setObjectName('settings_container')
-        settings_container_layout = QVBoxLayout(self.settings_container)
+        self.settings_container = QTabWidget()
+        self.settings_container.setObjectName('tab_widget')
+        #self.settings_container.setObjectName('settings_container')
+        #settings_container_layout = QVBoxLayout(self.settings_container)
 
-        ccli_container = QWidget()
-        ccli_container_layout = QVBoxLayout(ccli_container)
-        settings_container_layout.addWidget(ccli_container)
+        #self.settings_container_layout.addWidget(self.ccli_settings())
+        self.settings_container.addTab(self.ccli_settings(), 'CCLI Info')
 
-        ccli_title_label = QLabel('CCLI Information')
-        ccli_title_label.setFont(self.gui.bold_font)
-        ccli_title_label.setStyleSheet('background: #5555aa; color: white')
-        ccli_title_label.setContentsMargins(5, 5, 5, 5)
-        ccli_container_layout.addWidget(ccli_title_label)
+        #self.wait_widget.subtitle_label.setText('Loading Screens')
+        #self.gui.main.app.processEvents()
 
-        ccli_widget = QWidget()
-        ccli_layout = QHBoxLayout()
-        ccli_widget.setLayout(ccli_layout)
-        ccli_container_layout.addWidget(ccli_widget)
+        #settings_container_layout.addWidget(self.screen_settings())
+        self.settings_container.addTab(self.screen_settings(), 'Screen Settings')
 
-        ccli_label = QLabel('CCLI License #:')
-        ccli_label.setFont(self.gui.standard_font)
-        ccli_layout.addWidget(ccli_label)
+        #self.wait_widget.subtitle_label.setText('Loading Fonts')
+        #self.gui.main.app.processEvents()
 
-        self.ccli_line_edit = QLineEdit()
-        self.ccli_line_edit.setFont(self.gui.standard_font)
-        ccli_layout.addWidget(self.ccli_line_edit)
+        #settings_container_layout.addWidget(self.font_settings())
+        self.settings_container.addTab(self.font_settings(), 'Font Settings')
 
-        self.wait_widget.subtitle_label.setText('Loading Screens')
-        self.gui.main.app.processEvents()
+        #self.wait_widget.subtitle_label.setText('Loading Backgrounds')
+        #self.gui.main.app.processEvents()
 
-        settings_container_layout.addWidget(self.screen_settings())
+        #settings_container_layout.addWidget(self.background_settings())
+        self.settings_container.addTab(self.background_settings(), 'Background Settings')
 
-        self.wait_widget.subtitle_label.setText('Loading Fonts')
-        self.gui.main.app.processEvents()
+        #self.wait_widget.subtitle_label.setText('Loading Countdown Settings')
+        #self.gui.main.app.processEvents()
 
-        settings_container_layout.addWidget(self.font_settings())
+        #settings_container_layout.addWidget(self.countdown_settings())
+        #settings_container_layout.addStretch()
+        self.settings_container.addTab(self.countdown_settings(), 'Countdown Settings')
 
-        self.wait_widget.subtitle_label.setText('Loading Backgrounds')
-        self.gui.main.app.processEvents()
+        #self.wait_widget.subtitle_label.setText('Finishing Up')
+        #self.gui.main.app.processEvents()
 
-        settings_container_layout.addWidget(self.background_settings())
-        settings_container_layout.addStretch()
-
-        settings_scroll_area = QScrollArea()
+        """settings_scroll_area = QScrollArea()
         settings_scroll_area.setWidgetResizable(True)
-        #settings_scroll_area.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
-        #settings_scroll_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.settings_container.adjustSize()
         settings_scroll_area.setWidget(self.settings_container)
-        layout.addWidget(settings_scroll_area, 0, 0)
+        layout.addWidget(settings_scroll_area, 0, 0)"""
+        layout.addWidget(self.settings_container)
 
         button_widget = QWidget()
         button_layout = QHBoxLayout()
@@ -119,11 +114,39 @@ class SettingsWidget(QDialog):
         button_layout.addWidget(cancel_button)
         button_layout.addStretch()
 
+    def ccli_settings(self):
+        widget = QWidget()
+        widget.setObjectName('settings_container')
+        layout = QVBoxLayout(widget)
+
+        ccli_title_label = QLabel('CCLI Information')
+        ccli_title_label.setFont(self.gui.bold_font)
+        ccli_title_label.setStyleSheet('background: #5555aa; color: white')
+        ccli_title_label.setContentsMargins(5, 5, 5, 5)
+        layout.addWidget(ccli_title_label)
+
+        ccli_widget = QWidget()
+        ccli_layout = QHBoxLayout()
+        ccli_widget.setLayout(ccli_layout)
+        layout.addWidget(ccli_widget)
+
+        ccli_label = QLabel('CCLI License #:')
+        ccli_label.setFont(self.gui.standard_font)
+        ccli_layout.addWidget(ccli_label)
+
+        self.ccli_line_edit = QLineEdit()
+        self.ccli_line_edit.setFont(self.gui.standard_font)
+        ccli_layout.addWidget(self.ccli_line_edit)
+        layout.addStretch()
+
+        return widget
+
     def screen_settings(self):
         widget = QWidget()
+        widget.setObjectName('settings_container')
         widget.setMinimumWidth(self.min_width)
-        widget.setObjectName('screen_widget')
         layout = QGridLayout()
+        layout.setRowStretch(6, 100)
         widget.setLayout(layout)
 
         index = 0
@@ -181,8 +204,7 @@ class SettingsWidget(QDialog):
     def font_settings(self):
         widget = QWidget()
         widget.setMinimumWidth(self.min_width)
-        #widget.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
-        widget.setObjectName('font_widget')
+        widget.setObjectName('settings_container')
         layout = QVBoxLayout()
         widget.setLayout(layout)
 
@@ -218,13 +240,20 @@ class SettingsWidget(QDialog):
         self.stage_font_spinbox.installEventFilter(self)
         stage_font_layout.addWidget(self.stage_font_spinbox)
         stage_font_layout.addStretch()
+        layout.addStretch()
 
-        return widget
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        widget.adjustSize()
+        scroll_area.setWidget(widget)
+
+        return scroll_area
 
     def background_settings(self):
         from widgets import ImageCombobox
 
         widget = QWidget()
+        widget.setObjectName('settings_container')
         widget.setMinimumWidth(self.min_width)
         layout = QVBoxLayout()
         widget.setLayout(layout)
@@ -300,8 +329,170 @@ class SettingsWidget(QDialog):
         delete_image_button.clicked.connect(lambda: self.delete_background('image'))
         logo_background_layout.addWidget(delete_image_button)
         logo_background_layout.addStretch()
+        layout.addStretch()
 
         return widget
+
+    def countdown_settings(self):
+        widget = QWidget()
+        widget.setObjectName('settings_container')
+        layout = QVBoxLayout(widget)
+
+        title_label = QLabel('Service Countdown')
+        title_label.setFont(self.gui.bold_font)
+        title_label.setStyleSheet('background: #5555aa; color: white')
+        title_label.setContentsMargins(5, 5, 5, 5)
+        layout.addWidget(title_label)
+
+        options_widget = QWidget()
+
+        self.use_countdown_checkbox = QCheckBox('Use Countdown')
+        self.use_countdown_checkbox.setToolTip('Show a timer that counts down the time until the service starts')
+        self.use_countdown_checkbox.stateChanged.connect(lambda: self.use_countdown_changed(options_widget))
+        self.use_countdown_checkbox.setChecked(self.gui.main.settings['countdown_settings']['use_countdown'])
+        self.use_countdown_changed(options_widget)
+        layout.addWidget(self.use_countdown_checkbox)
+
+        layout.addWidget(options_widget)
+        options_layout = QGridLayout(options_widget)
+
+        self.countdown_sample_label = QLabel('Service starts in 3:21')
+        options_layout.addWidget(self.countdown_sample_label, 0, 0)
+        font = QFont(
+            self.gui.main.settings['countdown_settings']['font_face'],
+            self.gui.main.settings['countdown_settings']['font_size']
+        )
+        if self.gui.main.settings['countdown_settings']['font_bold']:
+            font.setBold(True)
+        self.countdown_sample_label.setFont(font)
+        self.countdown_sample_label.setStyleSheet(
+            f'background-color: {self.gui.main.settings["countdown_settings"]["bg_color"]}; '
+            f'color: {self.gui.main.settings["countdown_settings"]["fg_color"]};'
+        )
+
+        font_face_label = QLabel('Font')
+        font_face_label.setFont(self.gui.standard_font)
+        options_layout.addWidget(font_face_label, 1, 0)
+
+        self.countdown_font_combobox = FontFaceComboBox(self.gui)
+        for i in range(self.countdown_font_combobox.count()):
+            if self.countdown_font_combobox.itemText(i) == self.gui.main.settings['countdown_settings']['font_face']:
+                self.countdown_font_combobox.setCurrentIndex(i)
+                break
+        self.countdown_font_combobox.currentIndexChanged.connect(self.countdown_changed)
+        options_layout.addWidget(self.countdown_font_combobox, 2, 0)
+
+        font_size_label = QLabel('Font Size')
+        font_size_label.setFont(self.gui.standard_font)
+        options_layout.addWidget(font_size_label, 1, 1)
+
+        self.countdown_size_combobox = QComboBox()
+        self.countdown_size_combobox.setFont(self.gui.standard_font)
+        for i in range(10, 161, 2):
+            self.countdown_size_combobox.addItem(str(i))
+        for i in range(self.countdown_size_combobox.count()):
+            if self.countdown_size_combobox.itemText(i) == str(self.gui.main.settings['countdown_settings']['font_size']):
+                self.countdown_size_combobox.setCurrentIndex(i)
+                break
+        self.countdown_size_combobox.currentIndexChanged.connect(self.countdown_changed)
+
+        options_layout.addWidget(self.countdown_size_combobox, 2, 1)
+
+        self.countdown_bold_checkbox = QCheckBox('Bold')
+        self.countdown_bold_checkbox.setFont(self.gui.standard_font)
+        self.countdown_bold_checkbox.setChecked(self.gui.main.settings['countdown_settings']['font_bold'])
+        self.countdown_bold_checkbox.stateChanged.connect(self.countdown_changed)
+        options_layout.addWidget(self.countdown_bold_checkbox, 2, 2)
+
+        location_label = QLabel('Position')
+        location_label.setFont(self.gui.standard_font)
+        options_layout.addWidget(location_label, 1, 3)
+
+        self.countdown_position_combobox = QComboBox()
+        self.countdown_position_combobox.setFont(self.gui.standard_font)
+        self.countdown_position_combobox.addItem('Top', 'top_full')
+        self.countdown_position_combobox.addItem('Bottom', 'bottom_full')
+        if 'top' in self.gui.main.settings['countdown_settings']['position']:
+            self.countdown_position_combobox.setCurrentIndex(0)
+        elif 'bottom' in self.gui.main.settings['countdown_settings']['position']:
+            self.countdown_position_combobox.setCurrentIndex(1)
+        options_layout.addWidget(self.countdown_position_combobox, 2, 3)
+
+        start_time_label = QLabel('Service Start Time')
+        start_time_label.setFont(self.gui.standard_font)
+        options_layout.addWidget(start_time_label, 3, 0)
+
+        self.countdown_start_time_widget = QTimeEdit()
+        self.countdown_start_time_widget.setFont(self.gui.standard_font)
+        self.countdown_start_time_widget.setTime(
+            QTime(
+                self.gui.main.settings['countdown_settings']['start_time'][0],
+                self.gui.main.settings['countdown_settings']['start_time'][1],
+                0,
+                0
+            )
+        )
+        options_layout.addWidget(self.countdown_start_time_widget, 4, 0)
+
+        show_time_label = QLabel('Time to Begin Countdown')
+        show_time_label.setFont(self.gui.standard_font)
+        options_layout.addWidget(show_time_label, 3, 1)
+
+        self.countdown_display_time_widget = QTimeEdit()
+        self.countdown_display_time_widget.setFont(self.gui.standard_font)
+        self.countdown_display_time_widget.setTime(
+            QTime(
+                self.gui.main.settings['countdown_settings']['display_time'][0],
+                self.gui.main.settings['countdown_settings']['display_time'][1],
+                0,
+                0
+            )
+        )
+        options_layout.addWidget(self.countdown_display_time_widget, 4, 1)
+
+        background_color_label = QLabel('Countdown Background Color')
+        background_color_label.setFont(self.gui.standard_font)
+        options_layout.addWidget(background_color_label, 5, 0)
+
+        self.bg_color_swatch = ClickableColorSwatch(self.gui)
+        self.bg_color_swatch.make_color_swatch_pixmap(self.gui.main.settings['countdown_settings']['bg_color'])
+        self.bg_color_swatch.color_changed.connect(self.countdown_changed)
+        options_layout.addWidget(self.bg_color_swatch, 6, 0)
+
+        foreground_color_label = QLabel('Countdown Font Color')
+        foreground_color_label.setFont(self.gui.standard_font)
+        options_layout.addWidget(foreground_color_label, 5, 1)
+
+        self.fg_color_swatch = ClickableColorSwatch(self.gui)
+        self.fg_color_swatch.make_color_swatch_pixmap(self.gui.main.settings['countdown_settings']['fg_color'])
+        self.fg_color_swatch.color_changed.connect(self.countdown_changed)
+        options_layout.addWidget(self.fg_color_swatch, 6, 1)
+        layout.addStretch()
+
+        return widget
+
+    def use_countdown_changed(self, options_widget):
+        if self.use_countdown_checkbox.isChecked():
+            options_widget.show()
+        else:
+            options_widget.hide()
+
+    def countdown_changed(self):
+        font = QFont(self.countdown_font_combobox.currentText(), int(self.countdown_size_combobox.currentText()))
+        if self.countdown_bold_checkbox.isChecked():
+            font.setBold(True)
+        self.countdown_sample_label.setFont(font)
+
+        bg_image = self.bg_color_swatch.pixmap().toImage()
+        pixel_color = bg_image.pixelColor(10, 10)
+        bg_color = f'rgba({pixel_color.red()}, {pixel_color.green()}, {pixel_color.blue()}, {pixel_color.alpha()})'
+
+        fg_image = self.fg_color_swatch.pixmap().toImage()
+        pixel_color = fg_image.pixelColor(10, 10)
+        fg_color = f'rgb({pixel_color.red()}, {pixel_color.green()}, {pixel_color.blue()})'
+
+        self.countdown_sample_label.setStyleSheet(f'background-color: {bg_color}; color: {fg_color};')
+        self.countdown_sample_label.repaint()
 
     def eventFilter(self, obj, evt):
         if evt.type() == QEvent.Type.Wheel:
@@ -610,7 +801,7 @@ class SettingsWidget(QDialog):
 
             self.gui.position_screens(primary_screen, secondary_screen)
 
-        self.gui.main.settings['song_font_face'] = self.song_font_settings_widget.font_list_widget.currentItem().data(20)
+        self.gui.main.settings['song_font_face'] = self.song_font_settings_widget.font_face_combobox.currentText()
         self.gui.main.settings['song_font_size'] = self.song_font_settings_widget.font_size_spinbox.value()
         self.gui.main.settings['song_font_color'] = (
             self.song_font_settings_widget.font_color_button_group.checkedButton().objectName())
@@ -621,7 +812,7 @@ class SettingsWidget(QDialog):
         self.gui.main.settings['song_outline_color'] = self.song_font_settings_widget.outline_color_slider.color_slider.value()
         self.gui.main.settings['song_outline_width'] = self.song_font_settings_widget.outline_width_slider.offset_slider.value()
 
-        self.gui.main.settings['bible_font_face'] = self.bible_font_settings_widget.font_list_widget.currentItem().data(20)
+        self.gui.main.settings['bible_font_face'] = self.bible_font_settings_widget.font_face_combobox.currentText()
         self.gui.main.settings['bible_font_size'] = self.bible_font_settings_widget.font_size_spinbox.value()
         self.gui.main.settings['bible_font_color'] = (
             self.bible_font_settings_widget.font_color_button_group.checkedButton().objectName())
@@ -644,10 +835,29 @@ class SettingsWidget(QDialog):
         self.gui.main.settings['ccli_num'] = self.ccli_line_edit.text()
         self.gui.main.settings['stage_font_size'] = self.stage_font_spinbox.value()
 
+        self.gui.main.settings['countdown_settings']['use_countdown'] = self.use_countdown_checkbox.isChecked()
+        self.gui.main.settings['countdown_settings']['font_face'] = self.countdown_font_combobox.currentText()
+        self.gui.main.settings['countdown_settings']['font_size'] = int(self.countdown_size_combobox.currentText())
+        self.gui.main.settings['countdown_settings']['font_bold'] = self.countdown_bold_checkbox.isChecked()
+        self.gui.main.settings['countdown_settings']['position'] = self.countdown_position_combobox.currentData(Qt.ItemDataRole.UserRole)
+        bg_qcolor = self.bg_color_swatch.pixmap().toImage().pixelColor(10, 10)
+        bg_color = f'rgba({bg_qcolor.red()}, {bg_qcolor.green()}, {bg_qcolor.blue()}, {bg_qcolor.alpha()})'
+        self.gui.main.settings['countdown_settings']['bg_color'] = bg_color
+        fg_qcolor = self.fg_color_swatch.pixmap().toImage().pixelColor(10, 10)
+        fg_color = f'rgb({fg_qcolor.red()}, {fg_qcolor.green()}, {fg_qcolor.blue()})'
+        self.gui.main.settings['countdown_settings']['fg_color'] = fg_color
+        self.gui.main.settings['countdown_settings']['start_time'] = [
+            self.countdown_start_time_widget.time().hour(),
+            self.countdown_start_time_widget.time().minute()
+        ]
+        self.gui.main.settings['countdown_settings']['display_time'] = [
+            self.countdown_display_time_widget.time().hour(),
+            self.countdown_display_time_widget.time().minute()
+        ]
+
         self.gui.main.save_settings()
-        self.gui.apply_settings()
-        self.done(0)
+        self.gui.apply_settings(theme_too=False)
+        self.hide()
 
     def cancel(self):
-        self.done(0)
-        self.gui.main.app.processEvents()
+        self.hide()

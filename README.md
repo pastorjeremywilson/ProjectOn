@@ -16,7 +16,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.5.7?
+# What's New in Version 1.5.7.001?
 - Fixed an issue where a custom font was not displaying in Custom Slides
 - Song search now includes searching each song's lyrics (search terms found in titles appear first in the results)
 - Ensured that, when a custom slide is to be split into individual slides, the split occurs only at the blank lines
@@ -25,7 +25,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.5.7) and run
+system only. Download the current ProjectOn installer (v.1.5.7.001) and run
 it on your computer.
 
 # Using ProjectOn

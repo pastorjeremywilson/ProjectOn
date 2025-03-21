@@ -1,8 +1,11 @@
 Done:
-    Custom font in Custom Slides
-    Search songs - include words
-    Split Slides - split at double enter
-    CCLI Login Greyed Out
+    Added countdown timer
+    Redesigned FontWidget
+
+To Do:
+    Remove commented lines from settings_widget
+    Change countdown widget on settings save
+    Improve font widget layout
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types
@@ -10,3 +13,15 @@ Future Releases:
     Video backgrounds
     Further consolidate widgets
     Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
+
+
+self.main.settings['countdown_settings'] = {}
+self.main.settings['countdown_settings']['use_countdown'] = False - use_checkbox
+self.main.settings['countdown_settings']['font_face'] = 'Arial' - countdown_font_combobox
+self.main.settings['countdown_settings']['font_size'] = 36 - countdown_size_combobox
+self.main.settings['countdown_settings']['font_bold'] = False - countdown_bold_checkbox
+self.main.settings['countdown_settings']['position'] = 'bottom_full' - countdown_location_combobox
+self.main.settings['countdown_settings']['bg_color'] = 'rgba(0, 0, 255, 255)'bg_color_swatch.pixmap()
+self.main.settings['countdown_settings']['fg_color'] = 'rgb(255, 255, 255)' fg_color_swatch.pixmap()
+self.main.settings['countdown_settings']['start_time'] = [10, 45] - countdown_start_time_widget
+self.main.settings['countdown_settings']['display_time'] = [10, 40] - countdown_show_time_widget

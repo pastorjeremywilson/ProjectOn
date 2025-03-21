@@ -185,6 +185,10 @@ QComboBox::down-arrow {
     background: #e0e0e0;
     image: url('resources/gui_icons/scroll_down_arrow.svg');
 }
+QComboBox QAbstractItemView {
+    background: #303030;
+    color: #e0e0e0;
+}
 
 /*-------------------- QMessageBox --------------------*/
 QMessageBox {

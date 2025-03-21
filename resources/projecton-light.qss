@@ -93,6 +93,10 @@ QComboBox::down-arrow {
     background: #f0f0f0;
     image: url('resources/gui_icons/scroll_down_arrow.svg');
 }
+QComboBox QAbstractItemView {
+    background: #ffffff;
+    color: #000000;
+}
 
 /*-------------------- QSpinBox --------------------*/
 QSpinBox {

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.5.7
+ProjectOn v.1.5.7.001
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -40,7 +40,7 @@ from gevent import monkey
 
 import declarations
 from gui import GUI
-from runnables import SaveSettings, ServerCheck
+from runnables import SaveSettings, ServerCheckTimer
 from simple_splash import SimpleSplash
 from web_remote import RemoteServer
 from widgets import StandardItemWidget
@@ -110,8 +110,6 @@ class ProjectOn(QObject):
 
         self.remote_server = RemoteServer(self.gui)
         self.server_thread_pool.start(self.remote_server)
-        self.server_check = ServerCheck(self.remote_server, self.gui)
-        self.server_thread_pool.start(self.server_check)
 
         self.splash_widget.deleteLater()
         self.settings['last_status_count'] = self.status_update_count
@@ -123,6 +121,9 @@ class ProjectOn(QObject):
                 self.load_service(arg)
 
         self.app.processEvents()
+
+        self.server_check_timer = ServerCheckTimer(self.remote_server, self.gui)
+        self.server_check_timer.start()
 
         self.app.exec()
 
@@ -151,7 +152,7 @@ class ProjectOn(QObject):
         self.splash_widget = QWidget()
         self.splash_widget.setObjectName('splash_widget')
         self.splash_widget.setMinimumWidth(610)
-        self.splash_widget.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.splash_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.splash_widget.setStyleSheet(
             '#splash_widget { background: #6060c0; }')
         splash_layout = QHBoxLayout(self.splash_widget)
@@ -169,7 +170,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.5.7')
+        version_label = QLabel('v.1.5.7.001')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -212,6 +213,7 @@ class ProjectOn(QObject):
         container_layout.addWidget(self.info_label)
 
         self.splash_widget.show()
+        self.splash_widget.setFocus()
 
     def get_all_songs(self):
         """
