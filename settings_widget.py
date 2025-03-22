@@ -387,6 +387,7 @@ class SettingsWidget(QWidget):
 
         self.countdown_size_combobox = QComboBox()
         self.countdown_size_combobox.setFont(self.gui.standard_font)
+        self.countdown_size_combobox.setMinimumHeight(40)
         for i in range(10, 161, 2):
             self.countdown_size_combobox.addItem(str(i))
         for i in range(self.countdown_size_combobox.count()):
@@ -422,6 +423,7 @@ class SettingsWidget(QWidget):
         options_layout.addWidget(start_time_label, 3, 0)
 
         self.countdown_start_time_widget = QTimeEdit()
+        self.countdown_start_time_widget.setMinimumHeight(40)
         self.countdown_start_time_widget.setFont(self.gui.standard_font)
         self.countdown_start_time_widget.setTime(
             QTime(
@@ -438,6 +440,7 @@ class SettingsWidget(QWidget):
         options_layout.addWidget(show_time_label, 3, 1)
 
         self.countdown_display_time_widget = QTimeEdit()
+        self.countdown_display_time_widget.setMinimumHeight(40)
         self.countdown_display_time_widget.setFont(self.gui.standard_font)
         self.countdown_display_time_widget.setTime(
             QTime(

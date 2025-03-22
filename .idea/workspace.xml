@@ -7,11 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added countdown timer&#10;Redesigned font widget&#10;Redesigned settings widget&#10;Changed runnables to timers when runnable is performing periodic tasks">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/runnables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
@@ -171,14 +171,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00069" summary="Added missing add to service actions (image, video, and web) in the media_widget.py CustomListWidget">
-      <option name="closed" value="true" />
-      <created>1726769019955</created>
-      <option name="number" value="00069" />
-      <option name="presentableId" value="LOCAL-00069" />
-      <option name="project" value="LOCAL" />
-      <updated>1726769019956</updated>
     </task>
     <task id="LOCAL-00070" summary="Added restore from backup option and corresponding code.">
       <option name="closed" value="true" />
@@ -564,7 +556,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742528119425</updated>
     </task>
-    <option name="localTasksCounter" value="118" />
+    <task id="LOCAL-00118" summary="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster.">
+      <option name="closed" value="true" />
+      <created>1742592223386</created>
+      <option name="number" value="00118" />
+      <option name="presentableId" value="LOCAL-00118" />
+      <option name="project" value="LOCAL" />
+      <updated>1742592223386</updated>
+    </task>
+    <option name="localTasksCounter" value="119" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -585,7 +585,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added documentation&#10;Removed default to bold in lyric widget text label" />
     <MESSAGE value="Prior to this change, the data needed to properly display any given song, bible passage, custom slide, etc. were all stored in individual data slots in QListWidgetItem.data(int). This was getting to be overly complicated as more features were added. Now, a singular dictionary is created for each slide, with the data being stored as key:value pairs and that dictionary is stored in QListWidgetItem.data(Qt.ItemDataRole.UserRole). Or, slot number 256. All code has been changed to pull the data from this dictionary rather than the individual data slots.&#10;&#10;It appears that loading and displaying slides, as well as loading a saved service works fine. Further testing is needed in creating new items for each of the media categories, as well as deleting items." />
     <MESSAGE value="Improved the process of adding or deleting background images" />
     <MESSAGE value="Changed override global, split slides, and add auto checkboxes in the edit widget to checkable buttons with custom icons." />
@@ -610,7 +609,8 @@
     <MESSAGE value="Added a check to see if an inserted tag needs line breaks before or after" />
     <MESSAGE value="Fixed an issue where a custom font was not displaying in Custom Slides&#10;Song search now includes searching each song's lyrics (search terms found in titles appear first in the results)&#10;Ensured that, when a custom slide is to be split into individual slides, the split occurs only at the blank lines&#10;Fixed an issue with the CCLI song import where the login button was disabled on CCLI's website" />
     <MESSAGE value="Added countdown timer&#10;Redesigned font widget&#10;Redesigned settings widget&#10;Changed runnables to timers when runnable is performing periodic tasks" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added countdown timer&#10;Redesigned font widget&#10;Redesigned settings widget&#10;Changed runnables to timers when runnable is performing periodic tasks" />
+    <MESSAGE value="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster." />
+    <option name="LAST_COMMIT_MESSAGE" value="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

@@ -13,7 +13,8 @@ from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, Q
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
-    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QAbstractItemDelegate
+    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QAbstractItemDelegate, \
+    QStyleOptionViewItem
 
 
 class FontFaceListWidget(QListWidget):
@@ -69,30 +70,16 @@ class FontFaceComboBox(QComboBox):
         self.gui = gui
         self.setEditable(True)
         self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
-        #timer = QTimer()
-        #timer.singleShot(5000, self.populate_widget)
         self.populate_widget()
 
     def populate_widget(self):
-        if self.gui.main.initial_startup:
-            self.gui.main.update_status_signal.emit('Processing Fonts', 'status')
         try:
-            row = 0
-            #model = self.model()
-            families = QFontDatabase().families()
-            model = QStandardItemModel()
-            for font in families:
-                #if self.gui.main.initial_startup:
-                #    self.gui.main.update_status_signal.emit(font, 'info')
-                self.addItem(font)
-                #item = QStandardItem(font)
-                #item.setFont(QFont(font, 14))
-                #model.appendRow(item)
-                #self.addItem(font)
-                #model.setData(model.index(row, 0), QFont(font, 14), Qt.ItemDataRole.FontRole)
-                row += 1
-
-            #self.setModel(model.to)
+            for i in range(len(self.gui.font_pixmaps)):
+                if i == len(self.gui.font_pixmaps) - 1:
+                    self.setIconSize(QSize(self.gui.font_pixmaps[i][0], self.gui.font_pixmaps[i][1]))
+                    self.setMinimumWidth(self.gui.font_pixmaps[i][0])
+                else:
+                    self.addItem(QIcon(self.gui.font_pixmaps[i][1]), self.gui.font_pixmaps[i][0])
         except Exception:
             self.gui.main.error_log()
 
@@ -103,6 +90,7 @@ class FontFaceComboBox(QComboBox):
 
     def wheelEvent(self, evt):
         evt.ignore()
+
 
 class ImageCombobox(QComboBox):
     """
@@ -921,6 +909,7 @@ class FontWidget(QWidget):
         font_size_layout.addWidget(font_size_label)
 
         self.font_size_spinbox.setMaximumWidth(100)
+        self.font_size_spinbox.setMinimumHeight(40)
         self.font_size_spinbox.setFont(self.gui.standard_font)
         self.font_size_spinbox.setRange(10, 240)
         self.font_size_spinbox.valueChanged.connect(self.change_font)
@@ -928,7 +917,7 @@ class FontWidget(QWidget):
         font_size_layout.addWidget(self.font_size_spinbox)
 
         font_color_widget = QWidget()
-        face_size_layout.addWidget(font_color_widget)
+        layout.addWidget(font_color_widget)
         font_color_layout = QVBoxLayout(font_color_widget)
         font_color_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -954,6 +943,7 @@ class FontWidget(QWidget):
         self.custom_font_color_radio_button.setObjectName('custom_font_color_radio_button')
         self.custom_font_color_radio_button.clicked.connect(self.color_chooser)
         color_button_layout.addWidget(self.custom_font_color_radio_button)
+        color_button_layout.addStretch()
 
         self.font_color_button_group.addButton(self.white_radio_button)
         self.font_color_button_group.addButton(self.black_radio_button)

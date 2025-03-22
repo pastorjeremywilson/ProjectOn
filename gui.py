@@ -8,8 +8,9 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QAbstractItemModel
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QStandardItem
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QAbstractItemModel, QPoint
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QStandardItem, QPainter, \
+    QFontMetrics, QPainterPath, QBrush, QPen
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -72,7 +73,7 @@ class GUI(QObject):
     edit_widget = None
     countdown_widget = None
     countdown_timer = None
-    font_combobox_model = None
+    font_pixmaps = None
 
     standard_font = QFont('Helvetica', 12)
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
@@ -170,6 +171,9 @@ class GUI(QObject):
                     secondary_found = True
             if not secondary_found:
                 self.secondary_screen = self.primary_screen
+
+        self.main.update_status_signal.emit('Processing Fonts', 'status')
+        self.create_font_pixmaps()
 
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
@@ -732,6 +736,36 @@ class GUI(QObject):
                     os.system(f'start \"\" {save_location}')
                     self.main_window.close()
                     sys.exit(0)
+
+    def create_font_pixmaps(self):
+        font_families = QFontDatabase().families()
+        self.font_pixmaps = []
+        width = 0
+        height = 0
+        for font in font_families:
+            self.main.update_status_signal.emit(font, 'info')
+            font_metrics = QFontMetrics(QFont(font, 18))
+            text_rect = font_metrics.boundingRect(font)
+            if text_rect.width() > width:
+                width = text_rect.width()
+            if text_rect.height() > height:
+                height = text_rect.height()
+
+            pixmap = QPixmap(text_rect.width() + 10, text_rect.height() + 10)
+            pixmap.fill(QColor(0, 0, 0, 0))
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.setPen(Qt.GlobalColor.black)
+
+            painter.begin(pixmap)
+            painter.setFont(QFont(font, 18))
+            painter.drawText(QPoint(5, abs(text_rect.y()) + 5), font)
+            painter.end()
+
+            self.font_pixmaps.append([font, pixmap])
+        if height > 36:
+            height = 36
+        self.font_pixmaps.append([width, height])
 
     def print_oos(self):
         """
