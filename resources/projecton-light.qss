@@ -93,6 +93,10 @@ QComboBox::down-arrow {
     background: #f0f0f0;
     image: url('resources/gui_icons/scroll_down_arrow.svg');
 }
+QComboBox QAbstractItemView {
+    background: #ffffff;
+    color: #000000;
+}
 
 /*-------------------- QSpinBox --------------------*/
 QSpinBox {
@@ -118,6 +122,33 @@ QSpinBox::down-button {
     min-height: 15;
 }
 QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+    background: #aaaaff
+}
+
+/*-------------------- QTimeEdit --------------------*/
+QTimeEdit {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+}
+QTimeEdit QLineEdit {
+    background: #ffffff;
+    color: #000000;
+}
+QTimeEdit::up-button, QTimeEdit::down-button {
+    background: #ffffff;
+}
+QTimeEdit::up-button {
+    image: url('resources/gui_icons/scroll_up_arrow.svg');
+    min-width: 20;
+    min-height: 15;
+}
+QTimeEdit::down-button {
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
+    min-width: 20;
+    min-height: 15;
+}
+QTimeEdit::up-button:hover, QTimeEdit::down-button:hover {
     background: #aaaaff
 }
 
@@ -306,4 +337,9 @@ QProgressBar {
 QProgressBar::chunk {
     background-color: #5555aa;
     color: #ffffff;
+}
+
+/*-------------------- QGroupBox --------------------*/
+QGroupBox {
+    color: #000000;
 }

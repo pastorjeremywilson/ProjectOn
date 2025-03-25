@@ -6,7 +6,6 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog
 
 from openlp_import import OpenLPImport
-from settings_widget import SettingsWidget
 from widgets import ImageCombobox, FontWidget
 
 
@@ -152,7 +151,7 @@ class Toolbar(QWidget):
        self.olpi = OpenLPImport(self.gui)
 
     def open_settings(self):
-        self.sw = SettingsWidget(self.gui)
+        self.sw.show()
 
     def import_background(self):
         result = QFileDialog.getOpenFileName(

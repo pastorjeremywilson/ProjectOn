@@ -4,12 +4,13 @@ import shutil
 import sqlite3
 import sys
 import time
+from datetime import datetime
 from os.path import exists
 
 import requests
 from PIL.ImageQt import QPixmap
-from PyQt5.QtCore import QRunnable, Qt, QByteArray, QBuffer, QIODevice
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtCore import QRunnable, Qt, QByteArray, QBuffer, QIODevice, QTimer
+from PyQt5.QtWidgets import QMessageBox, QFileDialog, QWidget
 
 
 class CheckFiles(QRunnable):
@@ -232,47 +233,44 @@ class IndexImages(QRunnable):
         connection.close()
 
 
-class ServerCheck(QRunnable):
+class ServerCheckTimer(QTimer):
     """
-    Creates a QRunnable that will periodically check that the three servers are up and running. Emits the GUI's
+    Implements QTimer to periodically check that the three servers are up and running. Emits the GUI's
     server_alert_signal if the check fails.
+    Args:
+        remote_server (RemoteServer): The current instance of RemoteServer
+        gui (GUI): The current instance of GUI
     """
     def __init__(self, remote_server, gui):
-        """
-        :param RemoteServer remote_server: The current instance of RemoteServer
-        :param gui.GUI gui: The current instance of GUI
-        """
         super().__init__()
         self.remote_server = remote_server
         self.gui = gui
-        self.keep_checking = True
+        self.setInterval(5000)
+        self.timeout.connect(self.check_server)
 
-    def run(self):
-        while self.keep_checking:
-            if self.remote_server.socketio:
-                remote_response = requests.get('http://' + self.remote_server.gui.main.ip + ':15171/remote')
-                mremote_response = requests.get('http://' + self.remote_server.gui.main.ip + ':15171/mremote')
-                stage_response = requests.get('http://' + self.remote_server.gui.main.ip + ':15171/stage')
+    def check_server(self):
+        if self.remote_server.socketio:
+            remote_response = requests.get('http://' + self.remote_server.gui.main.ip + ':15171/remote')
+            mremote_response = requests.get('http://' + self.remote_server.gui.main.ip + ':15171/mremote')
+            stage_response = requests.get('http://' + self.remote_server.gui.main.ip + ':15171/stage')
 
-                if remote_response and mremote_response and stage_response:
-                    if not (remote_response.status_code == 200
-                            and mremote_response.status_code == 200
-                            and stage_response.status_code == 200):
-                        self.keep_checking = False
-                        error_text = (str(time.time()) + ' - '
-                                      + 'server error: remote-' + str(remote_response.status_code)
-                                      + ', mremote-' + str(mremote_response.status_code)
-                                      + ', stage-' + str(stage_response.status_code))
-                        with open('./error.log', 'a') as file:
-                            file.write(error_text)
-                        self.gui.server_alert_signal.emit()
-                else:
+            if remote_response and mremote_response and stage_response:
+                if not (remote_response.status_code == 200
+                        and mremote_response.status_code == 200
+                        and stage_response.status_code == 200):
                     self.keep_checking = False
+                    error_text = (str(time.time()) + ' - '
+                                  + 'server error: remote-' + str(remote_response.status_code)
+                                  + ', mremote-' + str(mremote_response.status_code)
+                                  + ', stage-' + str(stage_response.status_code))
                     with open('./error.log', 'a') as file:
-                        file.write('unknown server error')
+                        file.write(error_text)
                     self.gui.server_alert_signal.emit()
-
-                time.sleep(5)
+            else:
+                self.keep_checking = False
+                with open('./error.log', 'a') as file:
+                    file.write('unknown server error')
+                self.gui.server_alert_signal.emit()
 
 
 class SaveSettings(QRunnable):
@@ -342,3 +340,41 @@ class SlideAutoPlay(QRunnable):
             # don't emit the signal if keep_running was changed during sleep
             if self.keep_running:
                 self.gui.change_current_live_item_signal.emit()
+
+
+class CountdownTimer(QTimer):
+    """
+    Implements QTimer to check every second whether the service countdown widget should be displayed, and to change
+    the text of the widget's label.
+    Args:
+        countdown_widget (CountdownWidget): The countdown widget to be manipulated.
+        start_time (datetime.time): The start time of the service.
+        display_time (datetime.time): The time to start showing the countdown widget.
+    """
+    def __init__(self, settings, countdown_widget, start_time, display_time):
+        super().__init__()
+        self.settings = settings
+        self.countdown_widget = countdown_widget
+        self.start_time = start_time
+        self.display_time = display_time
+
+        self.setInterval(1000)
+        self.timeout.connect(self.operate_countdown)
+
+    def operate_countdown(self):
+        if self.settings['countdown_settings']['use_countdown']:
+            if datetime.now() > self.start_time:
+                self.stop()
+                self.countdown_widget.hide_self_signal.emit()
+            elif datetime.now() >= self.display_time:
+                if self.countdown_widget.isHidden():
+                    self.countdown_widget.show_self_signal.emit()
+                time_remaining = self.start_time - datetime.now()
+                minutes = str(time_remaining.seconds / 60).split('.')[0]
+                seconds = str(time_remaining.seconds % 60)
+                if len(seconds) == 1:
+                    seconds = '0' + seconds
+                self.countdown_widget.update_label_signal.emit(f'Service starts in {minutes}:{seconds}')
+            else:
+                if not self.countdown_widget.isHidden():
+                    self.countdown_widget.hide_self_signal.emit()

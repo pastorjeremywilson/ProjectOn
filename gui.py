@@ -4,11 +4,13 @@ import re
 import shutil
 import sys
 import tempfile
+from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QAbstractItemModel, QPoint
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QStandardItem, QPainter, \
+    QFontMetrics, QPainterPath, QBrush, QPen
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -26,17 +28,19 @@ from media_widget import MediaWidget
 from oos_widget import OOSWidget
 from openlyrics_export import OpenlyricsExport
 from preview_widget import PreviewWidget
-from runnables import TimedPreviewUpdate, SlideAutoPlay
+from runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
+from settings_widget import SettingsWidget
 from simple_splash import SimpleSplash
 from songselect_import import SongselectImport
 from toolbar import Toolbar
 from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, \
-    FontFaceComboBox
+    FontFaceComboBox, CountdownWidget
 
 
 class GUI(QObject):
     """
     Creates the user interface and handles user input that will change the interface or the display widget.
+    :param main ProjectOn: The current instance of ProjectOn
     """
     media_widget = None
     oos_widget = None
@@ -45,6 +49,7 @@ class GUI(QObject):
     display_widget = None
     lyric_label = None
     preview_display_widget = None
+    tool_bar = None
     current_file = None
     default_bible = None
 
@@ -53,7 +58,6 @@ class GUI(QObject):
     global_bible_background_pixmap = None
     custom_pixmap = None
     last_pixmap = None
-    display_widget = None
     sample_widget = None
     lyric_widget = None
     sample_lyric_widget = None
@@ -67,6 +71,9 @@ class GUI(QObject):
     central_widget = None
     central_layout = None
     edit_widget = None
+    countdown_widget = None
+    countdown_timer = None
+    font_pixmaps = None
 
     standard_font = QFont('Helvetica', 12)
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
@@ -116,19 +123,19 @@ class GUI(QObject):
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        self.main.status_label.setText('Checking Files')
+        self.main.update_status_signal.emit('Checking Files', 'status')
         self.main.app.processEvents()
 
         # ensure all needed files exist; thread it and wait until done before moving on
         self.check_files()
 
-        self.main.status_label.setText('Checking Database Integrity')
+        self.main.update_status_signal.emit('Checking Database Integrity', 'status')
         self.main.app.processEvents()
         self.main.check_db(self.main.database)
 
         self.main.get_song_titles()
 
-        self.main.status_label.setText('Indexing Images')
+        self.main.update_status_signal.emit('Indexing Images', 'status')
         self.main.app.processEvents()
 
         from runnables import IndexImages
@@ -165,8 +172,10 @@ class GUI(QObject):
             if not secondary_found:
                 self.secondary_screen = self.primary_screen
 
+        self.main.update_status_signal.emit('Processing Fonts', 'status')
+        self.create_font_pixmaps()
+
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
-        self.preloaded_font_combo_box = FontFaceComboBox(self)
 
         self.init_components()
         self.add_widgets()
@@ -188,6 +197,9 @@ class GUI(QObject):
             self.tool_bar.show_display_button.setChecked(False)
         else:
             self.tool_bar.show_display_button.setChecked(True)
+
+        self.main.update_status_signal.emit('Finalizing', 'status')
+        self.tool_bar.sw = SettingsWidget(self)
 
         self.main_window.showMaximized()
 
@@ -594,7 +606,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.5.7'
+        current_version = 'v.1.6.0'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -725,6 +737,36 @@ class GUI(QObject):
                     self.main_window.close()
                     sys.exit(0)
 
+    def create_font_pixmaps(self):
+        font_families = QFontDatabase().families()
+        self.font_pixmaps = []
+        width = 0
+        height = 0
+        for font in font_families:
+            self.main.update_status_signal.emit(font, 'info')
+            font_metrics = QFontMetrics(QFont(font, 18))
+            text_rect = font_metrics.boundingRect(font)
+            if text_rect.width() > width:
+                width = text_rect.width()
+            if text_rect.height() > height:
+                height = text_rect.height()
+
+            pixmap = QPixmap(text_rect.width() + 10, text_rect.height() + 10)
+            pixmap.fill(QColor(0, 0, 0, 0))
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.setPen(Qt.GlobalColor.black)
+
+            painter.begin(pixmap)
+            painter.setFont(QFont(font, 18))
+            painter.drawText(QPoint(5, abs(text_rect.y()) + 5), font)
+            painter.end()
+
+            self.font_pixmaps.append([font, pixmap])
+        if height > 36:
+            height = 36
+        self.font_pixmaps.append([width, height])
+
     def print_oos(self):
         """
         Provides a method to create a printout of the current order of service
@@ -838,7 +880,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.5.7')
+        title_label = QLabel('ProjectOn v.1.6.0')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -964,6 +1006,10 @@ class GUI(QObject):
     def apply_settings(self, theme_too=True):
         """
         Provides a method to apply all of the settings obtained from the settings json file.
+        Args:
+            theme_too (bool): Whether also to apply theme settings.
+        Returns:
+            None
         """
         try:
             # if/else the settings because things occur
@@ -1065,6 +1111,57 @@ class GUI(QObject):
             self.set_logo_image(self.main.image_dir + '/' + self.main.settings['logo_image'])
             self.change_display('live')
             self.change_display('sample')
+
+            if self.main.settings['countdown_settings']['use_countdown']:
+                if self.countdown_widget:
+                    self.countdown_widget.deleteLater()
+                    self.main.app.processEvents()
+                if self.countdown_timer:
+                    self.countdown_timer.stop()
+
+                font = QFont(
+                    self.main.settings['countdown_settings']['font_face'],
+                    self.main.settings['countdown_settings']['font_size']
+                )
+                if self.main.settings['countdown_settings']['font_bold']:
+                    font.setBold(True)
+                self.countdown_widget = CountdownWidget(
+                    self,
+                    font,
+                    self.main.settings['countdown_settings']['position'],
+                    self.main.settings['countdown_settings']['bg_color'],
+                    self.main.settings['countdown_settings']['fg_color']
+                )
+                self.countdown_widget.hide()
+
+                now_time = datetime.now()
+                start_time = datetime(
+                    now_time.year,
+                    now_time.month,
+                    now_time.day,
+                    self.main.settings['countdown_settings']['start_time'][0],
+                    self.main.settings['countdown_settings']['start_time'][1],
+                    0,
+                    0
+                )
+                display_time = datetime(
+                    now_time.year,
+                    now_time.month,
+                    now_time.day,
+                    self.main.settings['countdown_settings']['display_time'][0],
+                    self.main.settings['countdown_settings']['display_time'][1],
+                    0,
+                    0
+                )
+                self.countdown_timer = CountdownTimer(self.main.settings, self.countdown_widget, start_time, display_time)
+                self.countdown_timer.start()
+            else:
+                if self.countdown_widget:
+                    self.countdown_widget.deleteLater()
+                    self.main.app.processEvents()
+                if self.countdown_timer:
+                    self.countdown_timer.stop()
+
         except Exception:
             self.main.error_log()
 
@@ -1257,7 +1354,6 @@ class GUI(QObject):
             if (slide_data['split_slides']
                     and slide_data['split_slides'] == 'True'):
                 slide_text = re.sub(r'(<br />)\1+', '<split>', slide_text)
-                print(slide_text)
                 slide_data['parsed_text'] = re.split('<split>', slide_text)
             else:
                 slide_data['parsed_text'] = [slide_text]
@@ -1624,7 +1720,6 @@ class GUI(QObject):
 
             # set the font
             if 'override_global' in item_data.keys() and item_data['override_global'] == 'True':
-                print(json.dumps(item_data, indent=4))
                 font_face = item_data['font_family']
                 font_size = int(item_data['font_size'])
                 font_color = item_data['font_color']
@@ -1981,6 +2076,19 @@ class GUI(QObject):
             self.tool_bar.logo_screen_button.setChecked(True)
         else:
             self.logo_widget.hide()
+
+        if 'countdown_settings' not in self.main.settings.keys():
+            self.main.settings['countdown_settings'] = {}
+            self.main.settings['countdown_settings']['use_countdown'] = False
+            self.main.settings['countdown_settings']['font_face'] = 'Arial'
+            self.main.settings['countdown_settings']['font_size'] = 36
+            self.main.settings['countdown_settings']['font_bold'] = False
+            self.main.settings['countdown_settings']['position'] = 'bottom_full'
+            self.main.settings['countdown_settings']['bg_color'] = 'rgba(0, 0, 255, 255)'
+            self.main.settings['countdown_settings']['fg_color'] = 'rgb(255, 255, 255)'
+            self.main.settings['countdown_settings']['start_time'] = [10, 45]
+            self.main.settings['countdown_settings']['display_time'] = [10, 40]
+            self.main.save_settings()
 
         self.lyric_widget.hide()
         self.web_view.hide()

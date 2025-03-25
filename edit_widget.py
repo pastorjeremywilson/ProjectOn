@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QSpinBox, QTextEdit
+    QSpinBox, QTextEdit, QComboBox
 
 import parsers
 from formattable_text_edit import FormattableTextEdit
@@ -490,10 +490,9 @@ class EditWidget(QDialog):
         else:
             slide_type = 'bible'
 
-        for i in range(self.font_widget.font_list_widget.count()):
-            if (self.font_widget.font_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
-                    == self.gui.main.settings[slide_type + '_font_face']):
-                self.font_widget.font_list_widget.setCurrentRow(i)
+        for i in range(self.font_widget.font_face_combobox.count()):
+            if self.font_widget.font_face_combobox.itemText(i)  == self.gui.main.settings[slide_type + '_font_face']:
+                self.font_widget.font_face_combobox.setCurrentIndex(i)
                 break
 
         if self.gui.main.settings[slide_type + '_font_color'] == 'black':
@@ -663,9 +662,9 @@ class EditWidget(QDialog):
             font_face = self.gui.main.settings['song_font_face']
         else:
             font_face = song_data[7]
-        for i in range(self.font_widget.font_list_widget.count()):
-            if self.font_widget.font_list_widget.item(i).data(20) == font_face:
-                self.font_widget.font_list_widget.setCurrentRow(i)
+        for i in range(self.font_widget.font_face_combobox.count()):
+            if self.font_widget.font_face_combobox.itemText(i) == font_face:
+                self.font_widget.font_face_combobox.setCurrentIndex(i)
                 break
 
         # check the proper font color radio button
@@ -799,9 +798,9 @@ class EditWidget(QDialog):
             font_face = self.gui.main.settings['bible_font_face']
         else:
             font_face = custom_data[2]
-        for i in range(self.font_widget.font_list_widget.count()):
-            if self.font_widget.font_list_widget.item(i).data(20) == font_face:
-                self.font_widget.font_list_widget.setCurrentRow(i)
+        for i in range(self.font_widget.font_face_combobox.count()):
+            if self.font_widget.font_face_combobox.itemText(i) == font_face:
+                self.font_widget.font_face_combobox.setCurrentIndex(i)
                 break
 
         # check the proper font color radio button
@@ -1118,10 +1117,10 @@ class EditWidget(QDialog):
         else:
             footer = 'false'
 
-        if self.font_widget.font_list_widget.currentItem():
-            font = self.font_widget.font_list_widget.currentItem().data(20)
+        if self.font_widget.font_face_combobox.currentText():
+            font = self.font_widget.font_face_combobox.currentText()
         else:
-            font = self.font_widget.font_list_widget.item(0).data(20)
+            font = self.font_widget.font_face_combobox.itemText(0)
 
         if self.font_widget.font_color_button_group.checkedButton():
             font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
@@ -1308,10 +1307,10 @@ class EditWidget(QDialog):
         else:
             override_global = 'False'
 
-        if self.font_widget.font_list_widget.currentItem():
-            font = self.font_widget.font_list_widget.currentItem().data(20)
+        if self.font_widget.font_face_combobox.currentText():
+            font = self.font_widget.font_face_combobox.currentText()
         else:
-            font = self.font_widget.font_list_widget.item(0).data(20)
+            font = self.font_widget.font_face_combobox.itemText(0)
 
         if self.font_widget.font_color_button_group.checkedButton():
             font_color = self.font_widget.font_color_button_group.checkedButton().objectName()
