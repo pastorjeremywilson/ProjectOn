@@ -365,3 +365,8 @@ QProgressBar::chunk {
     background-color: #e0e0e0;
     color: #303030;
 }
+
+/*-------------------- QGroupBox --------------------*/
+QGroupBox {
+    color: #e0e0e0;
+}

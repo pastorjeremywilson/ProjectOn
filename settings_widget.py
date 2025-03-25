@@ -4,11 +4,11 @@ import shutil
 import sqlite3
 
 from PIL.ImageQt import QImage
-from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QRect, QTime
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath, QFont
+from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QRect, QTime, QSize
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath, QFont, QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, QCheckBox, \
-    QComboBox, QTimeEdit, QTabWidget
+    QComboBox, QTimeEdit, QTabWidget, QGroupBox
 
 from simple_splash import SimpleSplash
 from widgets import FontWidget, FontFaceComboBox, ClickableColorSwatch
@@ -38,7 +38,7 @@ class SettingsWidget(QWidget):
 
         self.accept_font_changes = True
         #self.wait_widget.subtitle_label.setText('Creating Font Sample')
-        self.gui.main.app.processEvents()
+        #self.gui.main.app.processEvents()
         #self.wait_widget.widget.deleteLater()
 
     def show_wait_widget(self):
@@ -54,6 +54,9 @@ class SettingsWidget(QWidget):
         layout.setRowStretch(1, 1)
 
         self.settings_container = QTabWidget()
+        self.settings_container.setFont(self.gui.standard_font)
+        self.settings_container.setIconSize(QSize(36, 36))
+        self.settings_container.setStyleSheet('QTabBar::tab { height: 42px; }')
         self.settings_container.setObjectName('tab_widget')
         #self.settings_container.setObjectName('settings_container')
         #settings_container_layout = QVBoxLayout(self.settings_container)
@@ -88,6 +91,11 @@ class SettingsWidget(QWidget):
 
         #self.wait_widget.subtitle_label.setText('Finishing Up')
         #self.gui.main.app.processEvents()
+        self.settings_container.setTabIcon(0, QIcon('resources/gui_icons/ccli_settings.svg'))
+        self.settings_container.setTabIcon(1, QIcon('resources/gui_icons/screen_settings.svg'))
+        self.settings_container.setTabIcon(2, QIcon('resources/gui_icons/font_settings_settings.svg'))
+        self.settings_container.setTabIcon(3, QIcon('resources/gui_icons/background_settings.svg'))
+        self.settings_container.setTabIcon(4, QIcon('resources/gui_icons/countdown_settings.svg'))
 
         """settings_scroll_area = QScrollArea()
         settings_scroll_area.setWidgetResizable(True)
@@ -220,10 +228,23 @@ class SettingsWidget(QWidget):
         layout.addWidget(font_widget)
 
         self.song_font_settings_widget = FontWidget(self.gui, 'song', draw_border=False)
-        font_layout.addWidget(self.song_font_settings_widget)
+        #font_layout.addWidget(self.song_font_settings_widget)
+        song_font_group_box = QGroupBox()
+        song_font_group_box.setTitle('Song Font Settings')
+        song_font_group_box.setFont(self.gui.standard_font)
+        song_font_group_box_layout = QVBoxLayout(song_font_group_box)
+        song_font_group_box_layout.addWidget(self.song_font_settings_widget)
+        font_layout.addWidget(song_font_group_box)
+        font_layout.addSpacing(20)
 
         self.bible_font_settings_widget = FontWidget(self.gui, 'bible', draw_border=False)
-        font_layout.addWidget(self.bible_font_settings_widget)
+        #font_layout.addWidget(self.bible_font_settings_widget)
+        bible_font_group_box = QGroupBox()
+        bible_font_group_box.setTitle('Bible Font Settings')
+        bible_font_group_box.setFont(self.gui.standard_font)
+        bible_font_group_box_layout = QVBoxLayout(bible_font_group_box)
+        bible_font_group_box_layout.addWidget(self.bible_font_settings_widget)
+        font_layout.addWidget(bible_font_group_box)
 
         stage_font_widget = QWidget()
         stage_font_layout = QHBoxLayout()
