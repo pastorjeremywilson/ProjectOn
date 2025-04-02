@@ -34,11 +34,6 @@ class EditWidget(QDialog):
         self.old_title = None
         self.new_song = False
         self.new_custom = False
-        self.item_index = None
-        if self.type == 'song':
-            self.item_index = self.gui.media_widget.song_list.currentIndex()
-        else:
-            self.item_index = self.gui.media_widget.custom_list.currentIndex()
 
         self.setObjectName('edit_widget')
         self.setWindowFlag(Qt.WindowType.Window)
@@ -1243,59 +1238,12 @@ class EditWidget(QDialog):
 
         self.deleteLater()
         save_widget.widget.deleteLater()
+
+        items = self.gui.media_widget.song_list.findItems(self.item_text, Qt.MatchFlag.MatchExactly)
+        self.gui.media_widget.song_list.setCurrentItem(items[0])
+
         if self.gui.oos_widget.oos_list_widget.currentItem():
             self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
-        if self.item_index:
-            self.gui.media_widget.song_list.setCurrentIndex(self.item_index)
-            self.gui.media_widget.song_list.scrollTo(self.item_index)
-
-    def get_simplified_text(self, lyrics):
-        break_tag = '<br />'
-
-        # 'flatten' the html if this is directly from the QTextEdit's toHtml function
-        if lyrics.startswith('<!'):
-            lyrics.replace('\n', '')
-            lyrics_split = re.split('<body.*?>', lyrics)
-            lyrics = lyrics_split[1].replace('</body></html>', '').strip()
-
-            # convert paragraphs to lines followed by break
-            paragraphs = re.findall('<p.*?>.*?</p>', lyrics)
-            lyrics = ''
-            for i in range(len(paragraphs)):
-                line = re.sub('<p.*?>', '', paragraphs[i])
-                line = line.replace('</p>', '').strip()
-                if i < len(paragraphs) - 1:
-                    if line != '<br />':
-                        lyrics += line + break_tag
-                    else:
-                        lyrics += line
-                elif line != '<br />':
-                    lyrics += line
-
-        # make paragraph tags if none exist
-        else:
-            lyrics = re.sub('\n', break_tag, lyrics)
-        lyrics = re.sub('<br.*?/>', break_tag, lyrics) # format old br tags
-
-        # simplify the formatting tags for bold, italic, and underline
-        style_substrings = re.findall('<span.*?</span>', lyrics)
-        for substring in style_substrings:
-            prefix = ''
-            suffix = ''
-            if 'font-weight' in substring:
-                prefix += '<b>'
-                suffix += '</b>'
-            if 'font-style' in substring:
-                prefix += '<i>'
-                suffix += '</i>'
-            if 'text-decoration' in substring:
-                prefix += '<u>'
-                suffix += '</u>'
-
-            new_substring = prefix + re.sub('<.*?>', '', substring) + suffix
-            lyrics = lyrics.replace(substring, new_substring)
-
-        return lyrics
 
     def save_custom(self):
         """
@@ -1444,11 +1392,60 @@ class EditWidget(QDialog):
 
         self.deleteLater()
         save_widget.widget.deleteLater()
+
+        items = self.gui.media_widget.custom_list.findItems(self.item_text, Qt.MatchFlag.MatchExactly)
+        self.gui.media_widget.custom_list.setCurrentItem(items[0])
+
         if self.gui.oos_widget.oos_list_widget.currentItem():
             self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
-        if self.item_index:
-            self.gui.media_widget.custom_list.setCurrentIndex(self.item_index)
-            self.gui.media_widget.custom_list.scrollTo(self.item_index)
+
+    def get_simplified_text(self, lyrics):
+        break_tag = '<br />'
+
+        # 'flatten' the html if this is directly from the QTextEdit's toHtml function
+        if lyrics.startswith('<!'):
+            lyrics.replace('\n', '')
+            lyrics_split = re.split('<body.*?>', lyrics)
+            lyrics = lyrics_split[1].replace('</body></html>', '').strip()
+
+            # convert paragraphs to lines followed by break
+            paragraphs = re.findall('<p.*?>.*?</p>', lyrics)
+            lyrics = ''
+            for i in range(len(paragraphs)):
+                line = re.sub('<p.*?>', '', paragraphs[i])
+                line = line.replace('</p>', '').strip()
+                if i < len(paragraphs) - 1:
+                    if line != '<br />':
+                        lyrics += line + break_tag
+                    else:
+                        lyrics += line
+                elif line != '<br />':
+                    lyrics += line
+
+        # make paragraph tags if none exist
+        else:
+            lyrics = re.sub('\n', break_tag, lyrics)
+        lyrics = re.sub('<br.*?/>', break_tag, lyrics) # format old br tags
+
+        # simplify the formatting tags for bold, italic, and underline
+        style_substrings = re.findall('<span.*?</span>', lyrics)
+        for substring in style_substrings:
+            prefix = ''
+            suffix = ''
+            if 'font-weight' in substring:
+                prefix += '<b>'
+                suffix += '</b>'
+            if 'font-style' in substring:
+                prefix += '<i>'
+                suffix += '</i>'
+            if 'text-decoration' in substring:
+                prefix += '<u>'
+                suffix += '</u>'
+
+            new_substring = prefix + re.sub('<.*?>', '', substring) + suffix
+            lyrics = lyrics.replace(substring, new_substring)
+
+        return lyrics
 
     def change_thumbnail(self, item):
         """

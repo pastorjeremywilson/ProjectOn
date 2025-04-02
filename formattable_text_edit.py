@@ -51,6 +51,7 @@ class FormattableTextEdit(QWidget):
         self.text_edit = CustomTextEdit()
         self.text_edit.setFont(self.gui.standard_font)
         self.text_edit.cursorPositionChanged.connect(self.set_style_buttons)
+        self.text_edit.selectionChanged.connect(self.set_style_buttons)
         layout.addWidget(self.text_edit)
 
     def set_bold(self):
@@ -58,81 +59,42 @@ class FormattableTextEdit(QWidget):
         Method to set/unset and merge the current selection or cursor's charFormat to bold.
         """
         cursor = self.text_edit.textCursor()
-        current_position = cursor.position()
-        if cursor.hasSelection():
-            selection_start = cursor.selectionStart()
-            selection_end = cursor.selectionEnd()
-            cursor.setPosition(selection_start, QTextCursor.MoveMode.MoveAnchor)
-            cursor.setPosition(selection_end, QTextCursor.MoveMode.KeepAnchor)
-            char_format = cursor.charFormat()
-            if char_format.font().bold():
-                char_format.setFontWeight(QFont.Weight.Normal)
-                cursor.mergeCharFormat(char_format)
-            else:
-                char_format.setFontWeight(QFont.Weight.Bold)
-                cursor.mergeCharFormat(char_format)
-        else:
-            font = cursor.charFormat().font()
-            if font.weight() == QFont.Weight.Normal:
-                font.setWeight(QFont.Weight.Bold)
-                self.text_edit.setCurrentFont(font)
-            else:
-                font.setWeight(QFont.Weight.Normal)
-                self.text_edit.setCurrentFont(font)
+        char_format = self.get_char_format(cursor)
 
-        self.text_edit.setFocus()
-        self.text_edit.textCursor().setPosition(current_position)
+        if char_format.fontWeight() == QFont.Weight.Bold:
+            char_format.setFontWeight(QFont.Weight.Normal)
+            cursor.setCharFormat(QTextCharFormat(char_format))
+        else:
+            char_format.setFontWeight(QFont.Weight.Bold)
+            cursor.setCharFormat(QTextCharFormat(char_format))
 
     def set_italic(self):
         """
         Method to set/unset and merge the current selection or cursor's charFormat to italic.
         """
         cursor = self.text_edit.textCursor()
-        if cursor.hasSelection():
-            font = QTextCharFormat(cursor.charFormat())
-            if not font.fontItalic():
-                font.setFontItalic(True)
-                cursor.setCharFormat(QTextCharFormat(font))
-            else:
-                font.setFontItalic(False)
-                cursor.mergeCharFormat(QTextCharFormat(font))
-        else:
-            font = cursor.charFormat().font()
-            if not font.italic():
-                font.setItalic(True)
-                self.text_edit.setCurrentFont(font)
-            else:
-                font.setItalic(False)
-                self.text_edit.setCurrentFont(font)
+        char_format = self.get_char_format(cursor)
 
-        self.text_edit.setFocus()
-        self.text_edit.textCursor().setPosition(self.cursor_position)
+        if not char_format.fontItalic():
+            char_format.setFontItalic(True)
+            cursor.setCharFormat(QTextCharFormat(char_format))
+        else:
+            char_format.setFontItalic(False)
+            cursor.setCharFormat(QTextCharFormat(char_format))
 
     def set_underline(self):
         """
         Method to set/unset and merge the current selection or cursor's charFormat to italic.
         """
         cursor = self.text_edit.textCursor()
-        if cursor.hasSelection():
-            font = QTextCharFormat(cursor.charFormat())
-            if not font.fontUnderline():
-                font.setFontUnderline(True)
-                cursor.setCharFormat(QTextCharFormat(font))
-            else:
-                font.setFontUnderline(False)
-                cursor.mergeCharFormat(QTextCharFormat(font))
-        else:
-            font = cursor.charFormat().font()
-            if not font.underline():
-                font.setUnderline(True)
-                self.text_edit.setCurrentFont(font)
-            else:
-                font.setUnderline(False)
-                self.text_edit.setCurrentFont(font)
+        char_format = self.get_char_format(cursor)
 
-        self.text_edit.setFocus()
-        if self.cursor_position:
-            self.text_edit.textCursor().setPosition(self.cursor_position)
+        if not char_format.fontUnderline():
+            char_format.setFontUnderline(True)
+            cursor.setCharFormat(QTextCharFormat(char_format))
+        else:
+            char_format.setFontUnderline(False)
+            cursor.setCharFormat(QTextCharFormat(char_format))
             
     def set_style_buttons(self):
         """
@@ -141,22 +103,33 @@ class FormattableTextEdit(QWidget):
         cursor = self.text_edit.textCursor()
         self.cursor_position = cursor.position()
 
-        font = cursor.charFormat().font()
+        char_format = self.get_char_format(cursor)
 
-        if font.weight() == QFont.Weight.Normal:
+        if char_format.fontWeight() == QFont.Weight.Normal:
             self.bold_button.setChecked(False)
         else:
             self.bold_button.setChecked(True)
 
-        if font.italic():
+        if char_format.fontItalic():
             self.italic_button.setChecked(True)
         else:
             self.italic_button.setChecked(False)
 
-        if font.underline():
+        if char_format.fontUnderline():
             self.underline_button.setChecked(True)
         else:
             self.underline_button.setChecked(False)
+
+    def get_char_format(self, cursor):
+        if cursor.hasSelection():
+            # move the cursor one character to the right or left in case the selection encloses the beginning of a tag
+            cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.KeepAnchor)
+            char_format = QTextCharFormat(cursor.charFormat())
+            cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter, QTextCursor.MoveMode.KeepAnchor)
+        else:
+            char_format = QTextCharFormat(cursor.charFormat())
+
+        return char_format
 
     def keyPressEvent(self, event: QKeyEvent):
         """
