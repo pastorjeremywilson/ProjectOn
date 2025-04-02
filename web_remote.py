@@ -1,7 +1,7 @@
 import re
 
 import geventwebsocket
-from engineio.async_drivers import gevent
+import gevent
 
 import logging
 from http.server import BaseHTTPRequestHandler

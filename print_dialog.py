@@ -1,6 +1,6 @@
 import subprocess
 
-import wmi as wmi
+import wmi
 from PyQt5.QtGui import QImage, QPixmap, QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QHBoxLayout, QComboBox, QDialog
 from pymupdf import pymupdf

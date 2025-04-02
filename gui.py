@@ -8,9 +8,8 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QAbstractItemModel, QPoint
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QStandardItem, QPainter, \
-    QFontMetrics, QPainterPath, QBrush, QPen
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -33,8 +32,7 @@ from settings_widget import SettingsWidget
 from simple_splash import SimpleSplash
 from songselect_import import SongselectImport
 from toolbar import Toolbar
-from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, \
-    FontFaceComboBox, CountdownWidget
+from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, CountdownWidget
 
 
 class GUI(QObject):

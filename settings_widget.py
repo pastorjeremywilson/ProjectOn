@@ -1,10 +1,8 @@
-import json
 import os.path
 import shutil
 import sqlite3
 
-from PIL.ImageQt import QImage
-from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QRect, QTime, QSize
+from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QTime, QSize
 from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath, QFont, QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, QCheckBox, \

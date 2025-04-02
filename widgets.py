@@ -1,20 +1,14 @@
 import re
 import sqlite3
-import sys
-import threading
-from datetime import datetime
-from threading import Thread
 
 import requests
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QRunnable, \
-    QAbstractItemModel, QModelIndex
+from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
-    QImage, QFontDatabase, QFontMetrics, QStandardItemModel, QStandardItem
+    QImage, QFontDatabase, QFontMetrics
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
-    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QAbstractItemDelegate, \
-    QStyleOptionViewItem
+    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem
 
 
 class FontFaceListWidget(QListWidget):
