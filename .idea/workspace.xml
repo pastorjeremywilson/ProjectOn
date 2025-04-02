@@ -7,11 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Further refined the settings and font widget layouts.&#10;Added icons to the settings widget tabs.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
-    </list>
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -168,14 +164,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00072" summary="Release v.1.4.0">
-      <option name="closed" value="true" />
-      <created>1727212656791</created>
-      <option name="number" value="00072" />
-      <option name="presentableId" value="LOCAL-00072" />
-      <option name="project" value="LOCAL" />
-      <updated>1727212656791</updated>
     </task>
     <task id="LOCAL-00073" summary="Release v.1.4.0">
       <option name="closed" value="true" />
@@ -561,7 +549,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742932848161</updated>
     </task>
-    <option name="localTasksCounter" value="121" />
+    <task id="LOCAL-00121" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.">
+      <option name="closed" value="true" />
+      <created>1743632743829</created>
+      <option name="number" value="00121" />
+      <option name="presentableId" value="LOCAL-00121" />
+      <option name="project" value="LOCAL" />
+      <updated>1743632743831</updated>
+    </task>
+    <option name="localTasksCounter" value="122" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -582,7 +578,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Changed override global, split slides, and add auto checkboxes in the edit widget to checkable buttons with custom icons." />
     <MESSAGE value="Fixed text not centering properly when some words are bold.&#10;Fixed problem with underline and italic in Custom Slides.&#10;Added checks and possible corrections for unreachable urls in web items." />
     <MESSAGE value="Improved the way words are drawn for songs and custom slides.&#10;&#10;Centered and/or resized pixmaps for image slides." />
     <MESSAGE value="Fixed wrong background on slides with 'background' key but 'override_global' = 'False'." />
@@ -607,7 +602,8 @@
     <MESSAGE value="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster." />
     <MESSAGE value="Tweaked qss for font combobox on dark theme for visibility.&#10;Fixed loading time for font combobox by indexing fonts once, drawing them as pixmaps, and adding those pixmaps as icons." />
     <MESSAGE value="Further refined the settings and font widget layouts.&#10;Added icons to the settings widget tabs." />
-    <option name="LAST_COMMIT_MESSAGE" value="Further refined the settings and font widget layouts.&#10;Added icons to the settings widget tabs." />
+    <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
