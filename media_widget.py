@@ -753,7 +753,7 @@ class MediaWidget(QTabWidget):
                 file_name = file_name_split[len(file_name_split) - 1]
                 shutil.copy(result[0], self.gui.main.image_dir + '/' + file_name)
 
-                from main import IndexImages
+                from runnables import IndexImages
                 ii = IndexImages(self.gui.main, 'images')
                 ii.add_image_index(self.gui.main.image_dir + '/' + file_name, 'image')
                 self.image_list.blockSignals(True)
@@ -783,7 +783,7 @@ class MediaWidget(QTabWidget):
                 QMessageBox.information(
                     self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
 
-            from main import IndexImages
+            from runnables import IndexImages
             ii = IndexImages(self.gui.main, 'images')
             self.gui.main.thread_pool.start(ii)
             self.gui.main.thread_pool.waitForDone()

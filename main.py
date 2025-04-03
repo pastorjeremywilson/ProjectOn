@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.6.0
+ProjectOn v.1.6.1
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -17,7 +17,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import asyncio
 import json
 import logging
 import os.path
@@ -25,7 +24,6 @@ import shutil
 import socket
 import sqlite3
 import sys
-import threading
 import time
 import traceback
 import zipfile
@@ -171,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.6.0')
+        version_label = QLabel('v.1.6.1')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)

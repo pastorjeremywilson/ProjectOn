@@ -1,10 +1,8 @@
-import json
 import os.path
 import shutil
 import sqlite3
 
-from PIL.ImageQt import QImage
-from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QRect, QTime, QSize
+from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QTime, QSize
 from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath, QFont, QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, QCheckBox, \
@@ -589,7 +587,7 @@ class SettingsWidget(QWidget):
             except Exception:
                 self.gui.main.error_log()
 
-            from main import IndexImages
+            from runnables import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             ii.add_image_index(self.gui.main.background_dir + '/' + file_name, 'background')
 
@@ -675,7 +673,7 @@ class SettingsWidget(QWidget):
                     self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
 
             splash = SimpleSplash(self.gui, 'Reindexing Images. Please Wait...')
-            from main import IndexImages
+            from runnables import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             self.gui.main.thread_pool.start(ii)
             self.gui.main.thread_pool.waitForDone()

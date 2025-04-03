@@ -8,9 +8,8 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QAbstractItemModel, QPoint
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QStandardItem, QPainter, \
-    QFontMetrics, QPainterPath, QBrush, QPen
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -33,8 +32,7 @@ from settings_widget import SettingsWidget
 from simple_splash import SimpleSplash
 from songselect_import import SongselectImport
 from toolbar import Toolbar
-from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, \
-    FontFaceComboBox, CountdownWidget
+from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, CountdownWidget
 
 
 class GUI(QObject):
@@ -367,14 +365,14 @@ class GUI(QObject):
 
         if not exists(self.main.background_dir):
             shutil.copytree('resources/defaults/data/backgrounds', self.main.background_dir)
-            from main import IndexImages
+            from runnables import IndexImages
             ii = IndexImages(self.main, 'backgrounds')
             self.main.thread_pool.start(ii)
             self.main.thread_pool.waitForDone()
 
         if not exists(self.main.image_dir):
             shutil.copytree('resources/defaults/data/images', self.main.image_dir)
-            from main import IndexImages
+            from runnables import IndexImages
             ii = IndexImages(self.main, 'images')
             self.main.thread_pool.start(ii)
             self.main.thread_pool.waitForDone()
@@ -606,7 +604,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.6.0'
+        current_version = 'v.1.6.1'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -880,7 +878,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.6.0')
+        title_label = QLabel('ProjectOn v.1.6.1')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()

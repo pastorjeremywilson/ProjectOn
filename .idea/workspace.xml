@@ -7,18 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Tweaked qss for font combobox on dark theme for visibility.&#10;Fixed loading time for font combobox by indexing fonts once, drawing them as pixmaps, and adding those pixmaps as icons.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/main.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/main.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,9 +128,8 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.10 (project_on)" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -150,6 +142,10 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.linecount" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.linecount" />
@@ -176,46 +172,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00071" summary="Returned to bold being the default display widget lyric widget font style">
-      <option name="closed" value="true" />
-      <created>1726933370342</created>
-      <option name="number" value="00071" />
-      <option name="presentableId" value="LOCAL-00071" />
-      <option name="project" value="LOCAL" />
-      <updated>1726933370343</updated>
-    </task>
-    <task id="LOCAL-00072" summary="Release v.1.4.0">
-      <option name="closed" value="true" />
-      <created>1727212656791</created>
-      <option name="number" value="00072" />
-      <option name="presentableId" value="LOCAL-00072" />
-      <option name="project" value="LOCAL" />
-      <updated>1727212656791</updated>
-    </task>
-    <task id="LOCAL-00073" summary="Release v.1.4.0">
-      <option name="closed" value="true" />
-      <created>1727215708150</created>
-      <option name="number" value="00073" />
-      <option name="presentableId" value="LOCAL-00073" />
-      <option name="project" value="LOCAL" />
-      <updated>1727215708151</updated>
-    </task>
-    <task id="LOCAL-00074" summary="Release v.1.4.0">
-      <option name="closed" value="true" />
-      <created>1727215736679</created>
-      <option name="number" value="00074" />
-      <option name="presentableId" value="LOCAL-00074" />
-      <option name="project" value="LOCAL" />
-      <updated>1727215736679</updated>
-    </task>
-    <task id="LOCAL-00075" summary="Fixed crash when importing from CCLI SongSelect.">
-      <option name="closed" value="true" />
-      <created>1728682678510</created>
-      <option name="number" value="00075" />
-      <option name="presentableId" value="LOCAL-00075" />
-      <option name="project" value="LOCAL" />
-      <updated>1728682678511</updated>
     </task>
     <task id="LOCAL-00076" summary="Built a skeleton for adding audio slides. Might be on the wrong track though and audio can simply be added to custom slides instead of having separate audio slides.">
       <option name="closed" value="true" />
@@ -569,7 +525,47 @@
       <option name="project" value="LOCAL" />
       <updated>1742672829839</updated>
     </task>
-    <option name="localTasksCounter" value="120" />
+    <task id="LOCAL-00120" summary="Further refined the settings and font widget layouts.&#10;Added icons to the settings widget tabs.">
+      <option name="closed" value="true" />
+      <created>1742932848159</created>
+      <option name="number" value="00120" />
+      <option name="presentableId" value="LOCAL-00120" />
+      <option name="project" value="LOCAL" />
+      <updated>1742932848161</updated>
+    </task>
+    <task id="LOCAL-00121" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.">
+      <option name="closed" value="true" />
+      <created>1743632743829</created>
+      <option name="number" value="00121" />
+      <option name="presentableId" value="LOCAL-00121" />
+      <option name="project" value="LOCAL" />
+      <updated>1743632743831</updated>
+    </task>
+    <task id="LOCAL-00122" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.">
+      <option name="closed" value="true" />
+      <created>1743632942706</created>
+      <option name="number" value="00122" />
+      <option name="presentableId" value="LOCAL-00122" />
+      <option name="project" value="LOCAL" />
+      <updated>1743632942707</updated>
+    </task>
+    <task id="LOCAL-00123" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10">
+      <option name="closed" value="true" />
+      <created>1743637934234</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1743637934234</updated>
+    </task>
+    <task id="LOCAL-00124" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages">
+      <option name="closed" value="true" />
+      <created>1743647555709</created>
+      <option name="number" value="00124" />
+      <option name="presentableId" value="LOCAL-00124" />
+      <option name="project" value="LOCAL" />
+      <updated>1743647555709</updated>
+    </task>
+    <option name="localTasksCounter" value="125" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -590,10 +586,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Improved the process of adding or deleting background images" />
-    <MESSAGE value="Changed override global, split slides, and add auto checkboxes in the edit widget to checkable buttons with custom icons." />
-    <MESSAGE value="Fixed text not centering properly when some words are bold.&#10;Fixed problem with underline and italic in Custom Slides.&#10;Added checks and possible corrections for unreachable urls in web items." />
-    <MESSAGE value="Improved the way words are drawn for songs and custom slides.&#10;&#10;Centered and/or resized pixmaps for image slides." />
     <MESSAGE value="Fixed wrong background on slides with 'background' key but 'override_global' = 'False'." />
     <MESSAGE value="Tweaked edit widget button icons." />
     <MESSAGE value="Optimized imports" />
@@ -615,7 +607,11 @@
     <MESSAGE value="Added countdown timer&#10;Redesigned font widget&#10;Redesigned settings widget&#10;Changed runnables to timers when runnable is performing periodic tasks" />
     <MESSAGE value="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster." />
     <MESSAGE value="Tweaked qss for font combobox on dark theme for visibility.&#10;Fixed loading time for font combobox by indexing fonts once, drawing them as pixmaps, and adding those pixmaps as icons." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tweaked qss for font combobox on dark theme for visibility.&#10;Fixed loading time for font combobox by indexing fonts once, drawing them as pixmaps, and adding those pixmaps as icons." />
+    <MESSAGE value="Further refined the settings and font widget layouts.&#10;Added icons to the settings widget tabs." />
+    <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing." />
+    <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10" />
+    <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
