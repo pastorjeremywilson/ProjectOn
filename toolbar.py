@@ -164,7 +164,7 @@ class Toolbar(QWidget):
             except Exception:
                 self.gui.main.error_log()
 
-            from main import IndexImages
+            from runnables import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             ii.add_image_index(self.gui.main.background_dir + '/' + file_name, 'background')
             self.song_background_combobox.blockSignals(True)

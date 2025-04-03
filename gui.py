@@ -365,14 +365,14 @@ class GUI(QObject):
 
         if not exists(self.main.background_dir):
             shutil.copytree('resources/defaults/data/backgrounds', self.main.background_dir)
-            from main import IndexImages
+            from runnables import IndexImages
             ii = IndexImages(self.main, 'backgrounds')
             self.main.thread_pool.start(ii)
             self.main.thread_pool.waitForDone()
 
         if not exists(self.main.image_dir):
             shutil.copytree('resources/defaults/data/images', self.main.image_dir)
-            from main import IndexImages
+            from runnables import IndexImages
             ii = IndexImages(self.main, 'images')
             self.main.thread_pool.start(ii)
             self.main.thread_pool.waitForDone()
