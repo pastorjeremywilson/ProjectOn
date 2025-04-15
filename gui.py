@@ -8,8 +8,8 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, QScreen
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -604,7 +604,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.6.1'
+        current_version = 'v.1.6.1.001'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -878,7 +878,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.6.1')
+        title_label = QLabel('ProjectOn v.1.6.1.001')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1001,6 +1001,44 @@ class GUI(QObject):
         except Exception:
             self.main.error_log()
 
+    def size_background_to_screen(self, pixmap):
+        width = pixmap.width()
+        height = pixmap.height()
+        display_width = self.secondary_screen.size().width()
+        display_height = self.secondary_screen.size().height()
+        if width < display_width and height >= display_height:
+            pixmap = pixmap.scaledToWidth(display_width)
+            y = int((pixmap.height() - display_height) / 2)
+            pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
+        elif height < display_height and width >= display_width:
+            pixmap = pixmap.scaledToHiehgt(display_height)
+            x = int((pixmap.width() - display_width) / 2)
+            pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
+        elif width < display_width and height < display_height:
+            wdiff = display_width - width
+            hdiff = display_height - height
+            if wdiff > hdiff:
+                pixmap = pixmap.scaledToWidth(display_width)
+                y = int((pixmap.height() - display_height) / 2)
+                pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
+            else:
+                pixmap = pixmap.scaledToHiehgt(display_height)
+                x = int((pixmap.width() - display_width) / 2)
+                pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
+        else:
+            wdiff = width - display_width
+            hdiff = height - display_height
+            if wdiff < hdiff:
+                pixmap = pixmap.scaledToWidth(display_width)
+                y = int((pixmap.height() - display_height) / 2)
+                pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
+            else:
+                pixmap = pixmap.scaledToHiehgt(display_height)
+                x = int((pixmap.width() - display_width) / 2)
+                pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
+
+        return pixmap
+
     def apply_settings(self, theme_too=True):
         """
         Provides a method to apply all of the settings obtained from the settings json file.
@@ -1012,21 +1050,20 @@ class GUI(QObject):
         try:
             # if/else the settings because things occur
             if 'global_song_background' in self.main.settings.keys() and self.main.settings['global_song_background']:
-                self.global_song_background_pixmap = QPixmap(
-                    self.main.image_dir + '/' + self.main.settings['global_song_background'])
+                pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['global_song_background'])
             else:
                 self.main.settings['global_song_background'] = self.tool_bar.song_background_combobox.itemData(
                     2, Qt.ItemDataRole.UserRole)
-                self.global_song_background_pixmap = QPixmap(
-                    self.main.image_dir + '/' + self.main.settings['global_song_background'])
+                pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['global_song_background'])
+            self.global_song_background_pixmap = self.size_background_to_screen(pixmap)
+
             if 'global_bible_background' in self.main.settings.keys() and self.main.settings['global_bible_background']:
-                self.global_bible_background_pixmap = QPixmap(
-                    self.main.image_dir + '/' + self.main.settings['global_bible_background'])
+                pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['global_bible_background'])
             else:
                 self.main.settings['global_bible_background'] = self.tool_bar.bible_background_combobox.itemData(
                     2, Qt.ItemDataRole.UserRole)
-                self.global_bible_background_pixmap = QPixmap(
-                    self.main.image_dir + '/' + self.main.settings['global_bible_background'])
+                pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['global_bible_background'])
+            self.global_bible_background_pixmap = self.size_background_to_screen(pixmap)
 
             if theme_too:
                 if 'theme' in self.main.settings.keys():
@@ -1052,12 +1089,7 @@ class GUI(QObject):
             if index and not index == -1:
                 self.tool_bar.song_background_combobox.setCurrentIndex(index)
                 pixmap = QPixmap(self.main.background_dir + '/' + self.main.settings['global_song_background'])
-                pixmap = pixmap.scaled(
-                    self.secondary_screen.size().width(),
-                    self.secondary_screen.size().height(),
-                    Qt.AspectRatioMode.IgnoreAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation
-                )
+                pixmap = self.size_background_to_screen(pixmap)
                 self.global_song_background_pixmap = pixmap
             # show a message and set to default if the song background wasn't found
             else:
@@ -1082,12 +1114,7 @@ class GUI(QObject):
                 self.tool_bar.bible_background_combobox.setCurrentIndex(index)
 
                 pixmap = QPixmap(self.main.background_dir + '/' + self.main.settings['global_bible_background'])
-                pixmap = pixmap.scaled(
-                    self.secondary_screen.size().width(),
-                    self.secondary_screen.size().width(),
-                    Qt.AspectRatioMode.IgnoreAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation
-                )
+                pixmap = self.size_background_to_screen(pixmap)
                 self.global_bible_background_pixmap = pixmap
             # show a message and set to default if the song background wasn't found
             else:
@@ -1275,11 +1302,7 @@ class GUI(QObject):
         Provides a method for setting the global_song_background_pixmap variable, scaling it to the display size
         :param str file: The location of the background image file
         """
-        self.global_song_background_pixmap = QPixmap(file)
-        self.global_song_background_pixmap = self.global_song_background_pixmap.scaled(
-            self.display_widget.size().width(), self.display_widget.size().height(),
-            Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation
-        )
+        self.global_song_background_pixmap = self.size_background_to_screen(QPixmap(file))
 
         file_name_split = file.split('/')
         file_name = file_name_split[len(file_name_split) - 1]
@@ -1291,11 +1314,7 @@ class GUI(QObject):
         Provides a method for setting the global_bible_background_pixmap variable, scaling it to the display size
         :param str file: The location of the background image file
         """
-        self.global_bible_background_pixmap = QPixmap(file)
-        self.global_bible_background_pixmap = self.global_bible_background_pixmap.scaled(
-            self.display_widget.size().width(), self.display_widget.size().height(),
-            Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation
-        )
+        self.global_bible_background_pixmap = self.size_background_to_screen(QPixmap(file))
 
         file_name_split = file.split('/')
         file_name = file_name_split[len(file_name_split) - 1]
@@ -1307,11 +1326,7 @@ class GUI(QObject):
         Provides a method for setting the logo_pixmap variable, scaling it to the display size
         :param str file: The location of the background image file
         """
-        self.logo_pixmap = QPixmap(file)
-        self.logo_pixmap = self.logo_pixmap.scaled(
-            self.display_widget.size().width(), self.display_widget.size().height(),
-            Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation
-        )
+        self.logo_pixmap = self.size_background_to_screen(QPixmap(file))
         self.logo_label.setPixmap(self.logo_pixmap)
 
         file_name_split = file.split('/')
@@ -1670,7 +1685,8 @@ class GUI(QObject):
                     display_widget.setStyleSheet(
                         '#display_widget { background-color: ' + item_data['background'] + '}')
                 elif exists(self.main.background_dir + '/' + item_data['background']):
-                    self.custom_pixmap = QPixmap(self.main.background_dir + '/' + item_data['background'])
+                    pixmap = QPixmap(self.main.background_dir + '/' + item_data['background'])
+                    self.custom_pixmap = self.size_background_to_screen(pixmap)
                     display_widget.background_label.setPixmap(self.custom_pixmap)
                 else:
                     display_widget.background_label.setPixmap(self.global_song_background_pixmap)
