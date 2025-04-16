@@ -7,14 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Standardized background pixmap resizing to avoid skewing.&#10;&#10;Began adding a preview image when editing a song/custom slide.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
-    </list>
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Ensured that backgrounds/images are presented to the user sorted by name.&#10;&#10;Further refined the preview image when editing a song/custom slide." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -174,14 +167,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00079" summary="Added loop option to audio&#10;Changed edit widget audio buttons to icons">
-      <option name="closed" value="true" />
-      <created>1729011265985</created>
-      <option name="number" value="00079" />
-      <option name="presentableId" value="LOCAL-00079" />
-      <option name="project" value="LOCAL" />
-      <updated>1729011265985</updated>
     </task>
     <task id="LOCAL-00080" summary="Added auto-play option to custom slides. Auto-play parses user's text based on blank lines.">
       <option name="closed" value="true" />
@@ -567,7 +552,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744753676657</updated>
     </task>
-    <option name="localTasksCounter" value="128" />
+    <task id="LOCAL-00128" summary="Ensured that backgrounds/images are presented to the user sorted by name.&#10;&#10;Further refined the preview image when editing a song/custom slide.">
+      <option name="closed" value="true" />
+      <created>1744822617839</created>
+      <option name="number" value="00128" />
+      <option name="presentableId" value="LOCAL-00128" />
+      <option name="project" value="LOCAL" />
+      <updated>1744822617840</updated>
+    </task>
+    <option name="localTasksCounter" value="129" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -588,7 +581,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Optimized imports" />
     <MESSAGE value="Added pydoc generated html docs" />
     <MESSAGE value="Ready for Release" />
     <MESSAGE value="Improved text handling in the edit widget's QTextEdit" />
@@ -613,7 +605,8 @@
     <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages" />
     <MESSAGE value="Fixed layout problem on stage display.&#10;&#10;Added header to stage font size setting and fixed the spinbox height." />
     <MESSAGE value="Standardized background pixmap resizing to avoid skewing.&#10;&#10;Began adding a preview image when editing a song/custom slide." />
-    <option name="LAST_COMMIT_MESSAGE" value="Standardized background pixmap resizing to avoid skewing.&#10;&#10;Began adding a preview image when editing a song/custom slide." />
+    <MESSAGE value="Ensured that backgrounds/images are presented to the user sorted by name.&#10;&#10;Further refined the preview image when editing a song/custom slide." />
+    <option name="LAST_COMMIT_MESSAGE" value="Ensured that backgrounds/images are presented to the user sorted by name.&#10;&#10;Further refined the preview image when editing a song/custom slide." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
