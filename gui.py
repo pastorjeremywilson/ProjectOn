@@ -1011,7 +1011,7 @@ class GUI(QObject):
             y = int((pixmap.height() - display_height) / 2)
             pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
         elif height < display_height and width >= display_width:
-            pixmap = pixmap.scaledToHiehgt(display_height)
+            pixmap = pixmap.scaledToHeight(display_height)
             x = int((pixmap.width() - display_width) / 2)
             pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
         elif width < display_width and height < display_height:
@@ -1022,7 +1022,7 @@ class GUI(QObject):
                 y = int((pixmap.height() - display_height) / 2)
                 pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
             else:
-                pixmap = pixmap.scaledToHiehgt(display_height)
+                pixmap = pixmap.scaledToHeight(display_height)
                 x = int((pixmap.width() - display_width) / 2)
                 pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
         else:
@@ -1033,7 +1033,7 @@ class GUI(QObject):
                 y = int((pixmap.height() - display_height) / 2)
                 pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
             else:
-                pixmap = pixmap.scaledToHiehgt(display_height)
+                pixmap = pixmap.scaledToHeight(display_height)
                 x = int((pixmap.width() - display_width) / 2)
                 pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
 

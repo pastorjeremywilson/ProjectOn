@@ -520,7 +520,7 @@ class MediaWidget(QTabWidget):
             self.image_list.clear()
             connection = sqlite3.connect(self.gui.main.database)
             cursor = connection.cursor()
-            thumbnails = cursor.execute('SELECT * FROM imageThumbnails ORDER BY fileName').fetchall()
+            thumbnails = cursor.execute('SELECT * FROM imageThumbnails ORDER BY fileName COLLATE NOCASE ASC').fetchall()
 
             for record in thumbnails:
                 file_name = record[0]

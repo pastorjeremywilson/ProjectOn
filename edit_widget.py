@@ -2,7 +2,7 @@ import os.path
 import re
 from os.path import exists
 
-from PyQt5.QtCore import Qt, QSize, QTimer
+from PyQt5.QtCore import Qt, QSize, QTimer, QPoint
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
@@ -194,7 +194,7 @@ class EditWidget(QDialog):
             self.song_section_list_widget.setToolTip('Drag and drop the song segments into the song order box to '
                                                      'set the oder in which verses, choruses, etc. are displayed')
             self.song_section_list_widget.setFont(self.gui.standard_font)
-            lyrics_layout.addWidget(self.song_section_list_widget, 1, 1)
+            lyrics_layout.addWidget(self.song_section_list_widget, 1, 1, 2, 1)
 
             self.song_order_list_widget = CustomListWidget()
             self.song_order_list_widget.setAcceptDrops(True)
@@ -203,7 +203,7 @@ class EditWidget(QDialog):
             self.song_order_list_widget.setMinimumWidth(120)
             self.song_order_list_widget.setToolTip('Press "Delete" to remove an item from the song order list')
             self.song_order_list_widget.setFont(self.gui.standard_font)
-            lyrics_layout.addWidget(self.song_order_list_widget, 1, 2)
+            lyrics_layout.addWidget(self.song_order_list_widget, 1, 2, 2, 1)
 
             tool_bar = QWidget()
             toolbar_layout = QHBoxLayout()
@@ -258,11 +258,14 @@ class EditWidget(QDialog):
             toolbar_layout.addWidget(ending_button)
             toolbar_layout.addStretch()
 
-        self.preview_widget = QLabel()
+        self.preview_label_one = QLabel()
+        self.preview_label_two = QLabel()
         if self.type == 'song':
-            lyrics_layout.addWidget(self.preview_widget, 0, 3, 3, 1)
+            lyrics_layout.addWidget(self.preview_label_one, 0, 3, 2, 1)
+            lyrics_layout.addWidget(self.preview_label_two, 2, 3, 1, 1)
         else:
-            lyrics_layout.addWidget(self.preview_widget, 0, 1)
+            lyrics_layout.addWidget(self.preview_label_one, 0, 1)
+            lyrics_layout.addWidget(self.preview_label_two, 1, 1)
 
         if self.type == 'custom':
             audio_widget = QWidget()
@@ -769,9 +772,46 @@ class EditWidget(QDialog):
         if lyric_widget.footer_label.text() == '':
             lyric_widget.footer_label.hide()
 
-        preview_pixmap = display_widget.grab(display_widget.rect())
-        preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
-        self.preview_widget.setPixmap(preview_pixmap)
+        lyric_widget.paint_text()
+        lyric_widget_height = lyric_widget.total_height
+        target_height = display_widget.height() - lyric_widget.footer_label.height() - 40
+        half_lyrics = False
+
+        # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
+        if lyric_widget_height > target_height:
+            half_lyrics = True
+            segment_text_split = re.split('<br.*?/>', lyrics_html)
+            half_lines = int(len(segment_text_split) / 2)
+            if half_lines > 1:
+                first_lyrics = ''
+                for i in range(half_lines):
+                    first_lyrics += segment_text_split[i] + '<br />'
+                first_lyrics = first_lyrics[:-6]
+                lyric_widget.text = first_lyrics
+                lyric_widget.paint_text()
+                preview_pixmap = display_widget.grab(display_widget.rect())
+                preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
+                self.preview_label_one.setPixmap(preview_pixmap)
+
+                second_lyrics = ''
+                for i in range(half_lines, len(segment_text_split)):
+                    second_lyrics += segment_text_split[i] + '<br />'
+                second_lyrics = second_lyrics[:-6]
+                lyric_widget.text = second_lyrics
+                lyric_widget.paint_text()
+                preview_pixmap = display_widget.grab(display_widget.rect())
+                preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
+                self.preview_label_two.setPixmap(preview_pixmap)
+            else:
+                preview_pixmap = display_widget.grab(display_widget.rect())
+                preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
+                self.preview_label_one.setPixmap(preview_pixmap)
+                self.preview_label_two.clear()
+        else:
+            preview_pixmap = display_widget.grab(display_widget.rect())
+            preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
+            self.preview_label_one.setPixmap(preview_pixmap)
+            self.preview_label_two.clear()
 
     def add_audio_changed(self):
         self.audio_line_edit.setVisible(self.add_audio_button.isChecked())
