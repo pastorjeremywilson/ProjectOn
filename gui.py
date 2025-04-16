@@ -7,6 +7,7 @@ import tempfile
 from datetime import datetime
 from os.path import exists
 
+import PIL.ImageQt
 import requests
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect
 from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, QScreen
@@ -604,7 +605,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.6.1.002'
+        current_version = 'v.1.6.1.003'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -621,37 +622,44 @@ class GUI(QObject):
         if response and response.status_code == 200:
             text = response.text
             release_info = json.loads(text)
-            latest_version = [None, None]
-            for i in range(len(release_info)):
-                this_version = release_info[i]['tag_name']
-                this_version = this_version.replace('v.', '')
-                this_version = this_version.replace('rc', '')
-                this_version_split = this_version.split('.')
-                this_major = int(this_version_split[0])
-                this_minor = int(this_version_split[1])
-                this_patch = int(this_version_split[2])
 
-                if this_major > current_major:
-                    latest_version = [i, this_version]
-                elif this_major == current_major and this_minor > current_minor:
-                    latest_version = [i, this_version]
-                elif this_minor == current_minor and this_patch > current_patch:
-                    latest_version = [i, this_version]
+            newest_version = release_info[0]
+            newest_version_tag = newest_version['tag_name']
+            newest_version_tag = newest_version_tag.replace('v.', '')
+            newest_version_tag = newest_version_tag.replace('rc', '')
+            this_version_split = newest_version_tag.split('.')
+            this_major = int(this_version_split[0])
+            this_minor = int(this_version_split[1])
+            this_patch = int(this_version_split[2])
+
+            ask_update = False
+            if this_major > current_major:
+                ask_update = True
+            elif this_major == current_major and this_minor > current_minor:
+                ask_update = True
+            elif this_minor == current_minor and this_patch > current_patch:
+                ask_update = True
 
             if 'skip_update' in self.main.settings.keys():
-                if self.main.settings['skip_update'] == latest_version[1]:
+                if self.main.settings['skip_update'] == newest_version['tag_name']:
                     return
 
-            if latest_version[1]:
+            if ask_update:
+                release_notes = newest_version['body'].split('[!')[0].strip()
+
                 dialog = QDialog()
                 dialog.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
                 layout = QVBoxLayout(dialog)
                 dialog.setWindowTitle('Update ProjectOn')
 
-                label = QLabel(f'An updated version of ProjectOn is available ({latest_version[1]}). '
+                label = QLabel(f'An updated version of ProjectOn is available ({newest_version["tag_name"]}). '
                                f'Would you like to update now?')
                 label.setFont(self.standard_font)
                 layout.addWidget(label)
+
+                notes_label = QLabel(release_notes)
+                label.setFont(self.standard_font)
+                layout.addWidget(notes_label)
 
                 checkbox = QCheckBox('Don\'t remind me again for this version')
                 layout.addWidget(checkbox, Qt.AlignmentFlag.AlignCenter)
@@ -682,12 +690,12 @@ class GUI(QObject):
                 response = dialog.exec()
 
                 if checkbox.isChecked():
-                    self.main.settings['skip_update'] = latest_version[1]
+                    self.main.settings['skip_update'] = newest_version['tag_name']
                 else:
                     self.main.settings['skip_update'] = 'none'
 
                 if response == 1:
-                    download_url = release_info[latest_version[0]]['assets'][0]['browser_download_url']
+                    download_url = newest_version['assets'][0]['browser_download_url']
                     download_dir = tempfile.gettempdir()
                     file_name_split = download_url.split('/')
                     file_name = file_name_split[len(file_name_split) - 1]
@@ -783,8 +791,8 @@ class GUI(QObject):
         from reportlab.pdfgen import canvas
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.utils import ImageReader
-        from PIL import Image
         from print_dialog import PrintDialog
+        from PIL import Image
 
         print_file_loc = tempfile.gettempdir() + '/print.pdf'
         marginH = 80
@@ -878,7 +886,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.6.1.002')
+        title_label = QLabel('ProjectOn v.1.6.1.003')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()

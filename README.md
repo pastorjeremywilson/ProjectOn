@@ -16,7 +16,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.6.1.002?
+# What's New in Version 1.6.1.003?
 - Added a countdown timer to the settings that will display "Service is 
 starting in..." on the main display window
 - Reorganized the settings window and the font widget
@@ -26,7 +26,7 @@ starting in..." on the main display window
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.6.1.002) and run
+system only. Download the current ProjectOn installer (v.1.6.1.003) and run
 it on your computer.
 
 # Using ProjectOn
