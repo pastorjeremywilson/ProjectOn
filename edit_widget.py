@@ -591,12 +591,21 @@ class EditWidget(QDialog):
 
         cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.KeepAnchor)
         iterations = 0
+        old_position = -1
+        end_found = False
         while not endpoint in cursor.selection().toPlainText():
             cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.KeepAnchor)
+            new_position = cursor.position()
+            if new_position == old_position:
+                end_found = True
+                break
+            old_position = new_position
             iterations += 1
             if iterations > 2000:
                 break
-        cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter, QTextCursor.MoveMode.KeepAnchor)
+
+        if not end_found:
+            cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter, QTextCursor.MoveMode.KeepAnchor)
         lyrics_html = cursor.selection().toHtml()
 
         if '<body>' in lyrics_html:
@@ -629,7 +638,7 @@ class EditWidget(QDialog):
         while lyrics_html.startswith('<br />'):
             lyrics_html = lyrics_html[6:].strip()
         while lyrics_html.endswith('<br />'):
-            lyrics_html = lyrics_html[:len(lyrics_html) - 6].strip()
+            lyrics_html = lyrics_html[:-6].strip()
 
         # set the font
         if 'override_global' in self.item_data.keys() and self.item_data['override_global'] == 'True':
