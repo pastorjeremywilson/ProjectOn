@@ -256,7 +256,7 @@ class CustomListWidget(QListWidget):
                     edit_text = 'Edit Custom Slide'
 
             if edit_text:
-                edit_song_action = QAction('Edit Song')
+                edit_song_action = QAction(edit_text)
                 edit_song_action.triggered.connect(self.edit_song)
                 menu.addAction(edit_song_action)
 
@@ -273,13 +273,15 @@ class CustomListWidget(QListWidget):
         """
         if self.itemAt(self.item_pos):
             if self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['type'] == 'song':
-                item_text = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['title']
+                song_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
+                item_text = song_data['title']
                 song_info = self.gui.main.get_song_data(item_text)
-                song_edit = EditWidget(self.gui, 'song', song_info, item_text)
+                self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text, song_data)
             elif self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
-                item_text = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['title']
+                song_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
+                item_text = song_data['title']
                 custom_info = self.gui.main.get_custom_data(item_text)
-                song_edit = EditWidget(self.gui, 'custom', custom_info, item_text)
+                self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text, song_data)
 
     def delete_song(self):
         """

@@ -520,7 +520,7 @@ class MediaWidget(QTabWidget):
             self.image_list.clear()
             connection = sqlite3.connect(self.gui.main.database)
             cursor = connection.cursor()
-            thumbnails = cursor.execute('SELECT * FROM imageThumbnails ORDER BY fileName').fetchall()
+            thumbnails = cursor.execute('SELECT * FROM imageThumbnails ORDER BY fileName COLLATE NOCASE ASC').fetchall()
 
             for record in thumbnails:
                 file_name = record[0]
@@ -1365,11 +1365,13 @@ class CustomListWidget(QListWidget):
             if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
                 item_text = self.itemAt(self.item_pos).text()
                 song_info = self.gui.main.get_song_data(item_text)
-                self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text)
+                song_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
+                self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text, song_data)
             elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 item_text = self.itemAt(self.item_pos).text()
                 custom_info = self.gui.main.get_custom_data(item_text)
-                self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text)
+                custom_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
+                self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text, custom_data)
 
     def delete_item(self):
         """

@@ -56,50 +56,18 @@ class SettingsWidget(QWidget):
         self.settings_container.setIconSize(QSize(36, 36))
         self.settings_container.setStyleSheet('QTabBar::tab { height: 42px; }')
         self.settings_container.setObjectName('tab_widget')
-        #self.settings_container.setObjectName('settings_container')
-        #settings_container_layout = QVBoxLayout(self.settings_container)
 
-        #self.settings_container_layout.addWidget(self.ccli_settings())
         self.settings_container.addTab(self.ccli_settings(), 'CCLI Info')
-
-        #self.wait_widget.subtitle_label.setText('Loading Screens')
-        #self.gui.main.app.processEvents()
-
-        #settings_container_layout.addWidget(self.screen_settings())
         self.settings_container.addTab(self.screen_settings(), 'Screen Settings')
-
-        #self.wait_widget.subtitle_label.setText('Loading Fonts')
-        #self.gui.main.app.processEvents()
-
-        #settings_container_layout.addWidget(self.font_settings())
         self.settings_container.addTab(self.font_settings(), 'Font Settings')
-
-        #self.wait_widget.subtitle_label.setText('Loading Backgrounds')
-        #self.gui.main.app.processEvents()
-
-        #settings_container_layout.addWidget(self.background_settings())
         self.settings_container.addTab(self.background_settings(), 'Background Settings')
-
-        #self.wait_widget.subtitle_label.setText('Loading Countdown Settings')
-        #self.gui.main.app.processEvents()
-
-        #settings_container_layout.addWidget(self.countdown_settings())
-        #settings_container_layout.addStretch()
         self.settings_container.addTab(self.countdown_settings(), 'Countdown Settings')
 
-        #self.wait_widget.subtitle_label.setText('Finishing Up')
-        #self.gui.main.app.processEvents()
         self.settings_container.setTabIcon(0, QIcon('resources/gui_icons/ccli_settings.svg'))
         self.settings_container.setTabIcon(1, QIcon('resources/gui_icons/screen_settings.svg'))
         self.settings_container.setTabIcon(2, QIcon('resources/gui_icons/font_settings_settings.svg'))
         self.settings_container.setTabIcon(3, QIcon('resources/gui_icons/background_settings.svg'))
         self.settings_container.setTabIcon(4, QIcon('resources/gui_icons/countdown_settings.svg'))
-
-        """settings_scroll_area = QScrollArea()
-        settings_scroll_area.setWidgetResizable(True)
-        self.settings_container.adjustSize()
-        settings_scroll_area.setWidget(self.settings_container)
-        layout.addWidget(settings_scroll_area, 0, 0)"""
         layout.addWidget(self.settings_container)
 
         button_widget = QWidget()
@@ -244,6 +212,12 @@ class SettingsWidget(QWidget):
         bible_font_group_box_layout.addWidget(self.bible_font_settings_widget)
         font_layout.addWidget(bible_font_group_box)
 
+        stage_title_label = QLabel('Stage Display Font Settings')
+        stage_title_label.setFont(self.gui.bold_font)
+        stage_title_label.setStyleSheet('background: #5555aa; color: white')
+        stage_title_label.setContentsMargins(5, 5, 5, 5)
+        layout.addWidget(stage_title_label)
+
         stage_font_widget = QWidget()
         stage_font_layout = QHBoxLayout()
         stage_font_widget.setLayout(stage_font_layout)
@@ -255,6 +229,7 @@ class SettingsWidget(QWidget):
 
         self.stage_font_spinbox = QSpinBox()
         self.stage_font_spinbox.setRange(12, 120)
+        self.stage_font_spinbox.setMinimumSize(60, 30)
         self.stage_font_spinbox.setFont(self.gui.standard_font)
         self.stage_font_spinbox.installEventFilter(self)
         stage_font_layout.addWidget(self.stage_font_spinbox)

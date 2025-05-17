@@ -183,7 +183,8 @@ class ImageCombobox(QComboBox):
             image_list = []
             connection = sqlite3.connect(self.gui.main.database)
             cursor = connection.cursor()
-            thumbnails = cursor.execute('SELECT * FROM ' + self.table).fetchall()
+            thumbnails = cursor.execute(
+                'SELECT * FROM ' + self.table + ' ORDER BY fileName COLLATE NOCASE ASC;').fetchall()
             for record in thumbnails:
                 if self.gui.main.initial_startup:
                     self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')

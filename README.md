@@ -16,17 +16,18 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.6.1?
-- Added a countdown timer to the settings that will display "Service is 
-starting in..." on the main display window
-- Reorganized the settings window and the font widget
-- Improved the loading time of both the fonts and the settings window
-- Many other bug fixes and improvements
+# What's New in Version 1.7.0?
+- Added a preview of the slides when editing a song or custom slide
+- Ensured that backgrounds and images are displayed sorted by name
+- Standardized background pixmap resizing to avoid skewing
+- Fixed layout problem on the stage display
+- Added a missing module that was causing an error when importing a video
+- Many other improvements and bug fixes under the hood
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.6.1) and run
+system only. Download the current ProjectOn installer (v.1.7.0) and run
 it on your computer.
 
 # Using ProjectOn

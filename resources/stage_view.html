@@ -9,19 +9,22 @@
 				overflow: hidden;
 				margin: 0;
 				padding: 0;
+				background: black;
+			}
+
+			#lyric_container {
+				width: 100%;
+				height: 100%;
+				display: table;
 			}
 
 			#lyric_display {
-				height: 100%;
-				width: 100%;
-				display: flex;
-				justify-content: center;
-				align-items: center;
 				text-align: center;
+				display: table-cell;
+				vertical-align: middle;
 				font-family: "Helvetica";
 				font-weight: bold;
 				line-height: 150%;
-				background: black;
 				color: white;
 				overflow: hidden;
 			}
@@ -30,16 +33,18 @@
 	</head>
 
     <body>
-		<div id="lyric_display"></div>
+		<div id="lyric_container">
+			<div id="lyric_display"></div>
+		</div>
     </body>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 	<script type="text/javascript" charset="utf-8">
 		var socket = io();
 		socket.on('update_stage', function(text) {
-			console.log(text[0]);
-			console.log(text[1]);
-			document.getElementById("lyric_display").style.fontSize = text[1] + 'px';
-			document.getElementById("lyric_display").innerHTML = text[0];
+			html = text[0];
+			font_size = text[1];
+			document.getElementById("lyric_display").innerHTML = html;
+			document.getElementById("lyric_display").style.fontSize = font_size + 'px';
 		});
 	</script>
 </html>
