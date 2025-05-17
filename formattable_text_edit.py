@@ -208,7 +208,8 @@ class CustomTextEdit(QTextEdit):
                     self.setHtml(parent.renumber_tags('all', self.toHtml()))
                     cursor.setPosition(position)
                     self.setTextCursor(cursor)
-                    parent.populate_tag_list()
+                    if parent.type == 'song':
+                        parent.populate_tag_list()
                     break
                 else:
                     parent = parent.parent()
