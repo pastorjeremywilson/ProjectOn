@@ -7,9 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed preview not showing when editing from OOS widget.&#10;&#10;Fixed removing last character from preview when text fragment finds end instead of stop character.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Prevented calling populate_tag_list when editor doesn't have a song open.&#10;&#10;Installed missing opencv-python which was causing an error when adding a video">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -170,14 +169,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00083" summary="Prior to this change, the data needed to properly display any given song, bible passage, custom slide, etc. were all stored in individual data slots in QListWidgetItem.data(int). This was getting to be overly complicated as more features were added. Now, a singular dictionary is created for each slide, with the data being stored as key:value pairs and that dictionary is stored in QListWidgetItem.data(Qt.ItemDataRole.UserRole). Or, slot number 256. All code has been changed to pull the data from this dictionary rather than the individual data slots.&#10;&#10;It appears that loading and displaying slides, as well as loading a saved service works fine. Further testing is needed in creating new items for each of the media categories, as well as deleting items.">
-      <option name="closed" value="true" />
-      <created>1729875895752</created>
-      <option name="number" value="00083" />
-      <option name="presentableId" value="LOCAL-00083" />
-      <option name="project" value="LOCAL" />
-      <updated>1729875895752</updated>
     </task>
     <task id="LOCAL-00084" summary="Improved the process of adding or deleting background images">
       <option name="closed" value="true" />
@@ -563,7 +554,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744844003566</updated>
     </task>
-    <option name="localTasksCounter" value="132" />
+    <task id="LOCAL-00132" summary="Prevented calling populate_tag_list when editor doesn't have a song open.&#10;&#10;Installed missing opencv-python which was causing an error when adding a video">
+      <option name="closed" value="true" />
+      <created>1747510218278</created>
+      <option name="number" value="00132" />
+      <option name="presentableId" value="LOCAL-00132" />
+      <option name="project" value="LOCAL" />
+      <updated>1747510218279</updated>
+    </task>
+    <option name="localTasksCounter" value="133" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -584,7 +583,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Improved text handling in the edit widget's QTextEdit" />
     <MESSAGE value="PyQt6 broke audio and video. Reverted to PyQt5.&#10;Added coloring to verse tags in the edit widget." />
     <MESSAGE value="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines." />
     <MESSAGE value="When selecting a custom font color, ensured that current color is default in the color dialog&#10;Ensured that cancelling the custom font color dialog doesn't change the current color to black&#10;Fixed delete image/background in settings widget to use the same delete function&#10;Ensured image widgets are updated after delete or add&#10;Changed the saving of settings to be threaded to facilitate more often saving of settings" />
@@ -609,7 +607,8 @@
     <MESSAGE value="Ensured that backgrounds/images are presented to the user sorted by name.&#10;&#10;Further refined the preview image when editing a song/custom slide." />
     <MESSAGE value="Streamlined the check for a newer version and added the notes for that version to the user prompt.&#10;&#10;Added reportlab package that was missing after the last virtual environment creation.&#10;&#10;Downgraded pillow to version that works with PyQt5." />
     <MESSAGE value="Fixed preview not showing when editing from OOS widget.&#10;&#10;Fixed removing last character from preview when text fragment finds end instead of stop character." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed preview not showing when editing from OOS widget.&#10;&#10;Fixed removing last character from preview when text fragment finds end instead of stop character." />
+    <MESSAGE value="Prevented calling populate_tag_list when editor doesn't have a song open.&#10;&#10;Installed missing opencv-python which was causing an error when adding a video" />
+    <option name="LAST_COMMIT_MESSAGE" value="Prevented calling populate_tag_list when editor doesn't have a song open.&#10;&#10;Installed missing opencv-python which was causing an error when adding a video" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
