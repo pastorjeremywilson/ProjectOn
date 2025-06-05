@@ -16,18 +16,17 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.7.0?
-- Added a preview of the slides when editing a song or custom slide
-- Ensured that backgrounds and images are displayed sorted by name
-- Standardized background pixmap resizing to avoid skewing
-- Fixed layout problem on the stage display
-- Added a missing module that was causing an error when importing a video
-- Many other improvements and bug fixes under the hood
+# What's New in Version 1.7.1?
+- Added the ability to print song lyrics from the editor window
+- Improved printing of the Order of Service
+- Fixed song list updating after add, delete, or search
+- Ensured custom slide icons change appropriately when global backgrounds are changed
+- Changed font face combo boxes over to Qt's native QFontComboBox
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.7.0) and run
+system only. Download the current ProjectOn installer (v.1.7.1) and run
 it on your computer.
 
 # Using ProjectOn

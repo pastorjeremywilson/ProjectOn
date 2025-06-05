@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QTime, QSize
 from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath, QFont, QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, QCheckBox, \
-    QComboBox, QTimeEdit, QTabWidget, QGroupBox
+    QComboBox, QTimeEdit, QTabWidget, QGroupBox, QFontComboBox
 
 from simple_splash import SimpleSplash
 from widgets import FontWidget, FontFaceComboBox, ClickableColorSwatch
@@ -368,7 +368,8 @@ class SettingsWidget(QWidget):
         font_face_label.setFont(self.gui.standard_font)
         options_layout.addWidget(font_face_label, 1, 0)
 
-        self.countdown_font_combobox = FontFaceComboBox(self.gui)
+        #self.countdown_font_combobox = FontFaceComboBox(self.gui)
+        self.countdown_font_combobox = QFontComboBox()
         self.countdown_font_combobox.setFont(self.gui.standard_font)
         self.countdown_font_combobox.setCurrentIndex(
             self.countdown_font_combobox.findText(self.gui.main.settings['countdown_settings']['font_face']))

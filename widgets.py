@@ -2,13 +2,15 @@ import re
 import sqlite3
 
 import requests
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint
+from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics
 from PyQt5.QtMultimedia import QMediaPlayer
+from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
-    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem
+    QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
+    QApplication, QFontComboBox
 
 
 class FontFaceListWidget(QListWidget):
@@ -124,31 +126,32 @@ class ImageCombobox(QComboBox):
         elif self.type == 'song':
             self.gui.main.settings['global_song_background'] = file_name
             self.gui.global_song_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
-
-            for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                item = self.gui.oos_widget.oos_list_widget.item(i)
-                if (item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_song'
-                        or item.data(Qt.ItemDataRole.UserRole)['type'] == 'song'):
-                    item = self.gui.oos_widget.oos_list_widget.item(i)
-                    widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
-                    pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
-                    pixmap = pixmap.scaled(
-                        50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                    widget.icon.setPixmap(pixmap)
         elif self.type == 'bible':
             self.gui.main.settings['global_bible_background'] = file_name
             self.gui.global_bible_background_pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
 
-            for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                item = self.gui.oos_widget.oos_list_widget.item(i)
-                if (item.data(Qt.ItemDataRole.UserRole)['background'] == 'global_bible'
-                        or item.data(Qt.ItemDataRole.UserRole)['type'] == 'bible'):
-                    item = self.gui.oos_widget.oos_list_widget.item(i)
-                    widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
-                    pixmap = QPixmap(self.gui.main.background_dir + '/' + file_name)
-                    pixmap = pixmap.scaled(
-                        50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                    widget.icon.setPixmap(pixmap)
+        for i in range(self.gui.oos_widget.oos_list_widget.count()):
+            item = self.gui.oos_widget.oos_list_widget.item(i)
+            item_data = item.data(Qt.ItemDataRole.UserRole)
+            pixmap = None
+
+            if item_data['type'] == 'song' or item_data['type'] == 'bible' or item_data['type'] == 'custom':
+                if not item_data['override_global'] or item_data['override_global'] == 'False':
+                    if item_data['type'] == self.type:
+                        pixmap = self.itemIcon(self.currentIndex()).pixmap(QSize(50, 27))
+                    elif item_data['type'] == 'custom' and self.type == 'bible':
+                        pixmap = self.itemIcon(self.currentIndex()).pixmap(QSize(50, 27))
+                else:
+                    if item_data['background'] == 'global_song' and self.type == 'song':
+                        pixmap = self.itemIcon(self.currentIndex()).pixmap(QSize(50, 27))
+                    elif item_data['background'] == 'global_bible' and self.type == 'bible':
+                        pixmap = self.itemIcon(self.currentIndex()).pixmap(QSize(50, 27))
+
+            if pixmap:
+                widget = self.gui.oos_widget.oos_list_widget.itemWidget(item)
+                widget.icon.setPixmap(pixmap)
+                widget.adjustSize()
+                item.setSizeHint(widget.sizeHint())
 
         if not self.suppress_autosave:
             self.gui.main.save_settings()
@@ -401,8 +404,10 @@ class CustomMainWindow(QMainWindow):
                 self.gui.video_probe = None
 
             self.gui.main.server_check_timer.stop()
-            self.gui.countdown_timer.stop()
-            self.gui.countdown_widget.deleteLater()
+            if self.gui.countdown_timer:
+                self.gui.countdown_timer.stop()
+            if self.gui.countdown_widget:
+                self.gui.countdown_widget.deleteLater()
 
             try:
                 self.gui.main.server_check.keep_checking = False
@@ -844,7 +849,8 @@ class FontWidget(QWidget):
         self.draw_border = draw_border
         self.applies_to_global = applies_to_global
 
-        self.font_face_combobox = FontFaceComboBox(self.gui)
+        #self.font_face_combobox = FontFaceComboBox(self.gui)
+        self.font_face_combobox = QFontComboBox()
         self.font_size_spinbox = QSpinBox()
         self.white_radio_button = QRadioButton('White')
         self.black_radio_button = QRadioButton('Black')
@@ -1486,3 +1492,54 @@ class ClickableColorSwatch(QLabel):
         rgb_color = f'rgba({chosen_color.red()}, {chosen_color.green()}, {chosen_color.blue()}, {chosen_color.alpha()})'
         self.make_color_swatch_pixmap(rgb_color)
         self.color_changed.emit()
+
+
+class PrintDialog(QDialog):
+    def __init__(self, document):
+        printer = QPrinter(QPrinter.PrinterMode.HighResolution)
+        resolution = printer.resolution()
+        document_size = QSizeF(8.5 * resolution, 11 * resolution)
+        document.setPageSize(document_size)
+
+        print_dialog = QDialog()
+        print_layout = QHBoxLayout(print_dialog)
+
+        document_viewer = QTextEdit()
+        document_viewer.setReadOnly(True)
+        print_layout.addWidget(document_viewer)
+        document_viewer.setDocument(document)
+        document_viewer.setFixedSize(QSize(int(850 * 0.75), int(1100 * 0.75)))
+
+        options_widget = QWidget()
+        options_layout = QVBoxLayout(options_widget)
+        print_layout.addWidget(options_widget)
+
+        printer_combobox = QComboBox()
+        options_layout.addWidget(printer_combobox)
+
+        printers = QPrinterInfo.availablePrinters()
+        default_printer = QPrinterInfo.defaultPrinter()
+
+        for this_printer in printers:
+            printer_combobox.addItem(this_printer.printerName())
+        printer_combobox.setCurrentText(default_printer.printerName())
+
+        button_widget = QWidget()
+        button_layout = QHBoxLayout(button_widget)
+        options_layout.addWidget(button_widget)
+        options_layout.addStretch()
+
+        print_button = QPushButton('Print')
+        print_button.pressed.connect(lambda: print_dialog.done(1))
+        button_layout.addWidget(print_button)
+
+        cancel_button = QPushButton('Cancel')
+        cancel_button.pressed.connect(lambda: print_dialog.done(-1))
+        button_layout.addWidget(cancel_button)
+        button_layout.addStretch()
+
+        result = print_dialog.exec()
+
+        if result == 1:
+            printer.setPrinterName(printer_combobox.currentText())
+            document.print(printer)

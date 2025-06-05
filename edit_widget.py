@@ -3,7 +3,8 @@ import re
 from os.path import exists
 
 from PyQt5.QtCore import Qt, QSize, QTimer, QPoint
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument
+from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QSpinBox, QTextEdit, QComboBox
@@ -11,7 +12,7 @@ from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, 
 import parsers
 from formattable_text_edit import FormattableTextEdit
 from simple_splash import SimpleSplash
-from widgets import StandardItemWidget, FontWidget, DisplayWidget, LyricDisplayWidget
+from widgets import StandardItemWidget, FontWidget, DisplayWidget, LyricDisplayWidget, PrintDialog
 
 
 class EditWidget(QDialog):
@@ -52,6 +53,9 @@ class EditWidget(QDialog):
             self.populate_custom_data(data)
             self.font_widget.change_font_sample()
         elif not data:
+            import declarations
+            self.item_data = declarations.SLIDE_DATA_DEFAULTS
+            self.item_data['type'] = type
             if type == 'song':
                 self.new_song = True
                 self.set_defaults()
@@ -90,11 +94,21 @@ class EditWidget(QDialog):
         main_layout.setSpacing(0)
         self.main_widget.setLayout(main_layout)
 
+        upper_widget = QWidget()
+        main_layout.addWidget(upper_widget)
+        upper_layout = QHBoxLayout(upper_widget)
+        upper_layout.setContentsMargins(0, 0, 0, 0)
+
+        details_widget = QWidget()
+        upper_layout.addWidget(details_widget)
+        details_layout = QVBoxLayout(details_widget)
+        details_layout.setContentsMargins(0, 0, 0, 0)
+
         title_widget = QWidget()
         title_layout = QHBoxLayout()
         title_layout.setContentsMargins(0, 0, 0, 5)
         title_widget.setLayout(title_layout)
-        main_layout.addWidget(title_widget)
+        details_layout.addWidget(title_widget)
 
         title_label = QLabel('Title:')
         title_label.setFont(self.gui.bold_font)
@@ -109,7 +123,7 @@ class EditWidget(QDialog):
             author_layout = QHBoxLayout()
             author_layout.setContentsMargins(0, 0, 0, 5)
             author_widget.setLayout(author_layout)
-            main_layout.addWidget(author_widget)
+            details_layout.addWidget(author_widget)
 
             author_label = QLabel('Author:')
             author_label.setFont(self.gui.bold_font)
@@ -123,7 +137,7 @@ class EditWidget(QDialog):
             copyright_layout = QHBoxLayout()
             copyright_layout.setContentsMargins(0, 0, 0, 5)
             copyright_widget.setLayout(copyright_layout)
-            main_layout.addWidget(copyright_widget)
+            details_layout.addWidget(copyright_widget)
 
             copyright_label = QLabel('Copyright:')
             copyright_label.setFont(self.gui.bold_font)
@@ -137,7 +151,7 @@ class EditWidget(QDialog):
             ccli_layout = QHBoxLayout()
             ccli_layout.setContentsMargins(0, 0, 0, 0)
             ccli_widget.setLayout(ccli_layout)
-            main_layout.addWidget(ccli_widget)
+            details_layout.addWidget(ccli_widget)
 
             ccli_label = QLabel('CCLI Song Number:')
             ccli_label.setFont(self.gui.bold_font)
@@ -146,6 +160,11 @@ class EditWidget(QDialog):
             self.ccli_num_line_edit = QLineEdit()
             self.ccli_num_line_edit.setFont(self.gui.standard_font)
             ccli_layout.addWidget(self.ccli_num_line_edit)
+
+            print_button = QPushButton('Print Lyrics')
+            print_button.setFont(self.gui.standard_font)
+            print_button.pressed.connect(self.print_lyrics)
+            upper_layout.addWidget(print_button)
 
         main_layout.addSpacing(20)
 
@@ -555,7 +574,7 @@ class EditWidget(QDialog):
         display_widget.background_label.clear()
         display_widget.setStyleSheet('#display_widget { background-color: none } ')
 
-        if self.item_data['override_global'] == 'False':
+        if not self.item_data['override_global'] or self.item_data['override_global'] == 'False':
             if self.item_data['type'] == 'song':
                 display_widget.background_label.setPixmap(self.gui.global_song_background_pixmap)
             else:
@@ -1387,6 +1406,36 @@ class EditWidget(QDialog):
         for tag in tag_list:
             self.song_section_list_widget.addItem(tag.replace('[', '').replace(']', ''))
 
+    def print_lyrics(self):
+        lyrics = self.get_simplified_text(self.lyrics_edit.text_edit.toHtml())
+
+        if '[' in lyrics:
+            song_order = []
+            for i in range(self.song_order_list_widget.count()):
+                tag = self.song_order_list_widget.item(i).text()
+                song_order.append(tag)
+            lyric_tags = re.findall('\[.*?\]', lyrics)
+
+            song_segments = re.split('\[.*?\]', lyrics)
+            song_dict = {}
+            index = 1
+            for tag in lyric_tags:
+                song_dict[tag] = song_segments[index]
+                index += 1
+
+            document = QTextDocument()
+            document_html = (f'<span style="font-family: \'Arial\'; font-size: 16pt; font-weight: bold;">'
+                             f'{self.title_line_edit.text()}</span><br /><br />')
+            for tag in song_order:
+                document_html += (f'<span style="font-family: \'Arial\'; font-size: 12pt; font-weight: bold;">'
+                                  f'{tag}</span><br />')
+                tag = f'[{tag}]'
+                document_html += (f'<span style="font-family: \'Arial\'; font-size: 12pt;">'
+                                  f'{song_dict[tag]}</span><br /><br />')
+            document.setHtml(document_html)
+
+            PrintDialog(document)
+
     def save_song(self):
         """
         Method to save user's changes for the song type editor.
@@ -1539,7 +1588,7 @@ class EditWidget(QDialog):
         self.deleteLater()
         save_widget.widget.deleteLater()
 
-        items = self.gui.media_widget.song_list.findItems(self.item_text, Qt.MatchFlag.MatchExactly)
+        items = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)
         self.gui.media_widget.song_list.setCurrentItem(items[0])
 
         if self.gui.oos_widget.oos_list_widget.currentItem():
@@ -1693,7 +1742,7 @@ class EditWidget(QDialog):
         self.deleteLater()
         save_widget.widget.deleteLater()
 
-        items = self.gui.media_widget.custom_list.findItems(self.item_text, Qt.MatchFlag.MatchExactly)
+        items = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)
         self.gui.media_widget.custom_list.setCurrentItem(items[0])
 
         if self.gui.oos_widget.oos_list_widget.currentItem():
