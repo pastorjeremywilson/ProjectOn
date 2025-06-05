@@ -1,6 +1,7 @@
 import os
 import shutil
 import sqlite3
+import threading
 from os.path import exists
 from xml.etree import ElementTree
 
@@ -455,14 +456,13 @@ class MediaWidget(QTabWidget):
         show_list_indices = []
         for i in range(len(self.song_list_items)):
             if search_string in self.song_list_items[i].data(Qt.ItemDataRole.UserRole)['title'].strip().lower():
-                #print(f'search string found in {self.song_list_items[i][1]}')
                 show_list_items.append(self.song_list_items[i].clone())
                 show_list_indices.append(i)
 
         for i in range(len(self.song_list_items)):
             if search_string in self.song_list_items[i].data(Qt.ItemDataRole.UserRole)['text'].strip().lower() and i not in show_list_indices:
-                #print(f'search string found in {self.song_list_search_index[i][1]}\'s lyrics')
                 show_list_items.append(self.song_list_items[i].clone())
+                show_list_indices.append(i)
 
         for item in show_list_items:
             self.song_list.addItem(item)
@@ -473,6 +473,7 @@ class MediaWidget(QTabWidget):
         with all of the songs.
         """
         self.song_list.clear()
+        self.song_list_items = []
         songs = self.gui.main.get_all_songs()
         if len(songs) > 0:
             for item in songs:
@@ -1387,7 +1388,9 @@ class CustomListWidget(QListWidget):
         )
 
         if response == QMessageBox.StandardButton.Yes:
-            self.gui.main.delete_item(self.currentItem())
+            thread = threading.Thread(target=self.gui.main.delete_item, args=(self.currentItem(),))
+            thread.start()
+            thread.join()
 
         if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.populate_song_list()

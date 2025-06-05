@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 import re
@@ -7,10 +8,10 @@ import tempfile
 from datetime import datetime
 from os.path import exists
 
-import PIL.ImageQt
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, QScreen
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, QScreen, \
+    QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -171,8 +172,8 @@ class GUI(QObject):
             if not secondary_found:
                 self.secondary_screen = self.primary_screen
 
-        self.main.update_status_signal.emit('Processing Fonts', 'status')
-        self.create_font_pixmaps()
+        #self.main.update_status_signal.emit('Processing Fonts', 'status')
+        #self.create_font_pixmaps()
 
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
@@ -605,7 +606,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.7.0'
+        current_version = 'v.1.7.1'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -777,6 +778,45 @@ class GUI(QObject):
         """
         Provides a method to create a printout of the current order of service
         """
+
+        document_html = '<table>'
+        for i in range(self.oos_widget.oos_list_widget.count()):
+            item = self.oos_widget.oos_list_widget.item(i)
+            widget = self.oos_widget.oos_list_widget.itemWidget(item)
+            if widget:
+                pixmap = widget.icon.pixmap()
+                type = widget.subtitle.text()
+                title = widget.title.text()
+
+                byte_array = QByteArray()
+                buffer = QBuffer(byte_array)
+                pixmap.save(buffer, "PNG")
+                base64_data = base64.b64encode(byte_array.data()).decode()
+                document_html += (f'<tr>'
+                                  f'    <td>'
+                                  f'        <span style="font-family: \'Arial\'; font-size: 12pt; font-weight: bold;">'
+                                  f'            {i + 1}.'
+                                  f'        </span>'
+                                  f'    </td>'
+                                  f'    <td><img src="data:image/png;base64,{base64_data}" /></td>'
+                                  f'    <td>'
+                                  f'        <span style="font-family: \'Arial\'; font-size: 12pt; font-weight: bold;">'
+                                  f'            {title}'
+                                  f'        </span>'
+                                  f'        <br />'
+                                  f'        <span style="font-family: \'Arial\'; font-size: 10pt;">{type}</span>'
+                                  f'        <br />'
+                                  f'    </td>'
+                                  f'</tr>')
+        document_html += '</table>'
+
+        document = QTextDocument()
+        document.setHtml(document_html)
+        from widgets import PrintDialog
+        PrintDialog(document)
+
+        return
+
         if self.oos_widget.oos_list_widget.count() == 0:
             QMessageBox.information(
                 self.main_window,
@@ -886,7 +926,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.7.0')
+        title_label = QLabel('ProjectOn v.1.7.1')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
