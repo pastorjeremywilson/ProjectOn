@@ -341,5 +341,10 @@ QProgressBar::chunk {
 
 /*-------------------- QGroupBox --------------------*/
 QGroupBox {
-    color: #000000;
+    border: 1px solid #aaaaff;
+    margin-top: 8px;
+    padding: 10px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
 }

@@ -1739,7 +1739,7 @@ class EditWidget(QDialog):
                     break
 
         self.update_preview_timer.stop()
-        self.deleteLater()
+        self.done(0)
         save_widget.widget.deleteLater()
 
         items = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)

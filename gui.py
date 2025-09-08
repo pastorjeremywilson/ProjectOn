@@ -172,9 +172,6 @@ class GUI(QObject):
             if not secondary_found:
                 self.secondary_screen = self.primary_screen
 
-        #self.main.update_status_signal.emit('Processing Fonts', 'status')
-        #self.create_font_pixmaps()
-
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
         self.init_components()
@@ -236,21 +233,66 @@ class GUI(QObject):
                 data_dir = True
 
         if not data_dir:
-            QMessageBox.question(
-                None,
-                'Locate Data Directory',
-                'Please locate the ProjectOn Data Directory that contains "projecton.db"',
-                QMessageBox.StandardButton.Ok
-            )
+            dialog = QDialog()
+            dialog.setWindowTitle('Locate Data Directory')
+            layout = QVBoxLayout(dialog)
 
-            result = QFileDialog.getExistingDirectory(
-                None,
-                'Data Directory',
-                os.path.expanduser('~/Documents')
-            )
-            if len(result) == 0:
+            label = QLabel('Unable to locate the data directory. Would you like to locate it yourself?<br /><br />'
+                           '(The Data Directory contains "projecton.db")')
+            layout.addWidget(label)
+
+            button_widget = QWidget()
+            layout.addWidget(button_widget)
+            button_layout = QHBoxLayout(button_widget)
+
+            ok_button = QPushButton('Locate')
+            ok_button.setFont(self.standard_font)
+            ok_button.setMinimumHeight(36)
+            ok_button.pressed.connect(lambda: dialog.done(1))
+            button_layout.addStretch()
+            button_layout.addWidget(ok_button)
+            button_layout.addSpacing(20)
+
+            create_new_button = QPushButton('Create New')
+            create_new_button.setFont(self.standard_font)
+            create_new_button.setMinimumHeight(36)
+            create_new_button.setToolTip('Create a new data directory in a folder of your choosing')
+            create_new_button.pressed.connect(lambda: dialog.done(2))
+            button_layout.addWidget(create_new_button)
+            button_layout.addSpacing(20)
+
+            cancel_button = QPushButton('Quit')
+            cancel_button.setFont(self.standard_font)
+            cancel_button.setMinimumHeight(36)
+            cancel_button.pressed.connect(lambda: dialog.done(-1))
+            button_layout.addWidget(cancel_button)
+            button_layout.addStretch()
+
+            response = dialog.exec()
+            if response == 1:
+                result = QFileDialog.getExistingDirectory(
+                    None,
+                    'Data Directory',
+                    os.path.expanduser('~/Documents')
+                )
+                if len(result) == 0:
+                    sys.exit(-1)
+                self.main.data_dir = result
+            elif response == -1:
                 sys.exit(-1)
-            self.main.data_dir = result
+            elif response == 2:
+                result = QFileDialog.getExistingDirectory(
+                    None,
+                    'New Data Directory',
+                    os.path.expanduser('~')
+                )
+                if len(result) == 0:
+                    sys.exit(-1)
+                else:
+                    #TODO: Fix permissions
+                    self.main.data_dir = result + '/projecton_data'
+                    os.mkdir(self.main.data_dir)
+                    shutil.copy('resources/defaults/data/', self.main.data_dir)
 
         self.main.config_file = self.main.data_dir + '/settings.json'
         self.main.database = self.main.data_dir + '/projecton.db'
@@ -606,7 +648,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.7.1'
+        current_version = 'v.1.7.1.001'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -926,7 +968,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.7.1')
+        title_label = QLabel('ProjectOn v.1.7.1.001')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
