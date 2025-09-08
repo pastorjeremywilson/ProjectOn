@@ -7,17 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added the ability to print song lyrics from the editor window&#10;    Improved printing of the Order of Service&#10;    Fixed song list updating after add, delete, or search&#10;    Ensured custom slide icons change appropriately when global backgrounds are changed&#10;    Changed font face combo boxes over to Qt's native QFontComboBox">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Redesigned Font Widget using QGroupBox for each child widget.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/toolbar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,14 +170,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00086" summary="Changed override global, split slides, and add auto checkboxes in the edit widget to checkable buttons with custom icons.">
-      <option name="closed" value="true" />
-      <created>1729972695551</created>
-      <option name="number" value="00086" />
-      <option name="presentableId" value="LOCAL-00086" />
-      <option name="project" value="LOCAL" />
-      <updated>1729972695551</updated>
     </task>
     <task id="LOCAL-00087" summary="Fixed text not centering properly when some words are bold.&#10;Fixed problem with underline and italic in Custom Slides.&#10;Added checks and possible corrections for unreachable urls in web items.">
       <option name="closed" value="true" />
@@ -571,7 +555,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749156434039</updated>
     </task>
-    <option name="localTasksCounter" value="135" />
+    <task id="LOCAL-00135" summary="Redesigned Font Widget using QGroupBox for each child widget.">
+      <option name="closed" value="true" />
+      <created>1757366454384</created>
+      <option name="number" value="00135" />
+      <option name="presentableId" value="LOCAL-00135" />
+      <option name="project" value="LOCAL" />
+      <updated>1757366454385</updated>
+    </task>
+    <option name="localTasksCounter" value="136" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -592,7 +584,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="When selecting a custom font color, ensured that current color is default in the color dialog&#10;Ensured that cancelling the custom font color dialog doesn't change the current color to black&#10;Fixed delete image/background in settings widget to use the same delete function&#10;Ensured image widgets are updated after delete or add&#10;Changed the saving of settings to be threaded to facilitate more often saving of settings" />
     <MESSAGE value="Moved runnables into their own file" />
     <MESSAGE value="Moved runnables into their own file&#10;Fixed problem with lyrics on the remote when reloading the page" />
     <MESSAGE value="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor" />
@@ -617,7 +608,8 @@
     <MESSAGE value="Prevented calling populate_tag_list when editor doesn't have a song open.&#10;&#10;Installed missing opencv-python which was causing an error when adding a video" />
     <MESSAGE value="Updated readmes. Ready for release." />
     <MESSAGE value="Added the ability to print song lyrics from the editor window&#10;    Improved printing of the Order of Service&#10;    Fixed song list updating after add, delete, or search&#10;    Ensured custom slide icons change appropriately when global backgrounds are changed&#10;    Changed font face combo boxes over to Qt's native QFontComboBox" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added the ability to print song lyrics from the editor window&#10;    Improved printing of the Order of Service&#10;    Fixed song list updating after add, delete, or search&#10;    Ensured custom slide icons change appropriately when global backgrounds are changed&#10;    Changed font face combo boxes over to Qt's native QFontComboBox" />
+    <MESSAGE value="Redesigned Font Widget using QGroupBox for each child widget." />
+    <option name="LAST_COMMIT_MESSAGE" value="Redesigned Font Widget using QGroupBox for each child widget." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

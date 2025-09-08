@@ -424,7 +424,7 @@ class EditWidget(QDialog):
         slide_settings_layout = QHBoxLayout(slide_settings_container)
         advanced_options_layout.addWidget(slide_settings_container)
 
-        self.font_widget = FontWidget(self.gui, self.type, draw_border=False, applies_to_global=False)
+        self.font_widget = NewFontWidget(self.gui, self.type, draw_border=False, applies_to_global=False)
         slide_settings_layout.addWidget(self.font_widget)
 
         background_widget = QWidget()
@@ -1722,7 +1722,7 @@ class EditWidget(QDialog):
                 else:
                     return
 
-        save_widget = SimpleSplash(self.gui, 'Saving...')
+        self.save_widget = SimpleSplash(self.gui, 'Saving...')
 
         self.gui.main.save_custom(custom_data, self.old_title)
         self.gui.media_widget.populate_custom_list()
@@ -1740,7 +1740,7 @@ class EditWidget(QDialog):
 
         self.update_preview_timer.stop()
         self.done(0)
-        save_widget.widget.deleteLater()
+        self.save_widget.widget.deleteLater()
 
         items = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)
         self.gui.media_widget.custom_list.setCurrentItem(items[0])

@@ -76,7 +76,7 @@ class Toolbar(QWidget):
         self.song_background_combobox.setToolTip('Choose a Background for All Songs')
         self.layout.addWidget(self.song_background_combobox)
 
-        self.bible_font_widget = FontWidget(self.gui, 'bible')
+        self.bible_font_widget = NewFontWidget(self.gui, 'bible')
         self.bible_font_widget.hide()
 
         bible_background_label = QLabel('Global Bible Settings:')
