@@ -61,11 +61,6 @@ class GetScripture:
                 self.main.gui.media_widget.bible_search_status_label.setText('no verses found')
                 return (-1, 'no verses found')
 
-            #supply chapter 1 for books with no chapters
-            if parsed_reference['book'].lower() in psr.chapterless_books:
-                parsed_reference['chapter_start'] = '1'
-                parsed_reference['chapter_end'] = '1'
-
             # go on to get the passage from the xml bible if the parsing worked out
             if parsed_reference['is_standardized_book']:
                 this_verse = ''
