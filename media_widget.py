@@ -663,7 +663,7 @@ class MediaWidget(QTabWidget):
             reference_split = self.bible_search_line_edit.text().split(' ')
 
             for i in range(len(reference_split)):
-                if ':' in reference_split[i]:
+                if '-' in reference_split[i]:
                     self.formatted_reference = self.passages[0] + ' ' + reference_split[i]
 
             scripture = ''

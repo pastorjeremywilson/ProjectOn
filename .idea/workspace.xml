@@ -7,12 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Redesigned Font Widget using QGroupBox for each child widget.">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/get_scripture.py" beforeDir="false" afterPath="$PROJECT_DIR$/get_scripture.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/parsers.py" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed no-chapter bible books not parsing correctly when capitalized">
+      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,14 +169,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00088" summary="Fixed text not centering properly when some words are bold.&#10;Fixed problem with underline and italic in Custom Slides.&#10;Added checks and possible corrections for unreachable urls in web items.">
-      <option name="closed" value="true" />
-      <created>1730240545680</created>
-      <option name="number" value="00088" />
-      <option name="presentableId" value="LOCAL-00088" />
-      <option name="project" value="LOCAL" />
-      <updated>1730240545680</updated>
     </task>
     <task id="LOCAL-00089" summary="Improved the way words are drawn for songs and custom slides.&#10;&#10;Centered and/or resized pixmaps for image slides.">
       <option name="closed" value="true" />
@@ -566,7 +554,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757367588708</updated>
     </task>
-    <option name="localTasksCounter" value="137" />
+    <task id="LOCAL-00137" summary="Fixed no-chapter bible books not parsing correctly when capitalized">
+      <option name="closed" value="true" />
+      <created>1757439505507</created>
+      <option name="number" value="00137" />
+      <option name="presentableId" value="LOCAL-00137" />
+      <option name="project" value="LOCAL" />
+      <updated>1757439505508</updated>
+    </task>
+    <option name="localTasksCounter" value="138" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -587,7 +583,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Moved runnables into their own file" />
     <MESSAGE value="Moved runnables into their own file&#10;Fixed problem with lyrics on the remote when reloading the page" />
     <MESSAGE value="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor" />
     <MESSAGE value="Fixed editor adding a blank line to the top of text." />
@@ -612,7 +607,8 @@
     <MESSAGE value="Updated readmes. Ready for release." />
     <MESSAGE value="Added the ability to print song lyrics from the editor window&#10;    Improved printing of the Order of Service&#10;    Fixed song list updating after add, delete, or search&#10;    Ensured custom slide icons change appropriately when global backgrounds are changed&#10;    Changed font face combo boxes over to Qt's native QFontComboBox" />
     <MESSAGE value="Redesigned Font Widget using QGroupBox for each child widget." />
-    <option name="LAST_COMMIT_MESSAGE" value="Redesigned Font Widget using QGroupBox for each child widget." />
+    <MESSAGE value="Fixed no-chapter bible books not parsing correctly when capitalized" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed no-chapter bible books not parsing correctly when capitalized" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
