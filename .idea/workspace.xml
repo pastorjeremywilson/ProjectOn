@@ -7,40 +7,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/conf.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/declarations.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/edit_widget.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/formattable_text_edit.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/get_scripture.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/gui.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/help.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/importers.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/live_widget.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/main.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/media_widget.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/oos_widget.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/openlp_import.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/openlyrics_export.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/parsers.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/preview_widget.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/settings_widget.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/simple_splash.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/songselect_import.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/toolbar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/web_remote.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/widgets.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/importers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/openlyrics_export.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlyrics_export.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple_splash.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,8 +148,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.main" />
       <item itemvalue="Python.linecount" />
+      <item itemvalue="Python.main" />
     </list>
     <recent_temporary>
       <list>
@@ -201,14 +177,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00090" summary="Improved the way words are drawn for songs and custom slides.&#10;&#10;Centered and/or resized pixmaps for image slides.">
-      <option name="closed" value="true" />
-      <created>1730849683490</created>
-      <option name="number" value="00090" />
-      <option name="presentableId" value="LOCAL-00090" />
-      <option name="project" value="LOCAL" />
-      <updated>1730849683490</updated>
     </task>
     <task id="LOCAL-00091" summary="Fixed wrong background on slides with 'background' key but 'override_global' = 'False'.">
       <option name="closed" value="true" />
@@ -594,7 +562,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757439978152</updated>
     </task>
-    <option name="localTasksCounter" value="139" />
+    <task id="LOCAL-00139" summary="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash.">
+      <option name="closed" value="true" />
+      <created>1757441182959</created>
+      <option name="number" value="00139" />
+      <option name="presentableId" value="LOCAL-00139" />
+      <option name="project" value="LOCAL" />
+      <updated>1757441182959</updated>
+    </task>
+    <option name="localTasksCounter" value="140" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -615,7 +591,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor" />
     <MESSAGE value="Fixed editor adding a blank line to the top of text." />
     <MESSAGE value="Added ability to see release notes from About and update dialog" />
     <MESSAGE value="Ensured web remote is getting correct text for each slide" />
@@ -640,7 +615,8 @@
     <MESSAGE value="Redesigned Font Widget using QGroupBox for each child widget." />
     <MESSAGE value="Fixed no-chapter bible books not parsing correctly when capitalized" />
     <MESSAGE value="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'" />
+    <MESSAGE value="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash." />
+    <option name="LAST_COMMIT_MESSAGE" value="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

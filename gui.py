@@ -648,7 +648,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.7.1.004'
+        current_version = 'v.1.7.1.005'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -968,7 +968,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.7.1.004')
+        title_label = QLabel('ProjectOn v.1.7.1.005')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1474,9 +1474,15 @@ class GUI(QObject):
 
         elif slide_data['type'] == 'bible':
             title = slide_data['title']
-            book_chapter = title.split(':')[0]
-            book = ' '.join(book_chapter.split(' ')[:-1]).strip()
-            current_chapter = book_chapter.replace(book, '').strip()
+
+            # check for a chapterless book reference
+            if ':' in title:
+                book_chapter = title.split(':')[0]
+                book = ' '.join(book_chapter.split(' ')[:-1]).strip()
+                current_chapter = book_chapter.replace(book, '').strip()
+            else:
+                book = title.split(' ')[0]
+                current_chapter = ''
 
             slide_texts = slide_data['parsed_text']
             for i in range(len(slide_texts)):
@@ -1518,12 +1524,18 @@ class GUI(QObject):
                     current_chapter = str(int(current_chapter) + 1)
 
                 if last_num == '':
-                    new_title = f'{book} {current_chapter}:{first_num}'
-                else:
-                    if int(first_num) > int(last_num):
-                        new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                    if ':' in title:
+                        new_title = f'{book} {current_chapter}:{first_num}'
                     else:
-                        new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
+                        new_title = f'{book} {first_num}'
+                else:
+                    if ':' in title:
+                        if int(first_num) > int(last_num):
+                            new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                        else:
+                            new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
+                    else:
+                        new_title = f'{book} {first_num}-{last_num}'
 
                 list_item.setData(24, ['', new_title, slide_texts[i]])
                 slide_data['type'] = 'bible'
@@ -2314,10 +2326,6 @@ class GUI(QObject):
         self.live_widget.slide_list.setFocus()
 
     def add_scripture_item(self, reference, text, version):
-        if not reference:
-            reference = 'custom_scripture'
-            version = 'custom_scripture'
-
         """
         Method to take a block of scripture and add it as a QListWidgetItem to the order of service widget.
         :param str reference: The scripture passage's reference from the bible
@@ -2325,6 +2333,10 @@ class GUI(QObject):
         :param str version: The version of the bible this passage is from
         :return:
         """
+        if not reference:
+            reference = 'custom_scripture'
+            version = 'custom_scripture'
+
         item = QListWidgetItem()
         slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
         slide_data['type'] = 'bible'

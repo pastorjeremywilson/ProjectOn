@@ -18,7 +18,7 @@ class EditWidget(QDialog):
     Provides a QDialog containing the necessary widgets to edit a song or custom slide.
     """
 
-    def __init__(self, gui, type, data=None, item_text=None, item_data=None):
+    def __init__(self, gui, type, data=None, item_text=None, item_data=None, from_oos=False):
         """
         Provides a QDialog containing the necessary widgets.py to edit a song or custom slide.
         :param gui.GUI gui: The current instance of GUI
@@ -35,6 +35,7 @@ class EditWidget(QDialog):
         self.new_song = False
         self.new_custom = False
         self.item_data = item_data
+        self.from_oos = from_oos
 
         self.setObjectName('edit_widget')
         self.setWindowFlag(Qt.WindowType.Window)
@@ -1438,6 +1439,7 @@ class EditWidget(QDialog):
         """
         Method to save user's changes for the song type editor.
         """
+
         # title is essential for the database, prompt user for title if not inputted
         if len(self.title_line_edit.text()) == 0:
             QMessageBox.information(
@@ -1569,28 +1571,23 @@ class EditWidget(QDialog):
         self.gui.main.save_song(song_data, self.old_title)
         self.gui.media_widget.populate_song_list()
 
-        if self.old_title:
+        if self.from_oos:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title'] == self.old_title:
-                    new_item = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)[
-                        0].clone()
-                    new_data = new_item.data(Qt.ItemDataRole.UserRole).copy()
-                    new_data['parsed_text'] = parsers.parse_song_data(self.gui, new_data)
-                    new_item.setData(Qt.ItemDataRole.UserRole, new_data)
-                    self.gui.oos_widget.oos_list_widget.takeItem(i)
-                    self.gui.media_widget.add_song_to_service(new_item, i)
+                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title'] == song_data[0]:
+                    item = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)[0]
+                    item_data = item.data(Qt.ItemDataRole.UserRole).copy()
+                    item_data['parsed_text'] = parsers.parse_song_data(self.gui, item_data)
+                    self.gui.oos_widget.oos_list_widget.item(i).setData(Qt.ItemDataRole.UserRole, item_data)
                     self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
+                    self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.item(i))
                     break
+        else:
+            items = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)
+            self.gui.media_widget.song_list.setCurrentItem(items[0])
 
         self.update_preview_timer.stop()
         self.deleteLater()
         save_widget.widget.deleteLater()
-
-        items = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)
-        self.gui.media_widget.song_list.setCurrentItem(items[0])
-
-        if self.gui.oos_widget.oos_list_widget.currentItem():
-            self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
 
     def save_custom(self):
         """
@@ -1725,26 +1722,22 @@ class EditWidget(QDialog):
         self.gui.main.save_custom(custom_data, self.old_title)
         self.gui.media_widget.populate_custom_list()
 
-        if self.old_title:
+        if self.from_oos:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.item_data['title'] == self.old_title:
-                    self.change_thumbnail(self.gui.oos_widget.oos_list_widget.item(i))
-                    new_item = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)[
-                        0].clone()
-                    self.gui.oos_widget.oos_list_widget.takeItem(i)
-                    self.gui.media_widget.add_custom_to_service(new_item, i)
+                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title'] == custom_data[0]:
+                    item = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)[0]
+                    item_data = item.data(Qt.ItemDataRole.UserRole).copy()
+                    self.gui.oos_widget.oos_list_widget.item(i).setData(Qt.ItemDataRole.UserRole, item_data)
                     self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
+                    self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.item(i))
                     break
+        else:
+            items = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)
+            self.gui.media_widget.custom_list.setCurrentItem(items[0])
 
         self.update_preview_timer.stop()
         self.done(0)
         self.save_widget.widget.deleteLater()
-
-        items = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)
-        self.gui.media_widget.custom_list.setCurrentItem(items[0])
-
-        if self.gui.oos_widget.oos_list_widget.currentItem():
-            self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
 
     def get_simplified_text(self, lyrics):
         break_tag = '<br />'
@@ -1824,7 +1817,7 @@ class EditWidget(QDialog):
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
 
-        item_widget = StandardItemWidget(self.gui, item.data(Qt.ItemDataRole.UserRole)['text'], '', pixmap)
+        item_widget = StandardItemWidget(self.gui, item.data(Qt.ItemDataRole.UserRole)['title'], '', pixmap)
         item.setSizeHint(item_widget.sizeHint())
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, item_widget)
 
