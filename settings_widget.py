@@ -8,8 +8,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonG
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, QCheckBox, \
     QComboBox, QTimeEdit, QTabWidget, QGroupBox, QFontComboBox
 
-from simple_splash import SimpleSplash
-from widgets import FontWidget, FontFaceComboBox, ClickableColorSwatch, NewFontWidget
+from widgets import ClickableColorSwatch, NewFontWidget, SimpleSplash
 
 
 class SettingsWidget(QWidget):

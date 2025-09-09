@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QHBoxLayout, QPushButton, QLabel, \
     QMessageBox, QFileDialog, QApplication
 
-from simple_splash import SimpleSplash
+from widgets import SimpleSplash
 
 
 class OpenlyricsExport(QWidget):

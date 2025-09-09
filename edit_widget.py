@@ -2,17 +2,15 @@ import os.path
 import re
 from os.path import exists
 
-from PyQt5.QtCore import Qt, QSize, QTimer, QPoint
+from PyQt5.QtCore import Qt, QSize, QTimer
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument
-from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QSpinBox, QTextEdit, QComboBox
+    QSpinBox
 
 import parsers
 from formattable_text_edit import FormattableTextEdit
-from simple_splash import SimpleSplash
-from widgets import StandardItemWidget, FontWidget, DisplayWidget, LyricDisplayWidget, PrintDialog
+from widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
 
 
 class EditWidget(QDialog):
@@ -1566,7 +1564,7 @@ class EditWidget(QDialog):
                 else:
                     return
 
-        save_widget = SimpleSplash(self.gui, 'Saving...')
+        save_widget = SimpleSplash(self.gui, 'Saving...', parent=self)
 
         self.gui.main.save_song(song_data, self.old_title)
         self.gui.media_widget.populate_song_list()

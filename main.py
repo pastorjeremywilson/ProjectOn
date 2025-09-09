@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.7.1.003
+ProjectOn v.1.7.1.004
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -40,7 +40,7 @@ from gevent import monkey
 import declarations
 from gui import GUI
 from runnables import SaveSettings, ServerCheckTimer
-from simple_splash import SimpleSplash
+from widgets import SimpleSplash
 from web_remote import RemoteServer
 from widgets import StandardItemWidget
 
@@ -169,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.7.1.003')
+        version_label = QLabel('v.1.7.1.004')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)

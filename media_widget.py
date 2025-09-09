@@ -14,8 +14,7 @@ import declarations
 import parsers
 from edit_widget import EditWidget
 from get_scripture import GetScripture
-from simple_splash import SimpleSplash
-from widgets import AutoSelectLineEdit, StandardItemWidget
+from widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash
 
 
 class MediaWidget(QTabWidget):

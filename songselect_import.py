@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit
     QMessageBox, QDialog
 from cryptography.fernet import Fernet
 
-from simple_splash import SimpleSplash
+from widgets import SimpleSplash
 
 
 class SongselectImport(QDialog):
