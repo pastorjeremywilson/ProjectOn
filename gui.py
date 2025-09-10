@@ -10,7 +10,7 @@ from os.path import exists
 
 import requests
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, QScreen, \
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, \
     QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem

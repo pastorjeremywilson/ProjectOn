@@ -140,8 +140,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.main" />
       <item itemvalue="Python.linecount" />
+      <item itemvalue="Python.main" />
     </list>
     <recent_temporary>
       <list>
