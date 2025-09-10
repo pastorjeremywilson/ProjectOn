@@ -648,7 +648,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.7.1.005'
+        current_version = 'v.1.7.1.006'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -968,7 +968,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.7.1.005')
+        title_label = QLabel('ProjectOn v.1.7.1.006')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1483,11 +1483,11 @@ class GUI(QObject):
             else:
                 book = title.split(' ')[0]
                 current_chapter = ''
-
+            print(title, book, current_chapter)
             slide_texts = slide_data['parsed_text']
+            print(slide_texts)
             for i in range(len(slide_texts)):
                 list_item = QListWidgetItem()
-
                 first_num_found = False
                 first_num = ''
                 last_num = ''
@@ -1497,28 +1497,24 @@ class GUI(QObject):
                 scripture_text = re.sub(
                     '<.*?>', '', slide_texts[i])
                 next_chapter = False
-                for j in range(len(scripture_text)):
-                    data = scripture_text[j]
-                    next_data = None
-                    if j < len(scripture_text) - 1:
-                        next_data = scripture_text[j + 1]
-                    num = ''
-                    if not skip_next:
-                        if data.isnumeric():
-                            num += data
-                            if next_data.isnumeric():
-                                num += next_data
-                                skip_next = True
-                            if not first_num_found:
-                                first_num = num
-                                first_num_found = True
-                            else:
-                                last_num = num
+                index = 0
+                while index < len(scripture_text): # iterate through the characters in this text to find all the numbers
+                    this_number = ''
+                    if scripture_text[index].isnumeric(): # work through the next few characters until no longer a number
+                        while scripture_text[index].isnumeric():
+                            this_number += scripture_text[index]
+                            index += 1
 
-                            if i > 0 and num == '1':
-                                next_chapter = True
-                    else:
-                        skip_next = False
+                        if not first_num_found:
+                            first_num = this_number
+                            first_num_found = True
+                        else:
+                            last_num = this_number
+
+                        if i > 0 and this_number == '1':
+                            next_chapter = True
+
+                    index += 1
 
                 if next_chapter:
                     current_chapter = str(int(current_chapter) + 1)
@@ -1537,7 +1533,6 @@ class GUI(QObject):
                     else:
                         new_title = f'{book} {first_num}-{last_num}'
 
-                list_item.setData(24, ['', new_title, slide_texts[i]])
                 slide_data['type'] = 'bible'
                 slide_data['title'] = new_title
                 slide_data['parsed_text'] = slide_texts[i]
