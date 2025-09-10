@@ -7,16 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,8 +140,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.linecount" />
       <item itemvalue="Python.main" />
+      <item itemvalue="Python.linecount" />
     </list>
     <recent_temporary>
       <list>
@@ -177,22 +169,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00091" summary="Fixed wrong background on slides with 'background' key but 'override_global' = 'False'.">
-      <option name="closed" value="true" />
-      <created>1730925700293</created>
-      <option name="number" value="00091" />
-      <option name="presentableId" value="LOCAL-00091" />
-      <option name="project" value="LOCAL" />
-      <updated>1730925700293</updated>
-    </task>
-    <task id="LOCAL-00092" summary="Tweaked edit widget button icons.">
-      <option name="closed" value="true" />
-      <created>1730936532998</created>
-      <option name="number" value="00092" />
-      <option name="presentableId" value="LOCAL-00092" />
-      <option name="project" value="LOCAL" />
-      <updated>1730936532999</updated>
     </task>
     <task id="LOCAL-00093" summary="Optimized imports">
       <option name="closed" value="true" />
@@ -570,7 +546,23 @@
       <option name="project" value="LOCAL" />
       <updated>1757441182959</updated>
     </task>
-    <option name="localTasksCounter" value="140" />
+    <task id="LOCAL-00140" summary="Fixed problem with OOS items not properly updating after having been edited.">
+      <option name="closed" value="true" />
+      <created>1757451486210</created>
+      <option name="number" value="00140" />
+      <option name="presentableId" value="LOCAL-00140" />
+      <option name="project" value="LOCAL" />
+      <updated>1757451486211</updated>
+    </task>
+    <task id="LOCAL-00141" summary="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
+      <option name="closed" value="true" />
+      <created>1757533285655</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1757533285656</updated>
+    </task>
+    <option name="localTasksCounter" value="142" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -591,8 +583,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed editor adding a blank line to the top of text." />
-    <MESSAGE value="Added ability to see release notes from About and update dialog" />
     <MESSAGE value="Ensured web remote is getting correct text for each slide" />
     <MESSAGE value="Fixed a problem where new tags weren't getting numbered." />
     <MESSAGE value="Added a check to see if an inserted tag needs line breaks before or after" />
@@ -616,7 +606,9 @@
     <MESSAGE value="Fixed no-chapter bible books not parsing correctly when capitalized" />
     <MESSAGE value="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'" />
     <MESSAGE value="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash." />
-    <option name="LAST_COMMIT_MESSAGE" value="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash." />
+    <MESSAGE value="Fixed problem with OOS items not properly updating after having been edited." />
+    <MESSAGE value="Fixed problem sending bible passage to preview when verse number has greater than 2 digits" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed problem sending bible passage to preview when verse number has greater than 2 digits" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
