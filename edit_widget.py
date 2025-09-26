@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, QSize, QTimer
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QSpinBox
+    QSpinBox, QComboBox
 
 import parsers
 from formattable_text_edit import FormattableTextEdit
@@ -305,11 +305,14 @@ class EditWidget(QDialog):
             audio_layout.addWidget(add_audio_label)
             audio_layout.addSpacing(20)
 
-            self.audio_line_edit = QLineEdit()
-            self.audio_line_edit.setObjectName('audio_line_edit')
-            self.audio_line_edit.setFont(self.gui.standard_font)
-            audio_layout.addWidget(self.audio_line_edit)
+            self.audio_combobox = QComboBox()
+            self.audio_combobox.setFont(self.gui.standard_font)
+            audio_layout.addWidget(self.audio_combobox)
             audio_layout.addSpacing(20)
+            results = self.gui.main.get_audio_clip_names()
+            self.audio_combobox.addItem('Choose an Audio File')
+            for result in results:
+                self.audio_combobox.addItem(result[0])
 
             self.choose_file_button = QPushButton()
             self.choose_file_button.setObjectName('choose_file_button')
@@ -331,7 +334,8 @@ class EditWidget(QDialog):
             audio_layout.addStretch()
 
             self.loop_audio_button.hide()
-            self.audio_line_edit.hide()
+            #self.audio_line_edit.hide()
+            self.audio_combobox.hide()
             self.choose_file_button.hide()
 
             auto_play_widget = QWidget()
@@ -841,14 +845,15 @@ class EditWidget(QDialog):
             self.preview_label_two.clear()
 
     def add_audio_changed(self):
-        self.audio_line_edit.setVisible(self.add_audio_button.isChecked())
+        #self.audio_line_edit.setVisible(self.add_audio_button.isChecked())
+        self.audio_combobox.setVisible(self.add_audio_button.isChecked())
         self.choose_file_button.setVisible(self.add_audio_button.isChecked())
         self.loop_audio_button.setVisible(self.add_audio_button.isChecked())
         if self.add_audio_button.isChecked():
             self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio_selected.svg'))
         else:
             self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio.svg'))
-            self.audio_line_edit.clear()
+            #self.audio_line_edit.clear()
 
     def split_slides_changed(self):
         if self.split_slides_button.isChecked():
@@ -867,8 +872,71 @@ class EditWidget(QDialog):
             os.path.expanduser('~'),
             'Audio Files (*.mp3 *.wav *.wma *.flac)'
         )
-        if len(result[0]) > 0:
-            self.audio_line_edit.setText(result[0])
+        if len(result[0]) == 0:
+            return
+
+        file_name = result[0]
+        name = file_name.split('/')[-1]
+        name = '.'.join(name.split('.')[:-1])
+        audio_format = file_name.split('.')[-1].upper()
+
+        dialog = QDialog()
+        dialog.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
+        dialog.setWindowTitle('Audio Name')
+        dialog.setWindowIcon(QIcon('resources/branding/icon.svg'))
+        layout = QVBoxLayout(dialog)
+
+        message = QLabel('Please provide a name for your audio clip:')
+        message.setFont(self.gui.standard_font)
+        layout.addWidget(message)
+
+        name_line_edit = QLineEdit(name)
+        message.setFont(self.gui.standard_font)
+        name_line_edit.selectAll()
+        layout.addWidget(name_line_edit)
+
+        button_widget = QWidget()
+        layout.addWidget(button_widget)
+        button_layout = QHBoxLayout(button_widget)
+
+        ok_button = QPushButton('Ok')
+        ok_button.setFont(self.gui.standard_font)
+        ok_button.pressed.connect(lambda: dialog.done(0))
+        button_layout.addStretch()
+        button_layout.addWidget(ok_button)
+        button_layout.addSpacing(20)
+
+        cancel_button = QPushButton('Cancel')
+        cancel_button.setFont(self.gui.standard_font)
+        cancel_button.pressed.connect(lambda: dialog.done(-1))
+        button_layout.addWidget(cancel_button)
+        button_layout.addStretch()
+
+        result = dialog.exec()
+        if result == -1:
+            return
+
+        if len(name_line_edit.text().strip()) > 0:
+            name = name_line_edit.text().strip()
+
+        try:
+            with open(file_name, 'rb') as file:
+                audio_data = file.read()
+            result = self.gui.main.save_audio(name, audio_format, audio_data)
+            if result == -2:
+                QMessageBox.information(
+                    self,
+                    'Name Exists',
+                    'That audio name already exists in the database. Please try again using a different name.',
+                    QMessageBox.StandardButton.Ok
+                )
+                return
+            elif result == 0:
+                self.audio_combobox.addItem(name)
+                self.audio_combobox.setCurrentText(name)
+        except Exception as ex:
+            self.gui.main.error_log()
+            return
 
     def override_global_changed(self):
         if self.override_global_button.isChecked():
@@ -1228,7 +1296,7 @@ class EditWidget(QDialog):
         # set the audio file
         if custom_data[16] and len(custom_data[6]) > 0:
             self.add_audio_button.setChecked(True)
-            self.audio_line_edit.setText(custom_data[16])
+            self.audio_combobox.setCurrentText(custom_data[16])
         self.add_audio_changed()
         if custom_data[17] == 'True':
             self.loop_audio_button.setChecked(True)
@@ -1636,8 +1704,8 @@ class EditWidget(QDialog):
         text = self.get_simplified_text(self.lyrics_edit.text_edit.toHtml())
 
         audio_file = ''
-        if len(self.audio_line_edit.text()) > 0:
-            audio_file = self.audio_line_edit.text()
+        if self.add_audio_button.isChecked() and not self.audio_combobox.currentText() == 'Choose an Audio File':
+            audio_file = self.audio_combobox.currentText()
         if self.loop_audio_button.isChecked():
             loop_audio = 'True'
         else:

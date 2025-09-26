@@ -9,7 +9,7 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, \
     QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -74,6 +74,7 @@ class GUI(QObject):
     countdown_widget = None
     countdown_timer = None
     font_pixmaps = None
+    audio_buffer = None
 
     standard_font = QFont('Helvetica', 12)
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
@@ -648,7 +649,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.7.1.006'
+        current_version = 'v.1.7.1.007'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -968,7 +969,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.7.1.006')
+        title_label = QLabel('ProjectOn v.1.7.1.007')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -2028,24 +2029,34 @@ class GUI(QObject):
                         and item_data['audio_file']
                         and len(item_data['audio_file']) > 0
                         and not self.media_player):
-                    if not exists(item_data['audio_file']):
-                        file_name = item_data['audio_file']
-                        file_name = file_name.replace('/', '\\')
+                    audio_data = self.main.get_audio_data(item_data['audio_file'])
+                    if audio_data == -2:
                         QMessageBox.critical(
                             self.main_window,
                             'Missing Audio File',
-                            f'The audio file at {file_name} is missing. Unable to play sound.',
+                            f'The audio named {item_data["audio_file"]} is missing. Unable to play sound.',
                             QMessageBox.StandardButton.Ok
                         )
                         return
+                    elif audio_data == -1:
+                        QMessageBox.critical(
+                            self.main_window,
+                            'Audio Data Error',
+                            'Error loading the audio. Unable to play sound.',
+                            QMessageBox.StandardButton.Ok
+                        )
 
                     self.media_player = QMediaPlayer(self.main_window)
-                    self.media_player.stateChanged.connect(self.media_state_changed)
                     self.media_player.error.connect(self.media_error)
-                    self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(item_data["audio_file"])))
+
+                    byte_array = QByteArray(audio_data[0])
+                    self.audio_buffer = QBuffer()
+                    self.audio_buffer.setData(byte_array)
+                    self.audio_buffer.open(QIODevice.ReadOnly)
+                    self.media_player.setMedia(QMediaContent(), self.audio_buffer)
 
                     if item_data['loop_audio'] == 'True':
-                        def repeat_media(state):
+                        def repeat_media():
                             if self.media_player.mediaStatus() == QMediaPlayer.EndOfMedia:
                                 self.media_player.play()
                         self.media_player.mediaStatusChanged.connect(repeat_media)
@@ -2224,9 +2235,6 @@ class GUI(QObject):
         self.media_player.stateChanged.connect(self.media_playing_change)
         self.media_player.error.connect(self.media_error)
         self.media_player.setVideoOutput(self.video_widget)
-
-    def media_state_changed(self, status):
-        print(status)
 
     def media_playing_change(self):
         if self.media_player.state() == QMediaPlayer.StoppedState:

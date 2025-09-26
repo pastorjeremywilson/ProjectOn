@@ -1,4 +1,9 @@
 DB_STRUCTURE = {
+    'audio': {
+        'name': 'TEXT',
+        'format': 'TEXT',
+        'data': 'BLOB'
+    },
     'backgroundThumbnails': {
         'fileName': 'TEXT',
         'image': 'BLOB'
