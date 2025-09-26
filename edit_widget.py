@@ -293,7 +293,7 @@ class EditWidget(QDialog):
             self.add_audio_button = QPushButton()
             self.add_audio_button.setObjectName('add_audio_button')
             self.add_audio_button.setCheckable(True)
-            self.add_audio_button.setToolTip('Add an audio file that will play when this slide is shown')
+            self.add_audio_button.setToolTip('Add audio that will play when this slide is shown')
             self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio.svg'))
             self.add_audio_button.setIconSize(button_size)
             self.add_audio_button.setChecked(False)
@@ -319,7 +319,7 @@ class EditWidget(QDialog):
             self.choose_file_button.setIcon(QIcon('resources/gui_icons/open.svg'))
             self.choose_file_button.setIconSize(QSize(24, 24))
             self.choose_file_button.setFont(self.gui.standard_font)
-            self.choose_file_button.setToolTip('Choose an audio file')
+            self.choose_file_button.setToolTip('Import an audio file')
             self.choose_file_button.pressed.connect(self.get_audio_file)
             audio_layout.addWidget(self.choose_file_button)
 

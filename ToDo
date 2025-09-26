@@ -1,9 +1,5 @@
 Done:
-    Added the ability to print song lyrics from the editor window
-    Improved printing of the Order of Service
-    Fixed song list updating after add, delete, or search
-    Ensured custom slide icons change appropriately when global backgrounds are changed
-    Changed font face combo boxes over to Qt's native QFontComboBox
+
 To Do:
 
 Future Releases:
