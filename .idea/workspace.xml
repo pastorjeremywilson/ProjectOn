@@ -7,15 +7,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Updated readmes. Ready for release.">
-      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Now saving audio attached to Custom Slides in the database as a blob">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,7 +76,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/conventionRegistrations&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/pasto/Desktop/project_on&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -176,94 +173,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00085" summary="Changed override global, split slides, and add auto checkboxes in the edit widget to checkable buttons with custom icons.">
-      <option name="closed" value="true" />
-      <created>1729972587536</created>
-      <option name="number" value="00085" />
-      <option name="presentableId" value="LOCAL-00085" />
-      <option name="project" value="LOCAL" />
-      <updated>1729972587537</updated>
-    </task>
-    <task id="LOCAL-00086" summary="Changed override global, split slides, and add auto checkboxes in the edit widget to checkable buttons with custom icons.">
-      <option name="closed" value="true" />
-      <created>1729972695551</created>
-      <option name="number" value="00086" />
-      <option name="presentableId" value="LOCAL-00086" />
-      <option name="project" value="LOCAL" />
-      <updated>1729972695551</updated>
-    </task>
-    <task id="LOCAL-00087" summary="Fixed text not centering properly when some words are bold.&#10;Fixed problem with underline and italic in Custom Slides.&#10;Added checks and possible corrections for unreachable urls in web items.">
-      <option name="closed" value="true" />
-      <created>1730237306438</created>
-      <option name="number" value="00087" />
-      <option name="presentableId" value="LOCAL-00087" />
-      <option name="project" value="LOCAL" />
-      <updated>1730237306439</updated>
-    </task>
-    <task id="LOCAL-00088" summary="Fixed text not centering properly when some words are bold.&#10;Fixed problem with underline and italic in Custom Slides.&#10;Added checks and possible corrections for unreachable urls in web items.">
-      <option name="closed" value="true" />
-      <created>1730240545680</created>
-      <option name="number" value="00088" />
-      <option name="presentableId" value="LOCAL-00088" />
-      <option name="project" value="LOCAL" />
-      <updated>1730240545680</updated>
-    </task>
-    <task id="LOCAL-00089" summary="Improved the way words are drawn for songs and custom slides.&#10;&#10;Centered and/or resized pixmaps for image slides.">
-      <option name="closed" value="true" />
-      <created>1730849556485</created>
-      <option name="number" value="00089" />
-      <option name="presentableId" value="LOCAL-00089" />
-      <option name="project" value="LOCAL" />
-      <updated>1730849556486</updated>
-    </task>
-    <task id="LOCAL-00090" summary="Improved the way words are drawn for songs and custom slides.&#10;&#10;Centered and/or resized pixmaps for image slides.">
-      <option name="closed" value="true" />
-      <created>1730849683490</created>
-      <option name="number" value="00090" />
-      <option name="presentableId" value="LOCAL-00090" />
-      <option name="project" value="LOCAL" />
-      <updated>1730849683490</updated>
-    </task>
-    <task id="LOCAL-00091" summary="Fixed wrong background on slides with 'background' key but 'override_global' = 'False'.">
-      <option name="closed" value="true" />
-      <created>1730925700293</created>
-      <option name="number" value="00091" />
-      <option name="presentableId" value="LOCAL-00091" />
-      <option name="project" value="LOCAL" />
-      <updated>1730925700293</updated>
-    </task>
-    <task id="LOCAL-00092" summary="Tweaked edit widget button icons.">
-      <option name="closed" value="true" />
-      <created>1730936532998</created>
-      <option name="number" value="00092" />
-      <option name="presentableId" value="LOCAL-00092" />
-      <option name="project" value="LOCAL" />
-      <updated>1730936532999</updated>
-    </task>
-    <task id="LOCAL-00093" summary="Optimized imports">
-      <option name="closed" value="true" />
-      <created>1731100448060</created>
-      <option name="number" value="00093" />
-      <option name="presentableId" value="LOCAL-00093" />
-      <option name="project" value="LOCAL" />
-      <updated>1731100448061</updated>
-    </task>
-    <task id="LOCAL-00094" summary="Added pydoc generated html docs">
-      <option name="closed" value="true" />
-      <created>1731106312953</created>
-      <option name="number" value="00094" />
-      <option name="presentableId" value="LOCAL-00094" />
-      <option name="project" value="LOCAL" />
-      <updated>1731106312954</updated>
-    </task>
-    <task id="LOCAL-00095" summary="Ready for Release">
-      <option name="closed" value="true" />
-      <created>1731435817094</created>
-      <option name="number" value="00095" />
-      <option name="presentableId" value="LOCAL-00095" />
-      <option name="project" value="LOCAL" />
-      <updated>1731435817094</updated>
     </task>
     <task id="LOCAL-00096" summary="Improved text handling in the edit widget's QTextEdit">
       <option name="closed" value="true" />
@@ -569,7 +478,95 @@
       <option name="project" value="LOCAL" />
       <updated>1747512795565</updated>
     </task>
-    <option name="localTasksCounter" value="134" />
+    <task id="LOCAL-00134" summary="Added the ability to print song lyrics from the editor window&#10;    Improved printing of the Order of Service&#10;    Fixed song list updating after add, delete, or search&#10;    Ensured custom slide icons change appropriately when global backgrounds are changed&#10;    Changed font face combo boxes over to Qt's native QFontComboBox">
+      <option name="closed" value="true" />
+      <created>1749156434039</created>
+      <option name="number" value="00134" />
+      <option name="presentableId" value="LOCAL-00134" />
+      <option name="project" value="LOCAL" />
+      <updated>1749156434039</updated>
+    </task>
+    <task id="LOCAL-00135" summary="Redesigned Font Widget using QGroupBox for each child widget.">
+      <option name="closed" value="true" />
+      <created>1757366454384</created>
+      <option name="number" value="00135" />
+      <option name="presentableId" value="LOCAL-00135" />
+      <option name="project" value="LOCAL" />
+      <updated>1757366454385</updated>
+    </task>
+    <task id="LOCAL-00136" summary="Redesigned Font Widget using QGroupBox for each child widget.">
+      <option name="closed" value="true" />
+      <created>1757367588708</created>
+      <option name="number" value="00136" />
+      <option name="presentableId" value="LOCAL-00136" />
+      <option name="project" value="LOCAL" />
+      <updated>1757367588708</updated>
+    </task>
+    <task id="LOCAL-00137" summary="Fixed no-chapter bible books not parsing correctly when capitalized">
+      <option name="closed" value="true" />
+      <created>1757439505507</created>
+      <option name="number" value="00137" />
+      <option name="presentableId" value="LOCAL-00137" />
+      <option name="project" value="LOCAL" />
+      <updated>1757439505508</updated>
+    </task>
+    <task id="LOCAL-00138" summary="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'">
+      <option name="closed" value="true" />
+      <created>1757439978152</created>
+      <option name="number" value="00138" />
+      <option name="presentableId" value="LOCAL-00138" />
+      <option name="project" value="LOCAL" />
+      <updated>1757439978152</updated>
+    </task>
+    <task id="LOCAL-00139" summary="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash.">
+      <option name="closed" value="true" />
+      <created>1757441182959</created>
+      <option name="number" value="00139" />
+      <option name="presentableId" value="LOCAL-00139" />
+      <option name="project" value="LOCAL" />
+      <updated>1757441182959</updated>
+    </task>
+    <task id="LOCAL-00140" summary="Fixed problem with OOS items not properly updating after having been edited.">
+      <option name="closed" value="true" />
+      <created>1757451486210</created>
+      <option name="number" value="00140" />
+      <option name="presentableId" value="LOCAL-00140" />
+      <option name="project" value="LOCAL" />
+      <updated>1757451486211</updated>
+    </task>
+    <task id="LOCAL-00141" summary="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
+      <option name="closed" value="true" />
+      <created>1757533285655</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1757533285656</updated>
+    </task>
+    <task id="LOCAL-00142" summary="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
+      <option name="closed" value="true" />
+      <created>1757533362962</created>
+      <option name="number" value="00142" />
+      <option name="presentableId" value="LOCAL-00142" />
+      <option name="project" value="LOCAL" />
+      <updated>1757533362962</updated>
+    </task>
+    <task id="LOCAL-00143" summary="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
+      <option name="closed" value="true" />
+      <created>1757533627949</created>
+      <option name="number" value="00143" />
+      <option name="presentableId" value="LOCAL-00143" />
+      <option name="project" value="LOCAL" />
+      <updated>1757533627949</updated>
+    </task>
+    <task id="LOCAL-00144" summary="Now saving audio attached to Custom Slides in the database as a blob">
+      <option name="closed" value="true" />
+      <created>1758921349584</created>
+      <option name="number" value="00144" />
+      <option name="presentableId" value="LOCAL-00144" />
+      <option name="project" value="LOCAL" />
+      <updated>1758921349585</updated>
+    </task>
+    <option name="localTasksCounter" value="145" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -590,14 +587,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines." />
-    <MESSAGE value="When selecting a custom font color, ensured that current color is default in the color dialog&#10;Ensured that cancelling the custom font color dialog doesn't change the current color to black&#10;Fixed delete image/background in settings widget to use the same delete function&#10;Ensured image widgets are updated after delete or add&#10;Changed the saving of settings to be threaded to facilitate more often saving of settings" />
-    <MESSAGE value="Moved runnables into their own file" />
-    <MESSAGE value="Moved runnables into their own file&#10;Fixed problem with lyrics on the remote when reloading the page" />
-    <MESSAGE value="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor" />
-    <MESSAGE value="Fixed editor adding a blank line to the top of text." />
-    <MESSAGE value="Added ability to see release notes from About and update dialog" />
-    <MESSAGE value="Ensured web remote is getting correct text for each slide" />
     <MESSAGE value="Fixed a problem where new tags weren't getting numbered." />
     <MESSAGE value="Added a check to see if an inserted tag needs line breaks before or after" />
     <MESSAGE value="Fixed an issue where a custom font was not displaying in Custom Slides&#10;Song search now includes searching each song's lyrics (search terms found in titles appear first in the results)&#10;Ensured that, when a custom slide is to be split into individual slides, the split occurs only at the blank lines&#10;Fixed an issue with the CCLI song import where the login button was disabled on CCLI's website" />
@@ -615,7 +604,15 @@
     <MESSAGE value="Fixed preview not showing when editing from OOS widget.&#10;&#10;Fixed removing last character from preview when text fragment finds end instead of stop character." />
     <MESSAGE value="Prevented calling populate_tag_list when editor doesn't have a song open.&#10;&#10;Installed missing opencv-python which was causing an error when adding a video" />
     <MESSAGE value="Updated readmes. Ready for release." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated readmes. Ready for release." />
+    <MESSAGE value="Added the ability to print song lyrics from the editor window&#10;    Improved printing of the Order of Service&#10;    Fixed song list updating after add, delete, or search&#10;    Ensured custom slide icons change appropriately when global backgrounds are changed&#10;    Changed font face combo boxes over to Qt's native QFontComboBox" />
+    <MESSAGE value="Redesigned Font Widget using QGroupBox for each child widget." />
+    <MESSAGE value="Fixed no-chapter bible books not parsing correctly when capitalized" />
+    <MESSAGE value="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'" />
+    <MESSAGE value="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash." />
+    <MESSAGE value="Fixed problem with OOS items not properly updating after having been edited." />
+    <MESSAGE value="Fixed problem sending bible passage to preview when verse number has greater than 2 digits" />
+    <MESSAGE value="Now saving audio attached to Custom Slides in the database as a blob" />
+    <option name="LAST_COMMIT_MESSAGE" value="Now saving audio attached to Custom Slides in the database as a blob" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

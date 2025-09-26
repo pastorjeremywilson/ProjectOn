@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog
 
 from openlp_import import OpenLPImport
-from widgets import ImageCombobox, FontWidget
+from widgets import ImageCombobox, FontWidget, NewFontWidget
 
 
 class Toolbar(QWidget):
@@ -55,7 +55,7 @@ class Toolbar(QWidget):
 
         self.layout.addStretch()
 
-        self.song_font_widget = FontWidget(self.gui, 'song')
+        self.song_font_widget = NewFontWidget(self.gui, 'song')
         self.song_font_widget.hide()
 
         song_background_label = QLabel('Global Song Settings:')
@@ -76,7 +76,7 @@ class Toolbar(QWidget):
         self.song_background_combobox.setToolTip('Choose a Background for All Songs')
         self.layout.addWidget(self.song_background_combobox)
 
-        self.bible_font_widget = FontWidget(self.gui, 'bible')
+        self.bible_font_widget = NewFontWidget(self.gui, 'bible')
         self.bible_font_widget.hide()
 
         bible_background_label = QLabel('Global Bible Settings:')

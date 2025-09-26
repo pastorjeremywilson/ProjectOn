@@ -16,17 +16,17 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.7.1?
-- Added the ability to print song lyrics from the editor window
-- Improved printing of the Order of Service
-- Fixed song list updating after add, delete, or search
-- Ensured custom slide icons change appropriately when global backgrounds are changed
-- Changed font face combo boxes over to Qt's native QFontComboBox
+# What's New in Version 1.8.0?
+- Fixed no-chapter bible books being added to the Order of Service as 'custom_scripture'
+- Fixed a problem in sending a bible passage to the preview when the verse number has greater than two digits
+- Fixed Order of Service items not properly updating after having been edited
+- Audio files attached to custom slides are now being imported into the database for ease of retrieval and portability
+- Some updates to the User Interface and many other bug fixes and improvements under the hood
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.7.1) and run
+system only. Download the current ProjectOn installer (v.1.8.0) and run
 it on your computer.
 
 # Using ProjectOn

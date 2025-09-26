@@ -8,8 +8,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonG
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, QCheckBox, \
     QComboBox, QTimeEdit, QTabWidget, QGroupBox, QFontComboBox
 
-from simple_splash import SimpleSplash
-from widgets import FontWidget, FontFaceComboBox, ClickableColorSwatch
+from widgets import ClickableColorSwatch, NewFontWidget, SimpleSplash
 
 
 class SettingsWidget(QWidget):
@@ -193,7 +192,7 @@ class SettingsWidget(QWidget):
         font_widget.setLayout(font_layout)
         layout.addWidget(font_widget)
 
-        self.song_font_settings_widget = FontWidget(self.gui, 'song', draw_border=False)
+        self.song_font_settings_widget = NewFontWidget(self.gui, 'song', draw_border=False)
         #font_layout.addWidget(self.song_font_settings_widget)
         song_font_group_box = QGroupBox()
         song_font_group_box.setTitle('Song Font Settings')
@@ -203,7 +202,7 @@ class SettingsWidget(QWidget):
         font_layout.addWidget(song_font_group_box)
         font_layout.addSpacing(20)
 
-        self.bible_font_settings_widget = FontWidget(self.gui, 'bible', draw_border=False)
+        self.bible_font_settings_widget = NewFontWidget(self.gui, 'bible', draw_border=False)
         #font_layout.addWidget(self.bible_font_settings_widget)
         bible_font_group_box = QGroupBox()
         bible_font_group_box.setTitle('Bible Font Settings')

@@ -9,8 +9,8 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, QScreen, \
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer, QIODevice
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, \
     QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
@@ -31,7 +31,7 @@ from openlyrics_export import OpenlyricsExport
 from preview_widget import PreviewWidget
 from runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
 from settings_widget import SettingsWidget
-from simple_splash import SimpleSplash
+from widgets import SimpleSplash
 from songselect_import import SongselectImport
 from toolbar import Toolbar
 from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, CountdownWidget
@@ -74,6 +74,7 @@ class GUI(QObject):
     countdown_widget = None
     countdown_timer = None
     font_pixmaps = None
+    audio_buffer = None
 
     standard_font = QFont('Helvetica', 12)
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
@@ -172,9 +173,6 @@ class GUI(QObject):
             if not secondary_found:
                 self.secondary_screen = self.primary_screen
 
-        #self.main.update_status_signal.emit('Processing Fonts', 'status')
-        #self.create_font_pixmaps()
-
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
         self.init_components()
@@ -236,21 +234,66 @@ class GUI(QObject):
                 data_dir = True
 
         if not data_dir:
-            QMessageBox.question(
-                None,
-                'Locate Data Directory',
-                'Please locate the ProjectOn Data Directory that contains "projecton.db"',
-                QMessageBox.StandardButton.Ok
-            )
+            dialog = QDialog()
+            dialog.setWindowTitle('Locate Data Directory')
+            layout = QVBoxLayout(dialog)
 
-            result = QFileDialog.getExistingDirectory(
-                None,
-                'Data Directory',
-                os.path.expanduser('~/Documents')
-            )
-            if len(result) == 0:
+            label = QLabel('Unable to locate the data directory. Would you like to locate it yourself?<br /><br />'
+                           '(The Data Directory contains "projecton.db")')
+            layout.addWidget(label)
+
+            button_widget = QWidget()
+            layout.addWidget(button_widget)
+            button_layout = QHBoxLayout(button_widget)
+
+            ok_button = QPushButton('Locate')
+            ok_button.setFont(self.standard_font)
+            ok_button.setMinimumHeight(36)
+            ok_button.pressed.connect(lambda: dialog.done(1))
+            button_layout.addStretch()
+            button_layout.addWidget(ok_button)
+            button_layout.addSpacing(20)
+
+            create_new_button = QPushButton('Create New')
+            create_new_button.setFont(self.standard_font)
+            create_new_button.setMinimumHeight(36)
+            create_new_button.setToolTip('Create a new data directory in a folder of your choosing')
+            create_new_button.pressed.connect(lambda: dialog.done(2))
+            button_layout.addWidget(create_new_button)
+            button_layout.addSpacing(20)
+
+            cancel_button = QPushButton('Quit')
+            cancel_button.setFont(self.standard_font)
+            cancel_button.setMinimumHeight(36)
+            cancel_button.pressed.connect(lambda: dialog.done(-1))
+            button_layout.addWidget(cancel_button)
+            button_layout.addStretch()
+
+            response = dialog.exec()
+            if response == 1:
+                result = QFileDialog.getExistingDirectory(
+                    None,
+                    'Data Directory',
+                    os.path.expanduser('~/Documents')
+                )
+                if len(result) == 0:
+                    sys.exit(-1)
+                self.main.data_dir = result
+            elif response == -1:
                 sys.exit(-1)
-            self.main.data_dir = result
+            elif response == 2:
+                result = QFileDialog.getExistingDirectory(
+                    None,
+                    'New Data Directory',
+                    os.path.expanduser('~')
+                )
+                if len(result) == 0:
+                    sys.exit(-1)
+                else:
+                    #TODO: Fix permissions
+                    self.main.data_dir = result + '/projecton_data'
+                    os.mkdir(self.main.data_dir)
+                    shutil.copy('resources/defaults/data/', self.main.data_dir)
 
         self.main.config_file = self.main.data_dir + '/settings.json'
         self.main.database = self.main.data_dir + '/projecton.db'
@@ -606,7 +649,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.7.1'
+        current_version = 'v.1.8.0'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -926,7 +969,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.7.1')
+        title_label = QLabel('ProjectOn v.1.8.0')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1432,58 +1475,63 @@ class GUI(QObject):
 
         elif slide_data['type'] == 'bible':
             title = slide_data['title']
-            book_chapter = title.split(':')[0]
-            book = ' '.join(book_chapter.split(' ')[:-1]).strip()
-            current_chapter = book_chapter.replace(book, '').strip()
 
+            # check for a chapterless book reference
+            if ':' in title:
+                book_chapter = title.split(':')[0]
+                book = ' '.join(book_chapter.split(' ')[:-1]).strip()
+                current_chapter = book_chapter.replace(book, '').strip()
+            else:
+                book = title.split(' ')[0]
+                current_chapter = ''
+
+            # find the verse range for each segment of scripture
             slide_texts = slide_data['parsed_text']
             for i in range(len(slide_texts)):
                 list_item = QListWidgetItem()
-
                 first_num_found = False
                 first_num = ''
                 last_num = ''
-                skip_next = False
 
-                # find the verse range for each segment of scripture
                 scripture_text = re.sub(
                     '<.*?>', '', slide_texts[i])
                 next_chapter = False
-                for j in range(len(scripture_text)):
-                    data = scripture_text[j]
-                    next_data = None
-                    if j < len(scripture_text) - 1:
-                        next_data = scripture_text[j + 1]
-                    num = ''
-                    if not skip_next:
-                        if data.isnumeric():
-                            num += data
-                            if next_data.isnumeric():
-                                num += next_data
-                                skip_next = True
-                            if not first_num_found:
-                                first_num = num
-                                first_num_found = True
-                            else:
-                                last_num = num
+                index = 0
+                while index < len(scripture_text): # iterate through the characters in this text to find all the numbers
+                    this_number = ''
+                    if scripture_text[index].isnumeric(): # work through the next few characters until no longer a number
+                        while scripture_text[index].isnumeric():
+                            this_number += scripture_text[index]
+                            index += 1
 
-                            if i > 0 and num == '1':
-                                next_chapter = True
-                    else:
-                        skip_next = False
+                        if not first_num_found:
+                            first_num = this_number
+                            first_num_found = True
+                        else:
+                            last_num = this_number
+
+                        if i > 0 and this_number == '1':
+                            next_chapter = True
+
+                    index += 1
 
                 if next_chapter:
                     current_chapter = str(int(current_chapter) + 1)
 
                 if last_num == '':
-                    new_title = f'{book} {current_chapter}:{first_num}'
-                else:
-                    if int(first_num) > int(last_num):
-                        new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                    if ':' in title:
+                        new_title = f'{book} {current_chapter}:{first_num}'
                     else:
-                        new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
+                        new_title = f'{book} {first_num}'
+                else:
+                    if ':' in title:
+                        if int(first_num) > int(last_num):
+                            new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                        else:
+                            new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
+                    else:
+                        new_title = f'{book} {first_num}-{last_num}'
 
-                list_item.setData(24, ['', new_title, slide_texts[i]])
                 slide_data['type'] = 'bible'
                 slide_data['title'] = new_title
                 slide_data['parsed_text'] = slide_texts[i]
@@ -1981,24 +2029,34 @@ class GUI(QObject):
                         and item_data['audio_file']
                         and len(item_data['audio_file']) > 0
                         and not self.media_player):
-                    if not exists(item_data['audio_file']):
-                        file_name = item_data['audio_file']
-                        file_name = file_name.replace('/', '\\')
+                    audio_data = self.main.get_audio_data(item_data['audio_file'])
+                    if audio_data == -2:
                         QMessageBox.critical(
                             self.main_window,
                             'Missing Audio File',
-                            f'The audio file at {file_name} is missing. Unable to play sound.',
+                            f'The audio named {item_data["audio_file"]} is missing. Unable to play sound.',
                             QMessageBox.StandardButton.Ok
                         )
                         return
+                    elif audio_data == -1:
+                        QMessageBox.critical(
+                            self.main_window,
+                            'Audio Data Error',
+                            'Error loading the audio. Unable to play sound.',
+                            QMessageBox.StandardButton.Ok
+                        )
 
                     self.media_player = QMediaPlayer(self.main_window)
-                    self.media_player.stateChanged.connect(self.media_state_changed)
                     self.media_player.error.connect(self.media_error)
-                    self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(item_data["audio_file"])))
+
+                    byte_array = QByteArray(audio_data[0])
+                    self.audio_buffer = QBuffer()
+                    self.audio_buffer.setData(byte_array)
+                    self.audio_buffer.open(QIODevice.ReadOnly)
+                    self.media_player.setMedia(QMediaContent(), self.audio_buffer)
 
                     if item_data['loop_audio'] == 'True':
-                        def repeat_media(state):
+                        def repeat_media():
                             if self.media_player.mediaStatus() == QMediaPlayer.EndOfMedia:
                                 self.media_player.play()
                         self.media_player.mediaStatusChanged.connect(repeat_media)
@@ -2178,9 +2236,6 @@ class GUI(QObject):
         self.media_player.error.connect(self.media_error)
         self.media_player.setVideoOutput(self.video_widget)
 
-    def media_state_changed(self, status):
-        print(status)
-
     def media_playing_change(self):
         if self.media_player.state() == QMediaPlayer.StoppedState:
             self.media_player.setPosition(0)
@@ -2272,10 +2327,6 @@ class GUI(QObject):
         self.live_widget.slide_list.setFocus()
 
     def add_scripture_item(self, reference, text, version):
-        if not reference:
-            reference = 'custom_scripture'
-            version = 'custom_scripture'
-
         """
         Method to take a block of scripture and add it as a QListWidgetItem to the order of service widget.
         :param str reference: The scripture passage's reference from the bible
@@ -2283,6 +2334,10 @@ class GUI(QObject):
         :param str version: The version of the bible this passage is from
         :return:
         """
+        if not reference:
+            reference = 'custom_scripture'
+            version = 'custom_scripture'
+
         item = QListWidgetItem()
         slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
         slide_data['type'] = 'bible'

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.7.1
+ProjectOn v.1.8.0
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -31,7 +31,7 @@ from datetime import datetime
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QRunnable
+from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
@@ -40,7 +40,7 @@ from gevent import monkey
 import declarations
 from gui import GUI
 from runnables import SaveSettings, ServerCheckTimer
-from simple_splash import SimpleSplash
+from widgets import SimpleSplash
 from web_remote import RemoteServer
 from widgets import StandardItemWidget
 
@@ -169,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.7.1')
+        version_label = QLabel('v.1.8.0')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -313,6 +313,55 @@ class ProjectOn(QObject):
             result = cursor.execute('SELECT * FROM customSlides WHERE title="' + title + '"').fetchone()
             connection.close()
             return result
+        except Exception:
+            self.error_log()
+            if connection:
+                connection.close()
+            return -1
+
+    def get_audio_clip_names(self):
+        connection = None
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            result = cursor.execute('SELECT "name" FROM "audio";').fetchall()
+            connection.close()
+            return result
+        except Exception:
+            self.error_log()
+            if connection:
+                connection.close()
+            return -1
+
+    def get_audio_data(self, name):
+        connection = None
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            result = cursor.execute(f'SELECT data, format FROM audio WHERE name="{name}";').fetchone()
+            if len(result) == 0:
+                return -2
+            connection.close()
+            return result
+        except Exception:
+            self.error_log()
+            if connection:
+                connection.close()
+            return -1
+
+    def save_audio(self, name, audio_format, audio_data):
+        connection = None
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            result = cursor.execute(f'SELECT "name" FROM "audio" WHERE "name"="{name}";').fetchall()
+            if len(result) > 0:
+                return -2
+            cursor.execute(
+                f'INSERT INTO audio (name, format, data) VALUES ("{name}", "{audio_format}", ?);', (audio_data,))
+            connection.commit()
+            connection.close()
+            return 0
         except Exception:
             self.error_log()
             if connection:
@@ -697,6 +746,7 @@ class ProjectOn(QObject):
 
                     self.gui.current_file = file_loc
                     self.gui.changes = False
+                    self.gui.main_window.setWindowTitle(f'ProjectOn - {filename}')
                     return 1
                 except Exception as ex:
                     QMessageBox.information(
@@ -1033,6 +1083,8 @@ class ProjectOn(QObject):
 
             self.gui.changes = False
             wait_widget.widget.deleteLater()
+
+            self.gui.main_window.setWindowTitle(f'ProjectOn - {file_name}')
 
     def add_to_recently_used(self, directory, file_name):
         """

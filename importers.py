@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QLineEdit, QWidget, QHBoxLayout, \
     QPushButton, QRadioButton, QButtonGroup
 
-from simple_splash import SimpleSplash
+from widgets import SimpleSplash
 
 
 class Importers:

@@ -2,17 +2,15 @@ import os.path
 import re
 from os.path import exists
 
-from PyQt5.QtCore import Qt, QSize, QTimer, QPoint
+from PyQt5.QtCore import Qt, QSize, QTimer
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument
-from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QSpinBox, QTextEdit, QComboBox
+    QSpinBox, QComboBox
 
 import parsers
 from formattable_text_edit import FormattableTextEdit
-from simple_splash import SimpleSplash
-from widgets import StandardItemWidget, FontWidget, DisplayWidget, LyricDisplayWidget, PrintDialog
+from widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
 
 
 class EditWidget(QDialog):
@@ -20,7 +18,7 @@ class EditWidget(QDialog):
     Provides a QDialog containing the necessary widgets to edit a song or custom slide.
     """
 
-    def __init__(self, gui, type, data=None, item_text=None, item_data=None):
+    def __init__(self, gui, type, data=None, item_text=None, item_data=None, from_oos=False):
         """
         Provides a QDialog containing the necessary widgets.py to edit a song or custom slide.
         :param gui.GUI gui: The current instance of GUI
@@ -37,6 +35,7 @@ class EditWidget(QDialog):
         self.new_song = False
         self.new_custom = False
         self.item_data = item_data
+        self.from_oos = from_oos
 
         self.setObjectName('edit_widget')
         self.setWindowFlag(Qt.WindowType.Window)
@@ -294,7 +293,7 @@ class EditWidget(QDialog):
             self.add_audio_button = QPushButton()
             self.add_audio_button.setObjectName('add_audio_button')
             self.add_audio_button.setCheckable(True)
-            self.add_audio_button.setToolTip('Add an audio file that will play when this slide is shown')
+            self.add_audio_button.setToolTip('Add audio that will play when this slide is shown')
             self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio.svg'))
             self.add_audio_button.setIconSize(button_size)
             self.add_audio_button.setChecked(False)
@@ -306,18 +305,21 @@ class EditWidget(QDialog):
             audio_layout.addWidget(add_audio_label)
             audio_layout.addSpacing(20)
 
-            self.audio_line_edit = QLineEdit()
-            self.audio_line_edit.setObjectName('audio_line_edit')
-            self.audio_line_edit.setFont(self.gui.standard_font)
-            audio_layout.addWidget(self.audio_line_edit)
+            self.audio_combobox = QComboBox()
+            self.audio_combobox.setFont(self.gui.standard_font)
+            audio_layout.addWidget(self.audio_combobox)
             audio_layout.addSpacing(20)
+            results = self.gui.main.get_audio_clip_names()
+            self.audio_combobox.addItem('Choose an Audio File')
+            for result in results:
+                self.audio_combobox.addItem(result[0])
 
             self.choose_file_button = QPushButton()
             self.choose_file_button.setObjectName('choose_file_button')
             self.choose_file_button.setIcon(QIcon('resources/gui_icons/open.svg'))
             self.choose_file_button.setIconSize(QSize(24, 24))
             self.choose_file_button.setFont(self.gui.standard_font)
-            self.choose_file_button.setToolTip('Choose an audio file')
+            self.choose_file_button.setToolTip('Import an audio file')
             self.choose_file_button.pressed.connect(self.get_audio_file)
             audio_layout.addWidget(self.choose_file_button)
 
@@ -332,7 +334,8 @@ class EditWidget(QDialog):
             audio_layout.addStretch()
 
             self.loop_audio_button.hide()
-            self.audio_line_edit.hide()
+            #self.audio_line_edit.hide()
+            self.audio_combobox.hide()
             self.choose_file_button.hide()
 
             auto_play_widget = QWidget()
@@ -424,7 +427,7 @@ class EditWidget(QDialog):
         slide_settings_layout = QHBoxLayout(slide_settings_container)
         advanced_options_layout.addWidget(slide_settings_container)
 
-        self.font_widget = FontWidget(self.gui, self.type, draw_border=False, applies_to_global=False)
+        self.font_widget = NewFontWidget(self.gui, self.type, draw_border=False, applies_to_global=False)
         slide_settings_layout.addWidget(self.font_widget)
 
         background_widget = QWidget()
@@ -842,14 +845,15 @@ class EditWidget(QDialog):
             self.preview_label_two.clear()
 
     def add_audio_changed(self):
-        self.audio_line_edit.setVisible(self.add_audio_button.isChecked())
+        #self.audio_line_edit.setVisible(self.add_audio_button.isChecked())
+        self.audio_combobox.setVisible(self.add_audio_button.isChecked())
         self.choose_file_button.setVisible(self.add_audio_button.isChecked())
         self.loop_audio_button.setVisible(self.add_audio_button.isChecked())
         if self.add_audio_button.isChecked():
             self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio_selected.svg'))
         else:
             self.add_audio_button.setIcon(QIcon('resources/gui_icons/audio.svg'))
-            self.audio_line_edit.clear()
+            #self.audio_line_edit.clear()
 
     def split_slides_changed(self):
         if self.split_slides_button.isChecked():
@@ -868,8 +872,71 @@ class EditWidget(QDialog):
             os.path.expanduser('~'),
             'Audio Files (*.mp3 *.wav *.wma *.flac)'
         )
-        if len(result[0]) > 0:
-            self.audio_line_edit.setText(result[0])
+        if len(result[0]) == 0:
+            return
+
+        file_name = result[0]
+        name = file_name.split('/')[-1]
+        name = '.'.join(name.split('.')[:-1])
+        audio_format = file_name.split('.')[-1].upper()
+
+        dialog = QDialog()
+        dialog.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
+        dialog.setWindowTitle('Audio Name')
+        dialog.setWindowIcon(QIcon('resources/branding/icon.svg'))
+        layout = QVBoxLayout(dialog)
+
+        message = QLabel('Please provide a name for your audio clip:')
+        message.setFont(self.gui.standard_font)
+        layout.addWidget(message)
+
+        name_line_edit = QLineEdit(name)
+        message.setFont(self.gui.standard_font)
+        name_line_edit.selectAll()
+        layout.addWidget(name_line_edit)
+
+        button_widget = QWidget()
+        layout.addWidget(button_widget)
+        button_layout = QHBoxLayout(button_widget)
+
+        ok_button = QPushButton('Ok')
+        ok_button.setFont(self.gui.standard_font)
+        ok_button.pressed.connect(lambda: dialog.done(0))
+        button_layout.addStretch()
+        button_layout.addWidget(ok_button)
+        button_layout.addSpacing(20)
+
+        cancel_button = QPushButton('Cancel')
+        cancel_button.setFont(self.gui.standard_font)
+        cancel_button.pressed.connect(lambda: dialog.done(-1))
+        button_layout.addWidget(cancel_button)
+        button_layout.addStretch()
+
+        result = dialog.exec()
+        if result == -1:
+            return
+
+        if len(name_line_edit.text().strip()) > 0:
+            name = name_line_edit.text().strip()
+
+        try:
+            with open(file_name, 'rb') as file:
+                audio_data = file.read()
+            result = self.gui.main.save_audio(name, audio_format, audio_data)
+            if result == -2:
+                QMessageBox.information(
+                    self,
+                    'Name Exists',
+                    'That audio name already exists in the database. Please try again using a different name.',
+                    QMessageBox.StandardButton.Ok
+                )
+                return
+            elif result == 0:
+                self.audio_combobox.addItem(name)
+                self.audio_combobox.setCurrentText(name)
+        except Exception as ex:
+            self.gui.main.error_log()
+            return
 
     def override_global_changed(self):
         if self.override_global_button.isChecked():
@@ -1229,7 +1296,7 @@ class EditWidget(QDialog):
         # set the audio file
         if custom_data[16] and len(custom_data[6]) > 0:
             self.add_audio_button.setChecked(True)
-            self.audio_line_edit.setText(custom_data[16])
+            self.audio_combobox.setCurrentText(custom_data[16])
         self.add_audio_changed()
         if custom_data[17] == 'True':
             self.loop_audio_button.setChecked(True)
@@ -1440,6 +1507,7 @@ class EditWidget(QDialog):
         """
         Method to save user's changes for the song type editor.
         """
+
         # title is essential for the database, prompt user for title if not inputted
         if len(self.title_line_edit.text()) == 0:
             QMessageBox.information(
@@ -1566,33 +1634,28 @@ class EditWidget(QDialog):
                 else:
                     return
 
-        save_widget = SimpleSplash(self.gui, 'Saving...')
+        save_widget = SimpleSplash(self.gui, 'Saving...', parent=self)
 
         self.gui.main.save_song(song_data, self.old_title)
         self.gui.media_widget.populate_song_list()
 
-        if self.old_title:
+        if self.from_oos:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title'] == self.old_title:
-                    new_item = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)[
-                        0].clone()
-                    new_data = new_item.data(Qt.ItemDataRole.UserRole).copy()
-                    new_data['parsed_text'] = parsers.parse_song_data(self.gui, new_data)
-                    new_item.setData(Qt.ItemDataRole.UserRole, new_data)
-                    self.gui.oos_widget.oos_list_widget.takeItem(i)
-                    self.gui.media_widget.add_song_to_service(new_item, i)
+                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title'] == song_data[0]:
+                    item = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)[0]
+                    item_data = item.data(Qt.ItemDataRole.UserRole).copy()
+                    item_data['parsed_text'] = parsers.parse_song_data(self.gui, item_data)
+                    self.gui.oos_widget.oos_list_widget.item(i).setData(Qt.ItemDataRole.UserRole, item_data)
                     self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
+                    self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.item(i))
                     break
+        else:
+            items = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)
+            self.gui.media_widget.song_list.setCurrentItem(items[0])
 
         self.update_preview_timer.stop()
         self.deleteLater()
         save_widget.widget.deleteLater()
-
-        items = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)
-        self.gui.media_widget.song_list.setCurrentItem(items[0])
-
-        if self.gui.oos_widget.oos_list_widget.currentItem():
-            self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
 
     def save_custom(self):
         """
@@ -1641,8 +1704,8 @@ class EditWidget(QDialog):
         text = self.get_simplified_text(self.lyrics_edit.text_edit.toHtml())
 
         audio_file = ''
-        if len(self.audio_line_edit.text()) > 0:
-            audio_file = self.audio_line_edit.text()
+        if self.add_audio_button.isChecked() and not self.audio_combobox.currentText() == 'Choose an Audio File':
+            audio_file = self.audio_combobox.currentText()
         if self.loop_audio_button.isChecked():
             loop_audio = 'True'
         else:
@@ -1722,31 +1785,27 @@ class EditWidget(QDialog):
                 else:
                     return
 
-        save_widget = SimpleSplash(self.gui, 'Saving...')
+        self.save_widget = SimpleSplash(self.gui, 'Saving...')
 
         self.gui.main.save_custom(custom_data, self.old_title)
         self.gui.media_widget.populate_custom_list()
 
-        if self.old_title:
+        if self.from_oos:
             for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.item_data['title'] == self.old_title:
-                    self.change_thumbnail(self.gui.oos_widget.oos_list_widget.item(i))
-                    new_item = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)[
-                        0].clone()
-                    self.gui.oos_widget.oos_list_widget.takeItem(i)
-                    self.gui.media_widget.add_custom_to_service(new_item, i)
+                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title'] == custom_data[0]:
+                    item = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)[0]
+                    item_data = item.data(Qt.ItemDataRole.UserRole).copy()
+                    self.gui.oos_widget.oos_list_widget.item(i).setData(Qt.ItemDataRole.UserRole, item_data)
                     self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
+                    self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.item(i))
                     break
+        else:
+            items = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)
+            self.gui.media_widget.custom_list.setCurrentItem(items[0])
 
         self.update_preview_timer.stop()
-        self.deleteLater()
-        save_widget.widget.deleteLater()
-
-        items = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)
-        self.gui.media_widget.custom_list.setCurrentItem(items[0])
-
-        if self.gui.oos_widget.oos_list_widget.currentItem():
-            self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.currentItem())
+        self.done(0)
+        self.save_widget.widget.deleteLater()
 
     def get_simplified_text(self, lyrics):
         break_tag = '<br />'
@@ -1826,7 +1885,7 @@ class EditWidget(QDialog):
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                    Qt.TransformationMode.SmoothTransformation)
 
-        item_widget = StandardItemWidget(self.gui, item.data(Qt.ItemDataRole.UserRole)['text'], '', pixmap)
+        item_widget = StandardItemWidget(self.gui, item.data(Qt.ItemDataRole.UserRole)['title'], '', pixmap)
         item.setSizeHint(item_widget.sizeHint())
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, item_widget)
 

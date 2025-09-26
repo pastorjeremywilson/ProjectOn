@@ -58,6 +58,16 @@ QComboBox[objectName="FontFaceComboBox"] QAbstractItemView {
     color: #000000;
 }
 
+/*-------------------- QGroupBox --------------------*/
+QGroupBox {
+    border: 1px solid #444466;
+    margin-top: 8px;
+    padding: 10px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+}
+
 /*-------------------- QSpinBox --------------------*/
 QSpinBox {
     background: #303030;

@@ -276,12 +276,12 @@ class CustomListWidget(QListWidget):
                 song_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
                 item_text = song_data['title']
                 song_info = self.gui.main.get_song_data(item_text)
-                self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text, song_data)
+                self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text, song_data, from_oos=True)
             elif self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 song_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
                 item_text = song_data['title']
                 custom_info = self.gui.main.get_custom_data(item_text)
-                self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text, song_data)
+                self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text, song_data, from_oos=True)
 
     def delete_song(self):
         """

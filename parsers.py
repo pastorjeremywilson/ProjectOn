@@ -564,6 +564,8 @@ class ParseScriptureReference:
         }
         location = ''
 
+        # first, split the reference at a space; check if the book includes a book number (i.e. 1 Corinthians)
+        # store any information after the book name (which should be chapter/verse info) as the 'location'
         reference_split = reference.split(' ')
         if reference_split[0].isnumeric():
             parsed_reference['book'] = ' '.join(reference_split[0:2])
@@ -584,9 +586,11 @@ class ParseScriptureReference:
             if len(location_split) > 1:
                 end = location_split[1]
 
-        if parsed_reference['book'] in self.chapterless_books:
+        if parsed_reference['book'].lower() in self.chapterless_books:
             parsed_reference['verse_start'] = start
             parsed_reference['verse_end'] = end
+            parsed_reference['chapter_start'] = '1'
+            parsed_reference['chapter_end'] = '1'
         else:
             if ':' not in start:
                 parsed_reference['chapter_start'] = start
