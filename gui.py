@@ -649,7 +649,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.8.0'
+        current_version = 'v.1.8.1'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -969,7 +969,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.8.0')
+        title_label = QLabel('ProjectOn v.1.8.1')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1473,7 +1473,7 @@ class GUI(QObject):
                     self.preview_widget.slide_list.addItem(list_item)
                     self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
-        elif slide_data['type'] == 'bible':
+        elif slide_data['type'] == 'bible' or slide_data['type'] == 'custom_bible':
             title = slide_data['title']
 
             # check for a chapterless book reference
@@ -2326,21 +2326,22 @@ class GUI(QObject):
                 self.tool_bar.logo_screen_button.setChecked(True)
         self.live_widget.slide_list.setFocus()
 
-    def add_scripture_item(self, reference, text, version):
+    def add_scripture_item(self, reference, text, version, scripture_edited):
         """
         Method to take a block of scripture and add it as a QListWidgetItem to the order of service widget.
         :param str reference: The scripture passage's reference from the bible
-        :param str text: The text of the scripture passage
+        :param list[str] text: The text of the scripture passage
         :param str version: The version of the bible this passage is from
+        :param bool scripture_edited: Whether this text was edited
         :return:
         """
-        if not reference:
-            reference = 'custom_scripture'
-            version = 'custom_scripture'
 
         item = QListWidgetItem()
         slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
-        slide_data['type'] = 'bible'
+        if scripture_edited:
+            slide_data['type'] = 'custom_bible'
+        else:
+            slide_data['type'] = 'bible'
         slide_data['title'] = reference
         slide_data['text'] = text
         slide_data['parsed_text'] = parsers.parse_scripture_by_verse(self, text)
@@ -2358,7 +2359,10 @@ class GUI(QObject):
 
         label_pixmap = self.global_bible_background_pixmap.scaled(
             50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        widget = StandardItemWidget(self, reference, 'Scripture', label_pixmap)
+        if scripture_edited:
+            widget = StandardItemWidget(self, reference, 'Scripture (edited)', label_pixmap)
+        else:
+            widget = StandardItemWidget(self, reference, 'Scripture', label_pixmap)
         item.setSizeHint(widget.sizeHint())
         self.oos_widget.oos_list_widget.addItem(item)
         self.oos_widget.oos_list_widget.setItemWidget(item, widget)

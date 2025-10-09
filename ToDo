@@ -1,10 +1,10 @@
 Done:
 
 To Do:
+    Rework the handling of edited bible passages
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types
-    Import slide audio to data folder
     Video backgrounds
     Further consolidate widgets
     Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
