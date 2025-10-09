@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, QAction
+from unicodedata import numeric
 
 import declarations
 import parsers
@@ -37,6 +38,7 @@ class MediaWidget(QTabWidget):
         self.song_list_items = []
 
         self.formatted_reference = None
+        self.scripture_text_edited = False
 
         self.init_components()
 
@@ -238,6 +240,7 @@ class MediaWidget(QTabWidget):
 
         self.scripture_text_edit = QTextEdit()
         self.scripture_text_edit.setFont(self.gui.standard_font)
+        self.scripture_text_edit.textChanged.connect(self.text_edited)
         scripture_layout.addWidget(self.scripture_text_edit)
 
         return scripture_widget
@@ -642,6 +645,7 @@ class MediaWidget(QTabWidget):
         placing the results in the scripture_text_edit of the bible widget.
         """
         self.passages = None
+        self.formatted_reference = False
         text = self.bible_search_line_edit.text()
 
         # if the current changes means that the line edit is empty, also clear the scripture text edit
@@ -670,6 +674,10 @@ class MediaWidget(QTabWidget):
                 scripture += passage[0] + ' ' + passage[1] + ' '
 
             self.scripture_text_edit.setText(scripture.strip())
+            self.scripture_text_edited = False
+
+    def text_edited(self):
+        self.scripture_text_edited = True
 
     def change_bible(self):
         """
@@ -1063,16 +1071,29 @@ class MediaWidget(QTabWidget):
         """
         Method to add the scripture passage contained in the bible widget's scripture_text_edit to the order of
         service's QListWidget
-        :return:
+        :return: None
         """
         if self.formatted_reference:
+            passages = []
+            text_split = self.scripture_text_edit.toPlainText().split()
+            add_verse = False
+            verse_number = False
+            verse_words = []
+            for item in text_split:
+                item = item.strip()
+                if add_verse and not item.isdigit():
+                    verse_words.append(item)
+                else:
+                    if verse_number:
+                        passages.append([verse_number, ' '.join(verse_words).strip()])
+                        verse_words = []
+                    verse_number = item
+                    add_verse = True
+            passages.append([verse_number, ' '.join(verse_words).strip()])
+
             reference = self.formatted_reference
             version = self.bible_selector_combobox.currentText()
-            self.gui.add_scripture_item(reference, self.passages[1], version)
-            self.formatted_reference = None
-            self.gui.changes = True
-        elif len(self.scripture_text_edit.toPlainText()) > 0:
-            self.gui.add_scripture_item(None, self.scripture_text_edit.toPlainText(), None)
+            self.gui.add_scripture_item(reference, passages, version, self.scripture_text_edited)
             self.gui.changes = True
 
     def add_custom_to_service(self, item=None, row=None):

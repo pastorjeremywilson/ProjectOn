@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.8.0
+ProjectOn v.1.8.0.001
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -169,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.8.0')
+        version_label = QLabel('v.1.8.0.001')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -698,7 +698,7 @@ class ProjectOn(QObject):
                     'title': item_data['title'],
                     'type': item_data['type']
                 }
-                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_scripture':
+                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_bible':
                     service_items[i]['text'] = item_data['parsed_text']
                 elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                     service_items[i]['text'] = item_data['parsed_text']
@@ -887,25 +887,34 @@ class ProjectOn(QObject):
                             self.gui.media_widget.add_song_to_service(song_item, from_load_service=True)
 
                     elif service_dict[key]['type'] == 'bible':
-                        if service_dict[key]['title'] == 'custom_scripture':
-                            self.gui.add_scripture_item(None, service_dict[key]['text'], None)
-                        else:
-                            if not self.gui.main.get_scripture:
-                                from get_scripture import GetScripture
-                                self.get_scripture = GetScripture(self)
-                            passages = self.get_scripture.get_passage(service_dict[key]['title'])
+                        if not self.gui.main.get_scripture:
+                            from get_scripture import GetScripture
+                            self.get_scripture = GetScripture(self)
+                        passages = self.get_scripture.get_passage(service_dict[key]['title'])
 
-                            if passages[0] == -1:
-                                QMessageBox.information(
-                                    self.gui.main_window,
-                                    'Error Loading Scripture',
-                                    'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
-                                    QMessageBox.StandardButton.Ok
-                                )
-                            else:
-                                reference = service_dict[key]['title']
-                                version = self.gui.media_widget.bible_selector_combobox.currentText()
-                                self.gui.add_scripture_item(reference, passages[1], version)
+                        if passages[0] == -1:
+                            QMessageBox.information(
+                                self.gui.main_window,
+                                'Error Loading Scripture',
+                                'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
+                                QMessageBox.StandardButton.Ok
+                            )
+                        else:
+                            reference = service_dict[key]['title']
+                            version = self.gui.media_widget.bible_selector_combobox.currentText()
+                            self.gui.add_scripture_item(reference, passages[1], version, scripture_edited=False)
+                    elif service_dict[key]['type'] == 'custom_bible':
+                        try:
+                            reference = service_dict[key]['title']
+                            text = service_dict[key]['text']
+                            passages = []
+                            for item in text:
+                                passage_split = item.split()
+                                passages.append([passage_split[0], ' '.join(passage_split[1:])])
+                            version = self.gui.media_widget.bible_selector_combobox.currentText()
+                            self.gui.add_scripture_item(reference, passages, version, scripture_edited=True)
+                        except KeyError:
+                            pass
 
                     elif service_dict[key]['type'] == 'custom':
                         try:
