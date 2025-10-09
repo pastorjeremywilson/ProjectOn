@@ -16,9 +16,12 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.8.0.001?
+# What's New in Version 1.8.1?
+- Fixed a bug that occurred when saving/loading bible verses that had been edited
+
+# What was New in Version 1.8.0?
 - Fixed no-chapter bible books being added to the Order of Service as 'custom_scripture'
-- Fixed a problem in sending a bible passage to the preview when the verse number has greater than two digits
+- Fixed a problem in sending a bible passage to the preview when the verse number is greater than two digits
 - Fixed Order of Service items not properly updating after having been edited
 - Audio files attached to custom slides are now being imported into the database for ease of retrieval and portability
 - Some updates to the User Interface and many other bug fixes and improvements under the hood
@@ -26,7 +29,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.8.0.001) and run
+system only. Download the current ProjectOn installer (v.1.8.1) and run
 it on your computer.
 
 # Using ProjectOn

@@ -7,14 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Updated the readmes and version numbers. Ready for release.">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed edited scriptures not saving/loading correctly.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,14 +169,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00097" summary="PyQt6 broke audio and video. Reverted to PyQt5.&#10;Added coloring to verse tags in the edit widget.">
-      <option name="closed" value="true" />
-      <created>1735928591822</created>
-      <option name="number" value="00097" />
-      <option name="presentableId" value="LOCAL-00097" />
-      <option name="project" value="LOCAL" />
-      <updated>1735928591822</updated>
     </task>
     <task id="LOCAL-00098" summary="PyQt6 broke audio and video. Reverted to PyQt5.&#10;Added coloring to verse tags in the edit widget.">
       <option name="closed" value="true" />
@@ -568,7 +554,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758922850220</updated>
     </task>
-    <option name="localTasksCounter" value="146" />
+    <task id="LOCAL-00146" summary="Fixed edited scriptures not saving/loading correctly.">
+      <option name="closed" value="true" />
+      <created>1759982530212</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1759982530212</updated>
+    </task>
+    <option name="localTasksCounter" value="147" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -589,7 +583,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added a check to see if an inserted tag needs line breaks before or after" />
     <MESSAGE value="Fixed an issue where a custom font was not displaying in Custom Slides&#10;Song search now includes searching each song's lyrics (search terms found in titles appear first in the results)&#10;Ensured that, when a custom slide is to be split into individual slides, the split occurs only at the blank lines&#10;Fixed an issue with the CCLI song import where the login button was disabled on CCLI's website" />
     <MESSAGE value="Added countdown timer&#10;Redesigned font widget&#10;Redesigned settings widget&#10;Changed runnables to timers when runnable is performing periodic tasks" />
     <MESSAGE value="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster." />
@@ -614,7 +607,8 @@
     <MESSAGE value="Fixed problem sending bible passage to preview when verse number has greater than 2 digits" />
     <MESSAGE value="Now saving audio attached to Custom Slides in the database as a blob" />
     <MESSAGE value="Updated the readmes and version numbers. Ready for release." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated the readmes and version numbers. Ready for release." />
+    <MESSAGE value="Fixed edited scriptures not saving/loading correctly." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed edited scriptures not saving/loading correctly." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
