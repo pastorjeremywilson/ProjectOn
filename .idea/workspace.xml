@@ -7,11 +7,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Updated version number and Readmes. Ready for release.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/import.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/import.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/importers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,14 +176,6 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00099" summary="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines.">
-      <option name="closed" value="true" />
-      <created>1736362179378</created>
-      <option name="number" value="00099" />
-      <option name="presentableId" value="LOCAL-00099" />
-      <option name="project" value="LOCAL" />
-      <updated>1736362179378</updated>
     </task>
     <task id="LOCAL-00100" summary="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines.">
       <option name="closed" value="true" />
@@ -565,7 +561,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760039058266</updated>
     </task>
-    <option name="localTasksCounter" value="148" />
+    <task id="LOCAL-00148" summary="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file.">
+      <option name="closed" value="true" />
+      <created>1760461727019</created>
+      <option name="number" value="00148" />
+      <option name="presentableId" value="LOCAL-00148" />
+      <option name="project" value="LOCAL" />
+      <updated>1760461727019</updated>
+    </task>
+    <option name="localTasksCounter" value="149" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -586,7 +590,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added countdown timer&#10;Redesigned font widget&#10;Redesigned settings widget&#10;Changed runnables to timers when runnable is performing periodic tasks" />
     <MESSAGE value="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster." />
     <MESSAGE value="Tweaked qss for font combobox on dark theme for visibility.&#10;Fixed loading time for font combobox by indexing fonts once, drawing them as pixmaps, and adding those pixmaps as icons." />
     <MESSAGE value="Further refined the settings and font widget layouts.&#10;Added icons to the settings widget tabs." />
@@ -611,7 +614,8 @@
     <MESSAGE value="Updated the readmes and version numbers. Ready for release." />
     <MESSAGE value="Fixed edited scriptures not saving/loading correctly." />
     <MESSAGE value="Updated version number and Readmes. Ready for release." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated version number and Readmes. Ready for release." />
+    <MESSAGE value="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file." />
+    <option name="LAST_COMMIT_MESSAGE" value="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
