@@ -6,9 +6,10 @@ from os.path import exists
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWebEngineCore import QWebEngineUrlRequestInterceptor
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings, QWebEnginePage
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
-    QMessageBox, QDialog
+    QMessageBox, QDialog, QFileDialog, QCheckBox
 from cryptography.fernet import Fernet
 
 from widgets import SimpleSplash
@@ -25,10 +26,11 @@ class SongselectImport(QDialog):
     def __init__(self, gui, suppress_browser=False):
         super().__init__()
         self.gui = gui
+        self.download_finished()
 
-        if not suppress_browser:
-            self.init_components()
-            self.show()
+        #if not suppress_browser:
+        #    self.init_components()
+        #    self.show()
 
     def init_components(self):
         primary_screen_width = self.gui.primary_screen.size().width()
@@ -66,11 +68,22 @@ class SongselectImport(QDialog):
 
         self.web_engine_view = QWebEngineView()
         self.web_engine_view.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
-        CHROME_USER_AGENT = ('Mozilla/5.0 ({os_info}) AppleWebKit/537.36 '
-                             '(KHTML, like Gecko) Chrome/{version} Safari/537.36')
-        chrome_version = '117.0.5938.48'
-        user_agent = CHROME_USER_AGENT.format(os_info='Windows NT 10.0; Win64; x64', version=chrome_version)
-        self.web_engine_view.page().profile().setHttpUserAgent(user_agent)
+        CHROME_USER_AGENT = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36')
+        self.request_intercepter = RequestInterceptor(
+            {
+                'Accept-Language': 'en-US, en;q=0.9',
+                'User-Agent': CHROME_USER_AGENT,
+                'Accept-Encoding': 'gzip, deflate',
+                'Connection': 'keep-alive',
+                #'Access-Control-Allow-Origin': '*'
+            }
+        )
+        self.web_engine_view.setPage(WebEnginePage())
+        self.web_engine_view.page().profile().setRequestInterceptor(self.request_intercepter)
+        self.web_engine_view.page().profile().setHttpUserAgent(CHROME_USER_AGENT)
+        self.web_engine_view.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+        self.web_engine_view.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
         self.web_engine_view.page().loadFinished.connect(self.page_loaded)
         self.web_engine_view.page().profile().downloadRequested.connect(self.download_requested)
         self.web_engine_view.urlChanged.connect(self.update_url)
@@ -207,7 +220,8 @@ class SongselectImport(QDialog):
                                        'document.getElementById("Password").value = "{password}";'
                                        'document.getElementById("sign-in").click();'
                                        ).format(user_name=user_name, password=password)
-            self._run_javascript(script_set_login_fields)
+            result = self._run_javascript(script_set_login_fields)
+            print('result:', result)
 
     def _run_javascript(self, script):
         """
@@ -270,138 +284,205 @@ class SongselectImport(QDialog):
         """
         Callback for when download has finished. Parses the downloaded file into song data to be saved to the database.
         """
-        if self.current_download_item:
-            if self.current_download_item.isFinished():
-                song_title = ''
-                author = ''
-                copyright = ''
-                song_number = ''
+        #if self.current_download_item:
+        #    if self.current_download_item.isFinished():
+        song_title = ''
+        author = ''
+        copyright = ''
+        song_number = ''
 
-                song_filename = os.path.join(self.current_download_item.downloadDirectory(),
-                                             self.current_download_item.downloadFileName())
-                with open(song_filename, 'r', encoding='utf-8') as file:
-                    song_text = file.read()
+        #song_filename = os.path.join(self.current_download_item.downloadDirectory(),
+        #                             self.current_download_item.downloadFileName())
 
-                song_text = re.sub('<br.*?>', '', song_text)
+        if ('show_songselect_warning' not in self.gui.main.settings.keys()
+                or self.gui.main.settings['show_songselect_warning']):
+            dialog = QDialog()
+            dialog.setWindowTitle('SongSelect Import')
+            layout = QVBoxLayout(dialog)
 
-                paragraphs = song_text.split('\n\n')
-                song_title = paragraphs[0].strip()
+            message_label = QLabel(
+                'ProjectOn\'s built-in browser no longer works with CCLI SongSelect\'s login page. Please download\n '
+                'your song\'s lyrics from SongSelect first, then open the file in the following window.'
+            )
+            message_label.setFont(self.gui.standard_font)
+            layout.addWidget(message_label)
 
-                copyright_info = paragraphs[-1]
-                copyright_lines = copyright_info.split('\n')
-                author = copyright_lines[0].strip()
-                copyright = copyright_lines[2]
-                song_number = copyright_lines[1].split('#')[-1]
+            no_show_checkbox = QCheckBox('Do not show this warning again')
+            no_show_checkbox.setFont(self.gui.standard_font)
+            layout.addWidget(no_show_checkbox)
 
-                song_text = '\n\n'.join(paragraphs[1:-1])
+            button_widget = QWidget()
+            layout.addWidget(button_widget)
+            button_layout = QHBoxLayout(button_widget)
 
-                song_text_split = song_text.split('\n')
-                segment_markers = [
-                    'intro',
-                    'verse',
-                    'pre-chorus',
-                    'chorus',
-                    'bridge',
-                    'tag',
-                    'ending'
-                ]
-                segment_marker_indices = []
-                for i in range(len(song_text_split)):
-                    for marker in segment_markers:
-                        if marker in song_text_split[i].lower() and len(song_text_split[i]) < len(marker) + 3:
-                            segment_marker_indices.append(i)
-                            break
+            ok_button = QPushButton('OK')
+            ok_button.setFont(self.gui.standard_font)
+            ok_button.pressed.connect(lambda: dialog.done(0))
+            button_layout.addStretch()
+            button_layout.addWidget(ok_button)
+            button_layout.addStretch()
 
-                index = 0
-                formatted_song_text = ''
-                order = []
-                while index < len(song_text_split):
-                    if index in segment_marker_indices:
-                        marker = song_text_split[index].strip()
-                        formatted_marker = f'[{marker}]\n'
-                        marker_split = marker.split(' ')
-                        if len(marker_split) < 2:
-                            marker_split.append('1')
-                            formatted_marker = f'[{marker} 1]\n'
-                        formatted_song_text += formatted_marker
-                        marker_split[0] = marker_split[0].lower().strip()[0]
-                        marker = ''.join(marker_split)
-                        order.append(marker)
-                    else:
-                        formatted_song_text += song_text_split[index] + '\n'
-                    index += 1
-                order = ' '.join(order)
+            dialog.exec()
 
-                song_data = [
-                    song_title,
-                    author,
-                    copyright,
-                    song_number,
-                    formatted_song_text,
-                    order,
-                    'true',
-                    'global',
-                    'global',
-                    'global_song',
-                    'global',
-                    'False',
-                    0,
-                    0,
-                    'False',
-                    0,
-                    0,
-                    'False',
-                    'False',
-                    100,
-                    100
-                ]
+            if no_show_checkbox.isChecked():
+                self.gui.main.settings['show_songselect_warning'] = False
+                self.gui.main.save_settings()
 
-                if song_title in self.gui.main.get_song_titles():
-                    dialog = QDialog(self.gui.main_window)
-                    dialog.setLayout(QVBoxLayout())
-                    dialog.setWindowTitle('Song Title Exists')
+        result = QFileDialog.getOpenFileName(
+            self.gui.main_window,
+            'SongSelect Lyrics File',
+            os.path.expanduser('~/Downloads'),
+            'SongSelect Lyrics File (*.txt)'
+        )
 
-                    label = QLabel('Unable to save song because this title already exists\n'
-                                   'in the database. Please provide a different title:')
-                    label.setFont(self.gui.standard_font)
-                    dialog.layout().addWidget(label)
+        if len(result[0]) == 0:
+            return
 
-                    line_edit = QLineEdit(song_title + '(1)', dialog)
-                    line_edit.setFont(self.gui.standard_font)
-                    dialog.layout().addWidget(line_edit)
+        song_filename = result[0]
+        with open(song_filename, 'r', encoding='utf-8') as file:
+            song_text = file.read()
 
-                    button_widget = QWidget()
-                    button_widget.setLayout(QHBoxLayout())
-                    dialog.layout().addWidget(button_widget)
+        song_text = re.sub('<br.*?>', '', song_text)
 
-                    ok_button = QPushButton('OK')
-                    ok_button.setFont(self.gui.standard_font)
-                    ok_button.clicked.connect(lambda: dialog.done(1))
-                    button_widget.layout().addStretch()
-                    button_widget.layout().addWidget(ok_button)
-                    button_widget.layout().addStretch()
+        paragraphs = song_text.split('\n\n')
+        song_title = paragraphs[0].strip()
 
-                    cancel_button = QPushButton('Cancel')
-                    cancel_button.setFont(self.gui.standard_font)
-                    cancel_button.clicked.connect(lambda: dialog.done(-1))
-                    button_widget.layout().addWidget(cancel_button)
-                    button_widget.layout().addStretch()
+        copyright_info = paragraphs[-1]
+        copyright_lines = copyright_info.split('\n')
+        author = copyright_lines[0].strip()
+        copyright = copyright_lines[2]
+        song_number = copyright_lines[1].split('#')[-1]
 
-                    result = dialog.exec()
+        song_text = '\n\n'.join(paragraphs[1:-1])
 
-                    if result == 1:
-                        song_data[0] = line_edit.text()
-                    else:
-                        return
+        song_text_split = song_text.split('\n')
+        segment_markers = [
+            'intro',
+            'verse',
+            'pre-chorus',
+            'chorus',
+            'bridge',
+            'tag',
+            'ending'
+        ]
+        segment_marker_indices = []
+        for i in range(len(song_text_split)):
+            for marker in segment_markers:
+                if marker in song_text_split[i].lower() and len(song_text_split[i]) < len(marker) + 3:
+                    segment_marker_indices.append(i)
+                    break
 
-                save_widget = SimpleSplash(self.gui, 'Saving...')
+        index = 0
+        formatted_song_text = ''
+        order = []
+        while index < len(song_text_split):
+            if index in segment_marker_indices:
+                marker = song_text_split[index].strip()
+                formatted_marker = f'[{marker}]\n'
+                marker_split = marker.split(' ')
+                if len(marker_split) < 2:
+                    marker_split.append('1')
+                    formatted_marker = f'[{marker} 1]\n'
+                formatted_song_text += formatted_marker
+                marker_split[0] = marker_split[0].lower().strip()[0]
+                marker = ''.join(marker_split)
+                order.append(marker)
+            else:
+                formatted_song_text += song_text_split[index] + '\n'
+            index += 1
+        order = ' '.join(order)
 
-                self.gui.main.save_song(song_data)
-                self.gui.media_widget.populate_song_list()
+        song_data = [
+            song_title,
+            author,
+            copyright,
+            song_number,
+            formatted_song_text,
+            order,
+            'true',
+            'global',
+            'global',
+            'global_song',
+            'global',
+            'False',
+            0,
+            0,
+            'False',
+            0,
+            0,
+            'False',
+            'False',
+            100,
+            100
+        ]
 
-                self.gui.media_widget.song_list.setCurrentItem(
-                    self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
+        if song_title in self.gui.main.get_song_titles():
+            dialog = QDialog(self.gui.main_window)
+            dialog.setLayout(QVBoxLayout())
+            dialog.setWindowTitle('Song Title Exists')
 
-                save_widget.widget.deleteLater()
-                os.remove(song_filename)
-                self.done(0)
+            label = QLabel('Unable to save song because this title already exists\n'
+                           'in the database. Please provide a different title:')
+            label.setFont(self.gui.standard_font)
+            dialog.layout().addWidget(label)
+
+            line_edit = QLineEdit(song_title + '(1)', dialog)
+            line_edit.setFont(self.gui.standard_font)
+            dialog.layout().addWidget(line_edit)
+
+            button_widget = QWidget()
+            button_widget.setLayout(QHBoxLayout())
+            dialog.layout().addWidget(button_widget)
+
+            ok_button = QPushButton('OK')
+            ok_button.setFont(self.gui.standard_font)
+            ok_button.clicked.connect(lambda: dialog.done(1))
+            button_widget.layout().addStretch()
+            button_widget.layout().addWidget(ok_button)
+            button_widget.layout().addStretch()
+
+            cancel_button = QPushButton('Cancel')
+            cancel_button.setFont(self.gui.standard_font)
+            cancel_button.clicked.connect(lambda: dialog.done(-1))
+            button_widget.layout().addWidget(cancel_button)
+            button_widget.layout().addStretch()
+
+            result = dialog.exec()
+
+            if result == 1:
+                song_data[0] = line_edit.text()
+            else:
+                return
+
+        save_widget = SimpleSplash(self.gui, 'Saving...')
+
+        self.gui.main.save_song(song_data)
+        self.gui.media_widget.populate_song_list()
+
+        self.gui.media_widget.song_list.setCurrentItem(
+            self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
+
+        save_widget.widget.deleteLater()
+        os.remove(song_filename)
+        self.done(0)
+
+
+class WebEnginePage (QWebEnginePage):
+    def __init__(self):
+        super().__init__()
+
+    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
+        print(f"JS Console ({level}): {message} at {sourceID}:{lineNumber}")
+
+
+class RequestInterceptor(QWebEngineUrlRequestInterceptor):
+    def __init__(self, headers):
+        super().__init__()
+        self.headers = headers
+
+    def set_headers(self,headers):
+        self.headers = headers
+
+    def interceptRequest(self, info):
+        for header in self.headers:
+            info.setHttpHeader(bytes(header, 'UTF-8'), bytes(self.headers[header], 'UTF-8'))

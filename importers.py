@@ -263,23 +263,14 @@ class Importers:
                     else:
                         author = element.text
 
-                copyright_element = root.find('.//properties/copyright', ns)
-                if copyright_element:
-                    copyright = copyright_element
-                else:
-                    copyright = ''
+                copyright = ''
+                copyright += root.find('.//properties/copyright', ns).text
 
-                ccli_song_number_element = root.find('.//properties/ccliNo', ns)
-                if ccli_song_number_element:
-                    ccli_song_number = ccli_song_number_element.text
-                else:
-                    ccli_song_number = ''
+                ccli_song_number = ''
+                ccli_song_number += root.find('.//properties/ccliNo', ns).text
 
-                order_element = root.find('.//properties/verseOrder', ns)
-                if order_element:
-                    order = order_element.text
-                else:
-                    order = ''
+                order = ''
+                order += root.find('.//properties/verseOrder', ns).text
 
                 lyrics_element = root.find('.//lyrics', ns)
                 lyrics = ''
