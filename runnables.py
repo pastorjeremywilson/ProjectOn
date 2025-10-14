@@ -293,6 +293,10 @@ class SaveSettings(QRunnable):
             device_specific_settings['last_status_count'] = self.main.settings['last_status_count']
             device_specific_settings['selected_screen_name'] = self.main.settings['selected_screen_name']
             device_specific_settings['data_dir'] = self.main.data_dir
+            if 'show_songselect_warning' not in self.main.settings.keys():
+                device_specific_settings['show_songselect_warning'] = True
+            else:
+                device_specific_settings['show_songselect_warning'] = self.main.settings['show_songselect_warning']
             with open(self.main.device_specific_config_file, 'w') as file:
                 file.write(json.dumps(device_specific_settings, indent=4))
 

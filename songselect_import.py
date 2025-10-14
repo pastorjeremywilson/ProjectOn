@@ -9,7 +9,7 @@ from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWebEngineCore import QWebEngineUrlRequestInterceptor
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings, QWebEnginePage
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
-    QMessageBox, QDialog, QFileDialog
+    QMessageBox, QDialog, QFileDialog, QCheckBox
 from cryptography.fernet import Fernet
 
 from widgets import SimpleSplash
@@ -294,13 +294,39 @@ class SongselectImport(QDialog):
         #song_filename = os.path.join(self.current_download_item.downloadDirectory(),
         #                             self.current_download_item.downloadFileName())
 
-        QMessageBox.information(
-            self.gui.main_window,
-            'SongSelect Import',
-            'ProjectOn\'s built-in browser no longer works with CCLI SongSelect\'s login page. Please download your'
-            'song\'s lyrics from SongSelect first, then open the file in the following window.',
-            QMessageBox.StandardButton.Ok
-        )
+        if ('show_songselect_warning' not in self.gui.main.settings.keys()
+                or self.gui.main.settings['show_songselect_warning']):
+            dialog = QDialog()
+            dialog.setWindowTitle('SongSelect Import')
+            layout = QVBoxLayout(dialog)
+
+            message_label = QLabel(
+                'ProjectOn\'s built-in browser no longer works with CCLI SongSelect\'s login page. Please download\n '
+                'your song\'s lyrics from SongSelect first, then open the file in the following window.'
+            )
+            message_label.setFont(self.gui.standard_font)
+            layout.addWidget(message_label)
+
+            no_show_checkbox = QCheckBox('Do not show this warning again')
+            no_show_checkbox.setFont(self.gui.standard_font)
+            layout.addWidget(no_show_checkbox)
+
+            button_widget = QWidget()
+            layout.addWidget(button_widget)
+            button_layout = QHBoxLayout(button_widget)
+
+            ok_button = QPushButton('OK')
+            ok_button.setFont(self.gui.standard_font)
+            ok_button.pressed.connect(lambda: dialog.done(0))
+            button_layout.addStretch()
+            button_layout.addWidget(ok_button)
+            button_layout.addStretch()
+
+            dialog.exec()
+
+            if no_show_checkbox.isChecked():
+                self.gui.main.settings['show_songselect_warning'] = False
+                self.gui.main.save_settings()
 
         result = QFileDialog.getOpenFileName(
             self.gui.main_window,

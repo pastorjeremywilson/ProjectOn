@@ -403,6 +403,8 @@ class GUI(QObject):
         if 'last_status_count' in device_specific_settings.keys():
             self.main.settings['last_status_count'] = device_specific_settings['last_status_count']
         self.main.settings['data_dir'] = self.main.data_dir
+        if 'show_songselect_warning' in device_specific_settings.keys():
+            self.main.settings['show_songselect_warning'] = device_specific_settings['show_songselect_warning']
 
         # check for the rest of the necessary files/directories
         if not exists(self.main.database):
