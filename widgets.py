@@ -54,7 +54,6 @@ class ClickableColorSwatch(QLabel):
         painter.setPen(pen)
         painter.setPen(Qt.GlobalColor.black)
 
-        painter.begin(pixmap)
         painter.fillRect(0, 0, 48, 48, brush)
         painter.drawRect(QRect(0, 0, 48, 48))
         painter.end()
@@ -271,14 +270,34 @@ class DisplayWidget(QWidget):
             self.hide()
 
     def paintEvent(self, evt):
-        super().paintEvent(evt)
         # in the case of a background pixmap, either center it if the pixmap is smaller than the display widget,
         # or scale it down if it is bigger
+        super().paintEvent(evt)
         if self.background_pixmap:
             #self.background_label.setStyleSheet('border: 5px solid green')
             p_width = self.background_pixmap.width()
             p_height = self.background_pixmap.height()
-            if p_width < self.width() or p_height < self.height():
+
+            width_diff = self.width() - p_width
+            height_diff = self.height() - p_height
+
+            if width_diff > 0 and height_diff > 0:
+                if width_diff > height_diff:
+                    ratio = self.width() / p_width
+                else:
+                    ratio = self.height() / p_height
+            elif width_diff > 0 and height_diff > 0:
+                if width_diff > height_diff:
+                    ratio = self.height() / p_height
+                else:
+                    ratio = self.width() / p_width
+            else:
+                if width_diff > 0:
+                    ratio = self.width() / p_width
+                else:
+                    ratio = self.height() / p_height
+
+            """if p_width < self.width() or p_height < self.height():
                 x = int((self.width() / 2) - (self.background_pixmap.width() / 2))
                 y = int((self.height() / 2) - (self.background_pixmap.height() / 2))
             elif p_width > self.width() or p_height > self.height():
@@ -287,19 +306,27 @@ class DisplayWidget(QWidget):
                 if x_ratio < y_ratio:
                     ratio = x_ratio
                 else:
-                    ratio = y_ratio
+                    ratio = y_ratio"""
 
-                self.background_pixmap = self.background_pixmap.scaled(
-                    int(p_width * ratio),
-                    int(p_height * ratio),
-                    Qt.AspectRatioMode.IgnoreAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation
-                )
-                x = int((self.width() / 2) - (self.background_pixmap.width() / 2))
+            """background_pixmap = self.background_pixmap.scaled(
+                int(p_width / ratio),
+                int(p_height / ratio),
+                Qt.AspectRatioMode.IgnoreAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )"""
+            background_pixmap = self.background_pixmap.scaled(
+                self.width(),
+                self.height(),
+                Qt.AspectRatioMode.IgnoreAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+            self.background_label.setPixmap(background_pixmap)
+            return
+            """    x = int((self.width() / 2) - (self.background_pixmap.width() / 2))
                 y = int((self.height() / 2) - (self.background_pixmap.height() / 2))
-            else:
-                x = 0
-                y = 0
+            else:"""
+            x = 0
+            y = 0
 
             # paint a new pixmap using the new coordinates and/or size
             pixmap = QPixmap(self.width(), self.height())
@@ -308,7 +335,6 @@ class DisplayWidget(QWidget):
             brush.setStyle(Qt.BrushStyle.SolidPattern)
 
             painter = QPainter(pixmap)
-            painter.begin(pixmap)
             painter.setBackground(brush)
             painter.drawPixmap(x, y, self.background_pixmap)
             painter.end()
@@ -449,7 +475,6 @@ class FontSample(QLabel):
 
         painter = QPainter(image)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.begin(image)
 
         background_image = self.make_sample_background(image_rect)
         painter.drawImage(QPoint(0, 0), background_image)

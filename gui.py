@@ -204,7 +204,10 @@ class GUI(QObject):
         self.check_update()
 
     def check_files(self):
-        self.main.user_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
+        if 'linux' in sys.platform:
+            self.main.user_dir = os.path.expanduser('~/.ProjectOn')
+        else:
+            self.main.user_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
         if not exists(self.main.user_dir):
             os.mkdir(self.main.user_dir)
         self.main.device_specific_config_file = os.path.expanduser(self.main.user_dir + '/localConfig.json')
@@ -292,8 +295,7 @@ class GUI(QObject):
                 else:
                     #TODO: Fix permissions
                     self.main.data_dir = result + '/projecton_data'
-                    os.mkdir(self.main.data_dir)
-                    shutil.copy('resources/defaults/data/', self.main.data_dir)
+                    shutil.copytree('resources/defaults/data', self.main.data_dir)
 
         self.main.config_file = self.main.data_dir + '/settings.json'
         self.main.database = self.main.data_dir + '/projecton.db'
@@ -651,7 +653,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.8.2'
+        current_version = 'v.1.8.2.001'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -659,7 +661,6 @@ class GUI(QObject):
         current_minor = int(current_version_split[1])
         current_patch = int(current_version_split[2])
 
-        response = None
         try:
             response = requests.get('https://api.github.com/repos/pastorjeremywilson/ProjectOn/releases', timeout=20)
         except Exception:
@@ -809,7 +810,6 @@ class GUI(QObject):
             painter.setRenderHint(QPainter.RenderHint.Antialiasing)
             painter.setPen(Qt.GlobalColor.black)
 
-            painter.begin(pixmap)
             painter.setFont(QFont(font, 18))
             painter.drawText(QPoint(5, abs(text_rect.y()) + 5), font)
             painter.end()
@@ -860,81 +860,6 @@ class GUI(QObject):
         from widgets import PrintDialog
         PrintDialog(document)
 
-        return
-
-        if self.oos_widget.oos_list_widget.count() == 0:
-            QMessageBox.information(
-                self.main_window,
-                'Nothing to do',
-                'There are no Order of Service items to print.',
-                QMessageBox.StandardButton.Ok
-            )
-            return
-
-        wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
-
-        from reportlab.pdfgen import canvas
-        from reportlab.lib.pagesizes import letter
-        from reportlab.lib.utils import ImageReader
-        from print_dialog import PrintDialog
-        from PIL import Image
-
-        print_file_loc = tempfile.gettempdir() + '/print.pdf'
-        marginH = 80
-        marginV = 70
-        font_size = 12
-        lineHeight = 38
-
-        # letter size = 612.0 x 792.0
-        # create variables based on letter-sized canvas
-        firstLine = 792 - marginV
-        lastLine = marginV
-        lineStart = marginH
-        lineEnd = 612 - marginH
-
-        canvas = canvas.Canvas(print_file_loc, pagesize=letter)
-        canvas.setFont('Helvetica', font_size)
-
-        currentLine = firstLine
-        canvas.setLineWidth(1.0)
-        for i in range(self.oos_widget.oos_list_widget.count()):
-            item = self.oos_widget.oos_list_widget.item(i)
-            widget = self.oos_widget.oos_list_widget.itemWidget(item)
-            widget.setObjectName('item_widget')
-            if widget:
-                canvas.setFont('Helvetica', font_size)
-                canvas.drawString(lineStart, currentLine + 16, f'{i + 1}.')
-
-                pixmap = widget.icon.pixmap()
-                type = widget.subtitle.text()
-                title = widget.title.text()
-
-                image = Image.fromqpixmap(pixmap)
-                image_reader = ImageReader(image)
-
-                canvas.drawImage(image_reader, lineStart + 30, currentLine)
-                canvas.setFont('Helvetica-Bold', font_size)
-                canvas.drawString(lineStart + 100, currentLine + 16, title)
-                canvas.setFont('Helvetica', font_size)
-                canvas.drawString(lineStart + 100, currentLine, type)
-
-                # only draw a line separator if this isn't the last one
-                if i < self.oos_widget.oos_list_widget.count() - 1:
-                    canvas.line(lineStart, currentLine - 5, lineStart + 300, currentLine - 5)
-
-                currentLine -= lineHeight
-
-                if currentLine < lastLine:
-                    canvas.showPage()
-                    currentLine = firstLine
-
-        canvas.save()
-        print_dialog = PrintDialog(print_file_loc, self)
-        print_dialog.exec()
-
-        if wait_widget:
-            wait_widget.widget.deleteLater()
-
     def ccli_import(self):
         from songselect_import import SongselectImport
         SongselectImport(self)
@@ -971,7 +896,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.8.2')
+        title_label = QLabel('ProjectOn v.1.8.2.001')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1075,14 +1000,6 @@ class GUI(QObject):
         """
         Provides a method to grab the display widget and scale it down as a preview.
         """
-        """pixmap = None
-        if self.video_widget:
-            try:
-                pixmap = self.graphics_view.grab()
-            except Exception as ex:
-                print(str(ex))
-                self.main.error_log()
-        else:"""
         pixmap = self.display_widget.grab()
 
         try:

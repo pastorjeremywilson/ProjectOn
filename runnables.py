@@ -263,13 +263,12 @@ class ServerCheckTimer(QTimer):
                                   + 'server error: remote-' + str(remote_response.status_code)
                                   + ', mremote-' + str(mremote_response.status_code)
                                   + ', stage-' + str(stage_response.status_code))
-                    with open('./error.log', 'a') as file:
-                        file.write(error_text)
+
+                    self.gui.main.error_log(error_text)
                     self.gui.server_alert_signal.emit()
             else:
                 self.keep_checking = False
-                with open('./error.log', 'a') as file:
-                    file.write('unknown server error')
+                self.gui.main.error_log('unknown server error')
                 self.gui.server_alert_signal.emit()
 
 
