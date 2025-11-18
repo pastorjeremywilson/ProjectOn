@@ -14,7 +14,7 @@ from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDataba
     QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
-from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
     QGraphicsView, QGraphicsScene
@@ -653,7 +653,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.8.2.001'
+        current_version = 'v.1.8.2.002'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -896,7 +896,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.8.2.001')
+        title_label = QLabel('ProjectOn v.1.8.2.002')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -2088,6 +2088,9 @@ class GUI(QObject):
         Create all the widgets.py that could be used on the display widget.
         """
         self.web_view = QWebEngineView()
+        web_engine_page = CustomWebEnginePage()
+        web_engine_page.setParent(self.web_view)
+        self.web_view.setPage(web_engine_page)
         self.display_layout.addWidget(self.web_view)
 
         self.blackout_widget = QWidget()
@@ -2285,3 +2288,12 @@ class GUI(QObject):
         item.setSizeHint(widget.sizeHint())
         self.oos_widget.oos_list_widget.addItem(item)
         self.oos_widget.oos_list_widget.setItemWidget(item, widget)
+
+
+class CustomWebEnginePage(QWebEnginePage):
+    def __init__(self):
+        super().__init__()
+
+    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
+        print(f'WebEnginePage message: {message}, line: {lineNumber}')
+        super().javaScriptConsoleMessage(level, message, lineNumber, sourceID)

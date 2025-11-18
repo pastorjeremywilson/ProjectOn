@@ -16,7 +16,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.8.2.001?
+# What's New in Version 1.8.2.002?
 - Fixed a bug that occurred when saving/loading bible verses that had been edited
 - SongSelect's login page no longer works with the built-in browser, so SongSelect import has been changed to use already-downloaded SongSelect lyrics files
 - Fixed some song data missing after importing an OpenLyrics file
@@ -31,7 +31,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.8.2.001) and run
+system only. Download the current ProjectOn installer (v.1.8.2.002) and run
 it on your computer.
 
 # Using ProjectOn

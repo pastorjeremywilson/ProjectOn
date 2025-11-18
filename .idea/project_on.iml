@@ -6,7 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/.linux_venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 virtualenv at ~/Documents/Python Workspace/Sermon Prep Database/.linux_venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12 virtualenv at ~/Documents/Python Workspace/project_on/.linux_venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

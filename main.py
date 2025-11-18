@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.8.2.001
+ProjectOn v.1.8.2.002
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -73,7 +73,7 @@ class ProjectOn(QObject):
         super().__init__()
 
         os.chdir(os.path.dirname(__file__))
-        os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
+        os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '0'
         os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         self.app = QApplication(sys.argv)
@@ -169,7 +169,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.8.2.001')
+        version_label = QLabel('v.1.8.2.002')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
