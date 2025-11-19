@@ -33,7 +33,6 @@ from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
-from PyQt5.QtWebEngine import QtWebEngine
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
 from gevent import monkey
@@ -81,12 +80,11 @@ class ProjectOn(QObject):
         from PyQt5 import QtWebEngine
         web_engine_location = os.path.dirname(QtWebEngine.__file__)
         if sys.platform == 'win32':
-            os.environ['QTWEBENGINEPROCESS_PATH'] = web_engine_location + '/Qt5/bin/QtWebEngineProcess.exe'
+            os.environ['QTWEBENGINEPROCESS_PATH'] = web_engine_location + '\\Qt5\\bin\\QtWebEngineProcess.exe'
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
         else:
-            web_engine_process = web_engine_location + '/Qt5/libexec/QtWebEngineProcess'
             os.environ['QTWEBENGINEPROCESS_PATH'] = web_engine_location + '/Qt5/libexec/QtWebEngineProcess'
-        #os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '0'
+        os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
 
         self.app = QApplication(sys.argv)
         #self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)

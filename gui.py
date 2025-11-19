@@ -205,7 +205,7 @@ class GUI(QObject):
         QMessageBox.question(
             self.main_window,
             'Web Engine Process Path',
-            f'Web Engine Process Path: {os.environ['QTWEBENGINEPROCESS_PATH']}',
+            f'Web Engine Process Path: {os.environ["QTWEBENGINEPROCESS_PATH"]}',
             QMessageBox.StandardButton.Ok
         )
 
