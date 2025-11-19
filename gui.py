@@ -202,6 +202,12 @@ class GUI(QObject):
         self.main_window.showMaximized()
 
         self.check_update()
+        QMessageBox.question(
+            self.main_window,
+            'Web Engine Process Path',
+            f'Web Engine Process Path: {os.environ['QTWEBENGINEPROCESS_PATH']}',
+            QMessageBox.StandardButton.Ok
+        )
 
     def check_files(self):
         if 'linux' in sys.platform:
@@ -653,7 +659,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.8.2.002'
+        current_version = 'v.1.8.2.003'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -896,7 +902,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.8.2.002')
+        title_label = QLabel('ProjectOn v.1.8.2.003')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
