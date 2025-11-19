@@ -2,12 +2,12 @@ import re
 import sqlite3
 
 import requests
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF
-from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
+from PyQt6.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF
+from PyQt6.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics
-from PyQt5.QtMultimedia import QMediaPlayer
-from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
-from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
+from PyQt6.QtMultimedia import QMediaPlayer
+from PyQt6.QtPrintSupport import QPrinterInfo, QPrinter
+from PyQt6.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
     QApplication, QFontComboBox, QGroupBox
@@ -89,7 +89,7 @@ class CountdownWidget(QWidget):
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
         self.setStyleSheet('background-color: ' + bg)
-        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         layout = QGridLayout(self)
 
         self.label = QLabel()

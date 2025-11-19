@@ -3,12 +3,12 @@ import re
 from asyncio import wait_for
 from os.path import exists
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QUrl, Qt
-from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWebEngineCore import QWebEngineUrlRequestInterceptor
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings, QWebEnginePage
-from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
+from PyQt6 import QtCore
+from PyQt6.QtCore import QUrl, Qt
+from PyQt6.QtGui import QFont, QIcon
+from PyQt6.QtWebEngineCore import QWebEngineUrlRequestInterceptor
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
     QMessageBox, QDialog, QFileDialog, QCheckBox
 from cryptography.fernet import Fernet
 
@@ -79,7 +79,6 @@ class SongselectImport(QDialog):
                 #'Access-Control-Allow-Origin': '*'
             }
         )
-        self.web_engine_view.setPage(WebEnginePage())
         self.web_engine_view.page().profile().setRequestInterceptor(self.request_intercepter)
         self.web_engine_view.page().profile().setHttpUserAgent(CHROME_USER_AGENT)
         self.web_engine_view.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
@@ -465,14 +464,6 @@ class SongselectImport(QDialog):
         save_widget.widget.deleteLater()
         os.remove(song_filename)
         self.done(0)
-
-
-class WebEnginePage (QWebEnginePage):
-    def __init__(self):
-        super().__init__()
-
-    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
-        print(f"JS Console ({level}): {message} at {sourceID}:{lineNumber}")
 
 
 class RequestInterceptor(QWebEngineUrlRequestInterceptor):

@@ -8,9 +8,9 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import QRunnable, Qt, QByteArray, QBuffer, QIODevice, QTimer
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt6.QtCore import QRunnable, Qt, QByteArray, QBuffer, QIODevice, QTimer
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import QMessageBox, QFileDialog
 
 
 class CheckFiles(QRunnable):

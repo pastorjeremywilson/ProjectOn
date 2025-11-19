@@ -6,7 +6,7 @@ from engineio.async_drivers import gevent
 import logging
 from http.server import BaseHTTPRequestHandler
 
-from PyQt5.QtCore import QRunnable, Qt
+from PyQt6.QtCore import QRunnable, Qt
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 

@@ -9,14 +9,14 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer, QIODevice
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, \
-    QTextDocument
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
-    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer, QIODevice
+from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, \
+    QTextDocument, QAction
+from PyQt6.QtMultimedia import QMediaPlayer
+from PyQt6.QtMultimediaWidgets import QGraphicsVideoItem
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, \
     QGraphicsView, QGraphicsScene
 
 import declarations
@@ -202,12 +202,6 @@ class GUI(QObject):
         self.main_window.showMaximized()
 
         self.check_update()
-        QMessageBox.question(
-            self.main_window,
-            'Web Engine Process Path',
-            f'Web Engine Process Path: {os.environ["QTWEBENGINEPROCESS_PATH"]}',
-            QMessageBox.StandardButton.Ok
-        )
 
     def check_files(self):
         if 'linux' in sys.platform:
@@ -2094,9 +2088,6 @@ class GUI(QObject):
         Create all the widgets.py that could be used on the display widget.
         """
         self.web_view = QWebEngineView()
-        web_engine_page = CustomWebEnginePage()
-        web_engine_page.setParent(self.web_view)
-        self.web_view.setPage(web_engine_page)
         self.display_layout.addWidget(self.web_view)
 
         self.blackout_widget = QWidget()
@@ -2294,12 +2285,3 @@ class GUI(QObject):
         item.setSizeHint(widget.sizeHint())
         self.oos_widget.oos_list_widget.addItem(item)
         self.oos_widget.oos_list_widget.setItemWidget(item, widget)
-
-
-class CustomWebEnginePage(QWebEnginePage):
-    def __init__(self):
-        super().__init__()
-
-    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
-        print(f'WebEnginePage message: {message}, line: {lineNumber}')
-        super().javaScriptConsoleMessage(level, message, lineNumber, sourceID)

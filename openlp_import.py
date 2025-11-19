@@ -4,7 +4,7 @@ import re
 import sqlite3
 from xml.etree import ElementTree as ET
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QLineEdit, QPushButton, QProgressBar, \
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QLineEdit, QPushButton, QProgressBar, \
     QFileDialog, QMessageBox, QDialog
 
 

@@ -1,8 +1,8 @@
 import json
 
 import requests
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QScrollArea, QDialog, QMessageBox
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QVBoxLayout, QLabel, QScrollArea, QDialog, QMessageBox
 
 
 def get_release_notes():

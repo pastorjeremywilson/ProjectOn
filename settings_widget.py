@@ -2,9 +2,9 @@ import os.path
 import shutil
 import sqlite3
 
-from PyQt5.QtCore import Qt, QRectF, QPointF, QEvent, QTime, QSize
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath, QFont, QIcon
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
+from PyQt6.QtCore import Qt, QRectF, QPointF, QEvent, QTime, QSize
+from PyQt6.QtGui import QPainter, QPixmap, QPen, QBrush, QColor, QPainterPath, QFont, QIcon
+from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QRadioButton, QButtonGroup, QVBoxLayout, QSpinBox, \
     QScrollArea, QHBoxLayout, QPushButton, QColorDialog, QFileDialog, QMessageBox, QDialog, QLineEdit, QCheckBox, \
     QComboBox, QTimeEdit, QTabWidget, QGroupBox, QFontComboBox
 

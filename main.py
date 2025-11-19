@@ -18,9 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-Trying PyQt5 v5.15.9 and QtWebEngine v5.15.5 to fix QWebEngine AMD atio6axx.dll crash
-"""
 import json
 import logging
 import os.path
@@ -35,10 +32,10 @@ from datetime import datetime
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint
-from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
-from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
+from PyQt6.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint
+from PyQt6.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon, QAction
+from PyQt6.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
+    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton
 from gevent import monkey
 
 import declarations
@@ -80,14 +77,6 @@ class ProjectOn(QObject):
         file_dir = os.path.dirname(__file__)
         os.chdir(file_dir)
 
-        # get the path of the QtWebEngine and set the QTWEBENGINEPROCESS_PATH environment variable accordingly
-        from PyQt5 import QtWebEngine
-        web_engine_location = os.path.dirname(QtWebEngine.__file__)
-        if sys.platform == 'win32':
-            os.environ['QTWEBENGINEPROCESS_PATH'] = web_engine_location + '\\Qt5\\bin\\QtWebEngineProcess.exe'
-            os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
-        else:
-            os.environ['QTWEBENGINEPROCESS_PATH'] = web_engine_location + '/Qt5/libexec/QtWebEngineProcess'
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
 
         self.app = QApplication(sys.argv)
