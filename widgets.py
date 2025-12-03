@@ -169,7 +169,7 @@ class CustomMainWindow(QMainWindow):
         if continue_close:
             # shutdown the media player
             if self.gui.media_player:
-                if self.gui.media_player.state() == QMediaPlayer.PlayingState:
+                if self.gui.media_player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
                     self.gui.media_player.stop()
                 self.gui.media_player.deleteLater()
                 if self.gui.video_widget:
@@ -883,7 +883,7 @@ class FontWidget(QWidget):
         self.font_sample.setFont(
             QFont(
                 font_name,
-                self.font_size_spinbox.value(),
+                int(self.font_size_spinbox.value()),
                 QFont.Weight.Bold))
 
         if self.font_color_button_group.checkedButton():

@@ -6,8 +6,6 @@ from os.path import exists
 from PyQt6 import QtCore
 from PyQt6.QtCore import QUrl, Qt
 from PyQt6.QtGui import QFont, QIcon
-from PyQt6.QtWebEngineCore import QWebEngineUrlRequestInterceptor
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
     QMessageBox, QDialog, QFileDialog, QCheckBox
 from cryptography.fernet import Fernet
@@ -466,7 +464,7 @@ class SongselectImport(QDialog):
         self.done(0)
 
 
-class RequestInterceptor(QWebEngineUrlRequestInterceptor):
+"""class RequestInterceptor(QWebEngineUrlRequestInterceptor):
     def __init__(self, headers):
         super().__init__()
         self.headers = headers
@@ -476,4 +474,4 @@ class RequestInterceptor(QWebEngineUrlRequestInterceptor):
 
     def interceptRequest(self, info):
         for header in self.headers:
-            info.setHttpHeader(bytes(header, 'UTF-8'), bytes(self.headers[header], 'UTF-8'))
+            info.setHttpHeader(bytes(header, 'UTF-8'), bytes(self.headers[header], 'UTF-8'))"""

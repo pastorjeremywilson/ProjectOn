@@ -9,12 +9,12 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer, QIODevice
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer
 from PyQt6.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, \
     QTextDocument, QAction
-from PyQt6.QtMultimedia import QMediaPlayer
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QGraphicsVideoItem
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, \
     QGraphicsView, QGraphicsScene
@@ -653,7 +653,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.8.2.004'
+        current_version = 'v.1.8.2.010'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -896,7 +896,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.8.2.004')
+        title_label = QLabel('ProjectOn v.1.8.2.010')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1016,34 +1016,35 @@ class GUI(QObject):
         height = pixmap.height()
         display_width = self.secondary_screen.size().width()
         display_height = self.secondary_screen.size().height()
+
         if width < display_width and height >= display_height:
-            pixmap = pixmap.scaledToWidth(display_width)
+            pixmap = pixmap.scaledToWidth(display_width, Qt.TransformationMode.SmoothTransformation)
             y = int((pixmap.height() - display_height) / 2)
             pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
         elif height < display_height and width >= display_width:
-            pixmap = pixmap.scaledToHeight(display_height)
+            pixmap = pixmap.scaledToHeight(display_height, Qt.TransformationMode.SmoothTransformation)
             x = int((pixmap.width() - display_width) / 2)
             pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
         elif width < display_width and height < display_height:
             wdiff = display_width - width
             hdiff = display_height - height
             if wdiff > hdiff:
-                pixmap = pixmap.scaledToWidth(display_width)
+                pixmap = pixmap.scaledToWidth(display_width, Qt.TransformationMode.SmoothTransformation)
                 y = int((pixmap.height() - display_height) / 2)
                 pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
             else:
-                pixmap = pixmap.scaledToHeight(display_height)
+                pixmap = pixmap.scaledToHeight(display_height, Qt.TransformationMode.SmoothTransformation)
                 x = int((pixmap.width() - display_width) / 2)
                 pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
         else:
             wdiff = width - display_width
             hdiff = height - display_height
-            if wdiff < hdiff:
-                pixmap = pixmap.scaledToWidth(display_width)
+            if wdiff > hdiff:
+                pixmap = pixmap.scaledToWidth(display_width, Qt.TransformationMode.SmoothTransformation)
                 y = int((pixmap.height() - display_height) / 2)
                 pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
             else:
-                pixmap = pixmap.scaledToHeight(display_height)
+                pixmap = pixmap.scaledToHeight(display_height, Qt.TransformationMode.SmoothTransformation)
                 x = int((pixmap.width() - display_width) / 2)
                 pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
 
@@ -1625,9 +1626,6 @@ class GUI(QObject):
             current_item = self.live_widget.slide_list.currentItem()
 
             self.live_widget.preview_label.clear()
-            if self.timed_update:
-                self.timed_update.stop = True
-                self.main.thread_pool.waitForDone()
             if not self.blackout_widget.isHidden():
                 self.tool_bar.black_screen_button.setChecked(True)
             if self.logo_widget and not self.logo_widget.isHidden():
@@ -1655,7 +1653,7 @@ class GUI(QObject):
 
                     # handle stopping the media player carefully to avoid an Access Violation
                     if self.media_player:
-                        if self.media_player.state() == QMediaPlayer.PlayingState:
+                        if self.media_player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
                             self.media_player.stop()
                             if self.timed_update:
                                 self.timed_update.stop = True
@@ -1667,21 +1665,20 @@ class GUI(QObject):
                         self.video_widget = None
                         self.graphics_view = None
                         self.audio_output = None
-            elif widget == 'live':
+            elif widget == 'live' and self.media_player:
                 # handle stopping the media player carefully to avoid an Access Violation
-                if self.media_player:
-                    if self.media_player.state() == QMediaPlayer.PlayingState:
-                        self.media_player.stop()
-                        if self.timed_update:
-                            self.timed_update.stop = True
-                    self.media_player.deleteLater()
-                    if self.video_widget:
-                        self.video_widget.deleteLater()
-                        self.graphics_view.deleteLater()
-                    self.media_player = None
-                    self.video_widget = None
-                    self.graphics_view = None
-                    self.audio_output = None
+                if self.media_player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
+                    self.media_player.stop()
+                    if self.timed_update:
+                        self.timed_update.stop = True
+                self.media_player.deleteLater()
+                if self.video_widget:
+                    self.video_widget.deleteLater()
+                    self.graphics_view.deleteLater()
+                self.media_player = None
+                self.video_widget = None
+                self.graphics_view = None
+                self.audio_output = None
 
             # set the background
             display_widget.background_label.clear()
@@ -1890,7 +1887,8 @@ class GUI(QObject):
 
             # hide or show the appropriate widgets.py
             if widget == 'live':
-                if not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video' and not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
+                if (not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video'
+                        and not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'web'):
                     if not self.web_view.isHidden():
                         self.web_view.hide()
                     if not self.blackout_widget.isHidden():
@@ -1902,12 +1900,11 @@ class GUI(QObject):
                         self.lyric_widget.repaint()
                     if current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'image':
                         self.lyric_widget.hide()
-
                 elif current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
                     self.make_video_widget()
                     self.video_widget.show()
-                    self.media_player.setMedia(
-                        QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name'])))
+                    self.media_player.setSource(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name']))
+                    #self.media_player.setMedia(QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name'])))
                     self.media_player.play()
 
                     self.timed_update = TimedPreviewUpdate(self)
@@ -1921,8 +1918,8 @@ class GUI(QObject):
                         self.blackout_widget.hide()
                     if not self.logo_widget.isHidden():
                         self.logo_widget.hide()
-
                 elif item_data['type'] == 'web':
+                    print('hiding other widgets')
                     if not self.lyric_widget.isHidden() and 'Unable' not in lyric_widget.text:
                         self.lyric_widget.hide()
                     elif 'Unable' in lyric_widget.text:
@@ -1931,13 +1928,15 @@ class GUI(QObject):
                         self.blackout_widget.hide()
                     if not self.logo_widget.isHidden():
                         self.logo_widget.hide()
-                    self.web_view.show()
                     if url_ok:
                         self.timeout_timer = QTimer()
                         timeout_value = 12
-
                         self.timeout_timer.singleShot(timeout_value * 1000, self.request_timed_out)
+                        print('loading url')
                         self.web_view.load(QUrl(url))
+
+                    print('showing web_view')
+                    self.web_view.show()
 
                     self.timed_update = TimedPreviewUpdate(self)
                     self.main.thread_pool.start(self.timed_update)
@@ -1966,13 +1965,14 @@ class GUI(QObject):
                         )
 
                     self.media_player = QMediaPlayer(self.main_window)
-                    self.media_player.error.connect(self.media_error)
+                    self.media_player.errorOccurred.connect(self.media_error)
 
-                    byte_array = QByteArray(audio_data[0])
+                    """byte_array = QByteArray(audio_data[0])
                     self.audio_buffer = QBuffer()
                     self.audio_buffer.setData(byte_array)
-                    self.audio_buffer.open(QIODevice.ReadOnly)
-                    self.media_player.setMedia(QMediaContent(), self.audio_buffer)
+                    self.audio_buffer.open(QIODevice.ReadOnly)"""
+                    self.media_player.setSource(QUrl(item_data['audio_file']))
+                    #self.media_player.setMedia(QMediaContent(), self.audio_buffer)
 
                     if item_data['loop_audio'] == 'True':
                         def repeat_media():
@@ -1980,7 +1980,7 @@ class GUI(QObject):
                                 self.media_player.play()
                         self.media_player.mediaStatusChanged.connect(repeat_media)
                     else:
-                        self.media_player.stateChanged.connect(self.media_playing_change)
+                        self.media_player.playbackStateChanged.connect(self.media_playing_change)
 
                     self.media_player.play()
 
@@ -2067,6 +2067,7 @@ class GUI(QObject):
         return False, url
 
     def request_timed_out(self):
+        return
         print('request timed out')
         self.timeout_timer.stop()
         self.web_view.stop()
@@ -2088,6 +2089,7 @@ class GUI(QObject):
         Create all the widgets.py that could be used on the display widget.
         """
         self.web_view = QWebEngineView()
+        print('adding web view to display layout')
         self.display_layout.addWidget(self.web_view)
 
         self.blackout_widget = QWidget()
@@ -2132,6 +2134,7 @@ class GUI(QObject):
         self.lyric_widget.hide()
         self.web_view.hide()
         self.blackout_widget.hide()
+        print('finished making special display widgets')
 
     def make_video_widget(self):
         """self.video_widget = QVideoWidget()
@@ -2139,8 +2142,8 @@ class GUI(QObject):
 
         self.graphics_view = QGraphicsView()
         self.graphics_view.setGeometry(self.display_widget.geometry())
-        self.graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.display_layout.addWidget(self.graphics_view)
 
         self.scene = QGraphicsScene(self.graphics_view)
@@ -2151,12 +2154,14 @@ class GUI(QObject):
         self.graphics_view.scene().addItem(self.video_widget)
 
         self.media_player = QMediaPlayer()
-        self.media_player.stateChanged.connect(self.media_playing_change)
-        self.media_player.error.connect(self.media_error)
+        self.audio_output = QAudioOutput()
+        self.media_player.setAudioOutput(self.audio_output)
+        self.media_player.playbackStateChanged.connect(self.media_playing_change)
+        self.media_player.errorOccurred.connect(self.media_error)
         self.media_player.setVideoOutput(self.video_widget)
 
     def media_playing_change(self):
-        if self.media_player.state() == QMediaPlayer.StoppedState:
+        if self.media_player.playbackState() == QMediaPlayer.PlaybackState.StoppedState:
             self.media_player.setPosition(0)
 
     def media_error(self):
@@ -2186,7 +2191,7 @@ class GUI(QObject):
             self.blackout_widget.hide()
             if self.live_widget.slide_list.currentItem():
                 if self.live_widget.slide_list.currentItem().data(40) == 'web':
-                    self.web_view.show()
+                    self.web_view.webview_window.show()
                 elif self.live_widget.slide_list.currentItem().data(40) == 'video':
                     self.video_widget.show()
                 else:
@@ -2197,8 +2202,8 @@ class GUI(QObject):
                 self.lyric_widget.hide()
             if self.video_widget and not self.video_widget.isHidden():
                 self.video_widget.hide()
-            if not self.web_view.isHidden():
-                self.web_view.hide()
+            if not self.web_view.webview_window.hidden:
+                self.web_view.webview_window.hide()
             if not self.logo_widget.isHidden():
                 self.logo_widget.hide()
                 self.tool_bar.logo_screen_button.setChecked(False)
@@ -2216,23 +2221,21 @@ class GUI(QObject):
         if len(self.main.settings['logo_image']) > 0:
             if self.tool_bar.logo_screen_button.isChecked():
                 self.logo_widget.hide()
-
                 if self.live_widget.slide_list.currentItem():
                     if self.live_widget.slide_list.currentItem().data(40) == 'web':
-                        self.web_view.show()
+                        self.web_view.webview_window.show()
                     elif self.live_widget.slide_list.currentItem().data(40) == 'video':
                         self.video_widget.show()
                     else:
                         self.lyric_widget.show()
                 self.tool_bar.logo_screen_button.setChecked(False)
-
             else:
                 if not self.lyric_widget.isHidden():
                     self.lyric_widget.hide()
                 if self.video_widget and not self.video_widget.isHidden():
                     self.video_widget.hide()
-                if not self.web_view.isHidden():
-                    self.web_view.hide()
+                if not self.web_view.webview_window.hidden:
+                    self.web_view.webview_window.hide()
                 if not self.blackout_widget.isHidden():
                     self.blackout_widget.show()
                     self.tool_bar.black_screen_button.setChecked(False)
@@ -2240,6 +2243,7 @@ class GUI(QObject):
                     self.display_widget.show()
                     self.tool_bar.show_display_button.setChecked(False)
 
+                self.logo_label.setPixmap(self.size_background_to_screen(self.logo_pixmap))
                 self.logo_widget.show()
                 self.logo_label.show()
                 self.tool_bar.logo_screen_button.setChecked(True)

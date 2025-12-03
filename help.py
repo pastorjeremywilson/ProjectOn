@@ -3,7 +3,6 @@ from os.path import exists
 
 from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QFont
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTabWidget, QMainWindow, QApplication
 
 

@@ -2,11 +2,12 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/.linux_venv" />
+      <excludeFolder url="file://$MODULE_DIR$/proprietary_codecs_venv" />
+      <excludeFolder url="file://$MODULE_DIR$/.win_qt6_proprietary_venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.11 virtualenv at X:\Documents\Python Workspace\project_on\.venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.11 virtualenv at X:\Documents\Python Workspace\project_on\.win_qt6_proprietary_venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

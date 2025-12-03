@@ -1,7 +1,11 @@
 Done:
 
 To Do:
-    Rework the handling of edited bible passages
+    Edit Custom Slide, custom font color not bringing up color picker
+    When editing custom slide settings, preview not updating
+    Background resizing still not right
+    Clear search/repopulate Songs and Custom Slides before loading service file
+    New webengine window opening every time a new page is loaded
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types
