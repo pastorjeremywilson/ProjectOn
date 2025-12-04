@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QFileDialog
 
 from openlp_import import OpenLPImport
-from widgets import ImageCombobox, FontWidget, NewFontWidget
+from widgets import ImageCombobox, NewFontWidget
 
 
 class Toolbar(QWidget):

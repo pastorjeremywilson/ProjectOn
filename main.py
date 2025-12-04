@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.8.2.004
+ProjectOn v.1.8.2.021
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 """
-Trying PyQt5 v5.15.9 and QtWebEngine v5.15.5 to fix QWebEngine AMD atio6axx.dll crash
+Trying Python v3.14, PyQt5 v5.15.5, and QtWebEngine v5.15.5 to fix QWebEngine AMD atio6axx.dll crash
 """
 import json
 import logging
@@ -80,14 +80,19 @@ class ProjectOn(QObject):
         file_dir = os.path.dirname(__file__)
         os.chdir(file_dir)
 
-        # get the path of the QtWebEngine and set the QTWEBENGINEPROCESS_PATH environment variable accordingly
-        from PyQt5 import QtWebEngine
-        web_engine_location = os.path.dirname(QtWebEngine.__file__)
+        if exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')):
+            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json'), 'r') as file:
+                contents = json.loads(file.read())
+            if 'last_status_count' in contents.keys():
+                last_status_count = contents['last_status_count']
+            if (sys.platform == 'win32'
+                    and 'force_software_rendering' in contents.keys()
+                    and contents['force_software_rendering']):
+                os.environ['QMLSCENE_DEVICE'] = 'softwarecontext'
+
         if sys.platform == 'win32':
-            os.environ['QTWEBENGINEPROCESS_PATH'] = web_engine_location + '\\Qt5\\bin\\QtWebEngineProcess.exe'
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
-        else:
-            os.environ['QTWEBENGINEPROCESS_PATH'] = web_engine_location + '/Qt5/libexec/QtWebEngineProcess'
+
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
 
         self.app = QApplication(sys.argv)
@@ -98,11 +103,6 @@ class ProjectOn(QObject):
         self.update_status_signal.connect(self.update_status_label)
 
         last_status_count = 100
-        if exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')):
-            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json'), 'r') as file:
-                contents = json.loads(file.read())
-            if 'last_status_count' in contents.keys():
-                last_status_count = contents['last_status_count']
         self.make_splash_screen(last_status_count)
 
         self.update_status_signal.emit('Creating Socket', 'status')
@@ -183,7 +183,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.8.2.004')
+        version_label = QLabel('v.1.8.2.021')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
