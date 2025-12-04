@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.8.2.021
+ProjectOn v.1.8.2.022
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 """
-Trying Python v3.14, PyQt5 v5.15.5, and QtWebEngine v5.15.5 to fix QWebEngine AMD atio6axx.dll crash
+Trying Python v3.14, PyQt5 v5.15.11, and QtWebEngine v5.15.7 to fix QWebEngine AMD atio6axx.dll crash
 """
 import json
 import logging
@@ -94,6 +94,7 @@ class ProjectOn(QObject):
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
+        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-features=ExperimentalJavaScript"
 
         self.app = QApplication(sys.argv)
         #self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
@@ -183,7 +184,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.8.2.021')
+        version_label = QLabel('v.1.8.2.022')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
