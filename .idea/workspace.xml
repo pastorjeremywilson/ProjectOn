@@ -7,11 +7,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file.">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/runnables.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/print_dialog.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +29,7 @@
       <list>
         <option value="Python Script" />
         <option value="Setup Script" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -43,7 +50,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/pastorjeremywilson/ProjectOn&quot;,
-    &quot;accountId&quot;: &quot;133976ce-37aa-4f84-8197-c9b9c19e2e22&quot;
+    &quot;accountId&quot;: &quot;77323ad5-efde-49a4-8c47-0663058923a8&quot;
   }
 }</component>
   <component name="MarkdownSettingsMigration">
@@ -56,7 +63,7 @@
   &quot;associatedIndex&quot;: 7
 }</component>
   <component name="ProjectId" id="2jQaGx5vSpr14HiLg4wfTm6y4We" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+  <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -66,6 +73,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Node.js.foobar.js.executor&quot;: &quot;Debug&quot;,
     &quot;Python.generate_pydocs.executor&quot;: &quot;Run&quot;,
     &quot;Python.get_github_events.executor&quot;: &quot;Debug&quot;,
     &quot;Python.main.executor&quot;: &quot;Debug&quot;,
@@ -75,7 +83,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/LBCNMembership&quot;,
+    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/project_on/.win_qt5_venv/Lib/site-packages/PyQt5&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -90,12 +98,16 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="X:\Documents\Python Workspace\project_on\.unusedCode" />
       <recent name="X:\Documents\Python Workspace\project_on\pydocs" />
       <recent name="X:\Documents\Python Workspace\project_on\resources\gui_icons" />
       <recent name="X:\Documents\Python Workspace\project_on\resources\branding" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
+    <configuration name="foobar.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$PROJECT_DIR$/foobar.js" working-dir="$PROJECT_DIR$">
+      <method v="2" />
+    </configuration>
     <configuration name="linecount" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="project_on" />
       <option name="ENV_FILES" value="" />
@@ -143,11 +155,14 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Node.js.foobar.js" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.linecount" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Node.js.foobar.js" />
+        <item itemvalue="Python.linecount" />
         <item itemvalue="Python.linecount" />
       </list>
     </recent_temporary>
@@ -155,7 +170,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-14705d77f0bb-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.25659.43" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.26830.99" />
+        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
       </set>
     </attachedChunks>
   </component>
@@ -172,62 +188,13 @@
       <workItem from="1725650345914" duration="5458000" />
       <workItem from="1725983928582" duration="6657000" />
       <workItem from="1725995303841" duration="13965000" />
-    </task>
-    <task id="LOCAL-00101" summary="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines.">
-      <option name="closed" value="true" />
-      <created>1736362620753</created>
-      <option name="number" value="00101" />
-      <option name="presentableId" value="LOCAL-00101" />
-      <option name="project" value="LOCAL" />
-      <updated>1736362620753</updated>
-    </task>
-    <task id="LOCAL-00102" summary="A little bug crept in to the chorus tag on songs.&#10;Displayed lyrics/custom slide text now respects empty lines.">
-      <option name="closed" value="true" />
-      <created>1736366386874</created>
-      <option name="number" value="00102" />
-      <option name="presentableId" value="LOCAL-00102" />
-      <option name="project" value="LOCAL" />
-      <updated>1736366386874</updated>
-    </task>
-    <task id="LOCAL-00103" summary="When selecting a custom font color, ensured that current color is default in the color dialog&#10;Ensured that cancelling the custom font color dialog doesn't change the current color to black&#10;Fixed delete image/background in settings widget to use the same delete function&#10;Ensured image widgets are updated after delete or add&#10;Changed the saving of settings to be threaded to facilitate more often saving of settings">
-      <option name="closed" value="true" />
-      <created>1736545879043</created>
-      <option name="number" value="00103" />
-      <option name="presentableId" value="LOCAL-00103" />
-      <option name="project" value="LOCAL" />
-      <updated>1736545879044</updated>
-    </task>
-    <task id="LOCAL-00104" summary="Moved runnables into their own file">
-      <option name="closed" value="true" />
-      <created>1736563370127</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1736563370127</updated>
-    </task>
-    <task id="LOCAL-00105" summary="Moved runnables into their own file&#10;Fixed problem with lyrics on the remote when reloading the page">
-      <option name="closed" value="true" />
-      <created>1736887847215</created>
-      <option name="number" value="00105" />
-      <option name="presentableId" value="LOCAL-00105" />
-      <option name="project" value="LOCAL" />
-      <updated>1736887847216</updated>
-    </task>
-    <task id="LOCAL-00106" summary="Moved runnables into their own file&#10;Fixed problem with lyrics on the remote when reloading the page">
-      <option name="closed" value="true" />
-      <created>1736888054521</created>
-      <option name="number" value="00106" />
-      <option name="presentableId" value="LOCAL-00106" />
-      <option name="project" value="LOCAL" />
-      <updated>1736888054521</updated>
-    </task>
-    <task id="LOCAL-00107" summary="Further refined the usage of blank lines when editing songs or custom slides&#10;Improved the adding and deleting of tags in the editor">
-      <option name="closed" value="true" />
-      <created>1736983822576</created>
-      <option name="number" value="00107" />
-      <option name="presentableId" value="LOCAL-00107" />
-      <option name="project" value="LOCAL" />
-      <updated>1736983822576</updated>
+      <workItem from="1763588792463" duration="805000" />
+      <workItem from="1764803424696" duration="7204000" />
+      <workItem from="1764872108570" duration="347000" />
+      <workItem from="1764872552256" duration="5067000" />
+      <workItem from="1764884920973" duration="397000" />
+      <workItem from="1764885540371" duration="1194000" />
+      <workItem from="1764955166824" duration="629000" />
     </task>
     <task id="LOCAL-00108" summary="Fixed editor adding a blank line to the top of text.">
       <option name="closed" value="true" />
@@ -565,7 +532,63 @@
       <option name="project" value="LOCAL" />
       <updated>1760468490298</updated>
     </task>
-    <option name="localTasksCounter" value="150" />
+    <task id="LOCAL-00150" summary="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file.">
+      <option name="closed" value="true" />
+      <created>1760471802586</created>
+      <option name="number" value="00150" />
+      <option name="presentableId" value="LOCAL-00150" />
+      <option name="project" value="LOCAL" />
+      <updated>1760471802586</updated>
+    </task>
+    <task id="LOCAL-00151" summary="Removed superfluous painter begin calls.&#10;Improved slide background scaling.&#10;Added QSS to prevent QWebEngineView crash on pop-up calls.">
+      <option name="closed" value="true" />
+      <created>1763157714859</created>
+      <option name="number" value="00151" />
+      <option name="presentableId" value="LOCAL-00151" />
+      <option name="project" value="LOCAL" />
+      <updated>1763157714860</updated>
+    </task>
+    <task id="LOCAL-00152" summary="Explicitly set QTWEBENGINE_DISABLE_SANDBOX environment variable to 0">
+      <option name="closed" value="true" />
+      <created>1763498309035</created>
+      <option name="number" value="00152" />
+      <option name="presentableId" value="LOCAL-00152" />
+      <option name="project" value="LOCAL" />
+      <updated>1763498309035</updated>
+    </task>
+    <task id="LOCAL-00153" summary="Removed setting QTWEBENGINE_DISABLE_SANDBOX environment variable. Setting QTWEBENGINEPROCESS_PATH environment variable based on platform.">
+      <option name="closed" value="true" />
+      <created>1763577869644</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1763577869645</updated>
+    </task>
+    <task id="LOCAL-00154" summary="Removed setting QTWEBENGINE_DISABLE_SANDBOX environment variable. Setting QTWEBENGINEPROCESS_PATH environment variable based on platform.">
+      <option name="closed" value="true" />
+      <created>1763578921101</created>
+      <option name="number" value="00154" />
+      <option name="presentableId" value="LOCAL-00154" />
+      <option name="project" value="LOCAL" />
+      <updated>1763578921102</updated>
+    </task>
+    <task id="LOCAL-00155" summary="Added option to settings to force software rendering in the event crashes rendering web pages on an AMD Radeon graphics card occurs. This setting will set QMLSCENE_DEVICE to 'softwarecontext' at startup.">
+      <option name="closed" value="true" />
+      <created>1764871532473</created>
+      <option name="number" value="00155" />
+      <option name="presentableId" value="LOCAL-00155" />
+      <option name="project" value="LOCAL" />
+      <updated>1764871532474</updated>
+    </task>
+    <task id="LOCAL-00156" summary="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file.">
+      <option name="closed" value="true" />
+      <created>1764881007170</created>
+      <option name="number" value="00156" />
+      <option name="presentableId" value="LOCAL-00156" />
+      <option name="project" value="LOCAL" />
+      <updated>1764881007171</updated>
+    </task>
+    <option name="localTasksCounter" value="157" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -586,11 +609,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster." />
-    <MESSAGE value="Tweaked qss for font combobox on dark theme for visibility.&#10;Fixed loading time for font combobox by indexing fonts once, drawing them as pixmaps, and adding those pixmaps as icons." />
-    <MESSAGE value="Further refined the settings and font widget layouts.&#10;Added icons to the settings widget tabs." />
-    <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing." />
-    <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10" />
     <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages" />
     <MESSAGE value="Fixed layout problem on stage display.&#10;&#10;Added header to stage font size setting and fixed the spinbox height." />
     <MESSAGE value="Standardized background pixmap resizing to avoid skewing.&#10;&#10;Began adding a preview image when editing a song/custom slide." />
@@ -611,7 +629,12 @@
     <MESSAGE value="Fixed edited scriptures not saving/loading correctly." />
     <MESSAGE value="Updated version number and Readmes. Ready for release." />
     <MESSAGE value="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file." />
-    <option name="LAST_COMMIT_MESSAGE" value="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file." />
+    <MESSAGE value="Removed superfluous painter begin calls.&#10;Improved slide background scaling.&#10;Added QSS to prevent QWebEngineView crash on pop-up calls." />
+    <MESSAGE value="Explicitly set QTWEBENGINE_DISABLE_SANDBOX environment variable to 0" />
+    <MESSAGE value="Removed setting QTWEBENGINE_DISABLE_SANDBOX environment variable. Setting QTWEBENGINEPROCESS_PATH environment variable based on platform." />
+    <MESSAGE value="Added option to settings to force software rendering in the event crashes rendering web pages on an AMD Radeon graphics card occurs. This setting will set QMLSCENE_DEVICE to 'softwarecontext' at startup." />
+    <MESSAGE value="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
@@ -619,5 +642,8 @@
         <watch expression="__exception__" />
       </configuration>
     </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1764955294815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

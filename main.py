@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.8.2
+ProjectOn v.1.8.3
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -16,6 +16,10 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+"""
+Trying Python v3.14, PyQt5 v5.15.11, and QtWebEngine v5.15.7 to fix QWebEngine AMD atio6axx.dll crash
 """
 import json
 import logging
@@ -72,9 +76,25 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
 
-        os.chdir(os.path.dirname(__file__))
+        # ensure we are working from the root directory of the program
+        file_dir = os.path.dirname(__file__)
+        os.chdir(file_dir)
+
+        if exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')):
+            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json'), 'r') as file:
+                contents = json.loads(file.read())
+            if 'last_status_count' in contents.keys():
+                last_status_count = contents['last_status_count']
+            if (sys.platform == 'win32'
+                    and 'force_software_rendering' in contents.keys()
+                    and contents['force_software_rendering']):
+                os.environ['QMLSCENE_DEVICE'] = 'softwarecontext'
+
+        if sys.platform == 'win32':
+            os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
+
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
-        os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
+        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-features=ExperimentalJavaScript"
 
         self.app = QApplication(sys.argv)
         #self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
@@ -84,11 +104,6 @@ class ProjectOn(QObject):
         self.update_status_signal.connect(self.update_status_label)
 
         last_status_count = 100
-        if exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')):
-            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json'), 'r') as file:
-                contents = json.loads(file.read())
-            if 'last_status_count' in contents.keys():
-                last_status_count = contents['last_status_count']
         self.make_splash_screen(last_status_count)
 
         self.update_status_signal.emit('Creating Socket', 'status')
@@ -169,7 +184,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.8.2')
+        version_label = QLabel('v.1.8.3')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1061,7 +1076,6 @@ class ProjectOn(QObject):
                             pen = QPen(Qt.GlobalColor.white)
                             painter.setPen(pen)
                             painter.setBrush(brush)
-                            painter.begin(pixmap)
                             painter.fillRect(pixmap.rect(), brush)
                             painter.setFont(self.gui.bold_font)
                             painter.drawText(QPoint(2, 20), 'WWW')
@@ -1307,48 +1321,57 @@ class ProjectOn(QObject):
             QMessageBox.StandardButton.Ok
         )
 
-    def error_log(self):
+    def error_log(self, log_text=None):
         """
         Method to write a traceback to the program's error log file as well as show the user the error.
         """
-        tb = traceback.walk_tb(sys.exc_info()[2])
-        for frame, line_no in tb:
-            clss = ''
-            if 'self' in frame.f_locals.keys():
-                try:
-                    clss = str(frame.f_locals['self']).split('<')[1].split(' ')[0].split('.')[1]
-                except IndexError:
-                    clss = str(frame.f_locals['self'])
-            file_name = frame.f_code.co_filename
-            method = frame.f_code.co_name
-            line_num = line_no
-            message_box_text = (
-                f'An error:\n'
-                f'    {sys.exc_info()[1]},\n'
-                f'occurred on line\n'
-                f'    {line_num}\n'
-                f'of\n'
-                f'    {file_name}\n'
-                f'in\n'
-                f'    {clss}.{method}'
-            )
-            date_time = time.ctime(time.time())
-            log_text = (f'\n{date_time}:\n'
-                        f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
+        if not log_text: # if text was provided, we're only logging information
+            tb = traceback.walk_tb(sys.exc_info()[2])
+            for frame, line_no in tb:
+                clss = ''
+                if 'self' in frame.f_locals.keys():
+                    try:
+                        clss = str(frame.f_locals['self']).split('<')[1].split(' ')[0].split('.')[1]
+                    except IndexError:
+                        clss = str(frame.f_locals['self'])
+                file_name = frame.f_code.co_filename
+                method = frame.f_code.co_name
+                line_num = line_no
+                message_box_text = (
+                    f'An error:\n'
+                    f'    {sys.exc_info()[1]},\n'
+                    f'occurred on line\n'
+                    f'    {line_num}\n'
+                    f'of\n'
+                    f'    {file_name}\n'
+                    f'in\n'
+                    f'    {clss}.{method}'
+                )
+                date_time = time.ctime(time.time())
+                log_text = (f'\n{date_time}:\n'
+                            f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
 
-        if not exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log')):
-            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log'), 'w') as file:
+            message_box = QMessageBox()
+            message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
+            message_box.setWindowTitle('An Error Occurred')
+            message_box.setText('<strong>Well, that wasn\'t supposed to happen!</strong><br><br>' + message_box_text)
+            message_box.setStandardButtons(QMessageBox.StandardButton.Close)
+            message_box.exec()
+        else:
+            date_time = time.ctime(time.time())
+            log_text = (f'\n{date_time}:\n' + log_text)
+
+        if 'linux' in sys.platform:
+            log_location = os.path.expanduser('~/.ProjectOn/error.log')
+        else:
+            log_location = os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log')
+
+        if not exists(log_location):
+            with open(log_location, 'w') as file:
                 pass
 
-        with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log'), 'a') as file:
+        with open(log_location, 'a') as file:
             file.write(log_text)
-
-        message_box = QMessageBox()
-        message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
-        message_box.setWindowTitle('An Error Occurred')
-        message_box.setText('<strong>Well, that wasn\'t supposed to happen!</strong><br><br>' + message_box_text)
-        message_box.setStandardButtons(QMessageBox.StandardButton.Close)
-        message_box.exec()
 
     def check_db(self, db_file):
         db_structure = declarations.DB_STRUCTURE.copy()
@@ -1388,14 +1411,14 @@ class ProjectOn(QObject):
                         
         if changes_made:
             connection.commit()
-            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log'), 'a') as file:
-                file.write(log_text)
+            self.error_log(log_text)
+
         connection.close()
 
 
 def log_unhandled_exception(exc_type, exc_value, exc_traceback):
     """
-    Provides a method for handling exceptions that arent' handled elsewhere in the program.
+    Provides a method for handling exceptions that aren't handled elsewhere in the program.
     :param exc_type:
     :param exc_value:
     :param exc_traceback:

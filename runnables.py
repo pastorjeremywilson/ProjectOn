@@ -263,13 +263,12 @@ class ServerCheckTimer(QTimer):
                                   + 'server error: remote-' + str(remote_response.status_code)
                                   + ', mremote-' + str(mremote_response.status_code)
                                   + ', stage-' + str(stage_response.status_code))
-                    with open('./error.log', 'a') as file:
-                        file.write(error_text)
+
+                    self.gui.main.error_log(error_text)
                     self.gui.server_alert_signal.emit()
             else:
                 self.keep_checking = False
-                with open('./error.log', 'a') as file:
-                    file.write('unknown server error')
+                self.gui.main.error_log('unknown server error')
                 self.gui.server_alert_signal.emit()
 
 
@@ -297,6 +296,10 @@ class SaveSettings(QRunnable):
                 device_specific_settings['show_songselect_warning'] = True
             else:
                 device_specific_settings['show_songselect_warning'] = self.main.settings['show_songselect_warning']
+            if 'force_software_rendering' not in self.main.settings.keys():
+                device_specific_settings['force_software_rendering'] = False
+            else:
+                device_specific_settings['force_software_rendering'] = self.main.settings['force_software_rendering']
             with open(self.main.device_specific_config_file, 'w') as file:
                 file.write(json.dumps(device_specific_settings, indent=4))
 

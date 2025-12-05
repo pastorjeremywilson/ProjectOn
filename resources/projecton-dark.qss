@@ -380,3 +380,22 @@ QProgressBar::chunk {
 QGroupBox {
     color: #e0e0e0;
 }
+
+/*-------------------- QWebEngineView --------------------*/
+QWebEngineView {
+    id: thisWeb
+
+    anchors.fill: parent
+    url: dlViewModel.targetUrl
+
+    onNewViewRequested: function (request) {
+      // Any user can trigger newViewRequested by simply holding the CTRL key while clicking any hyperlink.
+      // per Qt Docs: "If this signal is not handled, the requested load will fail."
+      // Using 5.15 on Linux, "fail" for us meant CRASH.
+      // (refer to: https://doc.qt.io/qt-5/qml-qtwebengine-webengineview.html#newViewRequested-signal)
+      // Some of their sample code make it seem like just using an empty
+      // function body would be sufficient to avoid the crash. However, in our
+      // testing that was not the case. This is the ONLY thing that managed
+      // to avoid a crash:
+      request.openIn(thisWeb)
+}

@@ -16,22 +16,16 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.8.2?
-- Fixed a bug that occurred when saving/loading bible verses that had been edited
-- SongSelect's login page no longer works with the built-in browser, so SongSelect import has been changed to use already-downloaded SongSelect lyrics files
-- Fixed some song data missing after importing an OpenLyrics file
-
-# What was New in Version 1.8.0?
-- Fixed no-chapter bible books being added to the Order of Service as 'custom_scripture'
-- Fixed a problem in sending a bible passage to the preview when the verse number is greater than two digits
-- Fixed Order of Service items not properly updating after having been edited
-- Audio files attached to custom slides are now being imported into the database for ease of retrieval and portability
-- Some updates to the User Interface and many other bug fixes and improvements under the hood
+# What's New in Version 1.8.3?
+- Fixed a crash that can happen on some AMD graphics cards when rendering web pages. In Settings->Screen Settings
+    ->Rendering there is a checkbox to "Force Software Rendering".
+- Added the ability to view console messages from loaded web pages: Menu Bar->Tools->View Web Page Messages.
+- Other improvements and bug fixes under the hood.
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.8.2) and run
+system only. Download the current ProjectOn installer (v.1.8.3) and run
 it on your computer.
 
 # Using ProjectOn

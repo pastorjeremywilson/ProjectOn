@@ -1187,7 +1187,6 @@ class MediaWidget(QTabWidget):
             pen = QPen(Qt.GlobalColor.white)
             painter.setPen(pen)
             painter.setBrush(brush)
-            painter.begin(pixmap)
             painter.fillRect(pixmap.rect(), brush)
             painter.setFont(self.gui.bold_font)
             painter.drawText(QPoint(2, 20), 'WWW')

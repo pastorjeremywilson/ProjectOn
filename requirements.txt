@@ -1,0 +1,10 @@
+cryptography==46.0.3
+Flask==3.1.2
+flask_socketio==5.5.1
+gevent==25.9.1
+gevent_websocket==0.10.1
+PyQt5==5.15.11
+python_engineio==4.12.3
+Requests==2.32.5
+pyinstaller==6.17.0
+pyqtwebengine==5.15.7
