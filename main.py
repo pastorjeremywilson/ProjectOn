@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.0.001
+ProjectOn v.1.9.0.002
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -119,14 +119,8 @@ class ProjectOn(QObject):
         self.update_status_signal.emit('Starting Remote Server', 'status')
         self.app.processEvents()
 
-        """self.remote_server = RemoteServer(self.gui)
-        self.thread_pool.start(self.remote_server)"""
-
-        print('Initializing Remote Server')
         self.remote_server = RemoteServer(self.gui)
-        print('Creating Server Thread')
         self.server_thread = threading.Thread(target=self.remote_server.start_server, daemon=True)
-        print('Starting Server Thread')
         self.server_thread.start()
 
         self.splash_widget.deleteLater()
@@ -188,7 +182,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.0.001')
+        version_label = QLabel('v.1.9.0.002')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1355,6 +1349,7 @@ class ProjectOn(QObject):
                 log_text = (f'\n{date_time}:\n'
                             f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
 
+            print(message_box_text)
             message_box = QMessageBox()
             message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
             message_box.setWindowTitle('An Error Occurred')

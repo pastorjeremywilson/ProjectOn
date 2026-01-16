@@ -2134,6 +2134,7 @@ class SettingsWidget(QWidget):
         layout.addWidget(self.settings_container)
 
         button_widget = QWidget()
+        button_widget.setObjectName('button_widget')
         button_layout = QHBoxLayout()
         button_widget.setLayout(button_layout)
         layout.addWidget(button_widget, 1, 0)
@@ -2183,6 +2184,7 @@ class SettingsWidget(QWidget):
         widget.setObjectName('settings_container')
         widget.setMinimumWidth(self.min_width)
         layout = QGridLayout()
+        layout.setSpacing(20)
         widget.setLayout(layout)
 
         index = 0
@@ -2221,13 +2223,9 @@ class SettingsWidget(QWidget):
 
         display_title_label = QLabel('Display Settings')
         display_title_label.setFont(self.gui.bold_font)
-        display_title_label.setStyleSheet('background: #5555aa; color: white')
+        display_title_label.setStyleSheet('background: #5555aa; color: white;')
         display_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(display_title_label, 0, 0, 1, index + 1)
-
-        spacing_widget = QWidget()
-        spacing_widget.setFixedHeight(20)
-        layout.addWidget(spacing_widget, 5, 0, 1, index + 1)
 
         self.screen_button_group = QButtonGroup()
         id = 0
@@ -2235,17 +2233,48 @@ class SettingsWidget(QWidget):
             self.screen_button_group.addButton(button, id)
             id += 1
 
+        stage_display_title_label = QLabel('Stage Display Settings')
+        stage_display_title_label.setFont(self.gui.bold_font)
+        stage_display_title_label.setStyleSheet('background: #5555aa; color: white;')
+        stage_display_title_label.setContentsMargins(5, 5, 5, 5)
+        layout.addWidget(stage_display_title_label, 5, 0, 1, index + 1)
+
+        stage_display_widget = QWidget()
+        stage_display_layout = QHBoxLayout(stage_display_widget)
+        layout.addWidget(stage_display_widget, 6, 0, 1, index + 1)
+
+        text_only_radio_button = QRadioButton('Text Only')
+        text_only_radio_button.setFont(self.gui.standard_font)
+        text_only_radio_button.setToolTip('Display only the text of slides on the stage display. '
+                                          'Best for slower networks.')
+        stage_display_layout.addWidget(text_only_radio_button)
+
+        mirror_radio_button = QRadioButton('Mirror Display')
+        mirror_radio_button.setFont(self.gui.standard_font)
+        mirror_radio_button.setToolTip('The stage display will show exactly what appears on the display screen.')
+        stage_display_layout.addWidget(mirror_radio_button)
+        stage_display_layout.addStretch()
+
+        self.stage_display_button_group = QButtonGroup()
+        self.stage_display_button_group.addButton(text_only_radio_button, 0)
+        self.stage_display_button_group.addButton(mirror_radio_button, 1)
+
+        if 'mirror_stage_display' in self.gui.main.settings.keys() and self.gui.main.settings['mirror_stage_display']:
+            mirror_radio_button.setChecked(True)
+        else:
+            text_only_radio_button.setChecked(True)
+
         if sys.platform == 'win32':
             rendering_title_label = QLabel('Rendering')
             rendering_title_label.setFont(self.gui.bold_font)
-            rendering_title_label.setStyleSheet('background: #5555aa; color: white')
+            rendering_title_label.setStyleSheet('background: #5555aa; color: white;')
             rendering_title_label.setContentsMargins(5, 5, 5, 5)
-            layout.addWidget(rendering_title_label, 6, 0, 1, index + 1)
+            layout.addWidget(rendering_title_label, 7, 0, 1, index + 1)
 
             self.software_checkbox = QCheckBox('Force Software Rendering')
             self.software_checkbox.setFont(self.gui.standard_font)
             self.software_checkbox.stateChanged.connect(self.rendering_restart)
-            layout.addWidget(self.software_checkbox, 7, 0, 1, index + 1)
+            layout.addWidget(self.software_checkbox, 8, 0, 1, index + 1)
 
             software_details = QTextEdit(
                 'Rending web pages on some AMD radeon graphics cards may cause ProjectOn to quit unexpectedly. If you '
@@ -2255,9 +2284,9 @@ class SettingsWidget(QWidget):
             software_details.setReadOnly(True)
             software_details.setCursor(Qt.CursorShape.ArrowCursor)
             software_details.setFont(self.gui.list_font)
-            layout.addWidget(software_details, 8, 0, 1, index + 1)
+            layout.addWidget(software_details, 9, 0, 1, index + 1)
 
-        layout.setRowStretch(9, 100)
+        layout.setRowStretch(10, 100)
 
         return widget
 
@@ -2267,6 +2296,29 @@ class SettingsWidget(QWidget):
         widget.setObjectName('settings_container')
         layout = QVBoxLayout()
         widget.setLayout(layout)
+
+        stage_title_label = QLabel('Stage Display Font Settings')
+        stage_title_label.setFont(self.gui.bold_font)
+        stage_title_label.setStyleSheet('background: #5555aa; color: white')
+        stage_title_label.setContentsMargins(5, 5, 5, 5)
+        layout.addWidget(stage_title_label)
+
+        stage_font_widget = QWidget()
+        stage_font_layout = QHBoxLayout()
+        stage_font_widget.setLayout(stage_font_layout)
+        layout.addWidget(stage_font_widget)
+
+        stage_font_label = QLabel('Stage Display Font Size:')
+        stage_font_label.setFont(self.gui.bold_font)
+        stage_font_layout.addWidget(stage_font_label)
+
+        self.stage_font_spinbox = QSpinBox()
+        self.stage_font_spinbox.setRange(12, 120)
+        self.stage_font_spinbox.setMinimumSize(60, 30)
+        self.stage_font_spinbox.setFont(self.gui.standard_font)
+        self.stage_font_spinbox.installEventFilter(self)
+        stage_font_layout.addWidget(self.stage_font_spinbox)
+        stage_font_layout.addStretch()
 
         title_label = QLabel('Global Font Settings')
         title_label.setFont(self.gui.bold_font)
@@ -2297,29 +2349,6 @@ class SettingsWidget(QWidget):
         bible_font_group_box_layout = QVBoxLayout(bible_font_group_box)
         bible_font_group_box_layout.addWidget(self.bible_font_settings_widget)
         font_layout.addWidget(bible_font_group_box)
-
-        stage_title_label = QLabel('Stage Display Font Settings')
-        stage_title_label.setFont(self.gui.bold_font)
-        stage_title_label.setStyleSheet('background: #5555aa; color: white')
-        stage_title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(stage_title_label)
-
-        stage_font_widget = QWidget()
-        stage_font_layout = QHBoxLayout()
-        stage_font_widget.setLayout(stage_font_layout)
-        layout.addWidget(stage_font_widget)
-
-        stage_font_label = QLabel('Stage Display Font Size:')
-        stage_font_label.setFont(self.gui.bold_font)
-        stage_font_layout.addWidget(stage_font_label)
-
-        self.stage_font_spinbox = QSpinBox()
-        self.stage_font_spinbox.setRange(12, 120)
-        self.stage_font_spinbox.setMinimumSize(60, 30)
-        self.stage_font_spinbox.setFont(self.gui.standard_font)
-        self.stage_font_spinbox.installEventFilter(self)
-        stage_font_layout.addWidget(self.stage_font_spinbox)
-        stage_font_layout.addStretch()
         layout.addStretch()
 
         scroll_area = QScrollArea()
@@ -2897,7 +2926,8 @@ class SettingsWidget(QWidget):
 
             self.gui.position_screens(primary_screen, secondary_screen)
 
-        self.gui.main.settings['force_software_rendering'] = self.software_checkbox.isChecked()
+        if sys.platform == 'win32':
+            self.gui.main.settings['force_software_rendering'] = self.software_checkbox.isChecked()
 
         self.gui.main.settings['song_font_face'] = self.song_font_settings_widget.font_face_combobox.currentText()
         self.gui.main.settings['song_font_size'] = self.song_font_settings_widget.font_size_spinbox.value()
@@ -2932,6 +2962,11 @@ class SettingsWidget(QWidget):
         )
         self.gui.main.settings['ccli_num'] = self.ccli_line_edit.text()
         self.gui.main.settings['stage_font_size'] = self.stage_font_spinbox.value()
+
+        if self.stage_display_button_group.checkedId() == 0:
+            self.gui.main.settings['mirror_stage_display'] = False
+        else:
+            self.gui.main.settings['mirror_stage_display'] = True
 
         self.gui.main.settings['countdown_settings']['use_countdown'] = self.use_countdown_checkbox.isChecked()
         self.gui.main.settings['countdown_settings']['font_face'] = self.countdown_font_combobox.currentText()

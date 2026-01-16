@@ -324,7 +324,7 @@ class TimedPreviewUpdate(QRunnable):
     def run(self):
         while self.keep_running:
             self.gui.grab_display_signal.emit()
-            time.sleep(0.1)
+            time.sleep(0.15)
 
 
 class SlideAutoPlay(QRunnable):

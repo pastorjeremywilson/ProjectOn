@@ -681,7 +681,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.9.0.001'
+        current_version = 'v.1.9.0.002'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -924,7 +924,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.0.001')
+        title_label = QLabel('ProjectOn v.1.9.0.002')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1063,6 +1063,13 @@ class GUI(QObject):
 
         try:
             if pixmap:
+                if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
+                    buffer = QBuffer()
+                    buffer.open(QIODevice.WriteOnly)
+                    pixmap.save(buffer, 'JPG', 70)
+                    jpg_bytes = bytes(buffer.data())
+                    self.main.remote_server.update_stage_image(jpg_bytes)
+                    buffer.close()
                 pixmap = pixmap.scaled(
                     int(self.display_widget.width() / 5), int(self.display_widget.height() / 5),
                     Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -2050,38 +2057,47 @@ class GUI(QObject):
 
             # change the preview image
             if widget == 'live':
-                if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
-                    full_size_pixmap = display_widget.grab(display_widget.rect())
-                    pixmap = full_size_pixmap.scaled(
-                        int(display_widget.width() / 5), int(display_widget.height() / 5),
-                        Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                full_size_pixmap = display_widget.grab(display_widget.rect())
+                pixmap = full_size_pixmap.scaled(
+                    int(display_widget.width() / 5),
+                    int(display_widget.height() / 5),
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                stage_html = re.sub('<p.*?>', '', lyrics_html)
+                stage_html = stage_html.replace('</p>', '')
+                stage_html = f'<p style="align-text: center;">{stage_html}</p>'
 
+                if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
                     self.live_widget.preview_label.setPixmap(pixmap)
 
-                    stage_html = re.sub('<p.*?>', '', lyrics_html)
-                    stage_html = stage_html.replace('</p>', '')
-                    self.mirror_display = True
-
-                    if self.mirror_display:
-                        start_time = time.time()
+                    if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
                         buffer = QBuffer()
                         buffer.open(QIODevice.WriteOnly)
                         full_size_pixmap.save(buffer, 'JPG', 70)
                         jpg_bytes = bytes(buffer.data())
                         self.main.remote_server.update_stage_image(jpg_bytes)
                         buffer.close()
-                        print('time to create and send image: ' + str(time.time() - start_time))
                     else:
                         self.main.remote_server.update_stage_text(
                             stage_html, self.main.settings['stage_font_size'])
                 elif auto_play_text:
-                    lyrics_html = '<p style="align-text: center;">' + auto_play_text[0] + '</p>'
-                    self.main.remote_server.socketio.emit(
-                        'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
+                    self.live_widget.preview_label.setPixmap(pixmap)
+                    if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
+                        buffer = QBuffer()
+                        buffer.open(QIODevice.WriteOnly)
+                        full_size_pixmap.save(buffer, 'JPG', 70)
+                        jpg_bytes = bytes(buffer.data())
+                        self.main.remote_server.update_stage_image(jpg_bytes)
+                        buffer.close()
+                    else:
+                        self.main.remote_server.update_stage_text(
+                            stage_html, self.main.settings['stage_font_size'])
                 else:
-                    lyrics_html = '<p style="align-text: center;">' + item_data['parsed_text'] + '</p>'
-                    self.main.remote_server.socketio.emit(
-                        'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
+                    if 'mirror_stage_display' in self.main.settings.keys() and not self.main.settings[
+                            'mirror_stage_display']:
+                        self.main.remote_server.update_stage_text(
+                            stage_html, self.main.settings['stage_font_size'])
 
             elif widget == 'sample':
                 pixmap = display_widget.grab(display_widget.rect())

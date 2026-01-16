@@ -56,12 +56,14 @@
 	<script type="text/javascript" charset="utf-8">
 		var socket = io();
 		socket.on('update_stage', function(text) {
+			document.getElementById("image_display").src = "";
 			html = text[0];
 			font_size = text[1];
 			document.getElementById("lyric_display").innerHTML = html;
 			document.getElementById("lyric_display").style.fontSize = font_size + 'px';
 		});
         socket.on('update_display', async (binaryData) => {
+            document.getElementById("lyric_display").innerHTML = "";
             const startTime = performance.now();
             const blob = new Blob([binaryData], { type: 'image/jpeg' });
             const url = URL.createObjectURL(blob);

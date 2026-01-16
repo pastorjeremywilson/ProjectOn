@@ -491,9 +491,9 @@ class EditWidget(QDialog):
         background_layout.addStretch()
 
         button_widget = QWidget()
+        button_widget.setObjectName('button_widget')
         button_layout = QHBoxLayout()
         button_widget.setLayout(button_layout)
-        main_layout.addWidget(button_widget)
 
         save_button = QPushButton('Save')
         save_button.setFont(self.gui.standard_font)
@@ -520,7 +520,9 @@ class EditWidget(QDialog):
         self.scroll_area.setWidget(self.main_widget)
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setMinimumWidth(self.main_widget.width() + self.scroll_area.verticalScrollBar().width())
+
         layout.addWidget(self.scroll_area)
+        layout.addWidget(button_widget)
 
     def set_defaults(self):
         if self.type == 'song':
