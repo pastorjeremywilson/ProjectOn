@@ -7,17 +7,91 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Tested, ready for release.">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/PythonSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/PythonSettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/VSWorkspaceState.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/VSWorkspaceState.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/ProjectOnDebug.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/ProjectOnDebug.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/compile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/compile.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/main.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton-console.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton-console.spec" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.spec" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/declarations.py" beforeDir="false" afterPath="$PROJECT_DIR$/declarations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/get_github_events.py" beforeDir="false" afterPath="$PROJECT_DIR$/get_github_events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/get_scripture.py" beforeDir="false" afterPath="$PROJECT_DIR$/get_scripture.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/help.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/importers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/live_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/live_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/print_dialog.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/openlp_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlp_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/openlyrics_export.py" beforeDir="false" afterPath="$PROJECT_DIR$/openlyrics_export.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/parsers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/preview_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/preview_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/install_image_large.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/install_image_large.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/branding/install_image_small.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/branding/install_image_small.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/data/bibles/KJV.xml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/defaults/data/bibles/KJV.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/data/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/resources/defaults/data/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/defaults/localConfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/resources/defaults/localConfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gpl-3.0.rtf" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gpl-3.0.rtf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/add_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/add_icon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/add_to_service_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/add_to_service_icon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/black_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/black_display.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/browser_back.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/browser_back.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/font_settings.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/font_settings.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/import.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/import.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/item_down.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/item_down.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/item_up.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/item_up.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/logo_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/logo_display.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/new.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/new.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/next.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/next.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/no_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/no_display.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/open.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/open.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/play_pause.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/play_pause.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/previous.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/previous.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/save.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/save.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/scroll_down_arrow.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/scroll_down_arrow.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/scroll_up_arrow.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/scroll_up_arrow.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/send_to_live_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/send_to_live_icon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/settings.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/settings.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/stop.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/stop.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/to_beginning.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/to_beginning.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/gui_icons/x_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/resources/gui_icons/x_icon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/file_locations.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/file_locations.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/import.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/import.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/main_screen.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/main_screen.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/media_box.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/media_box.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/menu_bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/menu_bar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/remote.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/settings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/mobile_web_remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/mobile_web_remote.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/stage_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/stage_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/web_remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/web_remote.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/runnables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songselect_import.py" beforeDir="false" afterPath="$PROJECT_DIR$/songselect_import.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/toolbar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +157,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/project_on/.win_qt5_venv/Lib/site-packages/PyQt5&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/conventionRegistrations&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -155,13 +229,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Node.js.foobar.js" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.linecount" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Node.js.foobar.js" />
         <item itemvalue="Python.linecount" />
         <item itemvalue="Python.linecount" />
       </list>
@@ -170,8 +242,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.26830.99" />
-        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
       </set>
     </attachedChunks>
   </component>
@@ -194,15 +265,8 @@
       <workItem from="1764872552256" duration="5067000" />
       <workItem from="1764884920973" duration="397000" />
       <workItem from="1764885540371" duration="1194000" />
-      <workItem from="1764955166824" duration="629000" />
-    </task>
-    <task id="LOCAL-00108" summary="Fixed editor adding a blank line to the top of text.">
-      <option name="closed" value="true" />
-      <created>1737060267805</created>
-      <option name="number" value="00108" />
-      <option name="presentableId" value="LOCAL-00108" />
-      <option name="project" value="LOCAL" />
-      <updated>1737060267806</updated>
+      <workItem from="1764955166824" duration="1346000" />
+      <workItem from="1764966860052" duration="73000" />
     </task>
     <task id="LOCAL-00109" summary="Added ability to see release notes from About and update dialog">
       <option name="closed" value="true" />
@@ -588,7 +652,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764881007171</updated>
     </task>
-    <option name="localTasksCounter" value="157" />
+    <task id="LOCAL-00157" summary="Tested, ready for release.">
+      <option name="closed" value="true" />
+      <created>1764955829415</created>
+      <option name="number" value="00157" />
+      <option name="presentableId" value="LOCAL-00157" />
+      <option name="project" value="LOCAL" />
+      <updated>1764955829415</updated>
+    </task>
+    <option name="localTasksCounter" value="158" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -609,7 +681,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages" />
     <MESSAGE value="Fixed layout problem on stage display.&#10;&#10;Added header to stage font size setting and fixed the spinbox height." />
     <MESSAGE value="Standardized background pixmap resizing to avoid skewing.&#10;&#10;Began adding a preview image when editing a song/custom slide." />
     <MESSAGE value="Ensured that backgrounds/images are presented to the user sorted by name.&#10;&#10;Further refined the preview image when editing a song/custom slide." />
@@ -634,7 +705,8 @@
     <MESSAGE value="Removed setting QTWEBENGINE_DISABLE_SANDBOX environment variable. Setting QTWEBENGINEPROCESS_PATH environment variable based on platform." />
     <MESSAGE value="Added option to settings to force software rendering in the event crashes rendering web pages on an AMD Radeon graphics card occurs. This setting will set QMLSCENE_DEVICE to 'softwarecontext' at startup." />
     <MESSAGE value="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file." />
+    <MESSAGE value="Tested, ready for release." />
+    <option name="LAST_COMMIT_MESSAGE" value="Tested, ready for release." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

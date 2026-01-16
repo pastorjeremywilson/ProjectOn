@@ -1,17 +1,14 @@
 import re
 
-import geventwebsocket
-from engineio.async_drivers import gevent
-
 import logging
 from http.server import BaseHTTPRequestHandler
 
-from PyQt5.QtCore import QRunnable, Qt
+from PyQt5.QtCore import Qt
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 
 
-class RemoteServer(QRunnable):
+class RemoteServer:
     app = None
     socketio = None
 
@@ -20,10 +17,10 @@ class RemoteServer(QRunnable):
         self.gui = gui
         self.html = None
 
-    def run(self):
+    def start_server(self):
         try:
             self.app = Flask(__name__, template_folder='resources')
-            self.socketio = SocketIO(self.app, async_mode='gevent')
+            self.socketio = SocketIO(self.app, async_mode='threading')
         except Exception:
             self.gui.main.error_log()
 
@@ -146,37 +143,24 @@ class RemoteServer(QRunnable):
 
         @self.app.route('/shutdown', methods=['GET'])
         def shutdown():
-            try:
-                self.socketio.stop()
-                return 'shutting down socketio'
-            except Exception:
-                self.gui.main.error_log()
-                return 'socketio shutdown failed'
-
-        @self.socketio.on('update_stage')
-        def update_stage(text):
-            self.socketio.emit('update_stage', text)
-
-        @self.socketio.on('update_oos')
-        def update_oos(text):
-            self.socketio.emit('update_oos', text)
-
-        @self.socketio.on('change_current_oos')
-        def change_current_oos(num):
-            self.socketio.emit('change_current_oos', str(num))
-
-        @self.socketio.on('update_slides')
-        def update_slides(text):
-            self.socketio.emit('update_slides', text)
-
-        @self.socketio.on('change_current_slide')
-        def change_current_slide(num):
-            self.socketio.emit('change_current_slide', str(num))
+            print('Shutting down the server via request is no '
+                  'longer necessary as the server is running on a daemonized thread.')
+            self.gui.main.error_log('Shutting down the server via request is no '
+                  'longer necessary as the server is running on a daemonized thread.')
 
         try:
-            self.socketio.run(self.app, self.gui.main.ip, 15171)
+            self.socketio.run(self.app, self.gui.main.ip, self.gui.main.port, allow_unsafe_werkzeug=True)
         except Exception:
             self.gui.main.error_log()
+
+    def update_stage_text(self, stage_html, font_size):
+        with self.app.app_context():
+            self.socketio.emit('update_stage', [stage_html, font_size])
+
+    def update_stage_image(self, jpg_bytes):
+        with self.app.app_context():
+            self.socketio.emit('update_display', jpg_bytes)
+            self.socketio.sleep(0)
 
     def get_all_gui_data(self):
         class_tag = ''

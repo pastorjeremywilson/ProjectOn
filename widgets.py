@@ -193,13 +193,6 @@ class CustomMainWindow(QMainWindow):
             except AttributeError:
                 pass
             self.gui.main.save_settings()
-            # shutdown the remote server
-            try:
-                requests.get('http://' + self.gui.main.ip + ':15171/shutdown')
-            except requests.exceptions.ConnectionError as e:
-                print("Shutdown with Connection Error " + e.__str__())
-            except BaseException as e:
-                print("Shutdown Error " + e.__str__())
 
             if self.gui.timed_update:
                 self.gui.timed_update.keep_running = False
@@ -1963,6 +1956,75 @@ class SimpleSplash:
         QApplication.processEvents()
 
 
+class StandardDialog(QDialog):
+    def __init__(self, gui, message, icon=None, temporary=False, buttons=['yes', 'no', 'cancel']):
+        """
+        Custom QDialog to standardize dialogs across the program.
+        :param str message: Message to display
+        :param QPixmap icon: Icon to use
+        :param bool temporary: 'True' will show the dialog for a fixed number of seconds,
+        specified by setting this class's 'temp_time' attribute
+        :param list of str buttons: Buttons to use on this dialog: ok | yes | no | cancel
+        """
+        super().__init__()
+        self.init_components()
+        self.gui = gui
+        self.message = message
+        self.icon = icon
+        self.temporary = temporary
+        self.buttons = buttons
+
+        self.OK = 1
+        self.YES = 2
+        self.NO = -1
+        self.CANCEL = -2
+
+    def init_components(self):
+        layout = QVBoxLayout(self)
+        if self.icon:
+            message_widget = QWidget()
+            layout.addWidget(message_widget)
+            message_layout = QHBoxLayout(message_widget)
+
+            icon_label = QLabel()
+            self.icon = self.icon.scaledToHeight(50, Qt.SmoothTransformation)
+            icon_label.setPixmap(self.icon)
+            message_layout.addWidget(icon_label)
+            message_layout.addSpacing(10)
+
+            message_label = QLabel(self.message)
+            message_label.setFont(self.gui.standard_font)
+            message_layout.addWidget(message_label)
+        else:
+            message_label = QLabel(self.message)
+            message_label.setFont(self.gui.standard_font)
+            layout.addWidget(message_label)
+
+        button_widget = QWidget()
+        button_layout = QHBoxLayout(button_widget)
+        button_layout.addStretch()
+
+        for i in range(len(self.buttons)):
+            this_button = QPushButton(self.buttons[i].capitalize())
+            this_button.setFont(self.gui.standard_font)
+            if this_button == 'ok':
+                this_button.pressed.connect(lambda: self.done(self.OK))
+            elif this_button == 'yes':
+                this_button.pressed.connect(lambda: self.done(self.YES))
+            elif this_button == 'no':
+                this_button.pressed.connect(lambda: self.done(self.NO))
+            elif this_button == 'cancel':
+                this_button.pressed.connect(lambda: self.done(self.CANCEL))
+
+            button_layout.addWidget(this_button)
+
+            if i < len(self.buttons) - 1:
+                button_layout.addSpacing(20)
+
+    def exec(self):
+        return self.exec()
+
+
 class StandardItemWidget(QWidget):
     """
     Provides a standardized QWidget to be used as a QListWidget ItemWidget
@@ -2777,14 +2839,14 @@ class SettingsWidget(QWidget):
                 for button in self.screen_button_group.buttons():
                     if button.objectName() == self.gui.main.settings['selected_screen_name']:
                         button.setChecked(True)
-                        screen_fount = True
+                        screen_found = True
 
                 if not screen_found:
                     for button in self.screen_button_group.buttons():
                         if 'primary' not in button.text():
                             button.setChecked(True)
 
-                if 'force_software_rendering' in self.gui.main.settings.keys():
+                if 'force_software_rendering' in self.gui.main.settings.keys() and sys.platform == 'win32':
                     self.software_checkbox.blockSignals(True)
                     self.software_checkbox.setChecked(self.gui.main.settings['force_software_rendering'])
                     self.software_checkbox.blockSignals(False)
@@ -2897,3 +2959,274 @@ class SettingsWidget(QWidget):
 
     def cancel(self):
         self.hide()
+        
+        
+class TextLayoutWidget(QWidget):
+    def __init__(
+            self,
+            gui,
+            for_sample=False,
+            font_face='Sans',
+            font_size=72,
+            use_outline=True,
+            outline_color=QColor(0, 0, 0),
+            outline_width=8,
+            fill_color=QColor(255, 255, 255),
+            use_shadow=True,
+            shadow_color=QColor(0, 0, 0),
+            shadow_offset=5,
+            use_shade=False,
+            shade_color=0,
+            shade_opacity=75,
+            background_pixmap=None,
+            sample_text=None,
+            footer_text=None):
+        super().__init__()
+        self.gui = gui
+        self.for_sample = for_sample
+        self.font_face = font_face
+        self.font_size = int(font_size)
+        self.use_outline = use_outline
+        self.outline_color = outline_color
+        self.outline_width = outline_width
+        self.fill_color = fill_color
+        self.use_shadow = use_shadow
+        self.shadow_color = shadow_color
+        self.shadow_offset = shadow_offset
+        self.use_shade = use_shade
+        self.shade_color = shade_color
+        self.shade_opacity = shade_opacity
+        self.sample_text = sample_text
+        self.background_pixmap = background_pixmap
+        if not self.background_pixmap:
+            self.background_pixmap = QPixmap(1920, 1080)
+            painter = QPainter(self.background_pixmap)
+            painter.setBackground(Qt.GlobalColor.blue)
+
+        if not self.sample_text:
+            self.sample_text = ('A mighty fortress is our God;\n'
+                                'A bulwark never failing.\n'
+                                'Our helper He amid the flood,\n'
+                                'Of mortal ills prevailing.')
+        self.footer_text = footer_text
+        if not self.footer_text:
+            self.footer_text = 'Sample Song\nSample Composer\nSample Copyright Information\nSample CCLI Number'
+
+        self.parent = self.gui
+        self.init_components()
+        
+    def init_components(self):
+        """
+        current, default text/footer ratio is 20:1
+        :return:
+        """
+        layout = QVBoxLayout(self)
+        sample_display_width = int(self.gui.secondary_screen.size().width() / 2)
+        sample_display_height = int(self.gui.secondary_screen.size().height() / 2)
+        self.font_size = int(self.font_size / 2)
+        h_margin = 5
+        v_margin = 5
+        lyric_height = int(sample_display_height / 21 * 20)
+        footer_height = int(sample_display_height / 21)
+
+        sample_widget = QWidget()
+        sample_widget.setFixedSize(sample_display_width, sample_display_height)
+        layout.addWidget(sample_widget)
+
+        background_label = QLabel()
+        background_label.setParent(sample_widget)
+        background_label.setFixedSize(sample_display_width, sample_display_height)
+        background_label.move(0, 0)
+        self.background_pixmap = self.background_pixmap.scaled(
+            sample_display_width,
+            sample_display_height,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        background_label.setPixmap(self.background_pixmap)
+
+        lyric_widget = TextLayoutLyricWidget(
+            self.gui,
+            self.for_sample,
+            self.use_outline ,
+            self.outline_color,
+            self.outline_width,
+            self.fill_color,
+            self.use_shadow,
+            self.shadow_color,
+            self.shadow_offset,
+            self.use_shade,
+            self.shade_color,
+            self.shade_opacity
+        )
+        lyric_widget.setFixedSize(sample_display_width - (h_margin * 2), lyric_height - v_margin)
+        lyric_widget.move(h_margin, v_margin)
+        lyric_widget.setText(self.sample_text)
+
+        footer_widget = QLabel(self.footer_text)
+        footer_widget.setFixedSize(sample_display_width - (h_margin * 2), footer_height - v_margin)
+
+
+class TextLayoutLyricWidget(QWidget):
+    def __init__(
+            self,
+            gui,
+            for_sample=False,
+            font_face='Sans',
+            font_size=72,
+            use_outline=True,
+            outline_color=QColor(0, 0, 0),
+            outline_width=8,
+            fill_color=QColor(255, 255, 255),
+            use_shadow=True,
+            shadow_color=QColor(0, 0, 0),
+            shadow_offset=5,
+            use_shade=False,
+            shade_color=0,
+            shade_opacity=75):
+        super().__init__()
+        self.gui = gui
+        self.for_sample = for_sample
+        self.font_face = font_face
+        self.font_size = int(font_size)
+        self.font = QFont(self.font_face, self.font_size, QFont.Weight.Bold)
+        self.use_outline = use_outline
+        self.outline_color = outline_color
+        self.outline_width = outline_width
+        self.fill_color = fill_color
+        self.use_shadow = use_shadow
+        self.shadow_color = shadow_color
+        self.shadow_offset = shadow_offset
+        self.use_shade = use_shade
+        self.shade_color = shade_color
+        self.shade_opacity = shade_opacity
+        self.text = ''
+
+    def setText(self, text):
+        self.text = text
+
+    def paintEvent(self, evt):
+        self.paint_text()
+
+    def paint_text(self):
+        self.total_height = 0
+        self.text = re.sub('<p.*?>', '', self.text)
+        self.text = re.sub('</p>', '', self.text)
+        self.text = re.sub('\n', '<br />', self.text)
+        self.text = re.sub('<br/>', '<br />', self.text)
+
+        BOLD = 0
+        ITALIC = 1
+        UNDERLINE = 2
+
+        font = self.font()
+        font_size = font.pointSize() + 2
+        painter_paths = []
+        longest_line = 0
+
+        # build paths for each line, creating a new path whenever the line becomes too long
+        usable_rect = QRect(0, 0, self.width(), self.height())
+        self.total_height = -1
+        while self.total_height == -1 or self.total_height > usable_rect.height():
+            longest_line = 0
+            painter_paths = []
+            word_path = QPainterPath()
+            path_index = -1
+
+            font_size -= 2
+            font = QFont(font.family(), font_size)
+            self.setFont(font)
+            line_height = self.fontMetrics().boundingRect('Way').height()
+            space_width = self.fontMetrics().boundingRect('w w').width() - self.fontMetrics().boundingRect('ww').width()
+
+            lines = self.text.split('<br />')
+            for i in range(len(lines)):
+                #if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
+                x = 0
+                y = 0
+                line_words = lines[i].split(' ')
+                if len(line_words) == 0:
+                    line_words = [' ']
+                painter_paths.append(QPainterPath())
+                path_index += 1
+                for word in line_words:
+                    #if len(re.sub('<.*?>', '', word).strip()) > 0:
+                    word_path.clear()
+                    if '<b>' in word:
+                        font.setWeight(1000)
+                    if '<i>' in word:
+                        font.setItalic(True)
+                    if '<u>' in word:
+                        font.setUnderline(True)
+
+                    word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                    if (painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width()
+                            > self.gui.display_widget.width() - 40):
+                        painter_paths.append(QPainterPath())
+                        x = 0
+                        y = 0
+                        path_index += 1
+                    painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                    x = painter_paths[path_index].boundingRect().width() + space_width
+
+                    if '</b>' in word:
+                        font.setWeight(QFont.Weight.Normal)
+                    if '</i>' in word:
+                        font.setItalic(False)
+                    if '</u>' in word:
+                        font.setUnderline(False)
+
+            # get the total size of the paths that will be drawn for creating the shading rectangle
+            self.total_height = 0
+            for path in painter_paths:
+                #if path.boundingRect().width() > 0:
+                self.total_height += line_height
+                if path.boundingRect().width() > longest_line:
+                    longest_line = path.boundingRect().width()
+
+        # start the first path at the midpoint of the usable rect, minus half the total height of the paths, plus
+        # the font's ascent (to account for the path's y being the baseline of the text)
+        path_y = (usable_rect.height() / 2) - (self.total_height / 2) + self.fontMetrics().ascent()
+        starting_y = path_y
+        painter = QPainter(self)
+        brush = QBrush()
+        painter.setBrush(brush)
+        pen = QPen()
+        painter.setPen(pen)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        opacity = self.shade_opacity
+        if not self.use_shade:
+            opacity = 0
+        shade_rect = QRectF(
+            int((self.gui.display_widget.width() / 2) - (longest_line / 2)) - 20,
+            starting_y - self.fontMetrics().ascent() - 20,
+            longest_line + 40,
+            self.total_height + 40
+        )
+        painter.fillRect(shade_rect, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
+
+        for path in painter_paths:
+            #if path.boundingRect().width() > 0:
+            path_x = (self.gui.display_widget.width() / 2) - (path.boundingRect().width() / 2)
+            path.translate(path_x, path_y)
+
+            if self.use_shadow:
+                path.translate(self.shadow_offset, self.shadow_offset)
+                shadow_brush = QBrush()
+                shadow_brush.setColor(self.shadow_color)
+                shadow_brush.setStyle(Qt.BrushStyle.SolidPattern)
+                painter.fillPath(path, shadow_brush)
+                path.translate(-self.shadow_offset, -self.shadow_offset)
+
+            brush.setColor(self.fill_color)
+            brush.setStyle(Qt.BrushStyle.SolidPattern)
+            pen.setColor(self.outline_color)
+            pen.setWidth(self.outline_width)
+            painter.setPen(pen)
+
+            painter.fillPath(path, brush)
+            if self.use_outline:
+                painter.strokePath(path, pen)
+
+            path_y += line_height

@@ -16,7 +16,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.8.3?
+# What's New in Version 1.9.0.001?
 - Fixed a crash that can happen on some AMD graphics cards when rendering web pages. In Settings->Screen Settings
     ->Rendering there is a checkbox to "Force Software Rendering".
 - Added the ability to view console messages from loaded web pages: Menu Bar->Tools->View Web Page Messages.
@@ -25,7 +25,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.8.3) and run
+system only. Download the current ProjectOn installer (v.1.9.0.001) and run
 it on your computer.
 
 # Using ProjectOn
