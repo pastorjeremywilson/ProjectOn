@@ -669,6 +669,9 @@ class MediaWidget(QTabWidget):
                 if '-' in reference_split[i]:
                     self.formatted_reference = self.passages[0] + ' ' + reference_split[i]
 
+            if not self.formatted_reference:
+                self.formatted_reference = self.passages[0] + ' ' + reference_split[1]
+
             scripture = ''
             for passage in self.passages[1]:
                 scripture += passage[0] + ' ' + passage[1] + ' '
