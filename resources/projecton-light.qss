@@ -18,7 +18,7 @@ QWidget[objectName="item_widget"] {
 
 /*-------------------- tool_bar_container --------------------*/
 QWidget[objectName="tool_bar_container"] {
-    background: #ffffff;
+    background: #eeeeff;
 }
 
 /*-------------------- tab_widget --------------------*/
@@ -28,20 +28,25 @@ QWidget[objectName="tab_widget"] {
 
 /*-------------------- font_widget --------------------*/
 QWidget[objectName="font_widget"] {
-    background: #ffffff;
+    background: #eeeeff;
     color: #000000;
 }
 
 /*-------------------- settings_container --------------------*/
 QWidget[objectName="settings_container"] {
-    background: #ffffff;
+    background: #eeeeff;
     color: #000000;
 }
 
 /*-------------------- edit_main_widget --------------------*/
 QWidget[objectName="edit_main_widget"] {
-    background: #ffffff;
+    background: #eeeeff;
     color: #000000;
+}
+
+/*-------------------- button_widget --------------------*/
+QWidget[objectName="button_widget"] {
+    background: #eaeaea;
 }
 
 /*-------------------- QPushButton --------------------*/
@@ -219,7 +224,7 @@ QCheckbox {
 
 /*-------------------- QMainWindow --------------------*/
 QMainWindow {
-    background: #f0f0f0;
+    background: #ffffff;
 }
 
 /*-------------------- QScrollArea --------------------*/
@@ -235,14 +240,14 @@ QDialog {
 
 /*-------------------- QListWidget --------------------*/
 QListWidget {
-	background: #ffffff;
+	background: #eeeeff;
 	color: #000000;
 }
 QListView {
-    background: #ffffff;
+    background: #eeeeff;
 }
 QListView::item {
-	background: #ffffff;
+	background: #eeeeff;
 	color: #000000;
 }
 QListView::item:hover {
@@ -255,11 +260,11 @@ QListView::item:selected {
 
 /*-------------------- QMenuBar --------------------*/
 QMenuBar {
-    background: #f0f0f0;
+    background: #eeeeff;
     color: #000000;
 }
 QMenuBar::item {
-    background: #f0f0f0;
+    background: #eeeeff;
     color: #000000;
 }
 QMenuBar::item:hover {
@@ -274,11 +279,11 @@ QMenuBar::item:pressed {
 
 /*-------------------- QMenu --------------------*/
 QMenu {
-    background: #f0f0f0;
+    background: #eeeeff;
     color: #000000;
 }
 QMenu::item {
-    background: #f0f0f0;
+    background: #eeeeff;
     color: #000000;
 }
 QMenuBar::item:hover {

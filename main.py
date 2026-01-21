@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.8.3
+ProjectOn v.1.9.1
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -17,10 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-"""
-Trying Python v3.14, PyQt5 v5.15.11, and QtWebEngine v5.15.7 to fix QWebEngine AMD atio6axx.dll crash
-"""
+import threading
 import json
 import logging
 import os.path
@@ -39,7 +36,6 @@ from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
-from gevent import monkey
 
 import declarations
 from gui import GUI
@@ -100,7 +96,7 @@ class ProjectOn(QObject):
         #self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
 
         self.thread_pool = QThreadPool()
-        self.server_thread_pool = QThreadPool()
+        #self.server_thread_pool = QThreadPool()
         self.update_status_signal.connect(self.update_status_label)
 
         last_status_count = 100
@@ -113,6 +109,7 @@ class ProjectOn(QObject):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('192.255.255.255', 1))
         self.ip = s.getsockname()[0]
+        self.port = 15171
 
         self.update_status_signal.emit('Creating GUI', 'status')
         self.app.processEvents()
@@ -123,7 +120,8 @@ class ProjectOn(QObject):
         self.app.processEvents()
 
         self.remote_server = RemoteServer(self.gui)
-        self.server_thread_pool.start(self.remote_server)
+        self.server_thread = threading.Thread(target=self.remote_server.start_server, daemon=True)
+        self.server_thread.start()
 
         self.splash_widget.deleteLater()
         self.settings['last_status_count'] = self.status_update_count
@@ -184,7 +182,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.8.3')
+        version_label = QLabel('v.1.9.1')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1351,6 +1349,7 @@ class ProjectOn(QObject):
                 log_text = (f'\n{date_time}:\n'
                             f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
 
+            print(message_box_text)
             message_box = QMessageBox()
             message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
             message_box.setWindowTitle('An Error Occurred')
@@ -1467,5 +1466,4 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
 if __name__ == '__main__':
     os.environ['QT_DEBUG_PLUGINS'] = '1'
     sys.excepthook = log_unhandled_exception
-    monkey.patch_all(ssl=False)
     ProjectOn()

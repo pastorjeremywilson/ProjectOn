@@ -44,6 +44,11 @@ QWidget[objectName="edit_main_widget"] {
     color: #e0e0e0;
 }
 
+/*-------------------- button_widget --------------------*/
+QWidget[objectName="button_widget"] {
+    background: #454545;
+}
+
 /*-------------------- FontFaceComboBox --------------------*/
 QComboBox[objectName="FontFaceComboBox"] {
     background: #a0a0a0;

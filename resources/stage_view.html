@@ -28,6 +28,18 @@
 				color: white;
 				overflow: hidden;
 			}
+
+            #image_display {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                transform: translateZ(0);           /* Promote to its own compositor layer */
+                will-change: transform, contents;   /* Hint frequent changes */
+                image-rendering: crisp-edges;       /* Skip smoothing if acceptable */
+                backface-visibility: hidden;        /* Sometimes helps GPU upload */
+            }
         </style>
 
 	</head>
@@ -36,15 +48,51 @@
 		<div id="lyric_container">
 			<div id="lyric_display"></div>
 		</div>
+        <div id="image_container">
+            <img id="image_display">
+        </div>
     </body>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 	<script type="text/javascript" charset="utf-8">
 		var socket = io();
 		socket.on('update_stage', function(text) {
+			document.getElementById("image_display").src = "";
 			html = text[0];
 			font_size = text[1];
 			document.getElementById("lyric_display").innerHTML = html;
 			document.getElementById("lyric_display").style.fontSize = font_size + 'px';
 		});
+        socket.on('update_display', async (binaryData) => {
+            document.getElementById("lyric_display").innerHTML = "";
+            const startTime = performance.now();
+            const blob = new Blob([binaryData], { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
+
+            const decoderImg = new Image();
+            decoderImg.src = url;
+
+            try {
+                await decoderImg.decode();
+
+                const offscreen = document.createElement('canvas');
+                offscreen.width = decoderImg.naturalWidth;
+                offscreen.height = decoderImg.naturalHeight;
+                const ctx = offscreen.getContext('2d', { willReadFrequently: false });
+                ctx.drawImage(decoderImg, 0, 0);
+
+                const display = document.getElementById('image_display');
+                display.src = url;
+
+                display.width = decoderImg.naturalWidth;
+                display.height = decoderImg.naturalHeight;
+                display.style.width = '100vw';
+                display.style.height = '100vh';
+                display.style.objectFit = 'contain';
+
+            } catch (err) {
+                console.error('Decode failed:', err);
+                document.getElementById('display').src = url;
+            }
+        });
 	</script>
 </html>

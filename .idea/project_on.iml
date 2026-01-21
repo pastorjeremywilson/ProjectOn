@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.linux_venv" />
       <excludeFolder url="file://$MODULE_DIR$/.win_qt5_venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.14 virtualenv at X:\Documents\Python Workspace\project_on\.win_qt5_venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12 virtualenv at ~/Documents/Python Workspace/project_on/.linux_venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

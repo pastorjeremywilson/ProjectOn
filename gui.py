@@ -5,6 +5,7 @@ import re
 import shutil
 import sys
 import tempfile
+import time
 from datetime import datetime
 from os.path import exists
 
@@ -30,7 +31,7 @@ from oos_widget import OOSWidget
 from openlyrics_export import OpenlyricsExport
 from preview_widget import PreviewWidget
 from runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
-from widgets import SimpleSplash, SettingsWidget
+from widgets import SimpleSplash, SettingsWidget, TextLayoutWidget
 from songselect_import import SongselectImport
 from toolbar import Toolbar
 from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, CountdownWidget
@@ -201,13 +202,30 @@ class GUI(QObject):
 
         self.main_window.showMaximized()
 
+        """
+        Experimenting with a text layout widget:
+        sample_data = self.media_widget.song_list.item(0).data(Qt.ItemDataRole.UserRole)
+        self.layout_widget = TextLayoutWidget(
+            self,
+            False,
+            sample_data['font_family'],
+            sample_data['font_size'],
+            sample_data['use_outline'],
+            sample_data['outline_color'],
+            sample_data['outline_width'],
+            sample_data['font_color'],
+            sample_data['use_shadow'],
+            sample_data['shadow_color'],
+            sample_data['shadow_offset'],
+            sample_data['use_shade'],
+            sample_data['shade_color'],
+            sample_data['shade_opacity']
+        )
+        self.layout_widget.move(20, 20)
+        self.layout_widget.show()
+        """
+
         self.check_update()
-        """QMessageBox.question(
-            self.main_window,
-            'Web Engine Process Path',
-            f'Web Engine Process Path: {os.environ["QTWEBENGINEPROCESS_PATH"]}',
-            QMessageBox.StandardButton.Ok
-        )"""
 
     def check_files(self):
         if 'linux' in sys.platform:
@@ -470,6 +488,7 @@ class GUI(QObject):
 
         self.main.update_status_signal.emit('Creating GUI: Building Sample Widget', 'status')
         self.sample_widget = DisplayWidget(self, sample=True)
+        self.sample_widget.setWindowTitle('Sample Widget')
         self.sample_layout = QVBoxLayout()
         self.sample_layout.setContentsMargins(0, 0, 0, 0)
         self.sample_widget.setLayout(self.sample_layout)
@@ -662,7 +681,7 @@ class GUI(QObject):
             wait_widget.widget.deleteLater()
 
     def check_update(self):
-        current_version = 'v.1.8.3'
+        current_version = 'v.1.9.1'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -905,7 +924,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.8.3')
+        title_label = QLabel('ProjectOn v.1.9.1')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1044,6 +1063,13 @@ class GUI(QObject):
 
         try:
             if pixmap:
+                if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
+                    buffer = QBuffer()
+                    buffer.open(QIODevice.WriteOnly)
+                    pixmap.save(buffer, 'JPG', 70)
+                    jpg_bytes = bytes(buffer.data())
+                    self.main.remote_server.update_stage_image(jpg_bytes)
+                    buffer.close()
                 pixmap = pixmap.scaled(
                     int(self.display_widget.width() / 5), int(self.display_widget.height() / 5),
                     Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
@@ -2031,26 +2057,47 @@ class GUI(QObject):
 
             # change the preview image
             if widget == 'live':
-                if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
-                    pixmap = display_widget.grab(display_widget.rect())
-                    pixmap = pixmap.scaled(
-                        int(display_widget.width() / 5), int(display_widget.height() / 5),
-                        Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                full_size_pixmap = display_widget.grab(display_widget.rect())
+                pixmap = full_size_pixmap.scaled(
+                    int(display_widget.width() / 5),
+                    int(display_widget.height() / 5),
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                stage_html = re.sub('<p.*?>', '', lyrics_html)
+                stage_html = stage_html.replace('</p>', '')
+                stage_html = f'<p style="align-text: center;">{stage_html}</p>'
 
+                if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
                     self.live_widget.preview_label.setPixmap(pixmap)
 
-                    stage_html = re.sub('<p.*?>', '', lyrics_html)
-                    stage_html = stage_html.replace('</p>', '')
-                    self.main.remote_server.socketio.emit(
-                        'update_stage', [stage_html, self.main.settings['stage_font_size']])
+                    if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
+                        buffer = QBuffer()
+                        buffer.open(QIODevice.WriteOnly)
+                        full_size_pixmap.save(buffer, 'JPG', 70)
+                        jpg_bytes = bytes(buffer.data())
+                        self.main.remote_server.update_stage_image(jpg_bytes)
+                        buffer.close()
+                    else:
+                        self.main.remote_server.update_stage_text(
+                            stage_html, self.main.settings['stage_font_size'])
                 elif auto_play_text:
-                    lyrics_html = '<p style="align-text: center;">' + auto_play_text[0] + '</p>'
-                    self.main.remote_server.socketio.emit(
-                        'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
+                    self.live_widget.preview_label.setPixmap(pixmap)
+                    if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
+                        buffer = QBuffer()
+                        buffer.open(QIODevice.WriteOnly)
+                        full_size_pixmap.save(buffer, 'JPG', 70)
+                        jpg_bytes = bytes(buffer.data())
+                        self.main.remote_server.update_stage_image(jpg_bytes)
+                        buffer.close()
+                    else:
+                        self.main.remote_server.update_stage_text(
+                            stage_html, self.main.settings['stage_font_size'])
                 else:
-                    lyrics_html = '<p style="align-text: center;">' + item_data['parsed_text'] + '</p>'
-                    self.main.remote_server.socketio.emit(
-                        'update_stage', [lyrics_html, self.main.settings['stage_font_size']])
+                    if 'mirror_stage_display' in self.main.settings.keys() and not self.main.settings[
+                            'mirror_stage_display']:
+                        self.main.remote_server.update_stage_text(
+                            stage_html, self.main.settings['stage_font_size'])
 
             elif widget == 'sample':
                 pixmap = display_widget.grab(display_widget.rect())
@@ -2059,6 +2106,9 @@ class GUI(QObject):
                     Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
+
+    def update_stage_image(self, jpg_bytes):
+        self.main.remote_server.socketio.emit('update_display', jpg_bytes)
 
     def test_url(self, url):
         response = None
