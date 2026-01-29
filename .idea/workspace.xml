@@ -7,22 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed single-verse bible passage not able to be added to service. Ready for release.">
-      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added &quot;Slide # of #&quot; to stage display.&#10;Redesigned settings widget.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/stage_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/stage_view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/toolbar.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -198,14 +184,6 @@
       <workItem from="1764885540371" duration="1194000" />
       <workItem from="1764955166824" duration="1346000" />
       <workItem from="1764966860052" duration="73000" />
-    </task>
-    <task id="LOCAL-00113" summary="Fixed a problem where new tags weren't getting numbered.">
-      <option name="closed" value="true" />
-      <created>1737579221394</created>
-      <option name="number" value="00113" />
-      <option name="presentableId" value="LOCAL-00113" />
-      <option name="project" value="LOCAL" />
-      <updated>1737579221395</updated>
     </task>
     <task id="LOCAL-00114" summary="Added a check to see if an inserted tag needs line breaks before or after">
       <option name="closed" value="true" />
@@ -591,7 +569,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769031969339</updated>
     </task>
-    <option name="localTasksCounter" value="162" />
+    <task id="LOCAL-00162" summary="Added &quot;Slide # of #&quot; to stage display.&#10;Redesigned settings widget.">
+      <option name="closed" value="true" />
+      <created>1769728458983</created>
+      <option name="number" value="00162" />
+      <option name="presentableId" value="LOCAL-00162" />
+      <option name="project" value="LOCAL" />
+      <updated>1769728458984</updated>
+    </task>
+    <option name="localTasksCounter" value="163" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -612,7 +598,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Streamlined the check for a newer version and added the notes for that version to the user prompt.&#10;&#10;Added reportlab package that was missing after the last virtual environment creation.&#10;&#10;Downgraded pillow to version that works with PyQt5." />
     <MESSAGE value="Fixed preview not showing when editing from OOS widget.&#10;&#10;Fixed removing last character from preview when text fragment finds end instead of stop character." />
     <MESSAGE value="Prevented calling populate_tag_list when editor doesn't have a song open.&#10;&#10;Installed missing opencv-python which was causing an error when adding a video" />
     <MESSAGE value="Updated readmes. Ready for release." />
@@ -637,7 +622,8 @@
     <MESSAGE value="Added code to send grab of display window to the stage webpage as jpg bytes." />
     <MESSAGE value="Added selection between text and mirror for the stage view to the display settings. Added slightly different background to the button widgets in settings and edit windows. Moved the edit buttons outside of the QScrollArea to keep visible. Minor tweaks to the GUI colors in light mode." />
     <MESSAGE value="Fixed single-verse bible passage not able to be added to service. Ready for release." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed single-verse bible passage not able to be added to service. Ready for release." />
+    <MESSAGE value="Added &quot;Slide # of #&quot; to stage display.&#10;Redesigned settings widget." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added &quot;Slide # of #&quot; to stage display.&#10;Redesigned settings widget." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
