@@ -18,7 +18,7 @@ from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
-    QGraphicsView, QGraphicsScene, QTextEdit
+    QGraphicsView, QGraphicsScene, QTextEdit, QApplication, QStyleFactory
 
 import declarations
 import parsers
@@ -31,9 +31,8 @@ from oos_widget import OOSWidget
 from openlyrics_export import OpenlyricsExport
 from preview_widget import PreviewWidget
 from runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
-from widgets import SimpleSplash, SettingsWidget, TextLayoutWidget
+from widgets import SimpleSplash, SettingsWidget, TextLayoutWidget, Toolbar, IndexedSettingsWidget
 from songselect_import import SongselectImport
-from toolbar import Toolbar
 from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, CountdownWidget
 
 
@@ -188,9 +187,6 @@ class GUI(QObject):
         self.main.update_status_signal.emit('Creating GUI: Creating Special Display Widgets', 'status')
         self.make_special_display_widgets()
 
-        if len(self.main.settings) > 0:
-            self.apply_settings()
-
         if len(self.screens) > 1:
             self.display_widget.show()
             self.tool_bar.show_display_button.setChecked(False)
@@ -198,7 +194,12 @@ class GUI(QObject):
             self.tool_bar.show_display_button.setChecked(True)
 
         self.main.update_status_signal.emit('Finalizing', 'status')
-        self.tool_bar.sw = SettingsWidget(self)
+        #self.tool_bar.sw = SettingsWidget(self)
+        self.tool_bar.sw = IndexedSettingsWidget(self)
+        QApplication.processEvents()
+
+        if len(self.main.settings) > 0:
+            self.apply_settings()
 
         self.main_window.showMaximized()
 
@@ -668,20 +669,16 @@ class GUI(QObject):
             video_action.triggered.connect(lambda: os.system(f'xdg-open \'\' {video_url}'))
 
     def set_theme(self, theme):
-        wait_widget = None
-        if not self.main.initial_startup:
-            wait_widget = SimpleSplash(self, 'Please wait...', subtitle=False)
         if theme == 'light':
             self.main.settings['theme'] = 'light'
-            self.main_window.setStyleSheet(self.light_style_sheet)
+            self.main.app.setStyleSheet(self.light_style_sheet)
         else:
             self.main.settings['theme'] = 'dark'
-            self.main_window.setStyleSheet(self.dark_style_sheet)
-        if wait_widget:
-            wait_widget.widget.deleteLater()
+            self.main.app.setStyleSheet(self.dark_style_sheet)
+        QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.1'
+        current_version = 'v.1.9.1.001'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -818,35 +815,6 @@ class GUI(QObject):
                     self.main_window.close()
                     sys.exit(0)
 
-    def create_font_pixmaps(self):
-        font_families = QFontDatabase().families()
-        self.font_pixmaps = []
-        width = 0
-        height = 0
-        for font in font_families:
-            self.main.update_status_signal.emit(font, 'info')
-            font_metrics = QFontMetrics(QFont(font, 18))
-            text_rect = font_metrics.boundingRect(font)
-            if text_rect.width() > width:
-                width = text_rect.width()
-            if text_rect.height() > height:
-                height = text_rect.height()
-
-            pixmap = QPixmap(text_rect.width() + 10, text_rect.height() + 10)
-            pixmap.fill(QColor(0, 0, 0, 0))
-            painter = QPainter(pixmap)
-            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-            painter.setPen(Qt.GlobalColor.black)
-
-            painter.setFont(QFont(font, 18))
-            painter.drawText(QPoint(5, abs(text_rect.y()) + 5), font)
-            painter.end()
-
-            self.font_pixmaps.append([font, pixmap])
-        if height > 36:
-            height = 36
-        self.font_pixmaps.append([width, height])
-
     def print_oos(self):
         """
         Provides a method to create a printout of the current order of service
@@ -924,7 +892,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.1')
+        title_label = QLabel('ProjectOn v.1.9.1.001')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1068,7 +1036,7 @@ class GUI(QObject):
                     buffer.open(QIODevice.WriteOnly)
                     pixmap.save(buffer, 'JPG', 70)
                     jpg_bytes = bytes(buffer.data())
-                    self.main.remote_server.update_stage_image(jpg_bytes)
+                    self.main.remote_server.update_stage_image(jpg_bytes, '')
                     buffer.close()
                 pixmap = pixmap.scaled(
                     int(self.display_widget.width() / 5), int(self.display_widget.height() / 5),
@@ -2068,6 +2036,10 @@ class GUI(QObject):
                 stage_html = stage_html.replace('</p>', '')
                 stage_html = f'<p style="align-text: center;">{stage_html}</p>'
 
+                slide_number = self.live_widget.slide_list.currentRow() + 1
+                num_slides = self.live_widget.slide_list.count()
+                slide_info = f'Slide {slide_number} of {num_slides}'
+
                 if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
                     self.live_widget.preview_label.setPixmap(pixmap)
 
@@ -2076,11 +2048,11 @@ class GUI(QObject):
                         buffer.open(QIODevice.WriteOnly)
                         full_size_pixmap.save(buffer, 'JPG', 70)
                         jpg_bytes = bytes(buffer.data())
-                        self.main.remote_server.update_stage_image(jpg_bytes)
+                        self.main.remote_server.update_stage_image(jpg_bytes, slide_info)
                         buffer.close()
                     else:
                         self.main.remote_server.update_stage_text(
-                            stage_html, self.main.settings['stage_font_size'])
+                            stage_html, self.main.settings['stage_font_size'], slide_info)
                 elif auto_play_text:
                     self.live_widget.preview_label.setPixmap(pixmap)
                     if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
@@ -2088,16 +2060,23 @@ class GUI(QObject):
                         buffer.open(QIODevice.WriteOnly)
                         full_size_pixmap.save(buffer, 'JPG', 70)
                         jpg_bytes = bytes(buffer.data())
-                        self.main.remote_server.update_stage_image(jpg_bytes)
+                        self.main.remote_server.update_stage_image(jpg_bytes, slide_info)
                         buffer.close()
                     else:
                         self.main.remote_server.update_stage_text(
-                            stage_html, self.main.settings['stage_font_size'])
+                            stage_html, self.main.settings['stage_font_size'], slide_info)
                 else:
-                    if 'mirror_stage_display' in self.main.settings.keys() and not self.main.settings[
+                    if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings[
                             'mirror_stage_display']:
+                        buffer = QBuffer()
+                        buffer.open(QIODevice.WriteOnly)
+                        full_size_pixmap.save(buffer, 'JPG', 70)
+                        jpg_bytes = bytes(buffer.data())
+                        self.main.remote_server.update_stage_image(jpg_bytes, '')
+                        buffer.close()
+                    else:
                         self.main.remote_server.update_stage_text(
-                            stage_html, self.main.settings['stage_font_size'])
+                            stage_html, self.main.settings['stage_font_size'], '')
 
             elif widget == 'sample':
                 pixmap = display_widget.grab(display_widget.rect())

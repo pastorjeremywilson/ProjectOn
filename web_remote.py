@@ -154,13 +154,13 @@ class RemoteServer:
         except Exception:
             self.gui.main.error_log()
 
-    def update_stage_text(self, stage_html, font_size):
+    def update_stage_text(self, stage_html, font_size, slide_info):
         with self.app.app_context():
-            self.socketio.emit('update_stage', [stage_html, font_size])
+            self.socketio.emit('update_stage', [stage_html, font_size, slide_info])
 
-    def update_stage_image(self, jpg_bytes):
+    def update_stage_image(self, jpg_bytes, slide_info):
         with self.app.app_context():
-            self.socketio.emit('update_display', jpg_bytes)
+            self.socketio.emit('update_display', [jpg_bytes, slide_info])
             self.socketio.sleep(0)
 
     def get_all_gui_data(self):

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.1
+ProjectOn v.1.9.1.001
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -35,7 +35,7 @@ from xml.etree import ElementTree
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
+    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QStyle, QStyleFactory
 
 import declarations
 from gui import GUI
@@ -93,10 +93,8 @@ class ProjectOn(QObject):
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-features=ExperimentalJavaScript"
 
         self.app = QApplication(sys.argv)
-        #self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
 
         self.thread_pool = QThreadPool()
-        #self.server_thread_pool = QThreadPool()
         self.update_status_signal.connect(self.update_status_label)
 
         last_status_count = 100
@@ -182,7 +180,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.1')
+        version_label = QLabel('v.1.9.1.001')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)

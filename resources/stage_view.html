@@ -22,7 +22,7 @@
 				text-align: center;
 				display: table-cell;
 				vertical-align: middle;
-				font-family: "Helvetica";
+				font-family: "Arial";
 				font-weight: bold;
 				line-height: 150%;
 				color: white;
@@ -36,9 +36,23 @@
                 width: 100vw;
                 height: 100vh;
                 transform: translateZ(0);           /* Promote to its own compositor layer */
+                z-index: 1;
                 will-change: transform, contents;   /* Hint frequent changes */
                 image-rendering: crisp-edges;       /* Skip smoothing if acceptable */
                 backface-visibility: hidden;        /* Sometimes helps GPU upload */
+            }
+            #slide_number {
+                position: absolute;
+                width: 100vw;
+                top: 94vh;
+                margin-right: 1vw;
+                z-index: 10;
+                font-family: "Arial";
+                font-weight: bold;
+                font-size: 5vh;
+                color: #ffffff;
+                text-shadow: 5px 5px 5px black;
+                text-align: right;
             }
         </style>
 
@@ -51,6 +65,7 @@
         <div id="image_container">
             <img id="image_display">
         </div>
+        <div id="slide_number"></div>
     </body>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 	<script type="text/javascript" charset="utf-8">
@@ -59,10 +74,14 @@
 			document.getElementById("image_display").src = "";
 			html = text[0];
 			font_size = text[1];
+			slide_number = text[2];
 			document.getElementById("lyric_display").innerHTML = html;
 			document.getElementById("lyric_display").style.fontSize = font_size + 'px';
+			document.getElementById("slide_number").innerHTML = slide_number;
 		});
-        socket.on('update_display', async (binaryData) => {
+        socket.on('update_display', async (data) => {
+            binaryData = data[0];
+            slide_number = data[1];
             document.getElementById("lyric_display").innerHTML = "";
             const startTime = performance.now();
             const blob = new Blob([binaryData], { type: 'image/jpeg' });
@@ -93,6 +112,8 @@
                 console.error('Decode failed:', err);
                 document.getElementById('display').src = url;
             }
+			document.getElementById("slide_number").innerHTML = "<span>" + slide_number + "</span>";
+			console.log(document.getElementById("slide_number").innerHTML);
         });
 	</script>
 </html>
