@@ -2,6 +2,8 @@ Done:
 
 To Do:
     Fix CCLI icon in settings
+    Fix crash when deleting web item (see Projector Computer logs)
+    Fix styling on dialogs
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types

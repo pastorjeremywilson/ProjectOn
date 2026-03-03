@@ -10,7 +10,8 @@ from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer, QIODevice
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer, QIODevice, \
+    QSize
 from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, \
     QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -79,7 +80,7 @@ class GUI(QObject):
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
     list_title_font = QFont('Helvetica', 10, QFont.Weight.Bold)
     list_font = QFont('Helvetica', 10)
-
+    toolbar_icon_size = QSize(36, 36)
     global_font_face = 'Helvetica'
     global_font_size = 48
     global_font_color = 'rgb(255, 255, 255)'
@@ -108,6 +109,14 @@ class GUI(QObject):
 
         self.audio_output = None
         self.main = main
+
+        display_geometry = self.main.app.primaryScreen().geometry()
+        if display_geometry.width() < 1920:
+            self.standard_font.setPointSize(10)
+            self.bold_font.setPointSize(10)
+            self.list_title_font.setPointSize(8)
+            self.list_font.setPointSize(8)
+            self.toolbar_icon_size = QSize(24, 24)
 
         self.live_from_remote_signal.connect(self.live_from_remote)
         self.live_slide_from_remote_signal.connect(self.live_slide_from_remote)
@@ -520,23 +529,23 @@ class GUI(QObject):
 
         self.main.update_status_signal.emit('Creating GUI: Adding Media Widget', 'status')
         self.media_widget = MediaWidget(self)
-        self.media_widget.setMinimumWidth(100)
+        #self.media_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.media_widget, 2, 0)
         self.main.update_status_signal.emit('', 'info')
 
         self.main.update_status_signal.emit('Creating GUI: Adding OOS Widget', 'status')
         self.oos_widget = OOSWidget(self)
-        self.oos_widget.setMinimumWidth(100)
+        #self.oos_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.oos_widget, 1, 0)
 
         self.main.update_status_signal.emit('Creating GUI: Adding Preview Widget', 'status')
         self.preview_widget = PreviewWidget(self)
-        self.preview_widget.setMinimumWidth(100)
+        #self.preview_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.preview_widget, 1, 2, 2, 1)
 
         self.main.update_status_signal.emit('Creating GUI: Adding Live Widget', 'status')
         self.live_widget = LiveWidget(self)
-        self.live_widget.setMinimumWidth(100)
+        #self.live_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.live_widget, 1, 3, 2, 1)
 
     def create_menu_bar(self):
@@ -1627,9 +1636,14 @@ class GUI(QObject):
             # show the play/pause/stop controls if this is a video or a custom slide with audio
             if (item_data['type'] == 'video'
                     or (item_data['type'] == 'custom' and item_data['audio_file'] and len(item_data['audio_file']) > 0)):
+                self.live_widget.web_controls.hide()
                 self.live_widget.player_controls.show()
+            elif item_data['type'] == 'web':
+                self.live_widget.player_controls.hide()
+                self.live_widget.web_controls.show()
             else:
                 self.live_widget.player_controls.hide()
+                self.live_widget.web_controls.hide()
 
             self.live_widget.blockSignals(False)
             self.oos_widget.oos_list_widget.blockSignals(False)
