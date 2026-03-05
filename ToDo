@@ -1,12 +1,14 @@
 Done:
+    Fix crash when deleting web item (see Projector Computer logs)
 
 To Do:
-    Fix CCLI icon in settings
-    Fix crash when deleting web item (see Projector Computer logs)
     Fix styling on dialogs
+    Ensure cleanup on stage display web page images
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types
     Video backgrounds
     Further consolidate widgets
     Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
+    Create module folders
+

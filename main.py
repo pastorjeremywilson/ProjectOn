@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.1.003
+ProjectOn v.1.9.1.004
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -180,7 +180,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.1.003')
+        version_label = QLabel('v.1.9.1.004')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -598,16 +598,13 @@ class ProjectOn(QObject):
             connection.commit()
             connection.close()
 
-            QMessageBox.information(
-                self.gui.main_window,
-                description + 'Removed',
-                item.data(Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
-                QMessageBox.StandardButton.Ok
-            )
+            return 0
         except Exception:
             self.error_log()
             if connection:
                 connection.close()
+
+            return -1
 
     def delete_all_songs(self):
         """

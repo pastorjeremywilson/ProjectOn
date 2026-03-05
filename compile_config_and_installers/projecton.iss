@@ -2,13 +2,14 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ProjectOn"
-#define MyAppVersion "1.9.1.003"
+#define MyAppVersion "1.9.1.004"
 #define MyAppPublisher "Wilson's Widgets"
 #define MyAppExeName "ProjectOn.exe"
 #define MyAppAssocName MyAppName + " File"
 #define MyAppAssocExt ".pro"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
-#define ResourceLocation "C:\Users\pasto\Desktop\output\ProjectOn\_internal"
+#define BaseLocation "C:\Users\jeremy\Desktop\output\ProjectOn"
+#define ResourceLocation BaseLocation + "\_internal"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -21,14 +22,14 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\gpl-3.0.rtf
+LicenseFile={#BaseLocation}\_internal\resources\gpl-3.0.rtf
 SourceDir={#ResourceLocation}\resources
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=C:\Users\pasto\Desktop\output\ProjectOn\installer
+OutputDir={#BaseLocation}\installer
 OutputBaseFilename=Setup Projecton v.{#MyAppVersion}
-SetupIconFile=C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\logo.ico
+SetupIconFile={#BaseLocation}\_internal\resources\logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -43,11 +44,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\pasto\Desktop\output\ProjectOn\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\README.html"; DestDir: "{app}\_internal"; Flags: isreadme
-Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\defaults\data\*"; DestDir: "{userappdata}\ProjectOn\data\"; Flags: createallsubdirs recursesubdirs onlyifdoesntexist uninsneveruninstall
-Source: "C:\Users\pasto\Desktop\output\ProjectOn\_internal\resources\defaults\localConfig.json"; DestDir: "{userappdata}\ProjectOn\"; Flags: onlyifdoesntexist uninsneveruninstall
+Source: "{#BaseLocation}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BaseLocation}\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BaseLocation}\_internal\README.html"; DestDir: "{app}\_internal"; Flags: isreadme
+Source: "{#BaseLocation}\_internal\resources\defaults\data\*"; DestDir: "{userappdata}\ProjectOn\data\"; Flags: createallsubdirs recursesubdirs onlyifdoesntexist uninsneveruninstall
+Source: "{#BaseLocation}\_internal\resources\defaults\localConfig.json"; DestDir: "{userappdata}\ProjectOn\"; Flags: onlyifdoesntexist uninsneveruninstall
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

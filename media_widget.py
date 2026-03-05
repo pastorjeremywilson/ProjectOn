@@ -1400,6 +1400,9 @@ class CustomListWidget(QListWidget):
         """
         Method to remove an item from this widget. Creates a QMessageBox to confirm removal.
         """
+        if not self.currentItem():
+            return
+
         response = QMessageBox.question(
             self.gui.main_window,
             'Really Delete',
@@ -1413,6 +1416,13 @@ class CustomListWidget(QListWidget):
             thread = threading.Thread(target=self.gui.main.delete_item, args=(self.currentItem(),))
             thread.start()
             thread.join()
+
+        QMessageBox.information(
+            self.gui.main_window,
+            'Removed',
+            self.currentItem().data(Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
+            QMessageBox.StandardButton.Ok
+        )
 
         if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.populate_song_list()

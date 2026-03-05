@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['../main.py'],
+    ['..\\main.py'],
     pathex=[],
     binaries=[],
     datas=[('../resources', 'resources/'), ('../static', 'static'), ('../README.md', '.'), ('../README.html', '.')],
@@ -21,7 +21,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='projecton',
+    name='ProjectOn',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -32,7 +32,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['../resources/icon.ico'],
+    icon=['..\\resources\\branding\\logo.ico'],
 )
 coll = COLLECT(
     exe,
@@ -41,5 +41,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='projecton',
+    name='ProjectOn',
 )
