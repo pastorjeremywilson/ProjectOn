@@ -16,7 +16,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.9.1.004?
+# What's New in Version 1.9.1.005?
 - ProjectOn can now mirror what is on the main display to the stage display. This means that the stage display
   website can show exactly what is beeing seen on the projector/main screen. This can be turned on in Settings->Screen
      Settings. 
@@ -26,7 +26,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.9.1.004) and run
+system only. Download the current ProjectOn installer (v.1.9.1.005) and run
 it on your computer.
 
 # Using ProjectOn

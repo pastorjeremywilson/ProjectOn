@@ -338,6 +338,8 @@ class MediaWidget(QTabWidget):
         self.image_list.setFont(self.gui.standard_font)
         self.image_list.setDragEnabled(True)
         self.image_list.doubleClicked.connect(self.add_image_to_service)
+        self.image_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.image_list.verticalScrollBar().setSingleStep(10)
         image_layout.addWidget(self.image_list)
 
         self.populate_image_list()
@@ -388,6 +390,8 @@ class MediaWidget(QTabWidget):
         self.video_list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.video_list.setDragEnabled(True)
         self.video_list.setFont(self.gui.standard_font)
+        self.video_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.video_list.verticalScrollBar().setSingleStep(10)
         self.populate_video_list()
         video_layout.addWidget(self.video_list)
 
