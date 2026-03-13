@@ -2293,6 +2293,56 @@ class SettingsWidget(QWidget):
 
         return widget
 
+    def update_settings(self):
+        widget = QWidget()
+        widget.setObjectName('settings_container')
+        widget.setMinimumWidth(self.min_width)
+        layout = QVBoxLayout()
+        widget.setLayout(layout)
+
+        display_title_label = QLabel('Preview Update Settings')
+        display_title_label.setFont(self.gui.bold_font)
+        display_title_label.setStyleSheet('background: #5555aa; color: white;')
+        display_title_label.setContentsMargins(5, 5, 5, 5)
+        layout.addWidget(display_title_label)
+
+        explanation_label = QLabel(
+            'The rate at which the ProjectOn preview image and the stage view updates when a website or video is '
+            'being displayed (in Frames Per Second). Higher gives smoother updates but higher CPU usage.'
+        )
+        explanation_label.setFont(self.gui.standard_font)
+        layout.addWidget(explanation_label)
+
+        button_widget = QWidget()
+        layout.addWidget(button_widget)
+        button_layout = QHBoxLayout(button_widget)
+        button_layout.setContentsMargins(0, 0, 0, 0)
+
+        fps_1_radio_button = QRadioButton('1 FPS')
+        fps_1_radio_button.setFont(self.gui.standard_font)
+        button_layout.addWidget(fps_1_radio_button)
+
+        fps_5_radio_button = QRadioButton('5 FPS')
+        fps_5_radio_button.setFont(self.gui.standard_font)
+        button_layout.addWidget(fps_5_radio_button)
+
+        fps_10_radio_button = QRadioButton('10 FPS')
+        fps_10_radio_button.setFont(self.gui.standard_font)
+        button_layout.addWidget(fps_10_radio_button)
+
+        fps_24_radio_button = QRadioButton('24 FPS')
+        fps_24_radio_button.setFont(self.gui.standard_font)
+        button_layout.addWidget(fps_24_radio_button)
+        button_layout.addStretch()
+
+        self.fps_button_group = QButtonGroup()
+        self.fps_button_group.addButton(fps_1_radio_button, 1)
+        self.fps_button_group.addButton(fps_5_radio_button, 5)
+        self.fps_button_group.addButton(fps_10_radio_button, 10)
+        self.fps_button_group.addButton(fps_24_radio_button, 24)
+
+        return widget
+
     def font_settings(self):
         widget = QWidget()
         widget.setMinimumWidth(self.min_width)
@@ -2966,6 +3016,9 @@ class SettingsWidget(QWidget):
         self.gui.main.settings['ccli_num'] = self.ccli_line_edit.text()
         self.gui.main.settings['stage_font_size'] = self.stage_font_spinbox.value()
 
+        self.gui.main.settings['update_fps'] = self.fps_button_group.id(self.fps_button_group.checkedButton())
+        print(self.gui.main.settings['update_fps'])
+
         if self.stage_display_button_group.checkedId() == 0:
             self.gui.main.settings['mirror_stage_display'] = False
         else:
@@ -3042,6 +3095,7 @@ class IndexedSettingsWidget(QWidget):
         settings_headings = [
             'CCLI',
             'Screens',
+            'Preview Update',
             'Fonts',
             'Backgrounds',
             'Countdown'
@@ -3075,6 +3129,8 @@ class IndexedSettingsWidget(QWidget):
         settings_container_layout.addWidget(self.ccli_settings())
         settings_container_layout.addSpacing(40)
         settings_container_layout.addWidget(self.screen_settings())
+        settings_container_layout.addSpacing(40)
+        settings_container_layout.addWidget(self.update_settings())
         settings_container_layout.addSpacing(40)
         settings_container_layout.addWidget(self.font_settings())
         settings_container_layout.addSpacing(40)
@@ -3236,6 +3292,59 @@ class IndexedSettingsWidget(QWidget):
             layout.addWidget(software_details, 9, 0, 1, index + 1)
 
         layout.setRowStretch(10, 100)
+
+        return widget
+
+    def update_settings(self):
+        widget = QWidget()
+        widget.setObjectName('settings_container')
+        layout = QVBoxLayout()
+        layout.setSpacing(20)
+        widget.setLayout(layout)
+
+        display_title_label = QLabel('Preview Update Settings')
+        display_title_label.setFont(self.gui.bold_font)
+        display_title_label.setStyleSheet('background: #5555aa; color: white;')
+        display_title_label.setContentsMargins(5, 5, 5, 5)
+        layout.addWidget(display_title_label)
+
+        explanation_label = QLabel(
+            'The rate at which the ProjectOn preview image and the stage view updates when a website or video is '
+            'being displayed (in Frames Per Second).\nHigher gives smoother updates but higher CPU usage.'
+        )
+        explanation_label.setFont(self.gui.standard_font)
+        layout.addWidget(explanation_label)
+
+        button_widget = QWidget()
+        layout.addWidget(button_widget)
+        button_layout = QHBoxLayout(button_widget)
+        button_layout.setContentsMargins(0, 0, 0, 0)
+
+        fps_1_radio_button = QRadioButton('1 FPS')
+        fps_1_radio_button.setFont(self.gui.standard_font)
+        button_layout.addWidget(fps_1_radio_button)
+        button_layout.addSpacing(10)
+
+        fps_5_radio_button = QRadioButton('5 FPS')
+        fps_5_radio_button.setFont(self.gui.standard_font)
+        button_layout.addWidget(fps_5_radio_button)
+        button_layout.addSpacing(10)
+
+        fps_10_radio_button = QRadioButton('10 FPS')
+        fps_10_radio_button.setFont(self.gui.standard_font)
+        button_layout.addWidget(fps_10_radio_button)
+        button_layout.addSpacing(10)
+
+        fps_24_radio_button = QRadioButton('24 FPS')
+        fps_24_radio_button.setFont(self.gui.standard_font)
+        button_layout.addWidget(fps_24_radio_button)
+        button_layout.addStretch()
+
+        self.fps_button_group = QButtonGroup()
+        self.fps_button_group.addButton(fps_1_radio_button, 1)
+        self.fps_button_group.addButton(fps_5_radio_button, 5)
+        self.fps_button_group.addButton(fps_10_radio_button, 10)
+        self.fps_button_group.addButton(fps_24_radio_button, 24)
 
         return widget
 
@@ -3822,6 +3931,15 @@ class IndexedSettingsWidget(QWidget):
                         if 'primary' not in button.text():
                             button.setChecked(True)
 
+                button_found = False
+                if 'update_fps' in self.gui.main.settings.keys():
+                    for button in self.fps_button_group.buttons():
+                        if self.fps_button_group.id(button) == self.gui.main.settings['update_fps']:
+                            button.setChecked(True)
+                            button_found = True
+                if not button_found:
+                    self.fps_button_group.button(10).setChecked(True)
+
                 if 'force_software_rendering' in self.gui.main.settings.keys() and sys.platform == 'win32':
                     self.software_checkbox.blockSignals(True)
                     self.software_checkbox.setChecked(self.gui.main.settings['force_software_rendering'])
@@ -3909,6 +4027,7 @@ class IndexedSettingsWidget(QWidget):
         )
         self.gui.main.settings['ccli_num'] = self.ccli_line_edit.text()
         self.gui.main.settings['stage_font_size'] = self.stage_font_spinbox.value()
+        self.gui.main.settings['update_fps'] = self.fps_button_group.id(self.fps_button_group.checkedButton())
 
         if self.stage_display_button_group.checkedId() == 0:
             self.gui.main.settings['mirror_stage_display'] = False

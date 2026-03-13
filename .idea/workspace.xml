@@ -7,10 +7,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed crash when deleting a web item (moved confirmation dialog to media_widget.py's delete_item method instead of the threaded main.delete_item method).">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/stage_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/stage_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/runnables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -219,15 +221,8 @@
       <workItem from="1772650800953" duration="818000" />
       <workItem from="1772733108390" duration="1588000" />
       <workItem from="1772836225088" duration="15000" />
-      <workItem from="1773353381997" duration="331000" />
-    </task>
-    <task id="LOCAL-00118" summary="Further refined countdown timer.&#10;Removed text formatting from font face comboboxes until I can get them to load faster.">
-      <option name="closed" value="true" />
-      <created>1742592223386</created>
-      <option name="number" value="00118" />
-      <option name="presentableId" value="LOCAL-00118" />
-      <option name="project" value="LOCAL" />
-      <updated>1742592223386</updated>
+      <workItem from="1773353381997" duration="4340000" />
+      <workItem from="1773440353057" duration="1999000" />
     </task>
     <task id="LOCAL-00119" summary="Tweaked qss for font combobox on dark theme for visibility.&#10;Fixed loading time for font combobox by indexing fonts once, drawing them as pixmaps, and adding those pixmaps as icons.">
       <option name="closed" value="true" />
@@ -613,7 +608,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772734662098</updated>
     </task>
-    <option name="localTasksCounter" value="167" />
+    <task id="LOCAL-00167" summary="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch.">
+      <option name="closed" value="true" />
+      <created>1773353999590</created>
+      <option name="number" value="00167" />
+      <option name="presentableId" value="LOCAL-00167" />
+      <option name="project" value="LOCAL" />
+      <updated>1773353999591</updated>
+    </task>
+    <option name="localTasksCounter" value="168" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -634,7 +637,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated readmes. Ready for release." />
     <MESSAGE value="Added the ability to print song lyrics from the editor window&#10;    Improved printing of the Order of Service&#10;    Fixed song list updating after add, delete, or search&#10;    Ensured custom slide icons change appropriately when global backgrounds are changed&#10;    Changed font face combo boxes over to Qt's native QFontComboBox" />
     <MESSAGE value="Redesigned Font Widget using QGroupBox for each child widget." />
     <MESSAGE value="Fixed no-chapter bible books not parsing correctly when capitalized" />
@@ -659,7 +661,8 @@
     <MESSAGE value="Added &quot;Slide # of #&quot; to stage display.&#10;Redesigned settings widget." />
     <MESSAGE value="Added button to live view widget to be displayed when showing a web page, allowing the user to reload that web page." />
     <MESSAGE value="Fixed crash when deleting a web item (moved confirmation dialog to media_widget.py's delete_item method instead of the threaded main.delete_item method)." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed crash when deleting a web item (moved confirmation dialog to media_widget.py's delete_item method instead of the threaded main.delete_item method)." />
+    <MESSAGE value="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch." />
+    <option name="LAST_COMMIT_MESSAGE" value="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
@@ -669,6 +672,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1773353628006" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1773442303338" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

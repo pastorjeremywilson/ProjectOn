@@ -79,41 +79,62 @@
 			document.getElementById("lyric_display").style.fontSize = font_size + 'px';
 			document.getElementById("slide_number").innerHTML = slide_number;
 		});
-        socket.on('update_display', async (data) => {
-            binaryData = data[0];
-            slide_number = data[1];
-            document.getElementById("lyric_display").innerHTML = "";
-            const startTime = performance.now();
-            const blob = new Blob([binaryData], { type: 'image/jpeg' });
-            const url = URL.createObjectURL(blob);
 
-            const decoderImg = new Image();
-            decoderImg.src = url;
+        let currentObjectURL = null;  // keep track of the previous one globally or in a closure
+		socket.on('update_display', async (data) => {
+			const binaryData = data[0];
+			const slide_number = data[1];
 
-            try {
-                await decoderImg.decode();
+			// 1. Immediately revoke the previous URL (if any)
+			if (currentObjectURL) {
+				URL.revokeObjectURL(currentObjectURL);
+				currentObjectURL = null;
+			}
 
-                const offscreen = document.createElement('canvas');
-                offscreen.width = decoderImg.naturalWidth;
-                offscreen.height = decoderImg.naturalHeight;
-                const ctx = offscreen.getContext('2d', { willReadFrequently: false });
-                ctx.drawImage(decoderImg, 0, 0);
+			// 2. Clean DOM quickly
+			document.getElementById("lyric_display").innerHTML = "";
 
-                const display = document.getElementById('image_display');
-                display.src = url;
+			const startTime = performance.now();
 
-                display.width = decoderImg.naturalWidth;
-                display.height = decoderImg.naturalHeight;
-                display.style.width = '100vw';
-                display.style.height = '100vh';
-                display.style.objectFit = 'contain';
+			// 3. Create fresh blob + url
+			const blob = new Blob([binaryData], { type: 'image/jpeg' });
+			const url = URL.createObjectURL(blob);
+			currentObjectURL = url;   // remember for next time
 
-            } catch (err) {
-                console.error('Decode failed:', err);
-                document.getElementById('display').src = url;
-            }
-			document.getElementById("slide_number").innerHTML = "<span>" + slide_number + "</span>";
-			console.log(document.getElementById("slide_number").innerHTML);
-        });
+			const display = document.getElementById('image_display');
+
+			try {
+				// Use the persistent <img> element → most efficient path
+				display.onload = () => {
+					// Optional: measure decode + raster time
+					// console.log(`Image ready in ${(performance.now() - startTime).toFixed(1)} ms`);
+					display.onload = null;  // clean up
+				};
+
+				display.onerror = () => {
+					console.error('Image load failed');
+					display.onerror = null;
+				};
+
+				// This triggers decode & display in one step
+				display.src = url;
+
+				// Only set dimensions/style when they actually change (optimization)
+				// You can compare with previous values if you store them
+				display.style.width  = '100vw';
+				display.style.height = '100vh';
+				display.style.objectFit = 'contain';
+
+				// Almost never need to force .width / .height on <img> when using object-fit: contain
+				// Let CSS handle it unless you have a very specific reason
+
+			} catch (err) {
+				console.error('Unexpected error:', err);
+				// Fallback — but prefer not to use a new Image() here
+				display.src = url;  // still try
+			}
+
+			document.getElementById("slide_number").innerHTML = `<span>${slide_number}</span>`;
+		});
 	</script>
 </html>
