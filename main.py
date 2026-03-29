@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.1.006
+ProjectOn v.1.9.1.007
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -32,7 +32,7 @@ from datetime import datetime
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint
+from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QStyle, QStyleFactory
@@ -90,7 +90,17 @@ class ProjectOn(QObject):
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
-        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-features=ExperimentalJavaScript"
+        #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = '--enable-features=ExperimentalJavaScript'
+        QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
+        QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_UseDesktopOpenGL)
+        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (
+            "--ignore-gpu-blacklist "
+            "--enable-gpu-rasterization "
+            "--enable-native-gpu-memory-buffers "
+            "--disable-gpu-sandbox "  # can help on some setups
+            "--enable-accelerated-video-decode "
+            "--enable-features=ExperimentalJavaScript"
+        )
 
         self.app = QApplication(sys.argv)
 
@@ -180,7 +190,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.1.006')
+        version_label = QLabel('v.1.9.1.007')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)

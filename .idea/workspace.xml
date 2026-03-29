@@ -7,12 +7,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps.">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/stage_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/stage_view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/runnables.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +56,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/pastorjeremywilson/ProjectOn&quot;,
-    &quot;accountId&quot;: &quot;f7ca7050-bc92-45de-b2f2-1756e26a64e9&quot;
+    &quot;accountId&quot;: &quot;77323ad5-efde-49a4-8c47-0663058923a8&quot;
   }
 }</component>
   <component name="MarkdownSettingsMigration">
@@ -98,7 +98,7 @@
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/project_on&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/SpeeDReaD&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -138,7 +138,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/linecount.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -162,7 +161,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -173,7 +171,6 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Node.js.foobar.js" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.linecount" />
     </list>
@@ -187,8 +184,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.30387.173" />
-        <option value="bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173" />
+        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
       </set>
     </attachedChunks>
   </component>
@@ -222,15 +218,8 @@
       <workItem from="1772733108390" duration="1588000" />
       <workItem from="1772836225088" duration="15000" />
       <workItem from="1773353381997" duration="4340000" />
-      <workItem from="1773440353057" duration="1999000" />
-    </task>
-    <task id="LOCAL-00119" summary="Tweaked qss for font combobox on dark theme for visibility.&#10;Fixed loading time for font combobox by indexing fonts once, drawing them as pixmaps, and adding those pixmaps as icons.">
-      <option name="closed" value="true" />
-      <created>1742672829838</created>
-      <option name="number" value="00119" />
-      <option name="presentableId" value="LOCAL-00119" />
-      <option name="project" value="LOCAL" />
-      <updated>1742672829839</updated>
+      <workItem from="1773440353057" duration="2305000" />
+      <workItem from="1773763513455" duration="19000" />
     </task>
     <task id="LOCAL-00120" summary="Further refined the settings and font widget layouts.&#10;Added icons to the settings widget tabs.">
       <option name="closed" value="true" />
@@ -616,7 +605,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773353999591</updated>
     </task>
-    <option name="localTasksCounter" value="168" />
+    <task id="LOCAL-00168" summary="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps.">
+      <option name="closed" value="true" />
+      <created>1773442650461</created>
+      <option name="number" value="00168" />
+      <option name="presentableId" value="LOCAL-00168" />
+      <option name="project" value="LOCAL" />
+      <updated>1773442650461</updated>
+    </task>
+    <option name="localTasksCounter" value="169" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -637,7 +634,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added the ability to print song lyrics from the editor window&#10;    Improved printing of the Order of Service&#10;    Fixed song list updating after add, delete, or search&#10;    Ensured custom slide icons change appropriately when global backgrounds are changed&#10;    Changed font face combo boxes over to Qt's native QFontComboBox" />
     <MESSAGE value="Redesigned Font Widget using QGroupBox for each child widget." />
     <MESSAGE value="Fixed no-chapter bible books not parsing correctly when capitalized" />
     <MESSAGE value="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'" />
@@ -662,7 +658,8 @@
     <MESSAGE value="Added button to live view widget to be displayed when showing a web page, allowing the user to reload that web page." />
     <MESSAGE value="Fixed crash when deleting a web item (moved confirmation dialog to media_widget.py's delete_item method instead of the threaded main.delete_item method)." />
     <MESSAGE value="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch." />
-    <option name="LAST_COMMIT_MESSAGE" value="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch." />
+    <MESSAGE value="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps." />
+    <option name="LAST_COMMIT_MESSAGE" value="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
@@ -672,6 +669,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1773442303338" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/project_on$main.coverage" NAME="main Coverage Results" MODIFIED="1773442532687" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

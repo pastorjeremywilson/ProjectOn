@@ -16,7 +16,7 @@ from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDataba
     QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile, QWebEngineSettings
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
     QGraphicsView, QGraphicsScene, QTextEdit, QApplication, QStyleFactory
@@ -687,7 +687,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.1.006'
+        current_version = 'v.1.9.1.007'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -901,7 +901,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.1.006')
+        title_label = QLabel('ProjectOn v.1.9.1.007')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -2171,6 +2171,14 @@ class GUI(QObject):
         Create all the widgets.py that could be used on the display widget.
         """
         self.web_view = QWebEngineView()
+        self.web_view.page().setBackgroundColor(Qt.GlobalColor.transparent)
+        self.web_view.setStyleSheet("background: transparent;")
+        settings = self.web_view.settings()
+        settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)
+        settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)  # rarely needed for video
+        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
         self.web_engine_page = CustomWebEnginePage()
         self.web_engine_page.setParent(self.web_view)
         self.web_view.setPage(self.web_engine_page)
