@@ -8,7 +8,7 @@
 #define MyAppAssocName MyAppName + " File"
 #define MyAppAssocExt ".pro"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
-#define BaseLocation "C:\Users\jeremy\Desktop\output\ProjectOn"
+#define BaseLocation "C:\Users\pasto\Desktop\output\ProjectOn"
 #define ResourceLocation BaseLocation + "\_internal"
 
 [Setup]

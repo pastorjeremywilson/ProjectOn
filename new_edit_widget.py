@@ -1,5 +1,6 @@
 import os.path
 import re
+import sys
 from os.path import exists
 
 from PyQt5.QtCore import Qt, QSize, QTimer
@@ -13,7 +14,7 @@ from formattable_text_edit import FormattableTextEdit
 from widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
 
 
-class EditWidget(QDialog):
+class NewEditWidget(QDialog):
     """
     Provides a QDialog containing the necessary widgets to edit a song or custom slide.
     """
@@ -29,7 +30,7 @@ class EditWidget(QDialog):
         super().__init__()
         self.gui = gui
         self.type = type
-        self.lyrics_edit = None
+        self.lyrics_edit = QListWidget()
         self.item_text = item_text
         self.old_title = None
         self.new_song = False
@@ -187,7 +188,7 @@ class EditWidget(QDialog):
             lyrics_layout.setColumnStretch(0, 10)
             lyrics_layout.setColumnStretch(1, 5)
 
-        self.lyrics_edit = FormattableTextEdit(self.gui)
+        self.lyrics_edit = QListWidget()
         self.lyrics_edit.setMinimumHeight(400)
         self.lyrics_edit.setFont(self.gui.standard_font)
         if self.type == 'song':
@@ -598,13 +599,11 @@ class EditWidget(QDialog):
             display_widget.background_label.setPixmap(self.gui.global_song_background_pixmap)
 
         # set the lyrics html
-        if '[' in self.lyrics_edit.text_edit.toPlainText():
-            startpoint = ']'
-            endpoint = '['
-        else:
-            startpoint = '\n'
-            endpoint = '\n'
-        cursor = self.lyrics_edit.text_edit.textCursor()
+        if not self.lyrics_edit.currentItem():
+            return
+        startpoint = '\n'
+        endpoint = '\n'
+        cursor = self.lyrics_edit.currentItem().lyrics_edit.textCursor()
         iterations = 0
         while not cursor.selection().toPlainText() == startpoint:
             cursor.clearSelection()
@@ -964,47 +963,22 @@ class EditWidget(QDialog):
         self.ccli_num_line_edit.setText(song_data[3])
 
         lyrics = self.get_simplified_text(song_data[4])
+        tag_list = re.findall(r'\[.*?]', lyrics)
+        lyrics_split = re.split(r'\[.*?]', lyrics)
+        lyrics_split.pop(0)
 
-        # reformat old tags, add coloring to tags
-        tag_list = re.findall('\[.*?]', lyrics, flags=re.S)
-        if self.gui.main.settings['theme'] == 'light':
-            color_tag_start = '<span style="color: #007600;">'
-        else:
-            color_tag_start = '<span style="color: #00ff00;">'
-        color_tag_end = '</span>'
+        segments = []
         for i in range(len(tag_list)):
-            if len(tag_list[i]) < 6:
-                if 'v' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('v', '').strip()
-                    new_tag = f'{color_tag_start}[Verse {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 'p' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('p', '').strip()
-                    new_tag = f'{color_tag_start}[Pre-Chorus {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 'c' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('c', '').strip()
-                    new_tag = f'{color_tag_start}[Chorus {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 'b' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('b', '').strip()
-                    new_tag = f'{color_tag_start}[Bridge {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 't' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('t', '').strip()
-                    new_tag = f'{color_tag_start}[Tag {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 'e' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('e', '').strip()
-                    new_tag = f'{color_tag_start}[Ending {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                else:
-                    new_tag = f'{color_tag_start}{tag_list[i]}{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-            else:
-                new_tag = f'{color_tag_start}{tag_list[i]}{color_tag_end}'
-                lyrics = lyrics.replace(tag_list[i], new_tag)
-        self.lyrics_edit.text_edit.setHtml(lyrics)
+            tag = tag_list[i].replace('[', '').replace(']', '').strip()
+            segments.append(tag)
+            tag_num = int(tag.split(' ')[1])
+            tag = tag.split(' ')[0]
+            item = LyricsEditListItem(self.gui, tag, tag_num, lyrics_split[i])
+            item.setSizeHint(item.widget.sizeHint())
+            self.lyrics_edit.addItem(item)
+            self.lyrics_edit.setItemWidget(item, item.widget)
+
+        self.populate_tag_list(segments)
 
         order_items = song_data[5].split(' ')
         for i in range(len(order_items)):
@@ -1156,7 +1130,6 @@ class EditWidget(QDialog):
             self.font_widget.shade_opacity_slider.color_slider.setValue(int(song_data[20]))
 
         self.font_widget.blockSignals(False)
-        self.populate_tag_list()
 
     def populate_custom_data(self, custom_data):
         """
@@ -1465,14 +1438,12 @@ class EditWidget(QDialog):
 
             return html
 
-    def populate_tag_list(self):
+    def populate_tag_list(self, segments):
         """
         Method to find tags in the song's lyrics and add those tags to the "segements" QListWidget
         """
         self.song_section_list_widget.clear()
-        lyrics_text = self.lyrics_edit.text_edit.toPlainText()
-        tag_list = re.findall('\[.*?\]', lyrics_text)
-        for tag in tag_list:
+        for tag in segments:
             self.song_section_list_widget.addItem(tag.replace('[', '').replace(']', ''))
 
     def print_lyrics(self):
@@ -1909,3 +1880,44 @@ class CustomListWidget(QListWidget):
                 self.takeItem(self.currentRow())
             else:
                 super().keyPressEvent(evt)
+
+
+class LyricsEditListItem(QListWidgetItem):
+    def __init__(self, gui, verse=None, verse_num=None, lyrics=None):
+        super().__init__()
+
+        self.widget = QWidget()
+        layout = QVBoxLayout(self.widget)
+
+        verse_container = QWidget()
+        layout.addWidget(verse_container)
+        verse_layout = QHBoxLayout(verse_container)
+
+        verse_options = [
+            'Verse',
+            'Chorus',
+            'Pre-Chorus',
+            'Bridge',
+            'Tag',
+            'Ending',
+        ]
+        self.verse_combo_box = QComboBox()
+        self.verse_combo_box.addItems(verse_options)
+        verse_layout.addWidget(self.verse_combo_box)
+        verse_layout.addSpacing(20)
+
+        self.verse_num_spinbox = QSpinBox()
+        self.verse_num_spinbox.setMinimum(1)
+        self.verse_num_spinbox.setMaximum(10)
+        verse_layout.addWidget(self.verse_num_spinbox)
+        verse_layout.addStretch()
+
+        self.lyrics_edit = FormattableTextEdit(gui)
+        layout.addWidget(self.lyrics_edit)
+
+        if verse:
+            self.verse_combo_box.setCurrentText(verse)
+        if verse_num:
+            self.verse_num_spinbox.setValue(verse_num)
+        if lyrics:
+            self.lyrics_edit.text_edit.setHtml(lyrics)

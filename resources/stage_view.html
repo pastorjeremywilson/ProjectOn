@@ -1,140 +1,143 @@
 <html>
-	<head>
-		<title>
-			ProjectOn Web Remote
-		</title>
+    <head>
+       <title>ProjectOn Web Remote</title>
+       <style>
+          body {
+             overflow: hidden;
+             margin: 0;
+             padding: 0;
+             background: black;
+          }
 
-		<style>
-			body {
-				overflow: hidden;
-				margin: 0;
-				padding: 0;
-				background: black;
-			}
+          #lyric_container {
+             width: 100%;
+             height: 100%;
+             display: table;
+          }
 
-			#lyric_container {
-				width: 100%;
-				height: 100%;
-				display: table;
-			}
+          #lyric_display {
+             text-align: center;
+             display: table-cell;
+             vertical-align: middle;
+             font-family: "Arial";
+             font-weight: bold;
+             line-height: 150%;
+             color: white;
+             overflow: hidden;
+          }
 
-			#lyric_display {
-				text-align: center;
-				display: table-cell;
-				vertical-align: middle;
-				font-family: "Arial";
-				font-weight: bold;
-				line-height: 150%;
-				color: white;
-				overflow: hidden;
-			}
+          #image_display {
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 100vw;
+             height: 100vh;
+             object-fit: contain;          /* Set once, not per-frame */
+             transform: translateZ(0);     /* Promote to compositor layer */
+             z-index: 1;
+             will-change: contents;        /* 'contents' only — 'transform' is redundant here */
+             image-rendering: crisp-edges;
+             backface-visibility: hidden;
+             display: none;               /* Hidden until first image arrives */
+          }
 
-            #image_display {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                transform: translateZ(0);           /* Promote to its own compositor layer */
-                z-index: 1;
-                will-change: transform, contents;   /* Hint frequent changes */
-                image-rendering: crisp-edges;       /* Skip smoothing if acceptable */
-                backface-visibility: hidden;        /* Sometimes helps GPU upload */
-            }
-            #slide_number {
-                position: absolute;
-                width: 100vw;
-                top: 94vh;
-                margin-right: 1vw;
-                z-index: 10;
-                font-family: "Arial";
-                font-weight: bold;
-                font-size: 5vh;
-                color: #ffffff;
-                text-shadow: 5px 5px 5px black;
-                text-align: right;
-            }
-        </style>
-
-	</head>
+          #slide_number {
+             position: absolute;
+             width: 100vw;
+             top: 94vh;
+             margin-right: 1vw;
+             z-index: 10;
+             font-family: "Arial";
+             font-weight: bold;
+             font-size: 5vh;
+             color: #ffffff;
+             text-shadow: 5px 5px 5px black;
+             text-align: right;
+          }
+       </style>
+    </head>
 
     <body>
-		<div id="lyric_container">
-			<div id="lyric_display"></div>
-		</div>
-        <div id="image_container">
-            <img id="image_display">
-        </div>
-        <div id="slide_number"></div>
+       <div id="lyric_container">
+          <div id="lyric_display"></div>
+       </div>
+       <div id="image_container">
+          <img id="image_display">
+       </div>
+       <div id="slide_number"></div>
     </body>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-	<script type="text/javascript" charset="utf-8">
-		var socket = io();
-		socket.on('update_stage', function(text) {
-			document.getElementById("image_display").src = "";
-			html = text[0];
-			font_size = text[1];
-			slide_number = text[2];
-			document.getElementById("lyric_display").innerHTML = html;
-			document.getElementById("lyric_display").style.fontSize = font_size + 'px';
-			document.getElementById("slide_number").innerHTML = slide_number;
-		});
 
-        let currentObjectURL = null;  // keep track of the previous one globally or in a closure
-		socket.on('update_display', async (data) => {
-			const binaryData = data[0];
-			const slide_number = data[1];
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+            integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+            crossorigin="anonymous"></script>
 
-			// 1. Immediately revoke the previous URL (if any)
-			if (currentObjectURL) {
-				URL.revokeObjectURL(currentObjectURL);
-				currentObjectURL = null;
-			}
+    <script type="text/javascript" charset="utf-8">
+       var socket = io();
 
-			// 2. Clean DOM quickly
-			document.getElementById("lyric_display").innerHTML = "";
+       const imageDisplay   = document.getElementById('image_display');
+       const lyricDisplay   = document.getElementById('lyric_display');
+       const lyricContainer = document.getElementById('lyric_container');
+       const slideNumber    = document.getElementById('slide_number');
 
-			const startTime = performance.now();
+       // ── Mode switching helpers ──────────────────────────────────────────────
+       function showTextMode() {
+          imageDisplay.style.display   = 'none';
+          lyricContainer.style.display = 'table';
+       }
 
-			// 3. Create fresh blob + url
-			const blob = new Blob([binaryData], { type: 'image/jpeg' });
-			const url = URL.createObjectURL(blob);
-			currentObjectURL = url;   // remember for next time
+       function showImageMode() {
+          lyricContainer.style.display = 'none';
+          imageDisplay.style.display   = 'block';
+       }
 
-			const display = document.getElementById('image_display');
+       // ── Text update ─────────────────────────────────────────────────────────
+       socket.on('update_stage', function(text) {
+          showTextMode();
+          lyricDisplay.innerHTML       = text[0];
+          lyricDisplay.style.fontSize  = text[1] + 'px';
+          slideNumber.textContent      = text[2];   // textContent is safer/faster than innerHTML for plain text
+       });
 
-			try {
-				// Use the persistent <img> element → most efficient path
-				display.onload = () => {
-					// Optional: measure decode + raster time
-					// console.log(`Image ready in ${(performance.now() - startTime).toFixed(1)} ms`);
-					display.onload = null;  // clean up
-				};
+       // ── Image update ────────────────────────────────────────────────────────
+       let currentObjectURL = null;
+       let framePending     = false;   // backpressure flag
 
-				display.onerror = () => {
-					console.error('Image load failed');
-					display.onerror = null;
-				};
+       socket.on('update_display', async (data) => {
 
-				// This triggers decode & display in one step
-				display.src = url;
+          // Drop frame if previous decode is still in flight
+          if (framePending) return;
+          framePending = true;
 
-				// Only set dimensions/style when they actually change (optimization)
-				// You can compare with previous values if you store them
-				display.style.width  = '100vw';
-				display.style.height = '100vh';
-				display.style.objectFit = 'contain';
+          const binaryData = data[0];
+          const newSlide   = data[1];
 
-				// Almost never need to force .width / .height on <img> when using object-fit: contain
-				// Let CSS handle it unless you have a very specific reason
+          // Decode off the critical path before touching the DOM
+          const blob    = new Blob([binaryData], { type: 'image/jpeg' });
+          const url     = URL.createObjectURL(blob);
+          const staging = new Image();
+          staging.src   = url;
 
-			} catch (err) {
-				console.error('Unexpected error:', err);
-				// Fallback — but prefer not to use a new Image() here
-				display.src = url;  // still try
-			}
+          try {
+             // Wait until pixels are fully decoded — no partial-frame flash
+             await staging.decode();
 
-			document.getElementById("slide_number").innerHTML = `<span>${slide_number}</span>`;
-		});
-	</script>
+             // Only now swap into the visible element and revoke the OLD url
+             const previousURL    = currentObjectURL;
+             imageDisplay.src     = url;
+             currentObjectURL     = url;
+
+             // Revoke AFTER the new src is committed
+             if (previousURL) URL.revokeObjectURL(previousURL);
+
+             slideNumber.textContent = newSlide;
+             showImageMode();
+
+          } catch (err) {
+             console.error('Image decode failed:', err);
+             URL.revokeObjectURL(url);   // clean up on failure
+          } finally {
+             framePending = false;
+          }
+       });
+    </script>
 </html>

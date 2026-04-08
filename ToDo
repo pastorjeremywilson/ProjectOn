@@ -1,8 +1,10 @@
 Done:
     Fix crash when deleting web item (see Projector Computer logs)
+    Ensure cleanup on stage display web page images
 
 To Do:
-    Ensure cleanup on stage display web page images
+    Improve lyrics editing with modular editing spaces (verse/chorus and number at top as dropdowns, lyrics below).
+        Probably as a custom list widget.
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types

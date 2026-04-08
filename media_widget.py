@@ -15,6 +15,7 @@ import declarations
 import parsers
 from edit_widget import EditWidget
 from get_scripture import GetScripture
+from new_edit_widget import NewEditWidget
 from widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash
 
 
@@ -1394,6 +1395,7 @@ class CustomListWidget(QListWidget):
                 song_info = self.gui.main.get_song_data(item_text)
                 song_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
                 self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text, song_data)
+                #self.new_edit_widget = NewEditWidget(self.gui, 'song', song_info, item_text, song_data)
             elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 item_text = self.itemAt(self.item_pos).text()
                 custom_info = self.gui.main.get_custom_data(item_text)
