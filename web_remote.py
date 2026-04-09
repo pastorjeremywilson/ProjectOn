@@ -161,7 +161,7 @@ class RemoteServer:
     def update_stage_image(self, jpg_bytes, slide_info):
         with self.app.app_context():
             self.socketio.emit('update_display', [jpg_bytes, slide_info])
-            self.socketio.sleep(0)
+            #self.socketio.sleep(0)
 
     def get_all_gui_data(self):
         class_tag = ''

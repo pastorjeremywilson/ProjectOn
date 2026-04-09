@@ -7,18 +7,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added optimizations for videos playing in QtWebEngine">
-      <change afterPath="$PROJECT_DIR$/new_edit_widget.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/stage_view.html.bak" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/stage_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/stage_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,36 +81,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Node.js.foobar.js.executor": "Debug",
-    "Python.generate_pydocs.executor": "Run",
-    "Python.get_github_events.executor": "Debug",
-    "Python.main.executor": "Debug",
-    "Python.powerpoint_viewer.executor": "Debug",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "ai.playground.ignore.import.keys.banner.in.settings": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "development",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/jeremy/Documents/Python Workspace/project_on",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "settings.sync",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Node.js.foobar.js.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.generate_pydocs.executor&quot;: &quot;Run&quot;,
+    &quot;Python.get_github_events.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.powerpoint_viewer.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;development&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/project_on&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySupportGeventDebugging" value="true" />
   </component>
@@ -184,8 +178,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.main" />
       <item itemvalue="Python.linecount" />
+      <item itemvalue="Python.main" />
     </list>
     <recent_temporary>
       <list>
@@ -233,22 +227,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00121" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.">
-      <option name="closed" value="true" />
-      <created>1743632743829</created>
-      <option name="number" value="00121" />
-      <option name="presentableId" value="LOCAL-00121" />
-      <option name="project" value="LOCAL" />
-      <updated>1743632743831</updated>
-    </task>
-    <task id="LOCAL-00122" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.">
-      <option name="closed" value="true" />
-      <created>1743632942706</created>
-      <option name="number" value="00122" />
-      <option name="presentableId" value="LOCAL-00122" />
-      <option name="project" value="LOCAL" />
-      <updated>1743632942707</updated>
     </task>
     <task id="LOCAL-00123" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10">
       <option name="closed" value="true" />
@@ -626,7 +604,23 @@
       <option name="project" value="LOCAL" />
       <updated>1774799773863</updated>
     </task>
-    <option name="localTasksCounter" value="170" />
+    <task id="LOCAL-00170" summary="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides.">
+      <option name="closed" value="true" />
+      <created>1775677057469</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
+      <option name="project" value="LOCAL" />
+      <updated>1775677057469</updated>
+    </task>
+    <task id="LOCAL-00171" summary="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides.">
+      <option name="closed" value="true" />
+      <created>1775677142173</created>
+      <option name="number" value="00171" />
+      <option name="presentableId" value="LOCAL-00171" />
+      <option name="project" value="LOCAL" />
+      <updated>1775677142173</updated>
+    </task>
+    <option name="localTasksCounter" value="172" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -647,7 +641,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed no-chapter bible books not parsing correctly when capitalized" />
     <MESSAGE value="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'" />
     <MESSAGE value="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash." />
     <MESSAGE value="Fixed problem with OOS items not properly updating after having been edited." />
@@ -672,7 +665,8 @@
     <MESSAGE value="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch." />
     <MESSAGE value="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps." />
     <MESSAGE value="Added optimizations for videos playing in QtWebEngine" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added optimizations for videos playing in QtWebEngine" />
+    <MESSAGE value="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides." />
+    <option name="LAST_COMMIT_MESSAGE" value="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

@@ -75,6 +75,7 @@ class GUI(QObject):
     countdown_timer = None
     font_pixmaps = None
     audio_buffer = None
+    error_in_loop = False
 
     standard_font = QFont('Helvetica', 12)
     bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
@@ -1036,16 +1037,24 @@ class GUI(QObject):
         """
         Provides a method to grab the display widget and scale it down as a preview.
         """
+        if self.error_in_loop:
+            return
         pixmap = self.display_widget.grab()
 
         try:
             if pixmap:
                 if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
                     buffer = QBuffer()
-                    buffer.open(QIODevice.WriteOnly)
-                    pixmap.save(buffer, 'JPG', 70)
-                    jpg_bytes = bytes(buffer.data())
-                    self.main.remote_server.update_stage_image(jpg_bytes, '')
+                    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                    success = pixmap.save(buffer, 'JPEG', 70)
+
+                    if success:
+                        jpg_bytes = buffer.data().data()
+                        self.main.remote_server.socketio.emit('update_display', [jpg_bytes, ''])
+                    else:
+                        print("Failed to save pixmap as JPEG!")
+
                     buffer.close()
                 pixmap = pixmap.scaled(
                     int(self.display_widget.width() / 5), int(self.display_widget.height() / 5),
@@ -1053,6 +1062,7 @@ class GUI(QObject):
                 self.live_widget.preview_label.setPixmap(pixmap)
         except Exception:
             self.main.error_log()
+            self.error_in_loop = True
 
     def size_background_to_screen(self, pixmap):
         width = pixmap.width()
@@ -2059,10 +2069,16 @@ class GUI(QObject):
 
                     if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
                         buffer = QBuffer()
-                        buffer.open(QIODevice.WriteOnly)
-                        full_size_pixmap.save(buffer, 'JPG', 70)
-                        jpg_bytes = bytes(buffer.data())
-                        self.main.remote_server.update_stage_image(jpg_bytes, slide_info)
+                        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                        success = pixmap.save(buffer, 'JPEG', 70)
+
+                        if success:
+                            jpg_bytes = buffer.data().data()
+                            self.main.remote_server.socketio.emit('update_display', [jpg_bytes, slide_info])
+                        else:
+                            print("Failed to save pixmap as JPEG!")
+
                         buffer.close()
                     else:
                         self.main.remote_server.update_stage_text(
@@ -2071,10 +2087,16 @@ class GUI(QObject):
                     self.live_widget.preview_label.setPixmap(pixmap)
                     if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
                         buffer = QBuffer()
-                        buffer.open(QIODevice.WriteOnly)
-                        full_size_pixmap.save(buffer, 'JPG', 70)
-                        jpg_bytes = bytes(buffer.data())
-                        self.main.remote_server.update_stage_image(jpg_bytes, slide_info)
+                        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                        success = pixmap.save(buffer, 'JPEG', 70)
+
+                        if success:
+                            jpg_bytes = buffer.data().data()
+                            self.main.remote_server.socketio.emit('update_display', [jpg_bytes, slide_info])
+                        else:
+                            print("Failed to save pixmap as JPEG!")
+
                         buffer.close()
                     else:
                         self.main.remote_server.update_stage_text(
@@ -2083,10 +2105,16 @@ class GUI(QObject):
                     if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings[
                             'mirror_stage_display']:
                         buffer = QBuffer()
-                        buffer.open(QIODevice.WriteOnly)
-                        full_size_pixmap.save(buffer, 'JPG', 70)
-                        jpg_bytes = bytes(buffer.data())
-                        self.main.remote_server.update_stage_image(jpg_bytes, '')
+                        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                        success = pixmap.save(buffer, 'JPEG', 70)
+
+                        if success:
+                            jpg_bytes = buffer.data().data()
+                            self.main.remote_server.socketio.emit('update_display', [jpg_bytes, ''])
+                        else:
+                            print("Failed to save pixmap as JPEG!")
+
                         buffer.close()
                     else:
                         self.main.remote_server.update_stage_text(
