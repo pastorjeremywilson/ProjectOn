@@ -36,6 +36,7 @@ QWidget[objectName="font_widget"] {
 QWidget[objectName="settings_container"] {
     background: #eeeeff;
     color: #000000;
+    border: 2px solid #5555aa;
 }
 
 /*-------------------- edit_main_widget --------------------*/
@@ -164,8 +165,16 @@ QScrollBar {
 }
 
 /*-------------------- QRadioButton --------------------*/
-QRadioButton {
-    color: #000000;
+QRadioButton::indicator {
+    background: #ffffff;
+    border: 2px solid black;
+    border-radius: 6px;
+}
+
+QRadioButton::indicator:checked {
+    background: #5555aa;
+    border: 2px solid black;
+    border-radius: 6px;
 }
 
 /*-------------------- QSlider --------------------*/
@@ -179,29 +188,33 @@ QSlider::handle:hover {
 /*-------------------- QLabel --------------------*/
 QLabel {
     background: transparent;
-    color: #000000
+    color: #000000;
 }
 
 /*-------------------- QLineEdit --------------------*/
 QLineEdit {
     background: #ffffff;
     color: #000000;
-    border: 1px solid #f0f0f0;
+    border: 1px solid #cccccf;
+    padding: 2px;
 }
 QLineEdit:focus {
+    background: #ffffff;
+    border: 2px solid #cccccf;
     border-bottom: 2px solid #5555aa;
+    padding: 2px;
 }
 
 /*-------------------- QTextEdit --------------------*/
 QTextEdit {
-    background: #ffffff;
+    background: white;
     color: #000000;
     border: 1px solid #f0f0f0;
 }
 
 /*-------------------- QMessageBox --------------------*/
 QMessageBox {
-    background: #ffffff;
+    background: #ffffffff !important;
     color: #000000;
 }
 
@@ -218,8 +231,14 @@ QWebEngineView {
 }
 
 /*-------------------- QCheckBox --------------------*/
-QCheckbox {
-    color: #ffffff;
+QCheckBox::indicator {
+    background: #ffffff;
+    border: 1px solid black;
+}
+
+QCheckBox::indicator:checked {
+    background: #5555aa;
+    border: 1px solid black;
 }
 
 /*-------------------- QMainWindow --------------------*/

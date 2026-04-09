@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.1
+ProjectOn v.1.9.2
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -32,10 +32,10 @@ from datetime import datetime
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint
+from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
+    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QStyle, QStyleFactory
 
 import declarations
 from gui import GUI
@@ -90,13 +90,21 @@ class ProjectOn(QObject):
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
-        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--enable-features=ExperimentalJavaScript"
+        #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = '--enable-features=ExperimentalJavaScript'
+        QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
+        QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_UseDesktopOpenGL)
+        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (
+            "--ignore-gpu-blacklist "
+            "--enable-gpu-rasterization "
+            "--enable-native-gpu-memory-buffers "
+            "--disable-gpu-sandbox "  # can help on some setups
+            "--enable-accelerated-video-decode "
+            "--enable-features=ExperimentalJavaScript"
+        )
 
         self.app = QApplication(sys.argv)
-        #self.app.setAttribute(Qt.ApplicationAttribute.AA_DisableWindowContextHelpButton, True)
 
         self.thread_pool = QThreadPool()
-        #self.server_thread_pool = QThreadPool()
         self.update_status_signal.connect(self.update_status_label)
 
         last_status_count = 100
@@ -182,7 +190,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.1')
+        version_label = QLabel('v.1.9.2')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -600,16 +608,13 @@ class ProjectOn(QObject):
             connection.commit()
             connection.close()
 
-            QMessageBox.information(
-                self.gui.main_window,
-                description + 'Removed',
-                item.data(Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
-                QMessageBox.StandardButton.Ok
-            )
+            return 0
         except Exception:
             self.error_log()
             if connection:
                 connection.close()
+
+            return -1
 
     def delete_all_songs(self):
         """
@@ -624,31 +629,32 @@ class ProjectOn(QObject):
         )
 
         if result == QMessageBox.StandardButton.Yes:
-            result = QMessageBox.question(
+            second_result = QMessageBox.question(
                 self.gui.main_window,
                 'Really Delete?',
                 'Just making sure: Do you really want to DELETE ALL SONGS?',
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
             )
+            if not second_result == QMessageBox.StandardButton.Yes:
+                return
         else:
             return
 
         connection = None
         try:
-            if result == QMessageBox.StandardButton.Yes:
-                connection = sqlite3.connect(self.database)
-                cursor = connection.cursor()
-                cursor.execute('DELETE FROM songs')
-                connection.commit()
-                connection.close()
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            cursor.execute('DELETE FROM songs')
+            connection.commit()
+            connection.close()
 
-                QMessageBox.information(
-                    self.gui.main_window,
-                    'Songs Deleted',
-                    'All songs have been removed.',
-                    QMessageBox.StandardButton.Ok
-                )
-                self.gui.media_widget.song_list.clear()
+            QMessageBox.information(
+                self.gui.main_window,
+                'Songs Deleted',
+                'All songs have been removed.',
+                QMessageBox.StandardButton.Ok
+            )
+            self.gui.media_widget.song_list.clear()
         except Exception:
             self.error_log()
             if connection:

@@ -120,7 +120,7 @@ class CustomListWidget(QListWidget):
         self.source_list_widget = None
 
         self.setAutoScroll(True)
-        self.setMinimumHeight(int(self.gui.primary_screen.size().height() * 2 / 5))
+        #self.setMinimumHeight(int(self.gui.primary_screen.size().height() * 2 / 5))
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.context_menu)
         self.currentItemChanged.connect(self.preview_item)

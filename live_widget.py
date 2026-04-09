@@ -65,6 +65,7 @@ class LiveWidget(QWidget):
         to_beginning_button.setIconSize(QSize(30, 30))
         to_beginning_button.setFixedSize(50, 50)
         to_beginning_button.setObjectName('to_beginning')
+        to_beginning_button.setToolTip('Start Video from Beginning')
         to_beginning_button.clicked.connect(self.video_control)
         player_layout.addStretch()
         player_layout.addWidget(to_beginning_button)
@@ -74,6 +75,7 @@ class LiveWidget(QWidget):
         play_button.setIconSize(QSize(30, 30))
         play_button.setFixedSize(50, 50)
         play_button.setObjectName('play')
+        play_button.setToolTip('Play/Pause the Video')
         play_button.clicked.connect(self.video_control)
         player_layout.addWidget(play_button)
 
@@ -82,12 +84,30 @@ class LiveWidget(QWidget):
         stop_button.setIconSize(QSize(30, 30))
         stop_button.setFixedSize(50, 50)
         stop_button.setObjectName('stop')
+        stop_button.setToolTip('Stop the Video')
         stop_button.clicked.connect(self.video_control)
         player_layout.addWidget(stop_button)
         player_layout.addStretch()
 
         layout.addWidget(self.player_controls, 2, 0, Qt.AlignmentFlag.AlignCenter)
         self.player_controls.hide()
+
+        self.web_controls = QWidget()
+        web_layout = QHBoxLayout(self.web_controls)
+
+        reload_button = QPushButton()
+        reload_button.setIcon(QIcon('resources/gui_icons/reload.svg'))
+        reload_button.setIconSize(QSize(30, 30))
+        reload_button.setFixedSize(50, 50)
+        reload_button.setObjectName('reload')
+        reload_button.setToolTip('Reload Web Page')
+        reload_button.clicked.connect(self.web_reload)
+        web_layout.addStretch()
+        web_layout.addWidget(reload_button)
+        web_layout.addStretch()
+
+        layout.addWidget(self.web_controls, 2, 0, Qt.AlignmentFlag.AlignCenter)
+        self.web_controls.hide()
 
     def video_control(self):
         """
@@ -104,6 +124,13 @@ class LiveWidget(QWidget):
                 self.gui.media_player.play()
         elif sender.objectName() == 'stop':
             self.gui.media_player.stop()
+
+    def web_reload(self):
+        """
+        Tell the web view widget to reload the current web page
+        :return: None
+        """
+        self.gui.web_view.reload()
 
     def web_buttons(self, button):
         """

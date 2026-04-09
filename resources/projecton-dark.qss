@@ -36,6 +36,7 @@ QWidget[objectName="font_widget"] {
 QWidget[objectName="settings_container"] {
     background: #303030;
     color: #e0e0e0;
+    border: 2px solid #444466;
 }
 
 /*-------------------- edit_main_widget --------------------*/
@@ -184,7 +185,17 @@ QPushButton:unchecked {
 
 /*-------------------- QRadioButton --------------------*/
 QRadioButton {
-    color: #e0e0e0;
+    color: #e0e0e0
+}
+QRadioButton::indicator {
+    background: #303030;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+}
+QRadioButton::indicator:checked {
+    background: #aaaaff;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
 }
 
 /*-------------------- QSlider --------------------*/
@@ -206,8 +217,11 @@ QLineEdit {
     background: #303030;
     color: #e0e0e0;
     border: 1px solid #505050;
+    padding: 2px;
 }
 QLineEdit:focus {
+    background: #303030;
+    border: 2px solid #505050;
     border-bottom: 2px solid #555588;
 }
 
@@ -256,7 +270,15 @@ QWebEngineView {
 
 /*-------------------- QCheckBox --------------------*/
 QCheckBox {
-    color: #e0e0e0;
+    color: #e0e0e0
+}
+QCheckBox::indicator {
+    background: #303030;
+    border: 1px solid #e0e0e0;
+}
+QCheckBox::indicator:checked {
+    background: #aaaaff;
+    border: 1px solid #e0e0e0;
 }
 
 /*-------------------- QMainWindow --------------------*/
@@ -330,6 +352,9 @@ QMenu::item:selected {
     background: #444466;
 }
 QMenu::item:pressed {
+    background: #444466;
+}
+QMenu::separator {
     background: #444466;
 }
 

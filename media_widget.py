@@ -15,6 +15,7 @@ import declarations
 import parsers
 from edit_widget import EditWidget
 from get_scripture import GetScripture
+from new_edit_widget import NewEditWidget
 from widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash
 
 
@@ -338,6 +339,8 @@ class MediaWidget(QTabWidget):
         self.image_list.setFont(self.gui.standard_font)
         self.image_list.setDragEnabled(True)
         self.image_list.doubleClicked.connect(self.add_image_to_service)
+        self.image_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.image_list.verticalScrollBar().setSingleStep(10)
         image_layout.addWidget(self.image_list)
 
         self.populate_image_list()
@@ -388,6 +391,8 @@ class MediaWidget(QTabWidget):
         self.video_list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.video_list.setDragEnabled(True)
         self.video_list.setFont(self.gui.standard_font)
+        self.video_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.video_list.verticalScrollBar().setSingleStep(10)
         self.populate_video_list()
         video_layout.addWidget(self.video_list)
 
@@ -1390,6 +1395,7 @@ class CustomListWidget(QListWidget):
                 song_info = self.gui.main.get_song_data(item_text)
                 song_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
                 self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text, song_data)
+                #self.new_edit_widget = NewEditWidget(self.gui, 'song', song_info, item_text, song_data)
             elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 item_text = self.itemAt(self.item_pos).text()
                 custom_info = self.gui.main.get_custom_data(item_text)
@@ -1400,6 +1406,9 @@ class CustomListWidget(QListWidget):
         """
         Method to remove an item from this widget. Creates a QMessageBox to confirm removal.
         """
+        if not self.currentItem():
+            return
+
         response = QMessageBox.question(
             self.gui.main_window,
             'Really Delete',
@@ -1413,6 +1422,13 @@ class CustomListWidget(QListWidget):
             thread = threading.Thread(target=self.gui.main.delete_item, args=(self.currentItem(),))
             thread.start()
             thread.join()
+
+        QMessageBox.information(
+            self.gui.main_window,
+            'Removed',
+            self.currentItem().data(Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
+            QMessageBox.StandardButton.Ok
+        )
 
         if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.populate_song_list()

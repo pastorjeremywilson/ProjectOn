@@ -324,7 +324,10 @@ class TimedPreviewUpdate(QRunnable):
     def run(self):
         while self.keep_running:
             self.gui.grab_display_signal.emit()
-            time.sleep(0.15)
+            sleep_time = 0.1
+            if 'update_fps' in self.gui.main.settings.keys():
+                sleep_time = 1 / self.gui.main.settings['update_fps']
+            time.sleep(sleep_time)
 
 
 class SlideAutoPlay(QRunnable):
