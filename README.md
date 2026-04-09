@@ -16,17 +16,19 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.9.1.008?
-- ProjectOn can now mirror what is on the main display to the stage display. This means that the stage display
-  website can show exactly what is beeing seen on the projector/main screen. This can be turned on in Settings->Screen
-     Settings. 
-- Fixed a problem where a single-verse bible passage wasn't able to be added to the service.</li>
-- Minor improvements to the user interface.</li>
+# What's New in Version 1.9.2?
+- Fixed a crash that can happen when deleting an item from the media library
+- Major improvements to the way images are sent from ProjectOn to the stage view website
+- Added option for changing the Frames Per Second updates on the preview widget and stage view
+- Optimized video playback from web pages
+- Added a reload button when displaying a web page
+- Added a "Slide # of #" in the bottom-right of the stage view
+- Many other tweaks and bug fixes in the GUI and behind the scenes
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.9.1.008) and run
+system only. Download the current ProjectOn installer (v.1.9.2) and run
 it on your computer.
 
 # Using ProjectOn

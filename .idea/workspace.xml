@@ -7,13 +7,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Switched image_display from img to canvas, optimized the conversion of images to bytes for use on a canvas">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -228,14 +229,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00124" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages">
-      <option name="closed" value="true" />
-      <created>1743647555709</created>
-      <option name="number" value="00124" />
-      <option name="presentableId" value="LOCAL-00124" />
-      <option name="project" value="LOCAL" />
-      <updated>1743647555709</updated>
     </task>
     <task id="LOCAL-00125" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages">
       <option name="closed" value="true" />
@@ -621,7 +614,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775770295539</updated>
     </task>
-    <option name="localTasksCounter" value="173" />
+    <task id="LOCAL-00173" summary="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked">
+      <option name="closed" value="true" />
+      <created>1775772699951</created>
+      <option name="number" value="00173" />
+      <option name="presentableId" value="LOCAL-00173" />
+      <option name="project" value="LOCAL" />
+      <updated>1775772699951</updated>
+    </task>
+    <option name="localTasksCounter" value="174" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -642,7 +643,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Moved SimpleSplash into the widgets file. Added optional parameter &quot;parent&quot; in order to specify a parent widget for the splash." />
     <MESSAGE value="Fixed problem with OOS items not properly updating after having been edited." />
     <MESSAGE value="Fixed problem sending bible passage to preview when verse number has greater than 2 digits" />
     <MESSAGE value="Now saving audio attached to Custom Slides in the database as a blob" />
@@ -667,7 +667,8 @@
     <MESSAGE value="Added optimizations for videos playing in QtWebEngine" />
     <MESSAGE value="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides." />
     <MESSAGE value="Switched image_display from img to canvas, optimized the conversion of images to bytes for use on a canvas" />
-    <option name="LAST_COMMIT_MESSAGE" value="Switched image_display from img to canvas, optimized the conversion of images to bytes for use on a canvas" />
+    <MESSAGE value="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
