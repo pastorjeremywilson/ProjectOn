@@ -36,6 +36,7 @@ QWidget[objectName="font_widget"] {
 QWidget[objectName="settings_container"] {
     background: #eeeeff;
     color: #000000;
+    border: 2px solid #5555aa;
 }
 
 /*-------------------- edit_main_widget --------------------*/

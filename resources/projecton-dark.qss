@@ -36,6 +36,7 @@ QWidget[objectName="font_widget"] {
 QWidget[objectName="settings_container"] {
     background: #303030;
     color: #e0e0e0;
+    border: 2px solid #444466;
 }
 
 /*-------------------- edit_main_widget --------------------*/
@@ -351,6 +352,9 @@ QMenu::item:selected {
     background: #444466;
 }
 QMenu::item:pressed {
+    background: #444466;
+}
+QMenu::separator {
     background: #444466;
 }
 

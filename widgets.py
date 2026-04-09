@@ -1661,8 +1661,11 @@ class NewFontWidget(QWidget):
             fill_color = fill_color.replace('rgb(', '')
             fill_color = fill_color.replace(')', '')
             fill_color_split = fill_color.split(', ')
-            self.font_sample.fill_color = QColor(
-                int(fill_color_split[0]), int(fill_color_split[1]), int(fill_color_split[2]))
+            try:
+                self.font_sample.fill_color = QColor(
+                    int(fill_color_split[0]), int(fill_color_split[1]), int(fill_color_split[2]))
+            except Exception:
+                pass
 
         if self.shadow_checkbox.isChecked():
             self.font_sample.use_shadow = True
@@ -1703,6 +1706,7 @@ class NewFontWidget(QWidget):
             r, g, b = int(color_split[0]), int(color_split[1]), int(color_split[2])
 
         color = QColorDialog.getColor(QColor(r, g, b), self)
+        print(color.getRgb())
         rgb = color.getRgb()
         if color.isValid():
             color_string = str(rgb[0]) + ', ' + str(rgb[1]) + ', ' + str(rgb[2])
@@ -3499,6 +3503,9 @@ class IndexedSettingsWidget(QWidget):
 
         layout.addWidget(options_widget)
         options_layout = QGridLayout(options_widget)
+        for i in range(4):
+            options_layout.setColumnStretch(i, 1)
+        options_layout.setColumnStretch(4, 5)
 
         self.countdown_sample_label = QLabel('Service starts in 3:21')
         options_layout.addWidget(self.countdown_sample_label, 0, 0, 1, 2)
@@ -3521,6 +3528,7 @@ class IndexedSettingsWidget(QWidget):
         #self.countdown_font_combobox = FontFaceComboBox(self.gui)
         self.countdown_font_combobox = QFontComboBox()
         self.countdown_font_combobox.setFont(self.gui.standard_font)
+        self.countdown_font_combobox.setMinimumHeight(40)
         self.countdown_font_combobox.setCurrentIndex(
             self.countdown_font_combobox.findText(self.gui.main.settings['countdown_settings']['font_face']))
         self.countdown_font_combobox.currentIndexChanged.connect(self.countdown_changed)
@@ -3555,6 +3563,7 @@ class IndexedSettingsWidget(QWidget):
 
         self.countdown_position_combobox = QComboBox()
         self.countdown_position_combobox.setFont(self.gui.standard_font)
+        self.countdown_position_combobox.setMinimumHeight(40)
         self.countdown_position_combobox.addItem('Top', 'top_full')
         self.countdown_position_combobox.addItem('Bottom', 'bottom_full')
         if 'top' in self.gui.main.settings['countdown_settings']['position']:

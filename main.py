@@ -629,31 +629,32 @@ class ProjectOn(QObject):
         )
 
         if result == QMessageBox.StandardButton.Yes:
-            result = QMessageBox.question(
+            second_result = QMessageBox.question(
                 self.gui.main_window,
                 'Really Delete?',
                 'Just making sure: Do you really want to DELETE ALL SONGS?',
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
             )
+            if not second_result == QMessageBox.StandardButton.Yes:
+                return
         else:
             return
 
         connection = None
         try:
-            if result == QMessageBox.StandardButton.Yes:
-                connection = sqlite3.connect(self.database)
-                cursor = connection.cursor()
-                cursor.execute('DELETE FROM songs')
-                connection.commit()
-                connection.close()
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            cursor.execute('DELETE FROM songs')
+            connection.commit()
+            connection.close()
 
-                QMessageBox.information(
-                    self.gui.main_window,
-                    'Songs Deleted',
-                    'All songs have been removed.',
-                    QMessageBox.StandardButton.Ok
-                )
-                self.gui.media_widget.song_list.clear()
+            QMessageBox.information(
+                self.gui.main_window,
+                'Songs Deleted',
+                'All songs have been removed.',
+                QMessageBox.StandardButton.Ok
+            )
+            self.gui.media_widget.song_list.clear()
         except Exception:
             self.error_log()
             if connection:

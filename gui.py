@@ -2071,7 +2071,7 @@ class GUI(QObject):
                         buffer = QBuffer()
                         buffer.open(QIODevice.OpenModeFlag.WriteOnly)
 
-                        success = pixmap.save(buffer, 'JPEG', 70)
+                        success = full_size_pixmap.save(buffer, 'JPEG', 70)
 
                         if success:
                             jpg_bytes = buffer.data().data()
@@ -2089,7 +2089,7 @@ class GUI(QObject):
                         buffer = QBuffer()
                         buffer.open(QIODevice.OpenModeFlag.WriteOnly)
 
-                        success = pixmap.save(buffer, 'JPEG', 70)
+                        success = full_size_pixmap.save(buffer, 'JPEG', 70)
 
                         if success:
                             jpg_bytes = buffer.data().data()
@@ -2107,7 +2107,7 @@ class GUI(QObject):
                         buffer = QBuffer()
                         buffer.open(QIODevice.OpenModeFlag.WriteOnly)
 
-                        success = pixmap.save(buffer, 'JPEG', 70)
+                        success = full_size_pixmap.save(buffer, 'JPEG', 70)
 
                         if success:
                             jpg_bytes = buffer.data().data()
