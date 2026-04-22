@@ -13,7 +13,13 @@ General Theme Colors:
 /*-------------------- item_widget --------------------*/
 QWidget[objectName="item_widget"] {
     background: #aaaaff;
-    color: #000000
+    color: #000000;
+}
+
+/*-------------------- song_item_widget --------------------*/
+QWidget[objectName="song_item_widget"] {
+    background: #aaaaff;
+    color: #000000;
 }
 
 /*-------------------- tool_bar_container --------------------*/

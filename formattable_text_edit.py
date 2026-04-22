@@ -18,10 +18,13 @@ class FormattableTextEdit(QWidget):
         super().__init__()
         self.cursor_position = None
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
         button_widget = QWidget()
         button_layout = QHBoxLayout()
+        button_layout.setContentsMargins(0, 0, 0, 0)
+        button_layout.setSpacing(10)
         button_widget.setLayout(button_layout)
 
         self.bold_button = QPushButton()

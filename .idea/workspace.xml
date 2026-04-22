@@ -7,14 +7,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Updated the readmes, changed version number, ready for release">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/help/intro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,19 +101,20 @@
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/project_on&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/CrossWorks&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.idesettings.debugger.python&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySupportGeventDebugging" value="true" />
+    <option name="mySupportQtDebugging" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -162,6 +162,7 @@
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="QT_LOGGING_RULES" value="*.debug=false;qt.qpa.*=false" />
       </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
@@ -229,14 +230,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00125" summary="Fixed a problem where selecting a block of formatted text incorrectly reported that formatting.&#10;&#10;Fixed song list/custom slide list not returning to the selected item after editing.&#10;&#10;Upgraded to Python 3.11 from 3.10&#10;&#10;Fixed calls to main.IndexImages that should have been runnables.IndexImages">
-      <option name="closed" value="true" />
-      <created>1743696211560</created>
-      <option name="number" value="00125" />
-      <option name="presentableId" value="LOCAL-00125" />
-      <option name="project" value="LOCAL" />
-      <updated>1743696211561</updated>
     </task>
     <task id="LOCAL-00126" summary="Fixed layout problem on stage display.&#10;&#10;Added header to stage font size setting and fixed the spinbox height.">
       <option name="closed" value="true" />
@@ -622,7 +615,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775772699951</updated>
     </task>
-    <option name="localTasksCounter" value="174" />
+    <task id="LOCAL-00174" summary="Updated the readmes, changed version number, ready for release">
+      <option name="closed" value="true" />
+      <created>1775773333160</created>
+      <option name="number" value="00174" />
+      <option name="presentableId" value="LOCAL-00174" />
+      <option name="project" value="LOCAL" />
+      <updated>1775773333160</updated>
+    </task>
+    <option name="localTasksCounter" value="175" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -643,7 +644,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed problem with OOS items not properly updating after having been edited." />
     <MESSAGE value="Fixed problem sending bible passage to preview when verse number has greater than 2 digits" />
     <MESSAGE value="Now saving audio attached to Custom Slides in the database as a blob" />
     <MESSAGE value="Updated the readmes and version numbers. Ready for release." />
@@ -668,7 +668,8 @@
     <MESSAGE value="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides." />
     <MESSAGE value="Switched image_display from img to canvas, optimized the conversion of images to bytes for use on a canvas" />
     <MESSAGE value="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked" />
-    <option name="LAST_COMMIT_MESSAGE" value="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked" />
+    <MESSAGE value="Updated the readmes, changed version number, ready for release" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the readmes, changed version number, ready for release" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

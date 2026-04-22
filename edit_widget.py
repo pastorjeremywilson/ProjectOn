@@ -190,10 +190,20 @@ class EditWidget(QDialog):
         self.lyrics_edit = FormattableTextEdit(self.gui)
         self.lyrics_edit.setMinimumHeight(400)
         self.lyrics_edit.setFont(self.gui.standard_font)
+        self.lyrics_edit.hide()
         if self.type == 'song':
             lyrics_layout.addWidget(self.lyrics_edit, 0, 0, 3, 1)
         else:
             lyrics_layout.addWidget(self.lyrics_edit, 0, 0)
+
+        self.lyrics_list_widget = QListWidget()
+        self.lyrics_list_widget.setMinimumHeight(400)
+        self.lyrics_list_widget.setSpacing(5)
+        self.lyrics_list_widget.setFont(self.gui.standard_font)
+        if self.type == 'song':
+            lyrics_layout.addWidget(self.lyrics_list_widget, 0, 0, 3, 1)
+        else:
+            lyrics_layout.addWidget(self.lyrics_list_widget, 0, 0)
 
         if self.type == 'song':
             segment_label = QLabel('Segments')
@@ -1006,6 +1016,18 @@ class EditWidget(QDialog):
                 lyrics = lyrics.replace(tag_list[i], new_tag)
         self.lyrics_edit.text_edit.setHtml(lyrics)
 
+        lyrics = self.get_simplified_text(song_data[4])
+        tag_list = re.findall(r'\[.*?]', lyrics, flags=re.S)
+        lyrics_split = re.split(r'\[.*?]', lyrics, flags=re.S)
+        lyrics_split.pop(0)
+
+        for i in range(len(tag_list)):
+            widget = self.create_song_item_widget(tag_list[i], lyrics_split[i])
+            item = QListWidgetItem()
+            item.setSizeHint(widget.sizeHint())
+            self.lyrics_list_widget.addItem(item)
+            self.lyrics_list_widget.setItemWidget(item, widget)
+
         order_items = song_data[5].split(' ')
         for i in range(len(order_items)):
             if 'v' in order_items[i]:
@@ -1157,6 +1179,81 @@ class EditWidget(QDialog):
 
         self.font_widget.blockSignals(False)
         self.populate_tag_list()
+
+    def create_song_item_widget(self, tag=None, text=None):
+        if not tag or not text:
+            tag = 'Verse 1'
+            text = ''
+
+        text = text.strip()
+        if text.startswith('<br />'):
+            text = text[6:]
+
+        tag = tag.replace('[', '').replace(']', '').strip()
+        tag_split = tag.split(' ')
+        if len(tag_split) > 1:
+            tag_num = int(tag_split[-1])
+        else:
+            tag_num = 1
+
+        widget = QWidget()
+        widget.setObjectName('song_item_widget')
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(0)
+
+        type_widget = QWidget()
+        layout.addWidget(type_widget)
+        type_layout = QHBoxLayout(type_widget)
+        type_layout.setContentsMargins(0, 0, 0, 0)
+        type_layout.setSpacing(5)
+
+        type_combobox = QComboBox()
+        type_combobox.setObjectName('type_combobox')
+        type_combobox.setFont(self.gui.standard_font)
+        type_combobox.setMinimumWidth(200)
+        type_combobox.setMinimumHeight(36)
+        types = [
+            'Verse',
+            'Pre-Chorus',
+            'Chorus',
+            'Bridge',
+            'Tag',
+            'Ending'
+        ]
+        type_combobox.addItems(types)
+        type_layout.addWidget(type_combobox)
+
+        number_spinbox = QSpinBox()
+        number_spinbox.setObjectName('number_spinbox')
+        number_spinbox.setFont(self.gui.standard_font)
+        number_spinbox.setMinimumWidth(50)
+        number_spinbox.setMinimumHeight(36)
+        number_spinbox.setMinimum(1)
+        number_spinbox.setMaximum(10)
+        number_spinbox.setValue(tag_num)
+        type_layout.addWidget(number_spinbox)
+        type_layout.addStretch()
+
+        edit_widget = FormattableTextEdit(self.gui)
+        edit_widget.setObjectName('edit_widget')
+        edit_widget.text_edit.setMaximumHeight(100)
+        edit_widget.text_edit.setHtml(text)
+        layout.addWidget(edit_widget)
+
+        if 'v' in tag.lower():
+            type_combobox.setCurrentIndex(types.index('Verse'))
+        elif 'p' in tag.lower():
+            type_combobox.setCurrentIndex(types.index('Pre-Chorus'))
+        elif 'c' in tag.lower():
+            type_combobox.setCurrentIndex(types.index('Chorus'))
+        elif 'b' in tag.lower():
+            type_combobox.setCurrentIndex(types.index('Bridge'))
+        elif 't' in tag.lower():
+            type_combobox.setCurrentIndex(types.index('Tag'))
+        elif 'e' in tag.lower():
+            type_combobox.setCurrentIndex(types.index('Ending'))
+
+        return widget
 
     def populate_custom_data(self, custom_data):
         """
@@ -1470,6 +1567,18 @@ class EditWidget(QDialog):
         Method to find tags in the song's lyrics and add those tags to the "segements" QListWidget
         """
         self.song_section_list_widget.clear()
+
+        tags = []
+        for i in range(self.lyrics_list_widget.count()):
+            widget = self.lyrics_list_widget.itemWidget(self.lyrics_list_widget.item(i))
+            tag_name = widget.findChild(QComboBox, 'type_combobox').currentText()
+            tag_number = str(widget.findChild(QSpinBox, 'number_spinbox').value())
+            tags.append(tag_name + ' ' + tag_number)
+
+        for tag in tags:
+            self.song_section_list_widget.addItem(tag)
+
+        return
         lyrics_text = self.lyrics_edit.text_edit.toPlainText()
         tag_list = re.findall('\[.*?\]', lyrics_text)
         for tag in tag_list:

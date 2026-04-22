@@ -6,6 +6,7 @@ Done:
 To Do:
     Improve lyrics editing with modular editing spaces (verse/chorus and number at top as dropdowns, lyrics below).
         Probably as a custom list widget.
+    Check for QPainter outside of paintEvent
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types
