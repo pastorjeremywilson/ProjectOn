@@ -3,13 +3,13 @@ import re
 from os.path import exists
 
 from PyQt5.QtCore import Qt, QSize, QTimer
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument, QDropEvent, QDrag
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
-    QSpinBox, QComboBox, QListWidgetItem
+    QSpinBox, QComboBox, QListWidgetItem, QTextEdit, QGroupBox, QAbstractItemView
 
 import parsers
-from formattable_text_edit import FormattableTextEdit
+from formattable_text_edit import FormattableTextEdit, CustomTextEdit
 from widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
 
 
@@ -36,6 +36,10 @@ class EditWidget(QDialog):
         self.new_custom = False
         self.item_data = item_data
         self.from_oos = from_oos
+
+        self.data = []
+        for i in range(len(data)):
+            self.data.append(data[i])
 
         self.setObjectName('edit_widget')
         self.setWindowFlag(Qt.WindowType.Window)
@@ -67,11 +71,6 @@ class EditWidget(QDialog):
 
         self.font_widget.change_font()
         self.show()
-
-        self.update_preview_timer = QTimer()
-        self.update_preview_timer.setInterval(500)
-        self.update_preview_timer.timeout.connect(self.update_preview_widget)
-        self.update_preview_timer.start()
 
     def init_components(self):
         """
@@ -167,14 +166,43 @@ class EditWidget(QDialog):
 
         main_layout.addSpacing(20)
 
-        lyrics_label = QLabel('Lyrics')
-        lyrics_label.setFont(self.gui.bold_font)
-        main_layout.addWidget(lyrics_label)
-
-        lyrics_widget = QWidget()
+        lyrics_widget = QGroupBox('Lyrics')
+        lyrics_widget.setFont(self.gui.bold_font)
+        if self.type == 'custom':
+            lyrics_widget.setTitle('Text')
         lyrics_widget.setObjectName('lyrics_widget')
         lyrics_layout = QGridLayout(lyrics_widget)
+        lyrics_layout.setSpacing(20)
         main_layout.addWidget(lyrics_widget)
+
+        if self.type == 'song':
+            lyrics_header_widget = QWidget()
+            lyrics_layout.addWidget(lyrics_header_widget, 0, 0)
+            lyrics_header_layout = QGridLayout(lyrics_header_widget)
+            lyrics_header_layout.setContentsMargins(0, 0, 0, 0)
+
+            lyrics_label = QLabel('Edit all lyrics')
+            lyrics_label.setFont(self.gui.standard_font)
+            lyrics_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+            lyrics_header_layout.addWidget(lyrics_label, 0, 0, Qt.AlignmentFlag.AlignLeft)
+
+            lyrics_toggle = QPushButton()
+            lyrics_toggle.setObjectName('lyrics_toggle')
+            lyrics_toggle.setCheckable(True)
+            lyrics_toggle.setFont(self.gui.standard_font)
+            lyrics_toggle.released.connect(self.toggle_lyrics)
+            lyrics_header_layout.addWidget(lyrics_toggle, 1, 0, Qt.AlignmentFlag.AlignLeft)
+
+            add_lyrics_label = QLabel('Add lyrics')
+            add_lyrics_label.setFont(self.gui.standard_font)
+            add_lyrics_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+            lyrics_header_layout.addWidget(add_lyrics_label, 0, 1, Qt.AlignmentFlag.AlignRight)
+
+            add_lyrics_button = QPushButton()
+            add_lyrics_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
+            add_lyrics_button.setToolTip('Add a block of lyrics')
+            add_lyrics_button.clicked.connect(self.add_lyrics_block)
+            lyrics_header_layout.addWidget(add_lyrics_button, 1, 1, Qt.AlignmentFlag.AlignRight)
 
         if self.type == 'song':
             lyrics_layout.setRowStretch(0, 1)
@@ -187,56 +215,56 @@ class EditWidget(QDialog):
             lyrics_layout.setColumnStretch(0, 10)
             lyrics_layout.setColumnStretch(1, 5)
 
-        self.lyrics_edit = FormattableTextEdit(self.gui)
-        self.lyrics_edit.setMinimumHeight(400)
-        self.lyrics_edit.setFont(self.gui.standard_font)
-        self.lyrics_edit.hide()
-        if self.type == 'song':
-            lyrics_layout.addWidget(self.lyrics_edit, 0, 0, 3, 1)
-        else:
-            lyrics_layout.addWidget(self.lyrics_edit, 0, 0)
-
-        self.lyrics_list_widget = QListWidget()
+        self.lyrics_list_widget = LyricListWidget()
+        self.lyrics_list_widget.setObjectName('lyrics_list_widget')
         self.lyrics_list_widget.setMinimumHeight(400)
         self.lyrics_list_widget.setSpacing(5)
+        self.lyrics_list_widget.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.lyrics_list_widget.verticalScrollBar().setSingleStep(15)
+        self.lyrics_list_widget.setDragEnabled(True)
+        self.lyrics_list_widget.setAcceptDrops(True)
+        self.lyrics_list_widget.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.lyrics_list_widget.currentRowChanged.connect(self.update_preview_widget)
         self.lyrics_list_widget.setFont(self.gui.standard_font)
+
+        self.lyrics_text_edit = CustomTextEdit()
+        self.lyrics_text_edit.setObjectName('lyrics_text_edit')
+        self.lyrics_text_edit.setFont(self.gui.standard_font)
+        self.lyrics_text_edit.hide()
+
         if self.type == 'song':
-            lyrics_layout.addWidget(self.lyrics_list_widget, 0, 0, 3, 1)
+            lyrics_layout.addWidget(self.lyrics_list_widget, 1, 0, 3, 1)
+            lyrics_layout.addWidget(self.lyrics_text_edit, 1, 0, 3, 1)
         else:
-            lyrics_layout.addWidget(self.lyrics_list_widget, 0, 0)
+            help_label = QLabel('Hint: Add a blank line between paragraphs to split into multiple slides')
+            help_label.setObjectName('help_label')
+            help_label.setFont(self.gui.standard_font)
+            main_layout.addWidget(help_label)
+            lyrics_layout.addWidget(help_label, 0, 0)
+            lyrics_layout.addWidget(self.lyrics_text_edit, 1, 0)
+            self.lyrics_list_widget.hide()
+            self.lyrics_text_edit.show()
 
         if self.type == 'song':
-            segment_label = QLabel('Segments')
-            segment_label.setFont(self.gui.standard_font)
-            lyrics_layout.addWidget(segment_label, 0, 1)
-
             song_order_label = QLabel('Song Order')
             song_order_label.setFont(self.gui.standard_font)
-            lyrics_layout.addWidget(song_order_label, 0, 2)
+            lyrics_layout.addWidget(song_order_label, 0, 1)
 
-            self.song_section_list_widget = QListWidget()
-            self.song_section_list_widget.setAcceptDrops(False)
-            self.song_section_list_widget.setDragEnabled(True)
-            self.song_section_list_widget.setDragDropMode(QListWidget.DragDropMode.DragOnly)
-            self.song_section_list_widget.setMinimumWidth(120)
-            self.song_section_list_widget.setToolTip('Drag and drop the song segments into the song order box to '
-                                                     'set the oder in which verses, choruses, etc. are displayed')
-            self.song_section_list_widget.setFont(self.gui.standard_font)
-            lyrics_layout.addWidget(self.song_section_list_widget, 1, 1, 2, 1)
-
-            self.song_order_list_widget = CustomListWidget()
-            self.song_order_list_widget.setAcceptDrops(True)
+            self.song_order_list_widget = SongOrderListWidget()
             self.song_order_list_widget.setDragEnabled(True)
+            self.song_order_list_widget.setAcceptDrops(True)
             self.song_order_list_widget.setDefaultDropAction(Qt.DropAction.MoveAction)
             self.song_order_list_widget.setMinimumWidth(120)
+            self.song_order_list_widget.setSpacing(5)
             self.song_order_list_widget.setToolTip('Press "Delete" to remove an item from the song order list')
             self.song_order_list_widget.setFont(self.gui.standard_font)
-            lyrics_layout.addWidget(self.song_order_list_widget, 1, 2, 2, 1)
+            lyrics_layout.addWidget(self.song_order_list_widget, 1, 1, 2, 1)
 
-            tool_bar = QWidget()
+            self.tool_bar = QWidget()
+            self.tool_bar.hide()
             toolbar_layout = QHBoxLayout()
-            tool_bar.setLayout(toolbar_layout)
-            main_layout.addWidget(tool_bar)
+            self.tool_bar.setLayout(toolbar_layout)
+            main_layout.addWidget(self.tool_bar)
             button_size = QSize(100, 30)
 
             tag_label = QLabel('Insert a Tag:')
@@ -578,6 +606,30 @@ class EditWidget(QDialog):
         self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole))
         self.font_widget.font_sample.paint_font()
 
+    def toggle_lyrics(self):
+        if self.sender().isChecked():
+            lyrics_html = ''
+            for i in range(self.lyrics_list_widget.count()):
+                widget = self.lyrics_list_widget.itemWidget(self.lyrics_list_widget.item(i))
+                type = widget.findChild(QComboBox, 'type_combobox').currentText()
+                number = str(widget.findChild(QSpinBox, 'number_spinbox').value())
+                lyrics = self.get_simplified_text(widget.findChild(CustomTextEdit).toHtml())
+                lyrics_html += f'[{type} {number}]<br />{lyrics}<br />'
+            lyrics_html = lyrics_html[:-6]
+            self.data[4] = lyrics_html
+            self.populate_song_data(self.data)
+            self.lyrics_list_widget.hide()
+            self.lyrics_text_edit.show()
+            self.song_order_list_widget.hide()
+            self.tool_bar.show()
+        else:
+            self.data[4] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+            self.populate_song_data(self.data)
+            self.lyrics_text_edit.hide()
+            self.tool_bar.hide()
+            self.lyrics_list_widget.show()
+            self.song_order_list_widget.show()
+
     def update_preview_widget(self):
         """
         Method to change what is being displayed in the preview widget.
@@ -608,71 +660,15 @@ class EditWidget(QDialog):
             display_widget.background_label.setPixmap(self.gui.global_song_background_pixmap)
 
         # set the lyrics html
-        if '[' in self.lyrics_edit.text_edit.toPlainText():
-            startpoint = ']'
-            endpoint = '['
-        else:
-            startpoint = '\n'
-            endpoint = '\n'
-        cursor = self.lyrics_edit.text_edit.textCursor()
-        iterations = 0
-        while not cursor.selection().toPlainText() == startpoint:
-            cursor.clearSelection()
-            cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter, QTextCursor.MoveMode.KeepAnchor)
-            iterations += 1
-            if iterations > 2000:
-                break
+        lyrics_html = None
+        if self.lyrics_list_widget.currentRow() is not None and self.lyrics_list_widget.currentRow() >= 0:
+            widget = self.lyrics_list_widget.itemWidget(self.lyrics_list_widget.item(self.lyrics_list_widget.currentRow()))
+            if widget:
+                lyrics_html = widget.findChild(FormattableTextEdit).text_edit.toHtml()
+                lyrics_html = self.get_simplified_text(lyrics_html)
 
-        cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.KeepAnchor)
-        iterations = 0
-        old_position = -1
-        end_found = False
-        while not endpoint in cursor.selection().toPlainText():
-            cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.KeepAnchor)
-            new_position = cursor.position()
-            if new_position == old_position:
-                end_found = True
-                break
-            old_position = new_position
-            iterations += 1
-            if iterations > 2000:
-                break
-
-        if not end_found:
-            cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter, QTextCursor.MoveMode.KeepAnchor)
-        lyrics_html = cursor.selection().toHtml()
-
-        if '<body>' in lyrics_html:
-            lyrics_html = lyrics_html.split('<body>')[1].strip()
-        lyrics_html = lyrics_html.replace('<br />', '{br /}')
-
-        if 'span' in lyrics_html and 'italic' in lyrics_html:
-            italicized_text = re.findall('<span style=" font-style:italic;">.*?</span>', lyrics_html)
-            for text in italicized_text:
-                new_text = re.sub('<span.*?italic.*?>', '{i}', text)
-                new_text = re.sub('</span>', '{/i}', new_text)
-                lyrics_html = lyrics_html.replace(text, new_text)
-
-        if 'span' in lyrics_html and 'font-weight' in lyrics_html:
-            bold_text = re.findall('<span style=" font-weight:600;">.*?</span>', lyrics_html)
-            for text in bold_text:
-                new_text = re.sub('<span.*?font-weight.*?>', '{b}', text)
-                new_text = re.sub('</span>', '{/b}', new_text)
-                lyrics_html = lyrics_html.replace(text, new_text)
-
-        if 'span' in lyrics_html and 'text-decoration' in lyrics_html:
-            underline_text = re.findall('<span.*?text-decoration.*?">.*?</span>', lyrics_html)
-            for text in underline_text:
-                new_text = re.sub('<span.*?text-decoration.*?>', '{u}', text)
-                new_text = re.sub('</span>', '{/u}', new_text)
-                lyrics_html = lyrics_html.replace(text, new_text)
-
-        lyrics_html = re.sub('<.*?>', '', lyrics_html)
-        lyrics_html = lyrics_html.replace('{', '<').replace('}', '>')
-        while lyrics_html.startswith('<br />'):
-            lyrics_html = lyrics_html[6:].strip()
-        while lyrics_html.endswith('<br />'):
-            lyrics_html = lyrics_html[:-6].strip()
+        if not lyrics_html:
+            return
 
         # set the font
         if 'override_global' in self.item_data.keys() and self.item_data['override_global'] == 'True':
@@ -776,7 +772,6 @@ class EditWidget(QDialog):
                     int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
 
         lyric_widget.text = lyrics_html
-        lyric_widget.repaint()
 
         # set the footer text
         lyric_widget.footer_label.show()
@@ -815,14 +810,11 @@ class EditWidget(QDialog):
         if lyric_widget.footer_label.text() == '':
             lyric_widget.footer_label.hide()
 
-        lyric_widget.paint_text()
         lyric_widget_height = lyric_widget.total_height
         target_height = display_widget.height() - lyric_widget.footer_label.height() - 40
-        half_lyrics = False
 
         # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
         if lyric_widget_height > target_height:
-            half_lyrics = True
             segment_text_split = re.split('<br.*?/>', lyrics_html)
             half_lines = int(len(segment_text_split) / 2)
             if half_lines > 1:
@@ -831,9 +823,8 @@ class EditWidget(QDialog):
                     first_lyrics += segment_text_split[i] + '<br />'
                 first_lyrics = first_lyrics[:-6]
                 lyric_widget.text = first_lyrics
-                lyric_widget.paint_text()
                 preview_pixmap = display_widget.grab(display_widget.rect())
-                preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
+                preview_pixmap = preview_pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
                 self.preview_label_one.setPixmap(preview_pixmap)
 
                 second_lyrics = ''
@@ -841,18 +832,17 @@ class EditWidget(QDialog):
                     second_lyrics += segment_text_split[i] + '<br />'
                 second_lyrics = second_lyrics[:-6]
                 lyric_widget.text = second_lyrics
-                lyric_widget.paint_text()
                 preview_pixmap = display_widget.grab(display_widget.rect())
-                preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
+                preview_pixmap = preview_pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
                 self.preview_label_two.setPixmap(preview_pixmap)
             else:
                 preview_pixmap = display_widget.grab(display_widget.rect())
-                preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
+                preview_pixmap = preview_pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
                 self.preview_label_one.setPixmap(preview_pixmap)
                 self.preview_label_two.clear()
         else:
             preview_pixmap = display_widget.grab(display_widget.rect())
-            preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
+            preview_pixmap = preview_pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
             self.preview_label_one.setPixmap(preview_pixmap)
             self.preview_label_two.clear()
 
@@ -967,6 +957,8 @@ class EditWidget(QDialog):
         Use the provided data to set the proper widgets.py to match the saved data
         :param list of str song_data: The song's QListWidgetItem data
         """
+        self.lyrics_text_edit.clear()
+        self.lyrics_list_widget.clear()
         self.old_title = song_data[0]
         self.title_line_edit.setText(song_data[0])
         self.author_line_edit.setText(song_data[1])
@@ -974,59 +966,26 @@ class EditWidget(QDialog):
         self.ccli_num_line_edit.setText(song_data[3])
 
         lyrics = self.get_simplified_text(song_data[4])
-
-        # reformat old tags, add coloring to tags
-        tag_list = re.findall('\[.*?]', lyrics, flags=re.S)
-        if self.gui.main.settings['theme'] == 'light':
-            color_tag_start = '<span style="color: #007600;">'
-        else:
-            color_tag_start = '<span style="color: #00ff00;">'
-        color_tag_end = '</span>'
-        for i in range(len(tag_list)):
-            if len(tag_list[i]) < 6:
-                if 'v' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('v', '').strip()
-                    new_tag = f'{color_tag_start}[Verse {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 'p' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('p', '').strip()
-                    new_tag = f'{color_tag_start}[Pre-Chorus {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 'c' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('c', '').strip()
-                    new_tag = f'{color_tag_start}[Chorus {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 'b' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('b', '').strip()
-                    new_tag = f'{color_tag_start}[Bridge {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 't' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('t', '').strip()
-                    new_tag = f'{color_tag_start}[Tag {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                elif 'e' in tag_list[i]:
-                    tag_num = tag_list[i].replace('[', '').replace(']', '').replace('e', '').strip()
-                    new_tag = f'{color_tag_start}[Ending {tag_num}]{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-                else:
-                    new_tag = f'{color_tag_start}{tag_list[i]}{color_tag_end}'
-                    lyrics = lyrics.replace(tag_list[i], new_tag)
-            else:
-                new_tag = f'{color_tag_start}{tag_list[i]}{color_tag_end}'
-                lyrics = lyrics.replace(tag_list[i], new_tag)
-        self.lyrics_edit.text_edit.setHtml(lyrics)
-
-        lyrics = self.get_simplified_text(song_data[4])
         tag_list = re.findall(r'\[.*?]', lyrics, flags=re.S)
         lyrics_split = re.split(r'\[.*?]', lyrics, flags=re.S)
         lyrics_split.pop(0)
 
+        all_lyrics = ''
         for i in range(len(tag_list)):
-            widget = self.create_song_item_widget(tag_list[i], lyrics_split[i])
+            widget = self.create_lyric_item_widget(tag_list[i], lyrics_split[i])
             item = QListWidgetItem()
             item.setSizeHint(widget.sizeHint())
             self.lyrics_list_widget.addItem(item)
             self.lyrics_list_widget.setItemWidget(item, widget)
+
+            if lyrics_split[i].startswith('<br />'):
+                lyrics_split[i] = lyrics_split[i][6:].strip()
+            if lyrics_split[i].endswith('<br />'):
+                lyrics_split[i] = lyrics_split[i][:-6].strip()
+            all_lyrics += f'<span style="color: darkGreen;">{tag_list[i]}</span><br />'
+            all_lyrics += f'{lyrics_split[i]}<br />'
+        all_lyrics = all_lyrics[:-6]
+        self.lyrics_text_edit.setHtml(all_lyrics)
 
         order_items = song_data[5].split(' ')
         for i in range(len(order_items)):
@@ -1043,6 +1002,7 @@ class EditWidget(QDialog):
             elif 'e' in order_items[i]:
                 order_items[i] = 'Ending ' + order_items[i].replace('[', '').replace(']', '').replace('e', '')
 
+        self.song_order_list_widget.clear()
         for i in range(len(order_items)):
             if len(order_items[i].strip()) > 0:
                 self.song_order_list_widget.addItem(order_items[i])
@@ -1178,9 +1138,25 @@ class EditWidget(QDialog):
             self.font_widget.shade_opacity_slider.color_slider.setValue(int(song_data[20]))
 
         self.font_widget.blockSignals(False)
-        self.populate_tag_list()
 
-    def create_song_item_widget(self, tag=None, text=None):
+    def add_lyrics_block(self):
+        value = 1
+        for i in range(self.lyrics_list_widget.count()):
+            widget = self.lyrics_list_widget.itemWidget(self.lyrics_list_widget.item(i))
+            type = widget.findChild(QComboBox, 'type_combobox').currentText()
+            number = widget.findChild(QSpinBox, 'number_spinbox').value()
+            if type == 'Verse':
+                value = number + 1
+        item = QListWidgetItem()
+        widget = self.create_lyric_item_widget(f'Verse {value}', ' ')
+        item.setSizeHint(widget.sizeHint())
+        self.lyrics_list_widget.addItem(item)
+        self.lyrics_list_widget.setItemWidget(item, widget)
+        self.lyrics_list_widget.setCurrentItem(item)
+        self.lyrics_list_widget.scrollToItem(item)
+        widget.findChild(QTextEdit).setFocus()
+
+    def create_lyric_item_widget(self, tag=None, text=None):
         if not tag or not text:
             tag = 'Verse 1'
             text = ''
@@ -1188,6 +1164,8 @@ class EditWidget(QDialog):
         text = text.strip()
         if text.startswith('<br />'):
             text = text[6:]
+        if text.endswith('<br />'):
+            text = text[:-6]
 
         tag = tag.replace('[', '').replace(']', '').strip()
         tag_split = tag.split(' ')
@@ -1198,6 +1176,7 @@ class EditWidget(QDialog):
 
         widget = QWidget()
         widget.setObjectName('song_item_widget')
+        widget.setAutoFillBackground(False)
         layout = QVBoxLayout(widget)
         layout.setSpacing(0)
 
@@ -1210,6 +1189,7 @@ class EditWidget(QDialog):
         type_combobox = QComboBox()
         type_combobox.setObjectName('type_combobox')
         type_combobox.setFont(self.gui.standard_font)
+        type_combobox.setToolTip('Lyric type')
         type_combobox.setMinimumWidth(200)
         type_combobox.setMinimumHeight(36)
         types = [
@@ -1226,6 +1206,7 @@ class EditWidget(QDialog):
         number_spinbox = QSpinBox()
         number_spinbox.setObjectName('number_spinbox')
         number_spinbox.setFont(self.gui.standard_font)
+        number_spinbox.setToolTip('Number (i.e. Verse 1, Verse 2, ...')
         number_spinbox.setMinimumWidth(50)
         number_spinbox.setMinimumHeight(36)
         number_spinbox.setMinimum(1)
@@ -1234,9 +1215,16 @@ class EditWidget(QDialog):
         type_layout.addWidget(number_spinbox)
         type_layout.addStretch()
 
+        delete_button = QPushButton()
+        delete_button.setIcon(QIcon('resources/gui_icons/x_icon.svg'))
+        delete_button.setToolTip('Delete this lyric section')
+        delete_button.pressed.connect(self.delete_item)
+        type_layout.addWidget(delete_button)
+
         edit_widget = FormattableTextEdit(self.gui)
         edit_widget.setObjectName('edit_widget')
         edit_widget.text_edit.setMaximumHeight(100)
+        edit_widget.text_edit.textChanged.connect(self.update_preview_widget)
         edit_widget.text_edit.setHtml(text)
         layout.addWidget(edit_widget)
 
@@ -1255,6 +1243,14 @@ class EditWidget(QDialog):
 
         return widget
 
+    def delete_item(self):
+        button = self.sender()
+        if not button:
+            return
+        point = button.mapTo(self.lyrics_list_widget.viewport(), button.rect().topLeft())
+        item = self.lyrics_list_widget.itemAt(point)
+        self.lyrics_list_widget.takeItem(self.lyrics_list_widget.row(item))
+
     def populate_custom_data(self, custom_data):
         """
         Use the provided data to set the proper widgets.py to match the saved data
@@ -1262,7 +1258,7 @@ class EditWidget(QDialog):
         """
         self.old_title = custom_data[0]
         self.title_line_edit.setText(custom_data[0])
-        self.lyrics_edit.text_edit.setHtml(self.get_simplified_text(custom_data[1]))
+        self.lyrics_text_edit.setHtml(self.get_simplified_text(custom_data[1]))
         self.font_widget.blockSignals(True)
 
         # set the override global checkbox
@@ -1479,21 +1475,21 @@ class EditWidget(QDialog):
         :return:
         """
 
-        slider_pos = self.lyrics_edit.text_edit.verticalScrollBar().sliderPosition()
+        slider_pos = self.lyrics_text_edit.verticalScrollBar().sliderPosition()
 
         if self.sender().text() == 'os':
-            self.lyrics_edit.text_edit.insertPlainText('\n#optional split#')
+            self.lyrics_text_edit.insertPlainText('\n#optional split#')
 
         else:
             # search first for previous instances of this tag; append numbers to the tag for multiple instances
             tag_name = self.sender().text()
-            lyrics_text = self.lyrics_edit.text_edit.toHtml()
-            occurrences = re.findall('\[' + tag_name + '.*?\]', lyrics_text)
+            lyrics_text = self.lyrics_text_edit.toHtml()
+            occurrences = re.findall(r'\[' + tag_name + '.*?]', lyrics_text)
 
             # determine if breaks are needed before or after the tag
             tag_start = '<br />'
             tag_end = '<br />'
-            cursor = self.lyrics_edit.text_edit.textCursor()
+            cursor = self.lyrics_text_edit.textCursor()
             cursor_pos = cursor.position()
             cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter, QTextCursor.MoveMode.KeepAnchor)
             if cursor.selection().toPlainText() == '\n' or cursor.position() == 0:
@@ -1504,14 +1500,14 @@ class EditWidget(QDialog):
                 tag_end = ''
 
             if len(occurrences) == 0:
-                self.lyrics_edit.text_edit.insertHtml(
-                    f'{tag_start}<span style="color:#00ff00;">[{tag_name} 1]</span>{tag_end}')
+                self.lyrics_text_edit.insertHtml(
+                    f'{tag_start}<span style="color:darkGreen;">[{tag_name} 1]</span>{tag_end}')
             else:
-                self.lyrics_edit.text_edit.insertHtml(
-                    f'{tag_start}<span style="color:#00ff00;">[{tag_name + tag_name}]</span>{tag_end}')
+                self.lyrics_text_edit.insertHtml(
+                    f'{tag_start}<span style="color:darkGreen;">[{tag_name + tag_name}]</span>{tag_end}')
 
-                self.lyrics_edit.text_edit.setHtml(self.renumber_tags(tag_name, self.lyrics_edit.text_edit.toHtml()))
-                self.lyrics_edit.text_edit.setFocus()
+                self.lyrics_text_edit.setHtml(self.renumber_tags(tag_name, self.lyrics_text_edit.toHtml()))
+                self.lyrics_text_edit.setFocus()
 
                 cursor.setPosition(cursor_pos)
                 while True:
@@ -1522,11 +1518,10 @@ class EditWidget(QDialog):
 
                 cursor.clearSelection()
                 cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.MoveAnchor)
-                self.lyrics_edit.text_edit.setTextCursor(cursor)
+                self.lyrics_text_edit.setTextCursor(cursor)
 
-        self.populate_tag_list()
-        self.lyrics_edit.text_edit.verticalScrollBar().setSliderPosition(slider_pos)
-        self.lyrics_edit.text_edit.setFocus()
+        self.lyrics_text_edit.verticalScrollBar().setSliderPosition(slider_pos)
+        self.lyrics_text_edit.setFocus()
 
     def renumber_tags(self, tag_name, html):
         """
@@ -1579,13 +1574,13 @@ class EditWidget(QDialog):
             self.song_section_list_widget.addItem(tag)
 
         return
-        lyrics_text = self.lyrics_edit.text_edit.toPlainText()
+        lyrics_text = self.lyrics_text_edit.toPlainText()
         tag_list = re.findall('\[.*?\]', lyrics_text)
         for tag in tag_list:
             self.song_section_list_widget.addItem(tag.replace('[', '').replace(']', ''))
 
     def print_lyrics(self):
-        lyrics = self.get_simplified_text(self.lyrics_edit.text_edit.toHtml())
+        lyrics = self.get_simplified_text(self.lyrics_text_edit.toHtml())
 
         if '[' in lyrics:
             song_order = []
@@ -1671,7 +1666,19 @@ class EditWidget(QDialog):
         else:
             background = self.background_line_edit.text()
 
-        lyrics = self.get_simplified_text(self.lyrics_edit.text_edit.toHtml())
+        if self.lyrics_list_widget.isVisible():
+            lyrics_html = ''
+            for i in range(self.lyrics_list_widget.count()):
+                widget = self.lyrics_list_widget.itemWidget(self.lyrics_list_widget.item(i))
+                type = widget.findChild(QComboBox, 'type_combobox').currentText()
+                number = str(widget.findChild(QSpinBox, 'number_spinbox').value())
+                lyrics = self.get_simplified_text(widget.findChild(CustomTextEdit).toHtml())
+                lyrics_html += f'[{type} {number}]<br />{lyrics}<br />'
+            lyrics_html = lyrics_html[:-6]
+            self.data[4] = lyrics_html
+            self.populate_song_data(self.data)
+
+        lyrics = self.get_simplified_text(self.lyrics_text_edit.toHtml())
 
         song_order = ''
         for i in range(self.song_order_list_widget.count()):
@@ -1764,7 +1771,6 @@ class EditWidget(QDialog):
             items = self.gui.media_widget.song_list.findItems(song_data[0], Qt.MatchFlag.MatchExactly)
             self.gui.media_widget.song_list.setCurrentItem(items[0])
 
-        self.update_preview_timer.stop()
         self.deleteLater()
         save_widget.widget.deleteLater()
 
@@ -1812,7 +1818,7 @@ class EditWidget(QDialog):
         else:
             background = self.background_line_edit.text()
 
-        text = self.get_simplified_text(self.lyrics_edit.text_edit.toHtml())
+        text = self.get_simplified_text(self.lyrics_text_edit.toHtml())
 
         audio_file = ''
         if self.add_audio_button.isChecked() and not self.audio_combobox.currentText() == 'Choose an Audio File':
@@ -1914,7 +1920,6 @@ class EditWidget(QDialog):
             items = self.gui.media_widget.custom_list.findItems(custom_data[0], Qt.MatchFlag.MatchExactly)
             self.gui.media_widget.custom_list.setCurrentItem(items[0])
 
-        self.update_preview_timer.stop()
         self.done(0)
         self.save_widget.widget.deleteLater()
 
@@ -2001,7 +2006,7 @@ class EditWidget(QDialog):
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, item_widget)
 
 
-class CustomListWidget(QListWidget):
+class SongOrderListWidget(QListWidget):
     """
     Implements QListWidget to provide the ability to press "Delete" in order to remove an item from the list
     """
@@ -2018,3 +2023,38 @@ class CustomListWidget(QListWidget):
                 self.takeItem(self.currentRow())
             else:
                 super().keyPressEvent(evt)
+
+    def dropEvent(self, evt):
+        if evt.source().objectName() == 'lyrics_list_widget':
+            widget = evt.source().itemWidget(evt.source().item(evt.source().currentRow()))
+            lyric_type = widget.findChild(QComboBox, 'type_combobox').currentText()
+            number = widget.findChild(QSpinBox, 'number_spinbox').value()
+            item = QListWidgetItem(f'{lyric_type} {number}')
+            self.insertItem(self.row(self.itemAt(evt.pos())), item)
+        elif evt.source() == self:
+            super().dropEvent(evt)
+
+class LyricListWidget(QListWidget):
+    def __init__(self):
+        super().__init__()
+
+    def startDrag(self, supportedActions):
+        drag = QDrag(self)
+
+        data = self.model().mimeData(self.selectedIndexes())
+        drag.setMimeData(data)
+        
+        rect = self.visualItemRect(self.currentItem())
+        pixmap = self.grab(rect)
+
+        transparent_pixmap = QPixmap(pixmap.size())
+        transparent_pixmap.fill(Qt.transparent)
+
+        painter = QPainter(transparent_pixmap)
+        painter.setOpacity(0.5)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+
+        drag.setPixmap(transparent_pixmap)
+        drag.setHotSpot(self.viewport().mapFromGlobal(self.cursor().pos()) - rect.topLeft())
+        drag.exec(supportedActions)

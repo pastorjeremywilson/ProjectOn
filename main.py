@@ -76,21 +76,10 @@ class ProjectOn(QObject):
         file_dir = os.path.dirname(__file__)
         os.chdir(file_dir)
 
-        if exists(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')):
-            with open(os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json'), 'r') as file:
-                contents = json.loads(file.read())
-            if 'last_status_count' in contents.keys():
-                last_status_count = contents['last_status_count']
-            if (sys.platform == 'win32'
-                    and 'force_software_rendering' in contents.keys()
-                    and contents['force_software_rendering']):
-                os.environ['QMLSCENE_DEVICE'] = 'softwarecontext'
-
         if sys.platform == 'win32':
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
-        #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = '--enable-features=ExperimentalJavaScript'
         QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
         QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_UseDesktopOpenGL)
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (
@@ -106,9 +95,6 @@ class ProjectOn(QObject):
 
         self.thread_pool = QThreadPool()
         self.update_status_signal.connect(self.update_status_label)
-
-        last_status_count = 100
-        self.make_splash_screen(last_status_count)
 
         self.update_status_signal.emit('Creating Socket', 'status')
         self.app.processEvents()
@@ -1470,6 +1456,5 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
 
 
 if __name__ == '__main__':
-    os.environ['QT_DEBUG_PLUGINS'] = '1'
     sys.excepthook = log_unhandled_exception
     ProjectOn()

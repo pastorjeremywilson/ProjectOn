@@ -134,11 +134,13 @@ class GUI(QObject):
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        self.main.update_status_signal.emit('Checking Files', 'status')
-        self.main.app.processEvents()
+        #self.main.update_status_signal.emit('Checking Files', 'status')
+        #self.main.app.processEvents()
 
         # ensure all needed files exist; thread it and wait until done before moving on
         self.check_files()
+
+        self.main.make_splash_screen(self.main.settings['last_status_count'])
 
         self.main.update_status_signal.emit('Checking Database Integrity', 'status')
         self.main.app.processEvents()
@@ -240,7 +242,7 @@ class GUI(QObject):
 
     def check_files(self):
         if 'linux' in sys.platform:
-            self.main.user_dir = os.path.expanduser('~/.ProjectOn')
+            self.main.user_dir = os.path.expanduser('~/.config/ProjectOn')
         else:
             self.main.user_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
         if not exists(self.main.user_dir):
@@ -430,6 +432,11 @@ class GUI(QObject):
                 self.main.settings[key] = default_settings[key]
 
         self.main.save_settings()
+
+        if (sys.platform == 'win32'
+                and 'force_software_rendering' in self.main.settings.keys()
+                and self.main.settings['force_software_rendering']):
+            os.environ['QMLSCENE_DEVICE'] = 'softwarecontext'
 
         self.main.settings['used_services'] = device_specific_settings['used_services']
         self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']

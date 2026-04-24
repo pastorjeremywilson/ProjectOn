@@ -1173,15 +1173,11 @@ class LyricDisplayWidget(QWidget):
         Overrides paintEvent to custom paint the text onto the widget
         :param QPaintEvent evt: paintEvent
         """
+
         palette = self.footer_label.palette()
         palette.setColor(QPalette.ColorRole.WindowText, self.fill_color)
         self.footer_label.setPalette(palette)
-        self.paint_text()
-
-    def paint_text(self):
-        """
-        Method to paint the text onto the widget, using the prescribed outline and shadow values
-        """
+        
         self.total_height = 0
         self.text = re.sub('<p.*?>', '', self.text)
         self.text = re.sub('</p>', '', self.text)
@@ -1330,6 +1326,9 @@ class LyricDisplayWidget(QWidget):
                 painter.strokePath(path, pen)
 
             path_y += line_height
+
+    def paint_text(self):
+        self.repaint()
 
 
 class NewFontWidget(QWidget):

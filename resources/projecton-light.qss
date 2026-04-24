@@ -12,13 +12,13 @@ General Theme Colors:
 
 /*-------------------- item_widget --------------------*/
 QWidget[objectName="item_widget"] {
-    background: #aaaaff;
+    background: #00000000;
     color: #000000;
 }
 
 /*-------------------- song_item_widget --------------------*/
 QWidget[objectName="song_item_widget"] {
-    background: #aaaaff;
+    background: #00000000;
     color: #000000;
 }
 
@@ -54,6 +54,27 @@ QWidget[objectName="edit_main_widget"] {
 /*-------------------- button_widget --------------------*/
 QWidget[objectName="button_widget"] {
     background: #eaeaea;
+}
+
+/*-------------------- lyrics_toggle --------------------*/
+QPushButton[objectName="lyrics_toggle"] {
+    border: none;
+    background: none;
+    icon: url(resources/gui_icons/toggle_switch_off.svg);
+    icon-size: 48px 24px;
+}
+QPushButton[objectName="lyrics_toggle"]:hover {
+    icon: url(resources/gui_icons/toggle_switch_hover.svg);
+}
+QPushButton[objectName="lyrics_toggle"]:checked {
+    border: none;
+    background: none;
+    icon: url(resources/gui_icons/toggle_switch_on.svg);
+    icon-size: 48px 24px;
+}
+
+QLabel[objectName="help_label"] {
+    color: #505050;
 }
 
 /*-------------------- QPushButton --------------------*/
@@ -94,20 +115,22 @@ QComboBox {
     selection-color: #000000;
     border: 1px solid #000000;
 }
-QComboBox::item {
+QComboBox::drop-down {
     background: #ffffff;
     color: #000000;
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border: 0;
 }
-QComboBox::item:hover {
-    background: #5555aa;
+QComboBox::drop-down:hover {
+    background: #aaaaff;
 }
 QComboBox::down-arrow {
-    background: #f0f0f0;
     image: url('resources/gui_icons/scroll_down_arrow.svg');
 }
-QComboBox QAbstractItemView {
-    background: #ffffff;
-    color: #000000;
+QComboBox::down-arrow:hover {
+    background: #aaaaff;
 }
 
 /*-------------------- QSpinBox --------------------*/
@@ -125,13 +148,13 @@ QSpinBox::up-button, QSpinBox::down-button {
 }
 QSpinBox::up-button {
     image: url('resources/gui_icons/scroll_up_arrow.svg');
-    min-width: 20;
-    min-height: 15;
+    min-width: 20px;
+    min-height: 15px;
 }
 QSpinBox::down-button {
     image: url('resources/gui_icons/scroll_down_arrow.svg');
-    min-width: 20;
-    min-height: 15;
+    min-width: 20px;
+    min-height: 15px;
 }
 QSpinBox::up-button:hover, QSpinBox::down-button:hover {
     background: #aaaaff
@@ -152,13 +175,13 @@ QTimeEdit::up-button, QTimeEdit::down-button {
 }
 QTimeEdit::up-button {
     image: url('resources/gui_icons/scroll_up_arrow.svg');
-    min-width: 20;
-    min-height: 15;
+    min-width: 20px;
+    min-height: 15px;
 }
 QTimeEdit::down-button {
     image: url('resources/gui_icons/scroll_down_arrow.svg');
-    min-width: 20;
-    min-height: 15;
+    min-width: 20px;
+    min-height: 15px;
 }
 QTimeEdit::up-button:hover, QTimeEdit::down-button:hover {
     background: #aaaaff
@@ -272,12 +295,11 @@ QListView {
     background: #eeeeff;
 }
 QListView::item {
-	background: #eeeeff;
+	background: #eeeeee;
 	color: #000000;
 }
 QListView::item:hover {
-	background: #ffffff;
-	border: 1px solid #aaaaff;
+	background: #808080;
 }
 QListView::item:selected {
 	background: #aaaaff;

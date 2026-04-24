@@ -7,6 +7,7 @@ To Do:
     Improve lyrics editing with modular editing spaces (verse/chorus and number at top as dropdowns, lyrics below).
         Probably as a custom list widget.
     Check for QPainter outside of paintEvent
+    Remove calls to LyricDisplayWidget.paint_text or change them to repaint. Remove LyricDisplayWidget.paint_text.
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types

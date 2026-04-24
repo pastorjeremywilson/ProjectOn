@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor, QFont, QTextCharFormat, QIcon, QKeyEvent
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QListWidgetItem, QListWidget
 
 
 class FormattableTextEdit(QWidget):
@@ -170,6 +170,7 @@ class CustomTextEdit(QTextEdit):
     """
     Provides a QTextEdit that can differentiate between plain text or mime data when inserting.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -216,4 +217,16 @@ class CustomTextEdit(QTextEdit):
                     break
                 else:
                     parent = parent.parent()
-            
+
+    def focusInEvent(self, evt):
+        from edit_widget import LyricListWidget
+        parent = self.parent()
+        while parent.parent():
+            if type(parent) == QListWidget or type(parent) == LyricListWidget:
+                point = self.mapTo(parent.viewport(), self.rect().topLeft())
+                item = parent.itemAt(point)
+                parent.setCurrentItem(item)
+                break
+            parent = parent.parent()
+
+        super().focusInEvent(evt)

@@ -494,6 +494,7 @@ class MediaWidget(QTabWidget):
 
                 list_item = QListWidgetItem(slide_data['title'])
                 list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                list_item.setSizeHint(QSize(200, 28))
 
                 self.song_list_items.append(list_item)
                 self.song_list.addItem(list_item.clone())
@@ -515,6 +516,7 @@ class MediaWidget(QTabWidget):
 
                 widget_item = QListWidgetItem(slide_data['title'])
                 widget_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                widget_item.setSizeHint(QSize(200, 28))
 
                 self.custom_list.addItem(widget_item)
 
@@ -1328,9 +1330,14 @@ class CustomListWidget(QListWidget):
             edit_action = QAction('Edit Song')
         elif self.type == 'custom':
             edit_action = QAction('Edit Slide')
+        elif self.type == 'web':
+            edit_action = QAction('Edit Web Item')
 
         if edit_action:
-            edit_action.triggered.connect(self.edit_song)
+            if self.type == 'web':
+                edit_action.triggered.connect(self.edit_web)
+            else:
+                edit_action.triggered.connect(self.edit_song)
             menu.addAction(edit_action)
 
         delete_action = None
@@ -1401,6 +1408,56 @@ class CustomListWidget(QListWidget):
                 custom_info = self.gui.main.get_custom_data(item_text)
                 custom_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
                 self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text, custom_data)
+
+    def edit_web(self):
+        if self.itemAt(self.item_pos):
+            data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
+            dialog = QDialog(self.gui.main_window)
+            dialog.setMinimumWidth(500)
+            dialog.setWindowTitle('Edit Web Item')
+            dialog.setWindowIcon(QIcon('resources/branding/logo.svg'))
+            layout = QVBoxLayout(dialog)
+            layout.setSpacing(0)
+
+            layout.addSpacing(20)
+            title_label = QLabel('Title')
+            title_label.setFont(self.gui.bold_font)
+            layout.addWidget(title_label)
+
+            title_line_edit = QLineEdit(data['title'])
+            title_line_edit.setFont(self.gui.standard_font)
+            layout.addWidget(title_line_edit)
+            layout.addSpacing(20)
+
+            url_label = QLabel('URL')
+            url_label.setFont(self.gui.bold_font)
+            layout.addWidget(url_label)
+
+            url_line_edit = QLineEdit(data['url'])
+            url_line_edit.setFont(self.gui.standard_font)
+            layout.addWidget(url_line_edit)
+            layout.addSpacing(20)
+
+            button_widget = QWidget()
+            layout.addWidget(button_widget)
+            button_layout = QHBoxLayout(button_widget)
+
+            ok_button = QPushButton('Save')
+            ok_button.setFont(self.gui.standard_font)
+            ok_button.pressed.connect(lambda: dialog.done(1))
+            button_layout.addStretch()
+            button_layout.addWidget(ok_button)
+
+            cancel_button = QPushButton('Cancel')
+            cancel_button.setFont(self.gui.standard_font)
+            cancel_button.pressed.connect(lambda: dialog.done(-1))
+            button_layout.addWidget(cancel_button)
+            button_layout.addStretch()
+
+            result = dialog.exec()
+            if result == 1:
+                self.gui.main.save_web_item(title_line_edit.text(), url_line_edit.text())
+                self.gui.media_widget.populate_web_list()
 
     def delete_item(self):
         """
