@@ -214,7 +214,7 @@ class Importers:
                                     tag += item[0].lower()
                                 save_lyrics = True
                     else:
-                        this_line = re.sub('\[.*?]', '', content_split[i])
+                        this_line = re.sub(r'\[.*?]', '', content_split[i])
                         this_line = re.sub('\s+', ' ', this_line)
                         lyrics += this_line + '\n'
 

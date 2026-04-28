@@ -7,19 +7,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Began redesigning the lyrics edit widget; particularly the lyrics editing area">
-      <change afterPath="$PROJECT_DIR$/resources/gui_icons/toggle_switch_hover.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/gui_icons/toggle_switch_off.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/gui_icons/toggle_switch_on.svg" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Finished redesigning the lyrics edit widget; needs more testing&#10;Fixed startup progress bar not reporting correctly">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/declarations.py" beforeDir="false" afterPath="$PROJECT_DIR$/declarations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/edit_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/formattable_text_edit.py" beforeDir="false" afterPath="$PROJECT_DIR$/formattable_text_edit.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/help.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/importers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/media_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/new_edit_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/new_edit_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oos_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/oos_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/parsers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/projecton-light.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web_remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_remote.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -65,7 +69,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/pastorjeremywilson/ProjectOn&quot;,
-    &quot;accountId&quot;: &quot;f7ca7050-bc92-45de-b2f2-1756e26a64e9&quot;
+    &quot;accountId&quot;: &quot;77323ad5-efde-49a4-8c47-0663058923a8&quot;
   }
 }</component>
   <component name="MarkdownSettingsMigration">
@@ -152,7 +156,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/linecount.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -177,7 +180,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -201,7 +203,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173" />
+        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
       </set>
     </attachedChunks>
   </component>
@@ -237,14 +239,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00127" summary="Standardized background pixmap resizing to avoid skewing.&#10;&#10;Began adding a preview image when editing a song/custom slide.">
-      <option name="closed" value="true" />
-      <created>1744753676657</created>
-      <option name="number" value="00127" />
-      <option name="presentableId" value="LOCAL-00127" />
-      <option name="project" value="LOCAL" />
-      <updated>1744753676657</updated>
     </task>
     <task id="LOCAL-00128" summary="Ensured that backgrounds/images are presented to the user sorted by name.&#10;&#10;Further refined the preview image when editing a song/custom slide.">
       <option name="closed" value="true" />
@@ -630,7 +624,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776898332231</updated>
     </task>
-    <option name="localTasksCounter" value="176" />
+    <task id="LOCAL-00176" summary="Finished redesigning the lyrics edit widget; needs more testing&#10;Fixed startup progress bar not reporting correctly">
+      <option name="closed" value="true" />
+      <created>1777064669181</created>
+      <option name="number" value="00176" />
+      <option name="presentableId" value="LOCAL-00176" />
+      <option name="project" value="LOCAL" />
+      <updated>1777064669181</updated>
+    </task>
+    <option name="localTasksCounter" value="177" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -651,7 +653,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Now saving audio attached to Custom Slides in the database as a blob" />
     <MESSAGE value="Updated the readmes and version numbers. Ready for release." />
     <MESSAGE value="Fixed edited scriptures not saving/loading correctly." />
     <MESSAGE value="Updated version number and Readmes. Ready for release." />
@@ -676,7 +677,8 @@
     <MESSAGE value="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked" />
     <MESSAGE value="Updated the readmes, changed version number, ready for release" />
     <MESSAGE value="Began redesigning the lyrics edit widget; particularly the lyrics editing area" />
-    <option name="LAST_COMMIT_MESSAGE" value="Began redesigning the lyrics edit widget; particularly the lyrics editing area" />
+    <MESSAGE value="Finished redesigning the lyrics edit widget; needs more testing&#10;Fixed startup progress bar not reporting correctly" />
+    <option name="LAST_COMMIT_MESSAGE" value="Finished redesigning the lyrics edit widget; needs more testing&#10;Fixed startup progress bar not reporting correctly" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

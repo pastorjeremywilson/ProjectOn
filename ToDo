@@ -1,13 +1,13 @@
 Done:
-    Fix crash when deleting web item (see Projector Computer logs)
-    Ensure cleanup on stage display web page images
-    Change all mirror_stage_display sends to new process
+    Fix "has been removed" when clicking "no" on delete song confirmation
+    Check for QPainter outside of paintEvent
+    Remove calls to LyricDisplayWidget.paint_text or change them to repaint. Remove LyricDisplayWidget.paint_text.
+    Get rid of song_info list and replace with song_data dict for everything
+    Fix startup progress bar shrinking at end
 
 To Do:
     Improve lyrics editing with modular editing spaces (verse/chorus and number at top as dropdowns, lyrics below).
-        Probably as a custom list widget.
-    Check for QPainter outside of paintEvent
-    Remove calls to LyricDisplayWidget.paint_text or change them to repaint. Remove LyricDisplayWidget.paint_text.
+        Probably as a custom list widget. Pretty well done. Needs testing.
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.2
+ProjectOn v.1.9.2.002
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -37,7 +37,8 @@ from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QStyle, QStyleFactory
 
-import declarations
+from declarations import SLIDE_DATA_DEFAULTS, SQL_COLUMN_TO_DICTIONARY_SONG, SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN, \
+    SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN, DB_STRUCTURE, SLIDE_DATA_DATA_TYPES, SQL_COLUMN_TO_DICTIONARY_CUSTOM
 from gui import GUI
 from runnables import SaveSettings, ServerCheckTimer
 from widgets import SimpleSplash
@@ -84,12 +85,12 @@ class ProjectOn(QObject):
         QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_UseDesktopOpenGL)
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (
             "--ignore-gpu-blacklist "
-            "--enable-gpu-rasterization "
             "--enable-native-gpu-memory-buffers "
             "--disable-gpu-sandbox "  # can help on some setups
             "--enable-accelerated-video-decode "
             "--enable-features=ExperimentalJavaScript"
         )
+            #"--enable-gpu-rasterization " -> this was causing fonts to disappear in the help web engine widget
 
         self.app = QApplication(sys.argv)
 
@@ -176,7 +177,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.2')
+        version_label = QLabel('v.1.9.2.002')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -203,6 +204,7 @@ class ProjectOn(QObject):
         container_layout.addSpacing(20)
 
         self.progress_bar = QProgressBar()
+        self.progress_bar.setFixedWidth(364)
         self.progress_bar.setRange(0, last_status_count)
         self.progress_bar.setValue(0)
         self.progress_bar.setTextVisible(False)
@@ -234,15 +236,35 @@ class ProjectOn(QObject):
             # check that the database has the newest columns
             result = cursor.execute('PRAGMA table_info(songs)').fetchall()
             updated_table = False
+            columns = []
             for record in result:
+                columns.append(record[1])
                 if record[1] == 'shade_opacity':
                     updated_table = True
             if not updated_table:
                 self.update_table(connection, cursor, 'songs')
 
             result = cursor.execute('SELECT * FROM songs ORDER BY title').fetchall()
-            connection.close()
-            return result
+
+            # there's been enough variation in how data is stored across versions that we're going to
+            # convert the stored sql data to the standardized slide data, including making sure the
+            # data types are standardized in each dictionary
+            all_songs = []
+            for song in result:
+                data = SLIDE_DATA_DEFAULTS.copy()
+                data['type'] = 'song'
+                for i in range(len(columns)):
+                    if 'global' in str(song[i]):
+                        data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = song[i]
+                    elif song[i] is not None and type(song[i]) is not int and song[i].lower() == 'true':
+                        data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = True
+                    elif song[i] is not None and type(song[i]) is not int and song[i].lower() == 'false':
+                        data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = False
+                    elif song[i] is not None:
+                        data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = SLIDE_DATA_DATA_TYPES[SQL_COLUMN_TO_DICTIONARY_SONG[i]](song[i])
+                all_songs.append(data)
+
+            return all_songs
         except Exception:
             self.error_log()
             if connection:
@@ -273,15 +295,35 @@ class ProjectOn(QObject):
             # check that the database has the newest columns
             result = cursor.execute('PRAGMA table_info(customSlides)').fetchall()
             updated_table = False
+            columns = []
             for record in result:
+                columns.append(record[1])
                 if record[1] == 'shade_opacity':
                     updated_table = True
             if not updated_table:
                 self.update_table(connection, cursor, 'customSlides')
 
             result = cursor.execute('SELECT * FROM customSlides ORDER BY title').fetchall()
+
+            # there's been enough variation in how data is stored across versions that we're going to
+            # convert the stored sql data to the standardized slide data, including making sure the
+            # data types are standardized in each dictionary
+            all_custom = []
+            for custom in result:
+                data = SLIDE_DATA_DEFAULTS.copy()
+                data['type'] = 'custom'
+                for i in range(len(columns)):
+                    if 'global' in str(custom[i]):
+                        data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = custom[i]
+                    elif custom[i] is not None and type(custom[i]) is not int and custom[i].lower() == 'true':
+                        data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = True
+                    elif custom[i] is not None and type(custom[i]) is not int and custom[i].lower() == 'false':
+                        data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = False
+                    elif custom[i] is not None:
+                        data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = SLIDE_DATA_DATA_TYPES[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]](custom[i])
+                all_custom.append(data)
             connection.close()
-            return result
+            return all_custom
         except Exception:
             self.error_log()
             if connection:
@@ -389,7 +431,7 @@ class ProjectOn(QObject):
         except Exception:
             self.error_log()
 
-    def save_song(self, song_data, old_title=None):
+    def save_song(self, data, old_title=None):
         """
         Takes song data as a string list, ordered by the column order of the 'songs' table of the program's database,
         and inserts or updates that data in the database.
@@ -398,50 +440,31 @@ class ProjectOn(QObject):
         """
         connection = None
         try:
-            for i in range(len(song_data)):
-                if song_data[i]:
-                    song_data[i] = (str(song_data[i])).replace('"', '""')
-                else:
-                    song_data[i] = ''
+            for key in data.keys():
+                if type(data[key]) == str:
+                    data[key] = data[key].replace('"', '""')
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
 
+            # if old_title has been provided, this song already exists in the database and we need to use UPDATE
             if old_title:
-                sql = (
-                    'UPDATE songs SET '
-                    'title="' + song_data[0] + '", '
-                    'author="' + song_data[1] + '", '
-                    'copyright="' + song_data[2] + '", '
-                    'ccliNum="' + song_data[3] + '", '
-                    'lyrics="' + song_data[4] + '", '
-                    'vorder="' + song_data[5] + '", '
-                    'footer="' + song_data[6] + '", ' 
-                    'font="' + song_data[7] + '", ' 
-                    'fontColor="' + song_data[8] + '", ' 
-                    'background="' + song_data[9] + '", '
-                    'font_size="' + song_data[10] + '", '
-                    'use_shadow="' + song_data[11] + '", '
-                    'shadow_color="' + song_data[12] + '", '
-                    'shadow_offset="' + song_data[13] + '", '
-                    'use_outline="' + song_data[14] + '", '
-                    'outline_color="' + song_data[15] + '", '
-                    'outline_width="' + song_data[16] + '", '
-                    'override_global="' + song_data[17] + '", '
-                    'use_shade="' + song_data[18] + '", '
-                    'shade_color="' + song_data[19] + '", '
-                    'shade_opacity="' + song_data[20] + '" '
-                    'WHERE title="' + old_title + '"'
-                )
-            else:
-                sql = ('INSERT INTO songs (title, author, copyright, ccliNum, lyrics, vorder, footer, font, fontColor, '
-                       'background, font_size, use_shadow, shadow_color, shadow_offset, use_outline, outline_color, '
-                       'outline_width, override_global, use_shade, shade_color, shade_opacity) VALUES ("'
-                       + song_data[0] + '","' + song_data[1] + '","' + song_data[2] + '","'
-                       + song_data[3] + '","' + song_data[4] + '","' + song_data[5] + '","' + song_data[6]
-                       + '","' + song_data[7] + '","' + song_data[8] + '","' + song_data[9] + '","' + song_data[10]
-                       + '","' + song_data[11] + '","' + song_data[12] + '","' + song_data[13] + '","' + song_data[14]
-                       + '","' + song_data[15] + '","' + song_data[16] + '","' + song_data[17] + '","' + song_data[18]
-                       + '","' + song_data[19] + '","' + song_data[20] + '")')
+                sql = 'UPDATE songs SET '
+                for key in data.keys():
+                    if key in SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN.keys():
+                        sql += f'{SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN[key]}="{data[key]}",'
+                sql = sql[:-1] + f' WHERE title="{old_title}";'
+            else: # use INSERT INTO instead
+                sql = 'INSERT INTO songs ('
+                for key in data.keys():
+                    if key in SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN.keys():
+                        sql += SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN[key] + ','
+                sql = sql[:-1] + ') VALUES ("'
+                for key in data.keys():
+                    if key in SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN.keys():
+                        sql += f'{data[key]}","'
+                sql = sql[:-2] + ');'
+
+            print(sql)
 
             cursor.execute(sql)
             connection.commit()
@@ -479,7 +502,7 @@ class ProjectOn(QObject):
 
         return custom_titles
 
-    def save_custom(self, custom_data, old_title):
+    def save_custom(self, data, old_title):
         """
         Takes custom slide data as a string list, ordered by the column order of the 'customSlides' table of the
         program's database, and inserts or updates that data in the database.
@@ -487,45 +510,32 @@ class ProjectOn(QObject):
         :param str old_title: Optional, the custom slide's original title so that it can be updated instead of inserted
         """
         connection = None
-        try:
-            if old_title:
-                sql = ('UPDATE customSlides SET '
-                       'title="' + custom_data[0] + '", '
-                       'text="' + custom_data[1] + '", ' 
-                       'font="' + custom_data[2] + '", ' 
-                       'fontColor="' + custom_data[3] + '", ' 
-                       'background="' + custom_data[4] + '", '
-                       'font_size="' + custom_data[5] + '", '
-                       'use_shadow="' + custom_data[6] + '", '
-                       'shadow_color="' + custom_data[7] + '", '
-                       'shadow_offset="' + custom_data[8] + '", '
-                       'use_outline="' + custom_data[9] + '", '
-                       'outline_color="' + custom_data[10] + '", '
-                       'outline_width="' + custom_data[11] + '", '
-                       'override_global="' + custom_data[12] + '", '
-                       'use_shade="' + custom_data[13] + '", '
-                       'shade_color="' + custom_data[14] + '", '
-                       'shade_opacity="' + custom_data[15] + '" ,'
-                       'audio_file="' + custom_data[16] + '", '
-                       'loop_audio="' + custom_data[17] + '", '
-                       'auto_play="' + custom_data[18] + '", '
-                       'slide_delay="' + custom_data[19] + '", '
-                       'split_slides="' + custom_data[20] + '" '
-                       'WHERE title="' + old_title + '";')
-            else:
-                sql = ('INSERT INTO customSlides (title, text, font, fontColor, background, font_size, use_shadow, '
-                       'shadow_color, shadow_offset, use_outline, outline_color, outline_width, override_global, '
-                       'use_shade, shade_color, shade_opacity, audio_file, loop_audio, auto_play, slide_delay, '
-                       'split_slides) VALUES ("' + custom_data[0] + '","' + custom_data[1] + '","' + custom_data[2]
-                       + '","' + custom_data[3] + '","' + custom_data[4] + '","' + custom_data[5]
-                       + '","' + custom_data[6] + '","' + custom_data[7] + '","' + custom_data[8]
-                       + '","' + custom_data[9] + '","' + custom_data[10] + '","' + custom_data[11]
-                       + '","' + custom_data[12] + '","' + custom_data[13] + '","' + custom_data[14]
-                       + '","' + custom_data[15] + '","' + custom_data[16] + '","' + custom_data[17]
-                       + '","' + custom_data[18] + '","' + custom_data[19] + '","' + custom_data[20] + '");')
 
+        try:
+            for key in data.keys():
+                if type(data[key]) == str:
+                    data[key] = data[key].replace('"', '""')
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
+
+            # if old_title has been provided, this song already exists in the database and we need to use UPDATE
+            if old_title:
+                sql = 'UPDATE customSlides SET '
+                for key in data.keys():
+                    if key in SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN.keys():
+                        sql += f'{SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN[key]}="{data[key]}",'
+                sql = sql[:-1] + f' WHERE title="{old_title}";'
+            else: # use INSERT INTO instead
+                sql = 'INSERT INTO customSlides ('
+                for key in data.keys():
+                    if key in SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN.keys():
+                        sql += SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN[key] + ','
+                sql = sql[:-1] + ') VALUES ("'
+                for key in data.keys():
+                    if key in SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN.keys():
+                        sql += f'{data[key]}","'
+                sql = sql[:-2] + ');'
+
             cursor.execute(sql)
             connection.commit()
             connection.close()
@@ -1365,7 +1375,7 @@ class ProjectOn(QObject):
             file.write(log_text)
 
     def check_db(self, db_file):
-        db_structure = declarations.DB_STRUCTURE.copy()
+        db_structure = DB_STRUCTURE.copy()
         connection = sqlite3.connect(db_file)
         cursor = connection.cursor()
         changes_made = False
@@ -1456,5 +1466,5 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
 
 
 if __name__ == '__main__':
-    sys.excepthook = log_unhandled_exception
+    #sys.excepthook = log_unhandled_exception
     ProjectOn()

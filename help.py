@@ -30,6 +30,7 @@ class Help(QMainWindow):
         self.setWindowTitle('Help Contents')
 
         tab_widget = QTabWidget()
+        tab_widget.setObjectName('help_tab_widget')
         tab_widget.currentChanged.connect(lambda: self.refresh_html(tab_widget))
         tab_widget.setFont(QFont('Helvetica', 12, QFont.Weight.Bold))
         self.setCentralWidget(tab_widget)

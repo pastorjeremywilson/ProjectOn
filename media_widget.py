@@ -13,6 +13,7 @@ from unicodedata import numeric
 
 import declarations
 import parsers
+from declarations import SLIDE_DATA_DEFAULTS
 from edit_widget import EditWidget
 from get_scripture import GetScripture
 from new_edit_widget import NewEditWidget
@@ -481,19 +482,14 @@ class MediaWidget(QTabWidget):
         """
         self.song_list.clear()
         self.song_list_items = []
-        songs = self.gui.main.get_all_songs()
-        if len(songs) > 0:
-            for item in songs:
+        all_songs = self.gui.main.get_all_songs()
+        if len(all_songs) > 0:
+            for song_data in all_songs:
                 if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Loading Songs - ' + item[0], 'info')
+                    self.gui.main.update_status_signal.emit(f'Loading Songs - {song_data['title']}', 'info')
 
-                slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
-                for i in range(len(item)):
-                    slide_data['type'] = 'song'
-                    slide_data[declarations.SQL_COLUMN_TO_DICTIONARY_SONG[i]] = item[i]
-
-                list_item = QListWidgetItem(slide_data['title'])
-                list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                list_item = QListWidgetItem(song_data['title'])
+                list_item.setData(Qt.ItemDataRole.UserRole, song_data)
                 list_item.setSizeHint(QSize(200, 28))
 
                 self.song_list_items.append(list_item)
@@ -507,18 +503,14 @@ class MediaWidget(QTabWidget):
         self.custom_list.clear()
         slides = self.gui.main.get_all_custom_slides()
         if len(slides) > 0:
-            for item in slides:
-                slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
-                slide_data['type'] = 'custom'
-                slide_data['use_footer'] = False
-                for i in range(len(item)):
-                    slide_data[declarations.SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = item[i]
+            for data in slides:
+                data['use_footer'] = False
 
-                widget_item = QListWidgetItem(slide_data['title'])
-                widget_item.setData(Qt.ItemDataRole.UserRole, slide_data)
-                widget_item.setSizeHint(QSize(200, 28))
+                list_item = QListWidgetItem(data['title'])
+                list_item.setData(Qt.ItemDataRole.UserRole, data)
+                list_item.setSizeHint(QSize(200, 28))
 
-                self.custom_list.addItem(widget_item)
+                self.custom_list.addItem(list_item)
 
     def populate_image_list(self):
         """
@@ -747,7 +739,9 @@ class MediaWidget(QTabWidget):
         Method to create an instance of EditWidget.
         :param str type: Whether the type to be added is a 'song' or a 'custom' slide
         """
-        edit_widget = EditWidget(self.gui, type)
+        item_text = ''
+        song_data = SLIDE_DATA_DEFAULTS
+        self.gui.edit_widget = EditWidget(self.gui, song_data, 'song')
 
     def send_to_live(self):
         self.gui.preview_widget.slide_list.setCurrentRow(0)
@@ -1396,18 +1390,13 @@ class CustomListWidget(QListWidget):
         """
         Method to create a EditWidget for a song or custom slide.
         """
+
         if self.itemAt(self.item_pos):
-            if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
-                item_text = self.itemAt(self.item_pos).text()
-                song_info = self.gui.main.get_song_data(item_text)
-                song_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
-                self.gui.edit_widget = EditWidget(self.gui, 'song', song_info, item_text, song_data)
-                #self.new_edit_widget = NewEditWidget(self.gui, 'song', song_info, item_text, song_data)
-            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
-                item_text = self.itemAt(self.item_pos).text()
-                custom_info = self.gui.main.get_custom_data(item_text)
-                custom_data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
-                self.gui.edit_widget = EditWidget(self.gui, 'custom', custom_info, item_text, custom_data)
+            data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
+            if data['type'] == 'song':
+                self.gui.edit_widget = EditWidget(self.gui, data, 'song')
+            elif data['type'] == 'custom':
+                self.gui.edit_widget = EditWidget(self.gui, data, 'custom')
 
     def edit_web(self):
         if self.itemAt(self.item_pos):
@@ -1480,22 +1469,22 @@ class CustomListWidget(QListWidget):
             thread.start()
             thread.join()
 
-        QMessageBox.information(
-            self.gui.main_window,
-            'Removed',
-            self.currentItem().data(Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
-            QMessageBox.StandardButton.Ok
-        )
+            QMessageBox.information(
+                self.gui.main_window,
+                'Removed',
+                self.currentItem().data(Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
+                QMessageBox.StandardButton.Ok
+            )
 
-        if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
-            self.gui.media_widget.populate_song_list()
-        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
-            self.gui.media_widget.populate_custom_list()
-        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'image':
-            self.gui.media_widget.populate_image_list()
-        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'video':
-            self.gui.media_widget.populate_video_list()
-        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'web':
-            self.gui.media_widget.populate_web_list()
+            if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+                self.gui.media_widget.populate_song_list()
+            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                self.gui.media_widget.populate_custom_list()
+            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'image':
+                self.gui.media_widget.populate_image_list()
+            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'video':
+                self.gui.media_widget.populate_video_list()
+            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'web':
+                self.gui.media_widget.populate_web_list()
 
-        self.gui.preview_widget.slide_list.clear()
+            self.gui.preview_widget.slide_list.clear()

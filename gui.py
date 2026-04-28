@@ -695,7 +695,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2'
+        current_version = 'v.1.9.2.002'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -711,6 +711,8 @@ class GUI(QObject):
         if response and response.status_code == 200:
             text = response.text
             release_info = json.loads(text)
+            if len(release_info) == 0:
+                return
 
             newest_version = release_info[0]
             newest_version_tag = newest_version['tag_name']
@@ -732,7 +734,7 @@ class GUI(QObject):
             if 'skip_update' in self.main.settings.keys():
                 if self.main.settings['skip_update'] == newest_version['tag_name']:
                     return
-
+                
             if ask_update:
                 release_notes = newest_version['body'].split('[!')[0].strip()
 
@@ -909,7 +911,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2')
+        title_label = QLabel('ProjectOn v.1.9.2.002')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1434,8 +1436,7 @@ class GUI(QObject):
         elif slide_data['type'] == 'custom':
             # parse the text if we're splitting it into individual slides
             slide_text = slide_data['text']
-            if (slide_data['split_slides']
-                    and slide_data['split_slides'] == 'True'):
+            if slide_data['split_slides']:
                 slide_text = re.sub(r'(<br />)\1+', '<split>', slide_text)
                 slide_data['parsed_text'] = re.split('<split>', slide_text)
             else:

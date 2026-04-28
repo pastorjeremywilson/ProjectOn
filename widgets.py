@@ -512,24 +512,27 @@ class FontSample(QLabel):
                 self.settings_widget.gui.main.background_dir + '/'
                 + self.settings_widget.gui.main.settings[f'global_{slide_type}_background'])
         else:
-            background = self.settings_widget.parent().parent().findChild(QLineEdit, 'background_line_edit').text()
-            if 'rgb(' in background:
+            background_button_text = self.settings_widget.parent().parent().findChild(
+                QButtonGroup, 'background_button_group').checkedButton().text()
+            if 'song' in background_button_text.lower():
+                sample_background = QImage(
+                    self.settings_widget.gui.main.background_dir + '/'
+                    + self.settings_widget.gui.main.settings['global_song_background'])
+            elif 'bible' in background_button_text.lower():
+                sample_background = QImage(
+                    self.settings_widget.gui.main.background_dir + '/'
+                    + self.settings_widget.gui.main.settings['global_bible_background'])
+            elif 'color' in background_button_text.lower():
+                background = self.settings_widget.parent().parent().findChild(
+                    QButtonGroup, 'background_button_group').button(2).objectData()
                 background = background.replace('rgb(', '')
                 background = background.replace(')', '')
                 background_split = background.split(', ')
                 sample_background = QImage(QSize(1920, 1080), QImage.Format.Format_RGB32)
                 sample_background.fill(
                     QColor(int(background_split[0]), int(background_split[1]), int(background_split[2])))
-            elif 'Song' in background:
-                sample_background = QImage(
-                    self.settings_widget.gui.main.background_dir + '/'
-                    + self.settings_widget.gui.main.settings['global_song_background'])
-            elif 'Bible' in background:
-                sample_background = QImage(
-                    self.settings_widget.gui.main.background_dir + '/'
-                    + self.settings_widget.gui.main.settings['global_bible_background'])
             else:
-                sample_background = QImage(self.settings_widget.gui.main.background_dir + '/' + background)
+                sample_background = QImage(self.settings_widget.gui.main.background_dir + '/' + background_button_text)
 
         ratio = sample_background.width() / rect.width()
         # if there was no background yet chosen, ration will be 0
@@ -557,7 +560,7 @@ class FontSample(QLabel):
 
 class FontWidget(QWidget):
     """
-    Implements QWidget that contains all of the settings that can be applied to the display font
+    Implements QWidget that contains all the settings that can be applied to the display font
     """
     mouse_release_signal = pyqtSignal(int)
 
@@ -1326,9 +1329,6 @@ class LyricDisplayWidget(QWidget):
                 painter.strokePath(path, pen)
 
             path_y += line_height
-
-    def paint_text(self):
-        self.repaint()
 
 
 class NewFontWidget(QWidget):
@@ -4215,9 +4215,6 @@ class TextLayoutLyricWidget(QWidget):
         self.text = text
 
     def paintEvent(self, evt):
-        self.paint_text()
-
-    def paint_text(self):
         self.total_height = 0
         self.text = re.sub('<p.*?>', '', self.text)
         self.text = re.sub('</p>', '', self.text)
@@ -4250,7 +4247,7 @@ class TextLayoutLyricWidget(QWidget):
 
             lines = self.text.split('<br />')
             for i in range(len(lines)):
-                #if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
+                # if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
                 x = 0
                 y = 0
                 line_words = lines[i].split(' ')
@@ -4259,7 +4256,7 @@ class TextLayoutLyricWidget(QWidget):
                 painter_paths.append(QPainterPath())
                 path_index += 1
                 for word in line_words:
-                    #if len(re.sub('<.*?>', '', word).strip()) > 0:
+                    # if len(re.sub('<.*?>', '', word).strip()) > 0:
                     word_path.clear()
                     if '<b>' in word:
                         font.setWeight(1000)
@@ -4288,7 +4285,7 @@ class TextLayoutLyricWidget(QWidget):
             # get the total size of the paths that will be drawn for creating the shading rectangle
             self.total_height = 0
             for path in painter_paths:
-                #if path.boundingRect().width() > 0:
+                # if path.boundingRect().width() > 0:
                 self.total_height += line_height
                 if path.boundingRect().width() > longest_line:
                     longest_line = path.boundingRect().width()
@@ -4316,7 +4313,7 @@ class TextLayoutLyricWidget(QWidget):
         painter.fillRect(shade_rect, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
 
         for path in painter_paths:
-            #if path.boundingRect().width() > 0:
+            # if path.boundingRect().width() > 0:
             path_x = (self.gui.display_widget.width() / 2) - (path.boundingRect().width() / 2)
             path.translate(path_x, path_y)
 
@@ -4339,6 +4336,7 @@ class TextLayoutLyricWidget(QWidget):
                 painter.strokePath(path, pen)
 
             path_y += line_height
+        super().paintEvent(evt)
 
 
 class Toolbar(QWidget):

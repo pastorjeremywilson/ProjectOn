@@ -21,7 +21,7 @@ class RemoteServer:
     def start_server(self):
         try:
             self.app = Flask(__name__, template_folder='resources')
-            self.socketio = SocketIO(self.app, async_mode='threading')
+            self.socketio = SocketIO(self.app, async_mode='gevent')
         except Exception:
             self.gui.main.error_log()
 
@@ -150,7 +150,7 @@ class RemoteServer:
                   'longer necessary as the server is running on a daemonized thread.')
 
         try:
-            self.socketio.run(self.app, self.gui.main.ip, self.gui.main.port, allow_unsafe_werkzeug=True)
+            self.socketio.run(self.app, self.gui.main.ip, self.gui.main.port)
         except Exception:
             self.gui.main.error_log()
 

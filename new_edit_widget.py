@@ -804,7 +804,7 @@ class NewEditWidget(QDialog):
         if lyric_widget.footer_label.text() == '':
             lyric_widget.footer_label.hide()
 
-        lyric_widget.paint_text()
+        #lyric_widget.paint_text()
         lyric_widget_height = lyric_widget.total_height
         target_height = display_widget.height() - lyric_widget.footer_label.height() - 40
         half_lyrics = False
@@ -820,7 +820,7 @@ class NewEditWidget(QDialog):
                     first_lyrics += segment_text_split[i] + '<br />'
                 first_lyrics = first_lyrics[:-6]
                 lyric_widget.text = first_lyrics
-                lyric_widget.paint_text()
+                #lyric_widget.paint_text()
                 preview_pixmap = display_widget.grab(display_widget.rect())
                 preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
                 self.preview_label_one.setPixmap(preview_pixmap)
@@ -830,7 +830,7 @@ class NewEditWidget(QDialog):
                     second_lyrics += segment_text_split[i] + '<br />'
                 second_lyrics = second_lyrics[:-6]
                 lyric_widget.text = second_lyrics
-                lyric_widget.paint_text()
+                #lyric_widget.paint_text()
                 preview_pixmap = display_widget.grab(display_widget.rect())
                 preview_pixmap = preview_pixmap.scaledToWidth(400, Qt.TransformationMode.SmoothTransformation)
                 self.preview_label_two.setPixmap(preview_pixmap)
@@ -1364,7 +1364,7 @@ class NewEditWidget(QDialog):
             # search first for previous instances of this tag; append numbers to the tag for multiple instances
             tag_name = self.sender().text()
             lyrics_text = self.lyrics_edit.text_edit.toHtml()
-            occurrences = re.findall('\[' + tag_name + '.*?\]', lyrics_text)
+            occurrences = re.findall(r'\[' + tag_name + '.*?]', lyrics_text)
 
             # determine if breaks are needed before or after the tag
             tag_start = '<br />'
@@ -1422,7 +1422,7 @@ class NewEditWidget(QDialog):
             ]
 
             for tag_name in tag_names:
-                occurrences = re.findall('\[' + tag_name + '.*?\]', html)
+                occurrences = re.findall(r'\[' + tag_name + '.*?]', html)
                 if len(occurrences) > 1:
                     for i in range(len(occurrences)):
                         html = html.replace(occurrences[i], f'<<{tag_name} {i + 1}>>', 1)
@@ -1430,7 +1430,7 @@ class NewEditWidget(QDialog):
 
             return html
         else:
-            occurrences = re.findall('\[' + tag_name + '.*?\]', html)
+            occurrences = re.findall(r'\[' + tag_name + '.*?]', html)
 
             for i in range(len(occurrences)):
                 html = html.replace(occurrences[i], f'<<{tag_name} {i + 1}>>', 1)
@@ -1454,9 +1454,9 @@ class NewEditWidget(QDialog):
             for i in range(self.song_order_list_widget.count()):
                 tag = self.song_order_list_widget.item(i).text()
                 song_order.append(tag)
-            lyric_tags = re.findall('\[.*?\]', lyrics)
+            lyric_tags = re.findall(r'\[.*?]', lyrics)
 
-            song_segments = re.split('\[.*?\]', lyrics)
+            song_segments = re.split(r'\[.*?]', lyrics)
             song_dict = {}
             index = 1
             for tag in lyric_tags:
