@@ -2219,12 +2219,12 @@ class LyricDelegate(QStyledItemDelegate):
 
         self.type_combobox.setCurrentIndex(self.type_combobox.findText(type))
         self.number_spinbox.setValue(int(number))
-        self.lyrics_text_edit.setHtml(data[1])
+        self.lyrics_text_edit.text_edit.setHtml(data[1])
 
     def setModelData(self, editor, model, index):
         # Take the text from widgets and save it back to the model
         type = f'[{self.type_combobox.currentText()} {self.number_spinbox.value()}]'
-        lyrics = self.gui.edit_widget.get_simplified_text(self.lyrics_text_edit.toHtml())
+        lyrics = self.gui.edit_widget.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
         data = [
             type,
             lyrics
@@ -2273,7 +2273,7 @@ class LyricDelegate(QStyledItemDelegate):
         label.adjustSize()
 
         if index == self.editing_index:
-            return QSize(label.width(), label.height() + 100)
+            return QSize(label.width(), label.height() + 150)
 
         return label.sizeHint()
 
@@ -2304,11 +2304,11 @@ class LyricDelegate(QStyledItemDelegate):
         self.number_spinbox = QSpinBox()
         self.number_spinbox.setFont(self.gui.standard_font)
         self.number_spinbox.setRange(1, 10)
+        self.number_spinbox.setMinimumHeight(36)
         type_layout.addWidget(self.number_spinbox)
         type_layout.addStretch()
 
-        self.lyrics_text_edit = QTextEdit()
-        self.lyrics_text_edit.setFont(self.gui.standard_font)
+        self.lyrics_text_edit = FormattableTextEdit(self.gui)
         layout.addWidget(self.lyrics_text_edit)
 
         button_widget = QWidget()

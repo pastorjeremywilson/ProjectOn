@@ -295,23 +295,6 @@ class DisplayWidget(QWidget):
                 else:
                     ratio = self.height() / p_height
 
-            """if p_width < self.width() or p_height < self.height():
-                x = int((self.width() / 2) - (self.background_pixmap.width() / 2))
-                y = int((self.height() / 2) - (self.background_pixmap.height() / 2))
-            elif p_width > self.width() or p_height > self.height():
-                x_ratio = self.width() / p_width
-                y_ratio = self.height() / p_height
-                if x_ratio < y_ratio:
-                    ratio = x_ratio
-                else:
-                    ratio = y_ratio"""
-
-            """background_pixmap = self.background_pixmap.scaled(
-                int(p_width / ratio),
-                int(p_height / ratio),
-                Qt.AspectRatioMode.IgnoreAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            )"""
             background_pixmap = self.background_pixmap.scaled(
                 self.width(),
                 self.height(),
@@ -320,24 +303,6 @@ class DisplayWidget(QWidget):
             )
             self.background_label.setPixmap(background_pixmap)
             return
-            """    x = int((self.width() / 2) - (self.background_pixmap.width() / 2))
-                y = int((self.height() / 2) - (self.background_pixmap.height() / 2))
-            else:"""
-            x = 0
-            y = 0
-
-            # paint a new pixmap using the new coordinates and/or size
-            pixmap = QPixmap(self.width(), self.height())
-            brush = QBrush()
-            brush.setColor(Qt.GlobalColor.black)
-            brush.setStyle(Qt.BrushStyle.SolidPattern)
-
-            painter = QPainter(pixmap)
-            painter.setBackground(brush)
-            painter.drawPixmap(x, y, self.background_pixmap)
-            painter.end()
-
-            self.background_label.setPixmap(pixmap)
 
 
 class FontFaceListWidget(QListWidget):

@@ -183,8 +183,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.linecount" />
       <item itemvalue="Python.main" />
+      <item itemvalue="Python.linecount" />
     </list>
     <recent_temporary>
       <list>

@@ -219,10 +219,9 @@ class CustomTextEdit(QTextEdit):
                     parent = parent.parent()
 
     def focusInEvent(self, evt):
-        from edit_widget import LyricListWidget
         parent = self.parent()
         while parent.parent():
-            if type(parent) == QListWidget or type(parent) == LyricListWidget:
+            if type(parent) == QListWidget:
                 point = self.mapTo(parent.viewport(), self.rect().topLeft())
                 item = parent.itemAt(point)
                 parent.setCurrentItem(item)

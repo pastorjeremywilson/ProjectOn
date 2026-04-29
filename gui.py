@@ -134,9 +134,6 @@ class GUI(QObject):
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        #self.main.update_status_signal.emit('Checking Files', 'status')
-        #self.main.app.processEvents()
-
         # ensure all needed files exist; thread it and wait until done before moving on
         self.check_files()
 
@@ -206,7 +203,6 @@ class GUI(QObject):
             self.tool_bar.show_display_button.setChecked(True)
 
         self.main.update_status_signal.emit('Finalizing', 'status')
-        #self.tool_bar.sw = SettingsWidget(self)
         self.tool_bar.sw = IndexedSettingsWidget(self)
         QApplication.processEvents()
 
@@ -214,29 +210,6 @@ class GUI(QObject):
             self.apply_settings()
 
         self.main_window.showMaximized()
-
-        """
-        Experimenting with a text layout widget:
-        sample_data = self.media_widget.song_list.item(0).data(Qt.ItemDataRole.UserRole)
-        self.layout_widget = TextLayoutWidget(
-            self,
-            False,
-            sample_data['font_family'],
-            sample_data['font_size'],
-            sample_data['use_outline'],
-            sample_data['outline_color'],
-            sample_data['outline_width'],
-            sample_data['font_color'],
-            sample_data['use_shadow'],
-            sample_data['shadow_color'],
-            sample_data['shadow_offset'],
-            sample_data['use_shade'],
-            sample_data['shade_color'],
-            sample_data['shade_opacity']
-        )
-        self.layout_widget.move(20, 20)
-        self.layout_widget.show()
-        """
 
         self.check_update()
 
@@ -537,23 +510,19 @@ class GUI(QObject):
 
         self.main.update_status_signal.emit('Creating GUI: Adding Media Widget', 'status')
         self.media_widget = MediaWidget(self)
-        #self.media_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.media_widget, 2, 0)
         self.main.update_status_signal.emit('', 'info')
 
         self.main.update_status_signal.emit('Creating GUI: Adding OOS Widget', 'status')
         self.oos_widget = OOSWidget(self)
-        #self.oos_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.oos_widget, 1, 0)
 
         self.main.update_status_signal.emit('Creating GUI: Adding Preview Widget', 'status')
         self.preview_widget = PreviewWidget(self)
-        #self.preview_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.preview_widget, 1, 2, 2, 1)
 
         self.main.update_status_signal.emit('Creating GUI: Adding Live Widget', 'status')
         self.live_widget = LiveWidget(self)
-        #self.live_widget.setMinimumWidth(100)
         self.central_layout.addWidget(self.live_widget, 1, 3, 2, 1)
 
     def create_menu_bar(self):
@@ -695,7 +664,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2.004'
+        current_version = 'v.1.9.2.005'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -911,7 +880,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2.004')
+        title_label = QLabel('ProjectOn v.1.9.2.005')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -2266,9 +2235,6 @@ class GUI(QObject):
         self.blackout_widget.hide()
 
     def make_video_widget(self):
-        """self.video_widget = QVideoWidget()
-        self.video_widget.setGeometry(self.display_widget.geometry())"""
-
         self.graphics_view = QGraphicsView()
         self.graphics_view.setGeometry(self.display_widget.geometry())
         self.graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
