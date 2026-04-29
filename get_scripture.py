@@ -121,7 +121,7 @@ class GetScripture:
                                         scripture_text.append(
                                             [
                                                 verse_number,
-                                                re.sub('\s+', ' ', this_verse).strip() + ' '
+                                                re.sub(r'\s+', ' ', this_verse).strip() + ' '
                                             ]
                                         )
                                 except ValueError:

@@ -10,30 +10,32 @@ def parse_song_data(gui, song_data):
     :param GUI gui: The current instance of GUI
     :param str lyrics: The raw lyrics data
     """
+    if 'text' not in song_data.keys() or len(song_data['text'].strip()) == 0:
+        print('to lyric text, not parsing')
+        return
     # start by building a dictionary of segment text keyed to their corresponding tags
     lyric_dictionary = {}
-    if song_data['text']:
-        lyrics = song_data['text']
-        if '<body' in lyrics:
-            lyrics_split = re.split('<body.*?>', lyrics)
-            lyrics = lyrics_split[1].split('</body>')[0].strip()
-            lyrics = re.sub('<p.*?>', '<p style="text-align: center;">', lyrics)
+    lyrics = song_data['text']
+    if '<body' in lyrics:
+        lyrics_split = re.split('<body.*?>', lyrics)
+        lyrics = lyrics_split[1].split('</body>')[0].strip()
+        lyrics = re.sub('<p.*?>', '<p style="text-align: center;">', lyrics)
 
-        segment_markers = re.findall(r'\[.*?]', lyrics)
-        segment_split = re.split(r'\[.*?]', lyrics)
+    segment_markers = re.findall(r'\[.*?]', lyrics)
+    segment_split = re.split(r'\[.*?]', lyrics)
 
-        if len(segment_markers) > 0:
-            for i in range(len(segment_markers)):
-                try:
-                    this_segment = segment_split[i + 1]
-                    lyric_dictionary.update({segment_markers[i]: this_segment.strip()})
-                except IndexError:
-                    lyric_dictionary.update({segment_markers[i]: segment_split[i + 1].strip()})
-        else:
-            lyrics_split = lyrics.split('<br /><br />')
-            for i in range(len(lyrics_split)):
-                if len(lyrics_split[i].strip()) > 0:
-                    lyric_dictionary.update({f'[Verse {i + 1}]': lyrics_split[i].strip()})
+    if len(segment_markers) > 0:
+        for i in range(len(segment_markers)):
+            try:
+                this_segment = segment_split[i + 1]
+                lyric_dictionary.update({segment_markers[i]: this_segment.strip()})
+            except IndexError:
+                lyric_dictionary.update({segment_markers[i]: segment_split[i + 1].strip()})
+    else:
+        lyrics_split = lyrics.split('<br /><br />')
+        for i in range(len(lyrics_split)):
+            if len(lyrics_split[i].strip()) > 0:
+                lyric_dictionary.update({f'[Verse {i + 1}]': lyrics_split[i].strip()})
 
     new_dict = {}
     for key in lyric_dictionary:
@@ -113,32 +115,40 @@ def parse_song_data(gui, song_data):
                 segment_text = segment_text.replace(text, new_text)
 
         # set the font, using the song's font data if override_global is True
-        if song_data['override_global'] == 'True':
+        if song_data['override_global']:
             font_face = song_data['font_family']
             font_size = int(song_data['font_size'])
             font_color = song_data['font_color']
-            use_shadow = False
-            if song_data['use_shadow'] == 'True':
-                use_shadow = True
-            if song_data['shadow_color'] and not song_data['shadow_color'] == 'None':
-                shadow_color = int(song_data['shadow_color'])
+
+            if 'global' in str(song_data['use_shadow']):
+                use_shadow = gui.main.settings['song_use_global']
             else:
-                shadow_color = gui.main.settings['shadow_color']
-            if song_data['shadow_offset'] and not song_data['shadow_offset'] == 'None':
-                shadow_offset = int(song_data['shadow_offset'])
+                use_shadow = song_data['use_shadow']
+
+            if 'global' in str(song_data['shadow_color']):
+                shadow_color = gui.main.settings['song_shadow_color']
             else:
-                shadow_offset = gui.main.settings['shadow_offset']
-            use_outline = False
-            if song_data['use_outline'] == 'True':
-                use_outline = True
-            if song_data['outline_color'] and not song_data['outline_color'] == 'None':
-                outline_color = int(song_data['outline_color'])
+                shadow_color = song_data['shadow_color']
+
+            if 'global' in str(song_data['shadow_offset']):
+                shadow_offset = gui.main.settings['song_shadow_offset']
             else:
-                outline_color = gui.main.settings['outline_color']
-            if song_data['outline_width'] and not song_data['outline_width'] == 'None':
-                outline_width = int(song_data['outline_width'])
+                shadow_offset = song_data['shadow_offset']
+
+            if 'global' in str(song_data['use_outline']):
+                use_outline = gui.min.settings['song_use_outline']
             else:
-                outline_width = gui.main.settings['outline_width']
+                use_outline = song_data['use_outline']
+
+            if 'global' in str(song_data['outline_color']):
+                outline_color = gui.main.settings['song_outline_color']
+            else:
+                outline_color = song_data['outline_color']
+
+            if 'global' in str(song_data['outline_width']):
+                outline_width = gui.main.settings['song_outline_width']
+            else:
+                outline_width = song_data['outline_width']
         else:
             font_face = gui.main.settings['song_font_face']
             font_size = gui.main.settings['song_font_size']

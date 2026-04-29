@@ -427,7 +427,8 @@ class FontSample(QLabel):
                  shadow_offset=5,
                  use_shade=False,
                  shade_color=0,
-                 shade_opacity=50):
+                 shade_opacity=50,
+                 edit_widget=None):
         super().__init__()
         self.settings_widget = settings_widget
         self.use_outline = use_outline
@@ -440,6 +441,7 @@ class FontSample(QLabel):
         self.use_shade = use_shade
         self.shade_color = shade_color
         self.shade_opacity = shade_opacity
+        self.edit_widget = edit_widget
 
         self.sample_background = None
 
@@ -448,10 +450,6 @@ class FontSample(QLabel):
         self.background_label = self.settings_widget.findChild(QLabel, 'font_sample_background_label')
 
     def paintEvent(self, evt):
-        self.paint_font()
-        super().paintEvent(evt)
-
-    def paint_font(self):
         brush = QBrush()
         pen = QPen()
 
@@ -504,6 +502,9 @@ class FontSample(QLabel):
 
         self.setPixmap(image)
 
+        super().paintEvent(evt)
+
+
     def make_sample_background(self, rect):
         slide_type = self.settings_widget.slide_type
 
@@ -511,20 +512,19 @@ class FontSample(QLabel):
             sample_background = QImage(
                 self.settings_widget.gui.main.background_dir + '/'
                 + self.settings_widget.gui.main.settings[f'global_{slide_type}_background'])
-        else:
-            background_button_text = self.settings_widget.parent().parent().findChild(
-                QButtonGroup, 'background_button_group').checkedButton().text()
+            return sample_background
+        elif self.edit_widget:
+            background_button_text = self.edit_widget.background_button_group.checkedButton().text()
             if 'song' in background_button_text.lower():
                 sample_background = QImage(
-                    self.settings_widget.gui.main.background_dir + '/'
-                    + self.settings_widget.gui.main.settings['global_song_background'])
+                    self.edit_widget.gui.main.background_dir + '/'
+                    + self.edit_widget.gui.main.settings['global_song_background'])
             elif 'bible' in background_button_text.lower():
                 sample_background = QImage(
-                    self.settings_widget.gui.main.background_dir + '/'
-                    + self.settings_widget.gui.main.settings['global_bible_background'])
+                    self.edit_widget.gui.main.background_dir + '/'
+                    + self.edit_widget.gui.main.settings['global_bible_background'])
             elif 'color' in background_button_text.lower():
-                background = self.settings_widget.parent().parent().findChild(
-                    QButtonGroup, 'background_button_group').button(2).objectData()
+                background = self.edit_widget.background_button_group.button(2).objectData()
                 background = background.replace('rgb(', '')
                 background = background.replace(')', '')
                 background_split = background.split(', ')
@@ -532,30 +532,33 @@ class FontSample(QLabel):
                 sample_background.fill(
                     QColor(int(background_split[0]), int(background_split[1]), int(background_split[2])))
             else:
-                sample_background = QImage(self.settings_widget.gui.main.background_dir + '/' + background_button_text)
+                sample_background = QImage(
+                    self.edit_widget.gui.main.background_dir + '/' + self.edit_widget.background_combobox.currentText())
 
-        ratio = sample_background.width() / rect.width()
-        # if there was no background yet chosen, ration will be 0
-        if ratio > 0:
-            sample_background = sample_background.scaled(
-                int(rect.width()),
-                int(sample_background.height() / ratio),
-                Qt.AspectRatioMode.IgnoreAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            )
+            ratio = sample_background.width() / rect.width()
+            # if there was no background yet chosen, ration will be 0
+            if ratio > 0:
+                sample_background = sample_background.scaled(
+                    int(rect.width()),
+                    int(sample_background.height() / ratio),
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
 
-            piece_rect = QRect(
-                0,
-                int(sample_background.height() / 2) - int(rect.height() / 2),
-                int(rect.width()),
-                int(rect.height())
-            )
-            sample_background = sample_background.copy(piece_rect)
-        else:
-            sample_background = QImage(QSize(int(rect.width()), int(rect.height())), QImage.Format_RGB32)
-            sample_background.fill(Qt.GlobalColor.black)
+                piece_rect = QRect(
+                    0,
+                    int(sample_background.height() / 2) - int(rect.height() / 2),
+                    int(rect.width()),
+                    int(rect.height())
+                )
+                sample_background = sample_background.copy(piece_rect)
+            else:
+                sample_background = QImage(QSize(int(rect.width()), int(rect.height())), QImage.Format_RGB32)
+                sample_background.fill(Qt.GlobalColor.black)
 
-        return sample_background
+            return sample_background
+
+        return -1
 
 
 class FontWidget(QWidget):
@@ -1337,7 +1340,7 @@ class NewFontWidget(QWidget):
     """
     mouse_release_signal = pyqtSignal(int)
 
-    def __init__(self, gui, slide_type, draw_border=True, applies_to_global=True):
+    def __init__(self, gui, slide_type, draw_border=True, applies_to_global=True, edit_widget=None):
         """
         Implements QWidget that contains all of the settings that can be applied to the display font
         :param GUI gui: the current instance of GUI
@@ -1348,6 +1351,7 @@ class NewFontWidget(QWidget):
         self.slide_type = slide_type
         self.draw_border = draw_border
         self.applies_to_global = applies_to_global
+        self.edit_widget = edit_widget
 
         #self.font_face_combobox = FontFaceComboBox(self.gui)
         self.font_face_combobox = QFontComboBox()
@@ -1377,7 +1381,7 @@ class NewFontWidget(QWidget):
         layout = QVBoxLayout(self)
 
         sample_text = self.slide_type.capitalize() + ' Font Sample'
-        self.font_sample = FontSample(self)
+        self.font_sample = FontSample(self, edit_widget=self.edit_widget)
         self.font_sample.text = sample_text
         self.font_sample.setObjectName('font_sample')
         layout.addWidget(self.font_sample)
@@ -2388,7 +2392,7 @@ class SettingsWidget(QWidget):
         layout.addWidget(font_widget)
 
         self.song_font_settings_widget = NewFontWidget(self.gui, 'song', draw_border=False)
-        #font_layout.addWidget(self.song_font_settings_widget)
+        font_layout.addWidget(self.song_font_settings_widget)
         song_font_group_box = QGroupBox()
         song_font_group_box.setTitle('Song Font Settings')
         song_font_group_box.setFont(self.gui.standard_font)

@@ -1,5 +1,6 @@
 import os.path
 import re
+import traceback
 from os.path import exists
 
 from PyQt5.QtCore import Qt, QSize, QTimer, QPoint
@@ -29,25 +30,28 @@ class EditWidget(QDialog):
         :param str type: The type of slide being edited: 'song' or 'custom'
         :param bool from_oos: Whether the slide is being edited from OOS
         """
+        if not data:
+            return
+
         super().__init__()
+
         self.gui = gui
         self.lyrics_edit = None
         self.old_title = None
         self.new_custom = False
         self.from_oos = from_oos
         self.new_song = False
-
-        if data:
-            self.data = data
-            self.type = data['type']
-        else:
-            self.type = type
-            self.data = SLIDE_DATA_DEFAULTS
-            self.data['type'] = type
-            self.new_song = True
+        self.data = data
+        self.type = data['type']
 
         self.setObjectName('edit_widget')
         self.setWindowFlag(Qt.WindowType.Window)
+
+        if self.data['title'] == '':
+            self.new_song = True
+        else:
+            self.old_title = self.data['title']
+
         self.init_components()
 
         self.main_widget.adjustSize()
@@ -247,8 +251,8 @@ class EditWidget(QDialog):
         self.lyrics_text_edit.hide()
 
         if self.type == 'song':
-            lyrics_layout.addWidget(self.lyrics_list_widget, 1, 0, 3, 1)
-            lyrics_layout.addWidget(self.lyrics_text_edit, 1, 0, 3, 1)
+            lyrics_layout.addWidget(self.lyrics_list_widget, 1, 0, 4, 1)
+            lyrics_layout.addWidget(self.lyrics_text_edit, 1, 0, 4, 1)
         else:
             help_label = QLabel('Hint: Add a blank line between paragraphs when choosing "Split Slides"')
             help_label.setObjectName('help_label')
@@ -259,11 +263,22 @@ class EditWidget(QDialog):
             self.lyrics_text_edit.show()
 
         if self.type == 'song':
+            self.song_order_header_widget = QWidget()
+            lyrics_layout.addWidget(self.song_order_header_widget, 0, 1)
+            song_order_header_layout = QVBoxLayout(self.song_order_header_widget)
+            song_order_header_layout.setContentsMargins(0, 0, 0, 0)
+
             song_order_label = QLabel('Song Order')
             song_order_label.setFont(self.gui.standard_font)
-            lyrics_layout.addWidget(song_order_label, 0, 1)
+            song_order_header_layout.addWidget(song_order_label)
+
+            help_label = QLabel('Hint: Drag lyrics here to set the song order.\nPress "Delete" to remove an item.')
+            help_label.setObjectName('help_label')
+            help_label.setFont(self.gui.standard_font)
+            song_order_header_layout.addWidget(help_label)
 
             self.song_order_list_widget = SongOrderListWidget()
+            self.song_order_list_widget.setObjectName('song_order_list_widget')
             self.song_order_list_widget.setDragEnabled(True)
             self.song_order_list_widget.setAcceptDrops(True)
             self.song_order_list_widget.setDefaultDropAction(Qt.DropAction.MoveAction)
@@ -478,7 +493,7 @@ class EditWidget(QDialog):
         slide_settings_layout = QHBoxLayout(slide_settings_container)
         advanced_options_layout.addWidget(slide_settings_container)
 
-        self.font_widget = NewFontWidget(self.gui, self.type, draw_border=False, applies_to_global=False)
+        self.font_widget = NewFontWidget(self.gui, self.type, draw_border=False, applies_to_global=False, edit_widget=self)
         slide_settings_layout.addWidget(self.font_widget)
 
         background_widget = QWidget()
@@ -606,10 +621,6 @@ class EditWidget(QDialog):
         self.font_widget.shade_color_slider.color_slider.setValue(self.gui.main.settings[slide_type + '_shade_color'])
         self.font_widget.shade_opacity_slider.color_slider.setValue(self.gui.main.settings[slide_type + '_shade_opacity'])
 
-    def background_combobox_change(self):
-        self.background_line_edit.setText(self.background_combobox.currentData(Qt.ItemDataRole.UserRole))
-        self.font_widget.font_sample.paint_font()
-
     def toggle_lyrics(self):
         if self.sender().isChecked():
             lyrics_html = ''
@@ -618,19 +629,31 @@ class EditWidget(QDialog):
                 data = index.data(Qt.ItemDataRole.UserRole)
                 lyrics_html += f'{data[0]}<br />{data[1]}<br />'
             lyrics_html = lyrics_html[:-6]
-            self.data[4] = lyrics_html
+            self.data['text'] = lyrics_html
+            self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
             self.populate_song_data()
             self.lyrics_list_widget.hide()
             self.lyrics_text_edit.show()
+            self.song_order_header_widget.hide()
             self.song_order_list_widget.hide()
+            self.preview_label_one.hide()
+            self.preview_label_two.hide()
             self.tool_bar.show()
         else:
-            self.data[4] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+            self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+            self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
             self.populate_song_data()
             self.lyrics_text_edit.hide()
             self.tool_bar.hide()
+            self.song_order_header_widget.show()
             self.lyrics_list_widget.show()
             self.song_order_list_widget.show()
+            self.preview_label_one.show()
+            self.preview_label_two.show()
+
+    def background_combobox_change(self):
+        self.background_button_group.button(3).setChecked(True)
+        self.font_widget.font_sample.repaint()
 
     def update_preview_widget(self):
         """
@@ -677,34 +700,36 @@ class EditWidget(QDialog):
             font_face = self.data['font_family']
             font_size = int(self.data['font_size'])
             font_color = self.data['font_color']
-            use_shadow = False
-            if self.data['use_shadow'] == 'True':
-                use_shadow = True
-            if self.data['shadow_color'] and not self.data['shadow_color'] == 'None':
-                shadow_color = int(self.data['shadow_color'])
+
+            if 'global' in str(self.data['use_shadow']):
+                use_shadow = self.gui.main.settings['song_use_global']
             else:
-                shadow_color = self.gui.main.settings['shadow_color']
-            if self.data['shadow_offset'] and not self.data['shadow_offset'] == 'None':
-                shadow_offset = int(self.data['shadow_offset'])
+                use_shadow = self.data['use_shadow']
+
+            if 'global' in str(self.data['shadow_color']):
+                shadow_color = self.gui.main.settings['song_shadow_color']
             else:
-                shadow_offset = self.gui.main.settings['shadow_offset']
-            use_outline = False
-            if self.data['use_outline'] == 'True':
-                use_outline = True
-            if self.data['outline_color'] and not self.data['outline_color'] == 'None':
-                outline_color = int(self.data['outline_color'])
+                shadow_color = self.data['shadow_color']
+
+            if 'global' in str(self.data['shadow_offset']):
+                shadow_offset = self.gui.main.settings['song_shadow_offset']
             else:
-                outline_color = self.gui.main.settings['outline_color']
-            if self.data['outline_width'] and not self.data['outline_width'] == 'None':
-                outline_width = int(self.data['outline_width'])
+                shadow_offset = self.data['shadow_offset']
+
+            if 'global' in str(self.data['use_outline']):
+                use_outline = self.gui.min.settings['song_use_outline']
             else:
-                outline_width = self.gui.main.settings['outline_width']
-            if self.data['use_shade'] == 'True':
-                use_shade = True
+                use_outline = self.data['use_outline']
+
+            if 'global' in str(self.data['outline_color']):
+                outline_color = self.gui.main.settings['song_outline_color']
             else:
-                use_shade = False
-            shade_color = int(self.data['shade_color'])
-            shade_opacity = int(self.data['shade_opacity'])
+                outline_color = self.data['outline_color']
+
+            if 'global' in str(self.data['outline_width']):
+                outline_width = self.gui.main.settings['song_outline_width']
+            else:
+                outline_width = self.data['outline_width']
         else:
             if self.data['type'] == 'custom':
                 font_face = self.gui.main.settings['bible_font_face']
@@ -961,7 +986,6 @@ class EditWidget(QDialog):
         """
         self.lyrics_text_edit.clear()
         self.lyrics_list_widget.model().clear()
-        self.old_title = self.data['title']
         self.title_line_edit.setText(self.data['title'])
         self.author_line_edit.setText(self.data['author'])
         self.copyright_line_edit.setText(self.data['copyright'])
@@ -1628,6 +1652,11 @@ class EditWidget(QDialog):
         else:
             self.data['font_color'] = 'white'
 
+        self.data['title'] = self.title_line_edit.text().strip()
+        self.data['author'] = self.author_line_edit.text().strip()
+        self.data['copyright'] = self.copyright_line_edit.text().strip()
+        self.data['ccli_song_number'] = self.ccli_num_line_edit.text().strip()
+
         self.data['font_size'] = self.font_widget.font_size_spinbox.value()
 
         self.data['use_shadow'] = self.font_widget.shadow_checkbox.isChecked()
@@ -1659,10 +1688,7 @@ class EditWidget(QDialog):
                 data = index.data(Qt.ItemDataRole.UserRole)
                 lyrics_html += f'{data[0]}<br />{data[1]}<br />'
             lyrics_html = lyrics_html[:-6]
-            self.data[4] = lyrics_html
-            self.populate_song_data()
-
-        self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+            self.data['text'] = lyrics_html
 
         verse_order = ''
         for i in range(self.song_order_list_widget.count()):
@@ -1672,6 +1698,10 @@ class EditWidget(QDialog):
             tag = ''.join(tag_split)
             verse_order += tag + ' '
         self.data['verse_order'] = verse_order.strip()
+
+        self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+        self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
+        self.populate_song_data()
 
     def update_custom_data(self):
         if self.override_global_button.isChecked():
@@ -1807,7 +1837,8 @@ class EditWidget(QDialog):
                     break
         else:
             items = self.gui.media_widget.song_list.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
-            self.gui.media_widget.song_list.setCurrentItem(items[0])
+            if len(items) > 0:
+                self.gui.media_widget.song_list.setCurrentItem(items[0])
 
         self.deleteLater()
         save_widget.widget.deleteLater()
@@ -1987,7 +2018,13 @@ class SongOrderListWidget(QListWidget):
             lyric_type = data[0].split(' ')[0].replace('[', '')
             number = data[0].split(' ')[1].replace(']', '')
             item = QListWidgetItem(f'{lyric_type} {number}')
-            self.insertItem(self.row(self.itemAt(evt.pos())), item)
+            row = self.row(self.itemAt(evt.pos()))
+            if row == -1:
+                self.addItem(item)
+            else:
+                self.insertItem(row, item)
+            self.update()
+            print(f"Item added to {hex(id(self))}, instance of type: {type(self)}. New count: {self.count()}")
         elif evt.source() == self:
             super().dropEvent(evt)
 
@@ -2200,6 +2237,8 @@ class LyricDelegate(QStyledItemDelegate):
         # This triggers setModelData and then closes the editor widget
         self.commitData.emit(editor)
         self.closeEditor.emit(editor, QStyledItemDelegate.EndEditHint.NoHint)
+        self.gui.main.app.processEvents()
+        self.gui.edit_widget.update_song_data()
 
     def close_without_save(self, editor):
         # Just closes the editor widget without calling setModelData

@@ -1089,11 +1089,11 @@ class GUI(QObject):
         elif width < display_width and height < display_height:
             wdiff = display_width - width
             hdiff = display_height - height
-            if wdiff > hdiff:
+            if wdiff > hdiff and not pixmap.isNull():
                 pixmap = pixmap.scaledToWidth(display_width)
                 y = int((pixmap.height() - display_height) / 2)
                 pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
-            else:
+            elif not pixmap.isNull():
                 pixmap = pixmap.scaledToHeight(display_height)
                 x = int((pixmap.width() - display_width) / 2)
                 pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
@@ -2236,6 +2236,8 @@ class GUI(QObject):
 
         if len(self.main.settings['logo_image']) > 0:
             pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['logo_image'])
+            if pixmap.isNull():
+                return
             pixmap = pixmap.scaled(
                 self.display_widget.size().width(), self.display_widget.size().height(),
                 Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation

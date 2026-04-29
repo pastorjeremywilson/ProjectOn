@@ -32,7 +32,7 @@ from datetime import datetime
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication
+from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, qInstallMessageHandler
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QStyle, QStyleFactory
@@ -463,8 +463,6 @@ class ProjectOn(QObject):
                     if key in SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN.keys():
                         sql += f'{data[key]}","'
                 sql = sql[:-2] + ');'
-
-            print(sql)
 
             cursor.execute(sql)
             connection.commit()
@@ -1466,5 +1464,5 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
 
 
 if __name__ == '__main__':
-    #sys.excepthook = log_unhandled_exception
+    sys.excepthook = log_unhandled_exception
     ProjectOn()

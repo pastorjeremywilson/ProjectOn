@@ -16,7 +16,6 @@ import parsers
 from declarations import SLIDE_DATA_DEFAULTS
 from edit_widget import EditWidget
 from get_scripture import GetScripture
-from new_edit_widget import NewEditWidget
 from widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash
 
 
@@ -739,9 +738,9 @@ class MediaWidget(QTabWidget):
         Method to create an instance of EditWidget.
         :param str type: Whether the type to be added is a 'song' or a 'custom' slide
         """
-        item_text = ''
         song_data = SLIDE_DATA_DEFAULTS
-        self.gui.edit_widget = EditWidget(self.gui, song_data, 'song')
+        song_data['type'] = type
+        self.gui.edit_widget = EditWidget(self.gui, song_data, type)
 
     def send_to_live(self):
         self.gui.preview_widget.slide_list.setCurrentRow(0)
