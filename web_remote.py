@@ -1,4 +1,4 @@
-import engineio.async_drivers.threading
+import engineio.async_drivers.gevent
 import re
 
 import logging

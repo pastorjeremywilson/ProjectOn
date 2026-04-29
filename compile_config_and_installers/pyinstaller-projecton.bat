@@ -1,5 +1,6 @@
 @"X:\Documents\Python Workspace\project_on\win_venv\Scripts\pyinstaller.exe" ^
---noconfirm --clean --onedir --noconsole --hidden-import=PyQt5.sip ^
+--noconfirm --clean --onedir --noconsole ^
+--hidden-import=PyQt5.sip ^
 --distpath C:\Users\pasto\Desktop\output ^
 --workpath C:\Users\pasto\Desktop\output\work ^
 -i "../resources/branding/logo.ico" ^
