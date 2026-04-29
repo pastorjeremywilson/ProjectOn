@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QGridLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QGridLayout, QAbstractItemView
 
 
 class PreviewWidget(QWidget):
@@ -48,7 +48,8 @@ class PreviewWidget(QWidget):
 
         self.slide_list = CustomListWidget(self.gui)
         self.slide_list.setObjectName('slide_list')
-        #self.slide_list.setStyleSheet('#slide_list { border: none; }')
+        self.slide_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.slide_list.verticalScrollBar().setSingleStep(15)
         self.slide_list.setFont(self.gui.standard_font)
         self.slide_list.itemClicked.connect(self.show_preview)
         self.slide_list.currentItemChanged.connect(self.show_preview)

@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtMultimedia import QMediaPlayer
-from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout, QAbstractItemView
 
 
 class LiveWidget(QWidget):
@@ -51,6 +51,8 @@ class LiveWidget(QWidget):
         self.slide_list = CustomListWidget(self.gui)
         self.slide_list.setObjectName('slide_list')
         self.slide_list.setFont(self.gui.standard_font)
+        self.slide_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.slide_list.verticalScrollBar().setSingleStep(15)
         container_layout.addWidget(self.slide_list, 1, 0)
 
         self.preview_label = QLabel()

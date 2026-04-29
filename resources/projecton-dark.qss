@@ -77,6 +77,26 @@ QPushButton[objectName="lyrics_toggle"]:checked {
     icon-size: 48px 24px;
 }
 
+/*-------------------- lyrics_list_widget --------------------*/
+QListView[objectName="lyrics_list_widget"] {
+    background: #303030;
+}
+QListView[objectName="lyrics_list_widget"]::item {
+	background: #404040;
+	color: #e0e0e0;
+}
+QListView[objectName="lyrics_list_widget"]::item:hover {
+    background: #262626;
+	color: #e0e0e0;
+}
+QListView[objectName="lyrics_list_widget"]::item:selected {
+	background: #404040;
+	color: #e0e0e0;
+}
+QListView[objectName="lyrics_list_widget"] QWidget[objectName="editor_widget"] {
+    background: #404040;
+}
+
 /*-------------------- FontFaceComboBox --------------------*/
 QComboBox[objectName="FontFaceComboBox"] {
     background: #a0a0a0;

@@ -16,7 +16,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.9.2.003?
+# What's New in Version 1.9.2.004?
 - Fixed a crash that can happen when deleting an item from the media library
 - Major improvements to the way images are sent from ProjectOn to the stage view website
 - Added option for changing the Frames Per Second updates on the preview widget and stage view
@@ -28,7 +28,7 @@ projection needs of a church service.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.9.2.003) and run
+system only. Download the current ProjectOn installer (v.1.9.2.004) and run
 it on your computer.
 
 # Using ProjectOn

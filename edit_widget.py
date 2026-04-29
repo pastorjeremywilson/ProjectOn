@@ -1,18 +1,16 @@
 import os.path
 import re
-import traceback
 from os.path import exists
 
-from PyQt5.QtCore import Qt, QSize, QTimer, QPoint
-from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument, QDropEvent, QDrag, \
+from PyQt5.QtCore import Qt, QSize, QPoint
+from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument, QDrag, \
     QStandardItemModel, QStandardItem, QFontMetrics
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QSpinBox, QComboBox, QListWidgetItem, QTextEdit, QGroupBox, QAbstractItemView, QStyledItemDelegate, QListView, \
-    QStyleOptionViewItem
+    QMenu, QAction
 
 import parsers
-from declarations import SLIDE_DATA_DEFAULTS
 from formattable_text_edit import FormattableTextEdit, CustomTextEdit
 from widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
 
@@ -237,6 +235,7 @@ class EditWidget(QDialog):
         self.lyrics_list_widget.setMinimumHeight(400)
         self.lyrics_list_widget.setVerticalScrollMode(QListWidget.ScrollMode.ScrollPerPixel)
         self.lyrics_list_widget.verticalScrollBar().setSingleStep(15)
+        self.lyrics_list_widget.setSpacing(5)
         model = QStandardItemModel()
         self.lyrics_list_widget.setModel(model)
         self.lyrics_list_widget.selectionModel().currentChanged.connect(self.update_preview_widget)
@@ -245,7 +244,7 @@ class EditWidget(QDialog):
         self.lyrics_list_widget.setAcceptDrops(True)
         self.lyrics_list_widget.setDragDropOverwriteMode(False)
 
-        self.lyrics_text_edit = CustomTextEdit()
+        self.lyrics_text_edit = LyricsTextEdit(self.gui)
         self.lyrics_text_edit.setObjectName('lyrics_text_edit')
         self.lyrics_text_edit.setFont(self.gui.standard_font)
         self.lyrics_text_edit.hide()
@@ -287,6 +286,12 @@ class EditWidget(QDialog):
             self.song_order_list_widget.setToolTip('Press "Delete" to remove an item from the song order list')
             self.song_order_list_widget.setFont(self.gui.standard_font)
             lyrics_layout.addWidget(self.song_order_list_widget, 1, 1, 2, 1)
+
+            self.song_order_help_label = QLabel('Toggle "Edit all lyrics"\nto edit the song order')
+            self.song_order_help_label.setObjectName('help_label')
+            self.song_order_help_label.setFont(self.gui.standard_font)
+            self.song_order_help_label.hide()
+            lyrics_layout.addWidget(self.song_order_help_label, 1, 1)
 
             self.tool_bar = QWidget()
             self.tool_bar.hide()
@@ -631,9 +636,11 @@ class EditWidget(QDialog):
             lyrics_html = lyrics_html[:-6]
             self.data['text'] = lyrics_html
             self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
+            self.update_song_data()
             self.populate_song_data()
             self.lyrics_list_widget.hide()
             self.lyrics_text_edit.show()
+            self.song_order_help_label.show()
             self.song_order_header_widget.hide()
             self.song_order_list_widget.hide()
             self.preview_label_one.hide()
@@ -642,9 +649,11 @@ class EditWidget(QDialog):
         else:
             self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
             self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
+            self.update_song_data()
             self.populate_song_data()
             self.lyrics_text_edit.hide()
             self.tool_bar.hide()
+            self.song_order_help_label.hide()
             self.song_order_header_widget.show()
             self.lyrics_list_widget.show()
             self.song_order_list_widget.show()
@@ -1992,6 +2001,88 @@ class EditWidget(QDialog):
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, item_widget)
 
 
+class LyricsTextEdit(QTextEdit):
+    def __init__(self, gui):
+        super().__init__()
+        self.gui = gui
+        self.cursorPositionChanged.connect(self.check_for_tag)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.context_menu)
+
+    def check_for_tag(self):
+        cursor = self.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.StartOfLine, QTextCursor.MoveMode.MoveAnchor)
+        cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
+        text = cursor.selectedText()
+        if '[' in text and ']' in text:
+            cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
+            cursor.movePosition(QTextCursor.MoveOperation.Right)
+            self.setTextCursor(cursor)
+
+    def context_menu(self):
+        """
+        Method to create a QMenu to be used as a custom context menu.
+        """
+        self.click_pos = self.mapFromGlobal(self.cursor().pos())
+
+        cursor = self.cursorForPosition(self.click_pos)
+        cursor.movePosition(QTextCursor.MoveOperation.StartOfLine, QTextCursor.MoveMode.MoveAnchor)
+        cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
+        text = cursor.selectedText()
+
+        if '[' in text and ']' in text:
+            menu = QMenu()
+            if self.gui.main.settings['theme'] == 'dark':
+                menu.setStyleSheet(
+                    'QMenu {'
+                        'background: #000000;'
+                        'color: #e0e0e0;'
+                    '}'
+                    'QMenu::item {'
+                        'background: #000000;'
+                        'color: #e0e0e0;'
+                    '}'
+                    'QMenu::item:hover {'
+                        'background: #555588;'
+                    '}'
+                    'QMenu::item:selected {'
+                        'background: #444466;'
+                    '}'
+                    'QMenu::item:pressed {'
+                        'background: #444466;'
+                    '}'
+                )
+            else:
+                menu.setStyleSheet(
+                    'QMenu {'
+                        'background: #f0f0f0;'
+                        'color: #000000;'
+                    '}'
+                    'QMenu::item {'
+                        'background: #f0f0f0;'
+                        'color: #000000;'
+                    '}'
+                    'QMenuBar::item:hover {'
+                        'background: #aaaaff;'
+                    '}'
+                    'QMenu::item:selected {'
+                        'background: #aaaaff;'
+                    '}'
+                    'QMenu::item:pressed {'
+                        'background: #aaaaff;'
+                    '}'
+                )
+
+            remove_tag_action = QAction('Remove Tag')
+            remove_tag_action.triggered.connect(lambda: self.remove_tag(cursor))
+            menu.addAction(remove_tag_action)
+
+            menu.exec(self.mapToGlobal(self.click_pos))
+
+    def remove_tag(self, cursor):
+        cursor.removeSelectedText()
+
+
 class SongOrderListWidget(QListWidget):
     """
     Implements QListWidget to provide the ability to press "Delete" in order to remove an item from the list
@@ -2133,8 +2224,7 @@ class LyricDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         # Take the text from widgets and save it back to the model
         type = f'[{self.type_combobox.currentText()} {self.number_spinbox.value()}]'
-        lyrics = self.lyrics_text_edit.toHtml()
-        lyrics = self.gui.edit_widget.get_simplified_text(lyrics)
+        lyrics = self.gui.edit_widget.get_simplified_text(self.lyrics_text_edit.toHtml())
         data = [
             type,
             lyrics
@@ -2154,6 +2244,17 @@ class LyricDelegate(QStyledItemDelegate):
             f'{type.replace('[', '').replace(']', '')}\n\n{lyrics}',
             Qt.ItemDataRole.DisplayRole
         )
+
+        # then update the data and lyrics text edit to match the changes
+        lyrics_html = ''
+        for i in range(model.rowCount()):
+            index = model.index(i, 0)
+            data = index.data(Qt.ItemDataRole.UserRole)
+            lyrics_html += f'{data[0]}<br />{data[1]}<br />'
+        lyrics_html = lyrics_html[:-6]
+        self.gui.edit_widget.data['text'] = lyrics_html
+        self.gui.edit_widget.data['parsed_text'] = parsers.parse_song_data(self.gui, self.gui.edit_widget.data)
+        self.gui.edit_widget.lyrics_text_edit.setHtml(self.gui.edit_widget.get_simplified_text(lyrics_html))
 
     def destroyEditor(self, editor, index):
         # Reset the editing index when done
@@ -2178,6 +2279,7 @@ class LyricDelegate(QStyledItemDelegate):
 
     def make_editor(self, parent=None, index=None):
         widget = QWidget(parent)
+        widget.setObjectName('editor_widget')
         widget.setAutoFillBackground(True)
         layout = QVBoxLayout(widget)
 
@@ -2237,8 +2339,6 @@ class LyricDelegate(QStyledItemDelegate):
         # This triggers setModelData and then closes the editor widget
         self.commitData.emit(editor)
         self.closeEditor.emit(editor, QStyledItemDelegate.EndEditHint.NoHint)
-        self.gui.main.app.processEvents()
-        self.gui.edit_widget.update_song_data()
 
     def close_without_save(self, editor):
         # Just closes the editor widget without calling setModelData

@@ -11,7 +11,6 @@ def parse_song_data(gui, song_data):
     :param str lyrics: The raw lyrics data
     """
     if 'text' not in song_data.keys() or len(song_data['text'].strip()) == 0:
-        print('to lyric text, not parsing')
         return
     # start by building a dictionary of segment text keyed to their corresponding tags
     lyric_dictionary = {}

@@ -4,10 +4,18 @@ Done:
     Remove calls to LyricDisplayWidget.paint_text or change them to repaint. Remove LyricDisplayWidget.paint_text.
     Get rid of song_info list and replace with song_data dict for everything
     Fix startup progress bar shrinking at end
+    Improve lyrics editing with modular editing spaces (verse/chorus and number at top as dropdowns, lyrics below).
+        Probably as a custom list widget.
+
+    Not updating order of service
+    Double-click edits not sticking
+    Title and author disappeared toggling back to list view
+    Add instructions on toggling back to set song order
+    More definition to the lyrics edit list widget
+    Pasting after tag turns green sometimes
 
 To Do:
-    Improve lyrics editing with modular editing spaces (verse/chorus and number at top as dropdowns, lyrics below).
-        Probably as a custom list widget. Pretty well done. Needs testing.
+    Switch lyric editor textEdit to formattable text edit
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types

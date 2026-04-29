@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QCursor, QIcon, QDropEvent
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QLabel, QMenu, QGridLayout, \
-    QPushButton, QSizePolicy, QMessageBox, QAction
+    QPushButton, QSizePolicy, QMessageBox, QAction, QAbstractItemView
 
 from edit_widget import EditWidget
 
@@ -45,13 +45,12 @@ class OOSWidget(QWidget):
         title_label.setObjectName('title_label')
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setFont(self.gui.bold_font)
-        #title_label.setStyleSheet(
-        #    'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
         container_layout.addWidget(title_label, 0, 0, 1, 2)
 
         self.oos_list_widget = CustomListWidget(self.gui)
         self.oos_list_widget.setObjectName('oos_list_widget')
-        #self.oos_list_widget.setStyleSheet('#oos_list_widget { margin: 0; }')
+        self.oos_list_widget.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.oos_list_widget.verticalScrollBar().setSingleStep(15)
         self.oos_list_widget.setFont(self.gui.bold_font)
         container_layout.addWidget(self.oos_list_widget, 1, 0, 2, 1)
 
