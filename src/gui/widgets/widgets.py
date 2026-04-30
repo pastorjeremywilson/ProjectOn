@@ -1032,9 +1032,9 @@ class ImageCombobox(QComboBox):
             cursor = connection.cursor()
             thumbnails = cursor.execute(
                 'SELECT * FROM ' + self.table + ' ORDER BY fileName COLLATE NOCASE ASC;').fetchall()
+            self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')
             for record in thumbnails:
                 if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit('Loading Thumbnails', 'status')
                     self.gui.main.update_status_signal.emit(record[0], 'info')
                 pixmap = QPixmap()
                 pixmap.loadFromData(record[1], 'JPG')
@@ -4394,31 +4394,28 @@ class Toolbar(QWidget):
 
         self.layout.addStretch()
 
-        self.show_display_button = QPushButton()
-        self.show_display_button.setIcon(QIcon('resources/gui_icons/no_display.svg'))
-        self.show_display_button.setToolTip('Show/Hide the Display Screen')
-        self.show_display_button.setIconSize(self.gui.toolbar_icon_size)
-        self.show_display_button.setFixedSize(48, 48)
-        self.show_display_button.setCheckable(True)
-        self.show_display_button.pressed.connect(self.gui.show_hide_display_screen)
-        self.layout.addWidget(self.show_display_button)
+        self.hide_display_button = QPushButton()
+        self.hide_display_button.setIcon(QIcon('resources/gui_icons/no_display.svg'))
+        self.hide_display_button.setToolTip('Show/Hide the Display Screen')
+        self.hide_display_button.setIconSize(self.gui.toolbar_icon_size)
+        self.hide_display_button.setCheckable(True)
+        self.hide_display_button.released.connect(self.gui.show_hide_display_screen)
+        self.layout.addWidget(self.hide_display_button)
 
         self.black_screen_button = QPushButton()
         self.black_screen_button.setIcon(QIcon('resources/gui_icons/black_display.svg'))
         self.black_screen_button.setToolTip('Show a Black Screen')
         self.black_screen_button.setIconSize(self.gui.toolbar_icon_size)
-        self.black_screen_button.setFixedSize(48, 48)
         self.black_screen_button.setCheckable(True)
-        self.black_screen_button.pressed.connect(self.gui.display_black_screen)
+        self.black_screen_button.released.connect(self.gui.display_black_screen)
         self.layout.addWidget(self.black_screen_button)
 
         self.logo_screen_button = QPushButton()
         self.logo_screen_button.setIcon(QIcon('resources/gui_icons/logo_display.svg'))
         self.logo_screen_button.setToolTip('Show the Logo Screen')
         self.logo_screen_button.setIconSize(self.gui.toolbar_icon_size)
-        self.logo_screen_button.setFixedSize(48, 48)
         self.logo_screen_button.setCheckable(True)
-        self.logo_screen_button.pressed.connect(self.gui.display_logo_screen)
+        self.logo_screen_button.released.connect(self.gui.display_logo_screen)
         self.layout.addWidget(self.logo_screen_button)
 
     def show_font_widget(self, slide_type):
@@ -4447,8 +4444,6 @@ class Toolbar(QWidget):
 
     def open_settings(self):
         self.sw.show()
-
-        print('==========\n' + self.sw.ccli_line_edit.styleSheet() + '\n==========')
 
     def import_background(self):
         result = QFileDialog.getOpenFileName(

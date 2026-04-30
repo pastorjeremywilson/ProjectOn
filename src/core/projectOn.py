@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.2.005
+ProjectOn v.1.9.2.006
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -77,7 +77,6 @@ class ProjectOn(QObject):
 
         # ensure we are working from the source root of the program
         self.file_dir = os.path.dirname(os.path.dirname(__file__))
-        print(self.file_dir)
         os.chdir(self.file_dir)
 
         if sys.platform == 'win32':
@@ -142,6 +141,10 @@ class ProjectOn(QObject):
         :param str text: The text to be displayed
         :param str type: Use 'status' if this will be an update to the status text under the main text
         """
+        # just in case
+        if not self.initial_startup:
+            return
+
         if self.splash_widget and not self.updating_label: # prevent access violation by ensuring processEvents has finished
             self.updating_label = True
             if type == 'status':
@@ -161,7 +164,7 @@ class ProjectOn(QObject):
         self.splash_widget = QWidget()
         self.splash_widget.setObjectName('splash_widget')
         self.splash_widget.setMinimumWidth(610)
-        self.splash_widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+        self.splash_widget.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.splash_widget.setStyleSheet(
             '#splash_widget { background: #6060c0; }')
         splash_layout = QHBoxLayout(self.splash_widget)
@@ -179,7 +182,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.2.005')
+        version_label = QLabel('v.1.9.2.006')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -445,6 +448,7 @@ class ProjectOn(QObject):
             for key in data.keys():
                 if type(data[key]) == str:
                     data[key] = data[key].replace('"', '""')
+
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
 

@@ -204,12 +204,7 @@ SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN = {
 
 SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN = {
     'title': 'title',
-    'author': 'author',
-    'copyright': 'copyright',
-    'ccli_song_number': 'ccliNum',
-    'text': 'lyrics',
-    'verse_order': 'vorder',
-    'use_footer': 'footer',
+    'text': 'text',
     'font_family': 'font',
     'font_color': 'fontColor',
     'background': 'background',
@@ -224,10 +219,9 @@ SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN = {
     'use_shade': 'use_shade',
     'shade_color': 'shade_color',
     'shade_opacity': 'shade_opacity',
-    'audio_file': '',
+    'audio_file': 'audio_file',
     'loop_audio': 'loop_audio',
     'split_slides': 'split_slides',
     'auto_play': 'auto_play',
     'slide_delay': 'slide_delay',
-    'file_name': 'file_name'
 }

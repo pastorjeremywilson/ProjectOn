@@ -1,13 +1,13 @@
 /*-------------------- Light Stylesheet for ProjectOn --------------------
-Note: Qt default background for widgets is #f0f0f0 or 240, 240, 240
+Note: Qt default background for widgets is #f0f0f2 or 240, 240, 240
 
 General Theme Colors:
     Background, usable widget: #ffffff
-    Background, widget: #f0f0f0
+    Background, widget: #f0f0f2
     Font color: #000000
     Hover: #aaaaff
     Selected/Pressed: #5555aa
-    Disabled: #505050
+    Disabled: #505052
 */
 
 /*-------------------- item_widget --------------------*/
@@ -29,7 +29,7 @@ QWidget[objectName="tool_bar_container"] {
 
 /*-------------------- tab_widget --------------------*/
 QWidget[objectName="tab_widget"] {
-    background: #c0c0c0;
+    background: #f0f0f2;
 }
 
 /*-------------------- font_widget --------------------*/
@@ -45,15 +45,16 @@ QWidget[objectName="settings_container"] {
     border: 2px solid #5555aa;
 }
 
-/*-------------------- edit_main_widget --------------------*/
-QWidget[objectName="edit_main_widget"] {
-    background: #eeeeff;
+/*-------------------- edit_widget --------------------*/
+QWidget[objectName="edit_widget"] {
+    background: #ffffff;
     color: #000000;
 }
 
-/*-------------------- button_widget --------------------*/
-QWidget[objectName="button_widget"] {
-    background: #eaeaea;
+/*-------------------- edit_main_widget --------------------*/
+QWidget[objectName="edit_main_widget"] {
+    background: #ffffff;
+    color: #000000;
 }
 
 /*-------------------- lyrics_toggle --------------------*/
@@ -74,7 +75,26 @@ QPushButton[objectName="lyrics_toggle"]:checked {
 }
 
 QLabel[objectName="help_label"] {
-    color: #505050;
+    color: #505052;
+}
+
+/*-------------------- lyrics_list_widget --------------------*/
+QListView[objectName="lyrics_list_widget"] {
+    background: #ffffff;
+}
+QListView[objectName="lyrics_list_widget"]::item {
+	background: #eeeeff;
+	color: #000000;
+}
+QListView[objectName="lyrics_list_widget"]::item:hover {
+    background: #e0e0e2;
+	color: #000000;
+}
+QListView[objectName="lyrics_list_widget"]::item:selected {
+	background: #aaaaff;
+}
+QListView[objectName="lyrics_list_widget"] QWidget[objectName="editor_widget"] {
+    background: #aaaaff;
 }
 
 /*-------------------- QPushButton --------------------*/
@@ -96,7 +116,7 @@ QPushButton:pressed {
 	border-style: inset;
 }
 QPushButton:disabled {
-    background: #505050;
+    background: #505052;
     color: grey;
 }
 QPushButton:checked {
@@ -189,7 +209,7 @@ QTimeEdit::up-button:hover, QTimeEdit::down-button:hover {
 
 /*-------------------- QScrollBar --------------------*/
 QScrollBar {
-	background : #f0f0f0;
+	background : #f0f0f2;
 	color: #000000;
 }
 
@@ -238,7 +258,7 @@ QLineEdit:focus {
 QTextEdit {
     background: white;
     color: #000000;
-    border: 1px solid #f0f0f0;
+    border: 1px solid #f0f0f2;
 }
 
 /*-------------------- QMessageBox --------------------*/
@@ -288,18 +308,18 @@ QDialog {
 
 /*-------------------- QListWidget --------------------*/
 QListWidget {
-	background: #eeeeff;
+	background: #ffffff;
 	color: #000000;
 }
 QListView {
-    background: #eeeeff;
+    background: #f0f0f2;
 }
 QListView::item {
-	background: #eeeeee;
+	background: #eeeeff;
 	color: #000000;
 }
 QListView::item:hover {
-	background: #808080;
+	background: #e0e0e2;
 }
 QListView::item:selected {
 	background: #aaaaff;
@@ -340,6 +360,7 @@ QMenu::item:selected {
     background: #aaaaff;
 }
 QMenu::item:pressed {
+    height: 1px;
     background: #aaaaff;
 }
 
@@ -350,7 +371,7 @@ QTabWidget::pane {
 
 /*-------------------- QTabBar --------------------*/
 QTabBar {
-    background: #f0f0f0;
+    background: #f0f0f2;
     color: #000000;
 }
 QTabBar::tab {
@@ -362,10 +383,10 @@ QTabBar::tab {
     margin-right: 2px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    background: #c0c0c0;
+    background: #eeeeff;
 }
 QTabBar::tab:hover {
-    background: #aaaaff;
+    background: #e0e0e2;
 }
 QTabBar::tab:selected {
     background: #aaaaff;

@@ -271,7 +271,6 @@ class EditWidget(QDialog):
             self.song_order_list_widget.setAcceptDrops(True)
             self.song_order_list_widget.setDefaultDropAction(Qt.DropAction.MoveAction)
             self.song_order_list_widget.setMinimumWidth(120)
-            self.song_order_list_widget.setSpacing(5)
             self.song_order_list_widget.setToolTip('Press "Delete" to remove an item from the song order list')
             self.song_order_list_widget.setFont(self.gui.standard_font)
             lyrics_layout.addWidget(self.song_order_list_widget, 1, 1, 2, 1)
@@ -728,6 +727,21 @@ class EditWidget(QDialog):
                 outline_width = self.gui.main.settings['song_outline_width']
             else:
                 outline_width = self.data['outline_width']
+
+            if 'global' in str(self.data['use_shade']):
+                use_shade = self.gui.main.settings['song_use_shade']
+            else:
+                use_shade = self.data['use_shade']
+
+            if 'global' in str(self.data['shade_color']):
+                shade_color = self.gui.main.settings['song_shade_color']
+            else:
+                shade_color = self.data['shade_color']
+
+            if 'global' in str(self.data['shade_opacity']):
+                shade_opacity = self.gui.main.settings['song_shade_opacity']
+            else:
+                shade_opacity = self.data['shade_opacity']
         else:
             if self.data['type'] == 'custom':
                 font_face = self.gui.main.settings['bible_font_face']
@@ -764,9 +778,9 @@ class EditWidget(QDialog):
         lyric_widget.use_outline = use_outline
         lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
         lyric_widget.outline_width = outline_width
+        lyric_widget.use_shade = use_shade
         if not use_shade:
             shade_opacity = 0
-        lyric_widget.use_shade = use_shade
         lyric_widget.shade_color = shade_color
         lyric_widget.shade_opacity = shade_opacity
 
@@ -994,6 +1008,39 @@ class EditWidget(QDialog):
         lyrics_split = re.split(r'\[.*?]', lyrics, flags=re.S)
         lyrics_split.pop(0)
 
+        # Tags from some previous versions don't have the space character required in order to properly parse them.
+        # Convert them to the new format.
+        old_tag_found = False
+        for i in range(len(tag_list)):
+            if ' ' not in tag_list[i]:
+                old_tag_found = True
+                old_tag = tag_list[i].replace('[', '').replace(']', '')
+                tag_letter = old_tag[0]
+                tag_number = old_tag[1]
+
+                new_tag = 'Verse 1'
+                if 'v' in tag_letter.lower():
+                    new_tag = f'Verse {tag_number}'
+                elif 'p' in tag_letter.lower():
+                    new_tag = f'Pre-Chorus {tag_number}'
+                elif 'c' in tag_letter.lower():
+                    new_tag = f'Chorus {tag_number}'
+                elif 'b' in tag_letter.lower():
+                    new_tag = f'Bridge {tag_number}'
+                elif 't' in tag_letter.lower():
+                    new_tag = f'Tag {tag_number}'
+                elif 'e' in tag_letter.lower():
+                    new_tag = f'Ending {tag_number}'
+
+                tag_list[i] = f'[{new_tag}]'
+
+        if old_tag_found: # rewrite the lyrics text to conform to the proper format
+            text = ''
+            for i in range(len(tag_list)):
+                text += f'{tag_list[i]}<br/>{lyrics_split[i]}<br/>'
+            text = text[:-6]
+            self.data['text'] = text
+
         all_lyrics = ''
         for i in range(len(tag_list)):
             if lyrics_split[i].startswith('<br />'):
@@ -1010,7 +1057,6 @@ class EditWidget(QDialog):
 
             item = QStandardItem(f'{plain_tag}\n\n{plain_lyrics}')
             item.setData([tag_list[i], lyrics_split[i]], Qt.ItemDataRole.UserRole)
-            #item.setFlags(item.flags() | Qt.ItemFlag.ItemIsDragEnabled | Qt.ItemFlag.ItemIsDropEnabled)
             self.lyrics_list_widget.model().appendRow(item)
         
         all_lyrics = all_lyrics[:-6]
@@ -1034,7 +1080,9 @@ class EditWidget(QDialog):
         self.song_order_list_widget.clear()
         for i in range(len(order_items)):
             if len(order_items[i].strip()) > 0:
-                self.song_order_list_widget.addItem(order_items[i])
+                item = QListWidgetItem(order_items[i])
+                item.setSizeHint(QSize(0, 28))
+                self.song_order_list_widget.addItem(item)
 
         self.font_widget.blockSignals(True)
 
@@ -2098,13 +2146,13 @@ class SongOrderListWidget(QListWidget):
             lyric_type = data[0].split(' ')[0].replace('[', '')
             number = data[0].split(' ')[1].replace(']', '')
             item = QListWidgetItem(f'{lyric_type} {number}')
+            item.setSizeHint(QSize(0, 28))
             row = self.row(self.itemAt(evt.pos()))
             if row == -1:
                 self.addItem(item)
             else:
                 self.insertItem(row, item)
             self.update()
-            print(f"Item added to {hex(id(self))}, instance of type: {type(self)}. New count: {self.count()}")
         elif evt.source() == self:
             super().dropEvent(evt)
 

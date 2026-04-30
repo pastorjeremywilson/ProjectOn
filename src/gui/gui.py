@@ -157,47 +157,36 @@ class GUI(QObject):
 
         self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
 
+        # check number of screens, set the primary to the app's primary screen and the secondary to the same if only one
+        self.screens = self.main.app.screens()
+        if len(self.screens) > 1:
+            self.primary_screen = self.main.app.primaryScreen()
+            for screen in self.screens:
+                if screen.name != self.primary_screen.name():
+                    self.secondary_screen = screen
+        else:
+            self.primary_screen = self.main.app.primaryScreen()
+            self.secondary_screen = self.main.app.primaryScreen()
+
         # if settings exist, set the secondary screen (the display screen) to the one in the settings
         if len(self.main.settings) > 0:
-            self.secondary_screen = self.main.settings['selected_screen_name']
-
-        self.screens = self.main.app.screens()
-        screen_found = False
-        for screen in self.screens:
-            if screen.name == self.secondary_screen:
-                self.primary_screen = self.main.app.primaryScreen()
-                screen_found = True
-
-        if not screen_found:
-            self.primary_screen = self.main.app.primaryScreen()
-            self.secondary_screen = None
-            secondary_found = False
             for screen in self.screens:
-                if not screen.name() == self.primary_screen.name():
+                if screen.name == self.main.settings['selected_screen_name']:
                     self.secondary_screen = screen
-                    secondary_found = True
-            if not secondary_found:
-                self.secondary_screen = self.primary_screen
 
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
         self.init_components()
         self.add_widgets()
 
-        self.position_screens(self.primary_screen, self.secondary_screen)
-        self.sample_widget.show()
-        self.sample_widget.hide()
-
         self.main.update_status_signal.emit('Creating GUI: Building Menu Bar', 'status')
         self.create_menu_bar()
         self.main.update_status_signal.emit('Creating GUI: Creating Special Display Widgets', 'status')
         self.make_special_display_widgets()
 
-        if len(self.screens) > 1:
-            self.display_widget.show()
-            self.tool_bar.show_display_button.setChecked(False)
-        else:
-            self.tool_bar.show_display_button.setChecked(True)
+        self.position_screens(self.primary_screen, self.secondary_screen)
+        self.sample_widget.show()
+        self.sample_widget.hide()
 
         self.main.update_status_signal.emit('Finalizing', 'status')
         self.tool_bar.sw = IndexedSettingsWidget(self)
@@ -628,9 +617,6 @@ class GUI(QObject):
         import_bible_action = tool_menu.addAction('Import XML Bible')
         import_bible_action.triggered.connect(self.main.import_xml_bible)
 
-        delete_songs_action = tool_menu.addAction('Clear Song Database')
-        delete_songs_action.triggered.connect(self.main.delete_all_songs)
-
         ccli_credentials_action = tool_menu.addAction('Save/Change CCLI SongSelect Password')
         ccli_credentials_action.triggered.connect(self.save_ccli_password)
 
@@ -661,7 +647,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2.005'
+        current_version = 'v.1.9.2.006'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -877,7 +863,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2.005')
+        title_label = QLabel('ProjectOn v.1.9.2.006')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1273,21 +1259,7 @@ class GUI(QObject):
         :param secondary_screen: The second screen if it exists, the main screen if not
         :return:
         """
-        if secondary_screen:
-            self.primary_screen = primary_screen
-            self.secondary_screen = secondary_screen
-            display_geometry = self.secondary_screen.geometry()
-
-            self.display_widget.setFixedSize(self.secondary_screen.size())
-            self.display_widget.background_label.setFixedSize(self.secondary_screen.size())
-
-            self.sample_widget.setFixedSize(self.secondary_screen.size())
-            self.sample_widget.background_label.setFixedSize(self.secondary_screen.size())
-            self.sample_lyric_widget.set_geometry()
-
-            self.main_window.setGeometry(self.primary_screen.geometry())
-        # place the display widget in the main screen and hide it if there is only one screen
-        else:
+        if self.primary_screen == self.secondary_screen:
             self.primary_screen = primary_screen
             self.secondary_screen = primary_screen
 
@@ -1301,11 +1273,37 @@ class GUI(QObject):
 
             self.main_window.setGeometry(self.primary_screen.geometry())
 
-        self.display_widget.move(display_geometry.left(), display_geometry.top())
-        self.sample_widget.move(display_geometry.left(), display_geometry.top())
-        self.main_window.move(self.primary_screen.geometry().left(), self.primary_screen.geometry().top())
-        if not self.main.initial_startup:
-            self.main_window.showMaximized()
+            self.display_widget.move(display_geometry.left(), display_geometry.top())
+            self.sample_widget.move(display_geometry.left(), display_geometry.top())
+            self.main_window.move(self.primary_screen.geometry().left(), self.primary_screen.geometry().top())
+
+            # set the initial state of the screen buttons
+            self.tool_bar.black_screen_button.setChecked(False)
+            self.display_black_screen()
+            self.tool_bar.logo_screen_button.setChecked(True)
+            self.display_logo_screen()
+            self.tool_bar.hide_display_button.setChecked(True)
+            self.show_hide_display_screen()
+        # place the display widget in the main screen and hide it if there is only one screen
+        else:
+            self.primary_screen = primary_screen
+            self.secondary_screen = secondary_screen
+
+            self.display_widget.setFixedSize(self.secondary_screen.size())
+            self.display_widget.background_label.setFixedSize(self.secondary_screen.size())
+
+            self.sample_widget.setFixedSize(self.secondary_screen.size())
+            self.sample_widget.background_label.setFixedSize(self.secondary_screen.size())
+            self.sample_lyric_widget.set_geometry()
+
+            self.main_window.setGeometry(self.primary_screen.geometry())
+
+            # set the initial state of the screen buttons
+            self.tool_bar.black_screen_button.setChecked(False)
+            self.tool_bar.logo_screen_button.setChecked(True)
+            self.tool_bar.hide_display_button.setChecked(False)
+        #if not self.main.initial_startup:
+        #    self.main_window.showMaximized()
 
     def show_server_alert(self):
         """
@@ -1640,6 +1638,9 @@ class GUI(QObject):
         Method to change what it being displayed in the display widget or the hidden sample widget.
         :param str widget: 'live' or 'sample' widget that is being changed
         """
+        # we don't need things being futzed with while the program is still starting up
+        if self.main.initial_startup:
+            return
 
         display_widget = None
         lyric_widget = None
@@ -1660,14 +1661,16 @@ class GUI(QObject):
             if self.timed_update:
                 self.timed_update.stop = True
                 self.main.thread_pool.waitForDone()
-            if not self.blackout_widget.isHidden():
-                self.tool_bar.black_screen_button.setChecked(True)
-            if self.logo_widget and not self.logo_widget.isHidden():
-                self.tool_bar.logo_screen_button.setChecked(True)
-            if display_widget.isHidden():
+
+            # hide the black and logo screens and show the display widget
+            if self.tool_bar.hide_display_button.isChecked():
                 if not self.primary_screen == self.secondary_screen:
                     display_widget.show()
-                    self.tool_bar.show_display_button.setChecked(False)
+                    self.tool_bar.hide_display_button.setChecked(False)
+            if self.tool_bar.black_screen_button.isChecked():
+                self.tool_bar.black_screen_button.setChecked(False)
+            if self.tool_bar.logo_screen_button.isChecked():
+                self.tool_bar.logo_screen_button.setChecked(False)
 
         elif widget == 'sample':
             display_widget = self.sample_widget
@@ -2200,19 +2203,15 @@ class GUI(QObject):
         layout.addWidget(self.logo_label)
         self.display_layout.addWidget(self.logo_widget)
 
-        if len(self.main.settings['logo_image']) > 0:
-            pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['logo_image'])
-            if pixmap.isNull():
-                return
+        if len(self.main.settings['logo_image'].strip()) == 0:
+            self.main.settings['logo_image'] = 'background.png'
+        pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['logo_image'])
+        if not pixmap.isNull():
             pixmap = pixmap.scaled(
                 self.display_widget.size().width(), self.display_widget.size().height(),
                 Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation
             )
-            self.logo_label.setPixmap(pixmap)
-            self.logo_widget.show()
-            self.tool_bar.logo_screen_button.setChecked(True)
-        else:
-            self.logo_widget.hide()
+        self.logo_label.setPixmap(pixmap)
 
         if 'countdown_settings' not in self.main.settings.keys():
             self.main.settings['countdown_settings'] = {}
@@ -2230,6 +2229,7 @@ class GUI(QObject):
         self.lyric_widget.hide()
         self.web_view.hide()
         self.blackout_widget.hide()
+        self.logo_widget.hide()
 
     def make_video_widget(self):
         self.graphics_view = QGraphicsView()
@@ -2264,80 +2264,95 @@ class GUI(QObject):
         """
         Method to toggle between showing and hiding the display screen.
         """
-        if self.tool_bar.show_display_button.isChecked():
-            self.display_widget.show()
-            self.tool_bar.show_display_button.setChecked(False)
-        else:
+        if self.tool_bar.hide_display_button.isChecked():
             self.display_widget.hide()
-            self.tool_bar.show_display_button.setChecked(True)
+        else:
+            self.display_widget.show()
         self.live_widget.slide_list.setFocus()
 
     def display_black_screen(self):
         """
         Method to toggle a black screen on and off
         """
-        # ensure that the display widget is showing and hide the other widgets.py
         if self.tool_bar.black_screen_button.isChecked():
+            # ensure the display widget is not being hidden
+            if self.tool_bar.hide_display_button.isChecked():
+                self.tool_bar.hide_display_button.setChecked(False)
+                self.show_hide_display_screen()
+
+            # ensure that the logo widget is not being shown
+            if self.tool_bar.logo_screen_button.isChecked():
+                self.tool_bar.logo_screen_button.setChecked(False)
+                self.display_logo_screen()
+
+            self.blackout_widget.show()
+
+            # hide all the other widgets in the display widget
+            if not self.lyric_widget.isHidden():
+                self.lyric_widget.hide()
+            if self.video_widget and not self.video_widget.isHidden():
+                self.video_widget.hide()
+            if self.web_view and not self.web_view.isHidden():
+                self.web_view.hide()
+        else:
             self.blackout_widget.hide()
+
+            # if there is a currently-selected live item, show that
             if self.live_widget.slide_list.currentItem():
-                if self.live_widget.slide_list.currentItem().data(40) == 'web':
+                if self.tool_bar.logo_screen_button.isChecked():
+                    self.tool_bar.logo_screen_button.setChecked(False)
+
+                data = self.live_widget.slide_list.currentItem().data(Qt.ItemDataRole.UserRole)
+                if data['type'] == 'web':
                     self.web_view.show()
-                elif self.live_widget.slide_list.currentItem().data(40) == 'video':
+                elif data['type'] == 'video':
                     self.video_widget.show()
                 else:
                     self.lyric_widget.show()
-            self.tool_bar.black_screen_button.setChecked(False)
-        else:
+
+    def display_logo_screen(self):
+        """
+        Method to toggle the logo widget on and off
+        """
+        # make sure a logo image is set, use default if not
+        if len(self.main.settings['logo_image'].strip()) == 0 or 'choose' in self.main.settings['logo_image'].lower():
+            self.main.settings['logo_image'] = 'background.png'
+
+        if self.tool_bar.logo_screen_button.isChecked():
+            #ensure the display widget is not being hidden
+            if self.tool_bar.hide_display_button.isChecked():
+                self.tool_bar.hide_display_button.setChecked(False)
+                self.show_hide_display_screen()
+
+            # ensure the black widget is not being shown
+            if self.tool_bar.black_screen_button.isChecked():
+                self.tool_bar.black_screen_button.setChecked(False)
+                self.display_black_screen()
+
+            self.logo_widget.show()
+            self.logo_label.show()
+
             if not self.lyric_widget.isHidden():
                 self.lyric_widget.hide()
             if self.video_widget and not self.video_widget.isHidden():
                 self.video_widget.hide()
             if not self.web_view.isHidden():
                 self.web_view.hide()
-            if not self.logo_widget.isHidden():
-                self.logo_widget.hide()
-                self.tool_bar.logo_screen_button.setChecked(False)
-            if self.display_widget.isHidden():
-                self.tool_bar.show_display_button.setChecked(False)
-                self.display_widget.show()
-            self.blackout_widget.show()
-            self.tool_bar.black_screen_button.setChecked(True)
-        self.live_widget.slide_list.setFocus()
+        else:
+            self.logo_widget.hide()
 
-    def display_logo_screen(self):
-        """
-        Method to toggle the logo widget on and off
-        """
-        if len(self.main.settings['logo_image']) > 0:
-            if self.tool_bar.logo_screen_button.isChecked():
-                self.logo_widget.hide()
-
-                if self.live_widget.slide_list.currentItem():
-                    if self.live_widget.slide_list.currentItem().data(40) == 'web':
-                        self.web_view.show()
-                    elif self.live_widget.slide_list.currentItem().data(40) == 'video':
-                        self.video_widget.show()
-                    else:
-                        self.lyric_widget.show()
-                self.tool_bar.logo_screen_button.setChecked(False)
-
-            else:
-                if not self.lyric_widget.isHidden():
-                    self.lyric_widget.hide()
-                if self.video_widget and not self.video_widget.isHidden():
-                    self.video_widget.hide()
-                if not self.web_view.isHidden():
-                    self.web_view.hide()
-                if not self.blackout_widget.isHidden():
-                    self.blackout_widget.show()
+            if self.live_widget.slide_list.currentItem():
+                if self.tool_bar.black_screen_button.isChecked():
                     self.tool_bar.black_screen_button.setChecked(False)
-                if self.display_widget.isHidden():
-                    self.display_widget.show()
-                    self.tool_bar.show_display_button.setChecked(False)
 
-                self.logo_widget.show()
-                self.logo_label.show()
-                self.tool_bar.logo_screen_button.setChecked(True)
+                data = self.live_widget.slide_list.currentItem().data(Qt.ItemDataRole.UserRole)
+                if data['type'] == 'web':
+                    self.web_view.show()
+                elif data['type'] == 'video':
+                    self.video_widget.show()
+                else:
+                    self.lyric_widget.show()
+
         self.live_widget.slide_list.setFocus()
 
     def add_scripture_item(self, reference, text, version, scripture_edited):

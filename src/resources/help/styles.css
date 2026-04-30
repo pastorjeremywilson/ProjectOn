@@ -45,6 +45,11 @@ hr {
     border-bottom: 3px solid #5555aa;
 }
 
+.fullBlock {
+    display: block;
+    width: 100vw;
+}
+
 .wrap {
     float: left;
     margin: 10px;

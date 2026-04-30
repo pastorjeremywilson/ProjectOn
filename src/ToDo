@@ -14,11 +14,13 @@ Done:
     More definition to the lyrics edit list widget
     Pasting after tag turns green sometimes
     Switch lyric editor textEdit to formattable text edit
+    Fix web remote icons
+    Fix re \s \{ \|
+    Check styles in light theme
+    Fix checked buttons in the screen buttons
 
 To Do:
-    Fix re \s \{ \|
-    Fix web remote icons
-    Check styles in light theme
+    Figure out why the splash widget isn't being destroyed (edit song after initial start)
     Update the help widget
     Update READMEs
 

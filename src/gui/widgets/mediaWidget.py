@@ -487,7 +487,7 @@ class MediaWidget(QTabWidget):
 
                 list_item = QListWidgetItem(song_data['title'])
                 list_item.setData(Qt.ItemDataRole.UserRole, song_data)
-                list_item.setSizeHint(QSize(200, 28))
+                list_item.setSizeHint(QSize(0, 28))
 
                 self.song_list_items.append(list_item)
                 self.song_list.addItem(list_item.clone())

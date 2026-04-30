@@ -409,6 +409,7 @@ QMenu::item:pressed {
     background: #444466;
 }
 QMenu::separator {
+    height: 1px;
     background: #444466;
 }
 

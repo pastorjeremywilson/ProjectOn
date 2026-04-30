@@ -59,10 +59,6 @@ class OOSWidget(QWidget):
         move_up_button.setIconSize(QSize(10, 30))
         move_up_button.setToolTip('Move Item Up')
         move_up_button.setFixedWidth(20)
-        '''move_up_button.setStyleSheet(
-            'QPushButton { border: square; background: white; margin-top: 1px; border-bottom: 1px solid black; } '
-            'QPushButton:hover { background: lightGrey; }'
-        )'''
         move_up_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
         move_up_button.clicked.connect(self.move_item_up)
         container_layout.addWidget(move_up_button, 1, 1)
@@ -72,10 +68,6 @@ class OOSWidget(QWidget):
         move_down_button.setIconSize(QSize(10, 30))
         move_down_button.setToolTip('Move Item Down')
         move_down_button.setFixedWidth(20)
-        '''move_down_button.setStyleSheet(
-            'QPushButton { border: square; background: white; margin-bottom: 1px; } '
-            'QPushButton:hover { background: lightGrey; }'
-        )'''
         move_down_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.MinimumExpanding)
         move_down_button.clicked.connect(self.move_item_down)
         container_layout.addWidget(move_down_button, 2, 1)
@@ -119,7 +111,6 @@ class CustomListWidget(QListWidget):
         self.source_list_widget = None
 
         self.setAutoScroll(True)
-        #self.setMinimumHeight(int(self.gui.primary_screen.size().height() * 2 / 5))
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.context_menu)
         self.currentItemChanged.connect(self.preview_item)

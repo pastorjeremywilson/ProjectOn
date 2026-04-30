@@ -171,7 +171,7 @@ class OpenlyricsExport(QWidget):
                                      '<?xml-stylesheet href="../stylesheets/openlyrics.css" type="text/css"?>\n'
                                      + file_contents)
 
-                    invalid = '<>:"/\|?*'
+                    invalid = r'<>:"/\|?*'
                     for char in invalid:
                         title = title.replace(char, '')
 
