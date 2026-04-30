@@ -40,13 +40,12 @@ from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
 
-from declarations import SLIDE_DATA_DEFAULTS, SQL_COLUMN_TO_DICTIONARY_SONG, SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN, \
+from dataHandling.declarations import SLIDE_DATA_DEFAULTS, SQL_COLUMN_TO_DICTIONARY_SONG, SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN, \
     SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN, DB_STRUCTURE, SLIDE_DATA_DATA_TYPES, SQL_COLUMN_TO_DICTIONARY_CUSTOM
-from gui import GUI
-from runnables import SaveSettings, ServerCheckTimer
-from widgets import SimpleSplash
-from web_remote import RemoteServer
-from widgets import StandardItemWidget
+from gui.gui import GUI
+from core.runnables import SaveSettings, ServerCheckTimer
+from gui.widgets.widgets import SimpleSplash, StandardItemWidget
+from core.webRemote import RemoteServer
 
 
 class ProjectOn(QObject):
@@ -76,9 +75,10 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
 
-        # ensure we are working from the root directory of the program
-        file_dir = os.path.dirname(__file__)
-        os.chdir(file_dir)
+        # ensure we are working from the source root of the program
+        self.file_dir = os.path.dirname(os.path.dirname(__file__))
+        print(self.file_dir)
+        os.chdir(self.file_dir)
 
         if sys.platform == 'win32':
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
@@ -903,7 +903,7 @@ class ProjectOn(QObject):
 
                     elif service_dict[key]['type'] == 'bible':
                         if not self.gui.main.get_scripture:
-                            from get_scripture import GetScripture
+                            from dataHandling.getScripture import GetScripture
                             self.get_scripture = GetScripture(self)
                         passages = self.get_scripture.get_passage(service_dict[key]['title'])
 
@@ -1463,8 +1463,3 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
         f'{full_traceback}')
     message_box.setStandardButtons(QMessageBox.StandardButton.Close)
     message_box.exec()
-
-
-if __name__ == '__main__':
-    sys.excepthook = log_unhandled_exception
-    ProjectOn()

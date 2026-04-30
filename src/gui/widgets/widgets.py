@@ -4,7 +4,6 @@ import shutil
 import sqlite3
 import sys
 
-import requests
 from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF, QTime
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics
@@ -15,7 +14,7 @@ from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QLi
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
     QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog
 
-from openlp_import import OpenLPImport
+from importExport.openlpImport import OpenLPImport
 
 
 class AutoSelectLineEdit(QLineEdit):
@@ -2384,7 +2383,7 @@ class SettingsWidget(QWidget):
         return scroll_area
 
     def background_settings(self):
-        from widgets import ImageCombobox
+        from gui.widgets.widgets import ImageCombobox
 
         widget = QWidget()
         widget.setObjectName('settings_container')
@@ -2711,7 +2710,7 @@ class SettingsWidget(QWidget):
             except Exception:
                 self.gui.main.error_log()
 
-            from runnables import IndexImages
+            from core.runnables import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             ii.add_image_index(self.gui.main.background_dir + '/' + file_name, 'background')
 
@@ -2759,7 +2758,7 @@ class SettingsWidget(QWidget):
         label.setFont(self.gui.standard_font)
         layout.addWidget(label)
 
-        from widgets import ImageCombobox
+        from gui.widgets.widgets import ImageCombobox
         if type == 'background':
             combobox = ImageCombobox(self.gui, type='delete_background')
         elif type == 'image':
@@ -2797,7 +2796,7 @@ class SettingsWidget(QWidget):
                     self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
 
             splash = SimpleSplash(self.gui, 'Reindexing Images. Please Wait...')
-            from runnables import IndexImages
+            from core.runnables import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             self.gui.main.thread_pool.start(ii)
             self.gui.main.thread_pool.waitForDone()
@@ -2989,7 +2988,6 @@ class SettingsWidget(QWidget):
         self.gui.main.settings['stage_font_size'] = self.stage_font_spinbox.value()
 
         self.gui.main.settings['update_fps'] = self.fps_button_group.id(self.fps_button_group.checkedButton())
-        print(self.gui.main.settings['update_fps'])
 
         if self.stage_display_button_group.checkedId() == 0:
             self.gui.main.settings['mirror_stage_display'] = False
@@ -3372,8 +3370,6 @@ class IndexedSettingsWidget(QWidget):
         return widget
 
     def background_settings(self):
-        from widgets import ImageCombobox
-
         widget = QWidget()
         widget.setObjectName('settings_container')
         #widget.setMinimumWidth(self.min_width)
@@ -3719,7 +3715,7 @@ class IndexedSettingsWidget(QWidget):
             except Exception:
                 self.gui.main.error_log()
 
-            from runnables import IndexImages
+            from core.runnables import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             ii.add_image_index(self.gui.main.background_dir + '/' + file_name, 'background')
 
@@ -3767,7 +3763,7 @@ class IndexedSettingsWidget(QWidget):
         label.setFont(self.gui.standard_font)
         layout.addWidget(label)
 
-        from widgets import ImageCombobox
+        from gui.widgets.widgets import ImageCombobox
         if type == 'background':
             combobox = ImageCombobox(self.gui, type='delete_background')
         elif type == 'image':
@@ -3805,7 +3801,7 @@ class IndexedSettingsWidget(QWidget):
                     self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
 
             splash = SimpleSplash(self.gui, 'Reindexing Images. Please Wait...')
-            from runnables import IndexImages
+            from core.runnables import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             self.gui.main.thread_pool.start(ii)
             self.gui.main.thread_pool.waitForDone()
@@ -4465,7 +4461,7 @@ class Toolbar(QWidget):
             except Exception:
                 self.gui.main.error_log()
 
-            from runnables import IndexImages
+            from core.runnables import IndexImages
             ii = IndexImages(self.gui.main, 'backgrounds')
             ii.add_image_index(self.gui.main.background_dir + '/' + file_name, 'background')
             self.song_background_combobox.blockSignals(True)

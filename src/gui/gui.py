@@ -5,36 +5,33 @@ import re
 import shutil
 import sys
 import tempfile
-import time
 from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QPoint, QRect, QByteArray, QBuffer, QIODevice, \
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QRect, QByteArray, QBuffer, QIODevice, \
     QSize
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QFontDatabase, QPainter, QFontMetrics, \
-    QTextDocument
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile, QWebEngineSettings
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
-    QGraphicsView, QGraphicsScene, QTextEdit, QApplication, QStyleFactory
+    QGraphicsView, QGraphicsScene, QTextEdit, QApplication
 
-import declarations
-import parsers
-from get_github_events import get_release_notes
-from help import Help
-from importers import Importers
-from live_widget import LiveWidget
-from media_widget import MediaWidget
-from oos_widget import OOSWidget
-from openlyrics_export import OpenlyricsExport
-from preview_widget import PreviewWidget
-from runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
-from widgets import SimpleSplash, SettingsWidget, TextLayoutWidget, Toolbar, IndexedSettingsWidget
-from songselect_import import SongselectImport
-from widgets import CustomMainWindow, DisplayWidget, LyricDisplayWidget, StandardItemWidget, CountdownWidget
+from dataHandling import parsers, declarations
+from dataHandling.getGithubEvents import get_release_notes
+from gui.widgets.help import Help
+from importExport.importers import Importers
+from gui.widgets.liveWidget import LiveWidget
+from gui.widgets.mediaWidget import MediaWidget
+from gui.widgets.oosWidget import OOSWidget
+from importExport.openlyricsExport import OpenlyricsExport
+from gui.widgets.previewWidget import PreviewWidget
+from core.runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
+from gui.widgets.widgets import Toolbar, IndexedSettingsWidget, CustomMainWindow, DisplayWidget, \
+    LyricDisplayWidget, StandardItemWidget, CountdownWidget
+from importExport.songselectImport import SongselectImport
 
 
 class GUI(QObject):
@@ -148,7 +145,7 @@ class GUI(QObject):
         self.main.update_status_signal.emit('Indexing Images', 'status')
         self.main.app.processEvents()
 
-        from runnables import IndexImages
+        from core.runnables import IndexImages
 
         ii = IndexImages(self.main, 'backgrounds')
         self.main.thread_pool.start(ii)
@@ -429,14 +426,14 @@ class GUI(QObject):
 
         if not exists(self.main.background_dir):
             shutil.copytree('resources/defaults/data/backgrounds', self.main.background_dir)
-            from runnables import IndexImages
+            from core.runnables import IndexImages
             ii = IndexImages(self.main, 'backgrounds')
             self.main.thread_pool.start(ii)
             self.main.thread_pool.waitForDone()
 
         if not exists(self.main.image_dir):
             shutil.copytree('resources/defaults/data/images', self.main.image_dir)
-            from runnables import IndexImages
+            from core.runnables import IndexImages
             ii = IndexImages(self.main, 'images')
             self.main.thread_pool.start(ii)
             self.main.thread_pool.waitForDone()
@@ -841,11 +838,11 @@ class GUI(QObject):
 
         document = QTextDocument()
         document.setHtml(document_html)
-        from widgets import PrintDialog
+        from gui.widgets.widgets import PrintDialog
         PrintDialog(document)
 
     def ccli_import(self):
-        from songselect_import import SongselectImport
+        from importExport.songselectImport import SongselectImport
         SongselectImport(self)
 
     def chord_pro_import(self):

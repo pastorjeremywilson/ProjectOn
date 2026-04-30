@@ -1,5 +1,7 @@
 import engineio.async_drivers.gevent
 import re
+import os
+import sys
 
 import logging
 from http.server import BaseHTTPRequestHandler
@@ -20,7 +22,11 @@ class RemoteServer:
 
     def start_server(self):
         try:
-            self.app = Flask(__name__, template_folder='resources')
+            self.app = Flask(
+                __name__,
+                template_folder=os.path.abspath('.') + '/resources',
+                static_folder=os.path.abspath('.') + '/core/static'
+            )
             self.socketio = SocketIO(self.app, async_mode='gevent')
         except Exception:
             self.gui.main.error_log()

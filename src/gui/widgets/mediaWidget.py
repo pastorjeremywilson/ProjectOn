@@ -9,14 +9,12 @@ from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, QAction
-from unicodedata import numeric
 
-import declarations
-import parsers
-from declarations import SLIDE_DATA_DEFAULTS
-from edit_widget import EditWidget
-from get_scripture import GetScripture
-from widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash
+from dataHandling import parsers, declarations
+from dataHandling.declarations import SLIDE_DATA_DEFAULTS
+from gui.widgets.editWidget import EditWidget
+from dataHandling.getScripture import GetScripture
+from gui.widgets.widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash
 
 
 class MediaWidget(QTabWidget):
@@ -764,7 +762,7 @@ class MediaWidget(QTabWidget):
                 file_name = file_name_split[len(file_name_split) - 1]
                 shutil.copy(result[0], self.gui.main.image_dir + '/' + file_name)
 
-                from runnables import IndexImages
+                from core.runnables import IndexImages
                 ii = IndexImages(self.gui.main, 'images')
                 ii.add_image_index(self.gui.main.image_dir + '/' + file_name, 'image')
                 self.image_list.blockSignals(True)
@@ -794,7 +792,7 @@ class MediaWidget(QTabWidget):
                 QMessageBox.information(
                     self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
 
-            from runnables import IndexImages
+            from core.runnables import IndexImages
             ii = IndexImages(self.gui.main, 'images')
             self.gui.main.thread_pool.start(ii)
             self.gui.main.thread_pool.waitForDone()

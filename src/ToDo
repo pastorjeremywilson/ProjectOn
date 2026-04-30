@@ -13,9 +13,14 @@ Done:
     Add instructions on toggling back to set song order
     More definition to the lyrics edit list widget
     Pasting after tag turns green sometimes
+    Switch lyric editor textEdit to formattable text edit
 
 To Do:
-    Switch lyric editor textEdit to formattable text edit
+    Fix re \s \{ \|
+    Fix web remote icons
+    Check styles in light theme
+    Update the help widget
+    Update READMEs
 
 Future Releases:
     Standardize parsed_text - title - text across all slide types

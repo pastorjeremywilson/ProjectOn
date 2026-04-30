@@ -3,7 +3,7 @@ from PyQt5.QtGui import QCursor, QIcon, QDropEvent
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QLabel, QMenu, QGridLayout, \
     QPushButton, QSizePolicy, QMessageBox, QAction, QAbstractItemView
 
-from edit_widget import EditWidget
+from gui.widgets.editWidget import EditWidget
 
 
 class OOSWidget(QWidget):

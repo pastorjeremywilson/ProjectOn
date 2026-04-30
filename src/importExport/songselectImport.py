@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit
     QMessageBox, QDialog, QFileDialog, QCheckBox
 from cryptography.fernet import Fernet
 
-from widgets import SimpleSplash
+from gui.widgets.widgets import SimpleSplash
 
 
 class SongselectImport(QDialog):

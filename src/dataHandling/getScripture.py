@@ -4,7 +4,7 @@ from os.path import exists
 
 from PyQt5.QtWidgets import QMessageBox
 
-from parsers import ParseScriptureReference
+from dataHandling.parsers import ParseScriptureReference
 
 
 class GetScripture:

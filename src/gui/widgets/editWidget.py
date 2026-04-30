@@ -10,9 +10,9 @@ from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, 
     QSpinBox, QComboBox, QListWidgetItem, QTextEdit, QGroupBox, QAbstractItemView, QStyledItemDelegate, QListView, \
     QMenu, QAction
 
-import parsers
-from formattable_text_edit import FormattableTextEdit, CustomTextEdit
-from widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
+from dataHandling import parsers
+from gui.widgets.formattableTextEdit import FormattableTextEdit
+from gui.widgets.widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
 
 
 class EditWidget(QDialog):
@@ -54,7 +54,7 @@ class EditWidget(QDialog):
 
         self.main_widget.adjustSize()
         preferred_height = int(self.gui.primary_screen.size().height() * 4 / 5)
-        self.setGeometry(50, 50, self.scroll_area.width(), preferred_height)
+        self.setGeometry(50, 50, 1200, preferred_height)
         self.title_line_edit.setFocus()
         if type == 'song':
             self.populate_song_data()
@@ -217,24 +217,13 @@ class EditWidget(QDialog):
             lyrics_layout.setColumnStretch(0, 10)
             lyrics_layout.setColumnStretch(1, 5)
 
-        """self.lyrics_list_widget = LyricListWidget()
-        self.lyrics_list_widget.setObjectName('lyrics_list_widget')
-        self.lyrics_list_widget.setMinimumHeight(400)
-        self.lyrics_list_widget.setSpacing(5)
-        self.lyrics_list_widget.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
-        self.lyrics_list_widget.verticalScrollBar().setSingleStep(15)
-        self.lyrics_list_widget.setDragEnabled(True)
-        self.lyrics_list_widget.setAcceptDrops(True)
-        self.lyrics_list_widget.setDefaultDropAction(Qt.DropAction.MoveAction)
-        self.lyrics_list_widget.currentRowChanged.connect(self.update_preview_widget)
-        self.lyrics_list_widget.setFont(self.gui.standard_font)"""
-
         self.lyrics_list_widget = LyricListWidget(self.gui)
         self.lyrics_list_widget.setObjectName('lyrics_list_widget')
         self.lyrics_list_widget.setFont(self.gui.standard_font)
-        self.lyrics_list_widget.setMinimumHeight(400)
+        self.lyrics_list_widget.setMinimumSize(220, 400)
         self.lyrics_list_widget.setVerticalScrollMode(QListWidget.ScrollMode.ScrollPerPixel)
         self.lyrics_list_widget.verticalScrollBar().setSingleStep(15)
+        self.lyrics_list_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.lyrics_list_widget.setSpacing(5)
         model = QStandardItemModel()
         self.lyrics_list_widget.setModel(model)
@@ -525,7 +514,7 @@ class EditWidget(QDialog):
         background_color_radio_button.setFont(self.gui.standard_font)
         background_color_radio_button.clicked.connect(self.color_chooser)
 
-        from widgets import ImageCombobox
+        from gui.widgets.widgets import ImageCombobox
         self.background_combobox = ImageCombobox(self.gui, 'edit')
         self.background_combobox.currentIndexChanged.connect(self.background_combobox_change)
 
@@ -2299,6 +2288,7 @@ class LyricDelegate(QStyledItemDelegate):
         self.type_combobox = QComboBox()
         self.type_combobox.setFont(self.gui.standard_font)
         self.type_combobox.addItems(types)
+        self.type_combobox.setMinimumHeight(36)
         type_layout.addWidget(self.type_combobox)
 
         self.number_spinbox = QSpinBox()
