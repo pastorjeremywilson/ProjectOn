@@ -22,7 +22,7 @@ class Help(QMainWindow):
         self.title_font = QFont('Helvetica', 16, QFont.Weight.Bold)
         self.base_url = QUrl.fromLocalFile(os.getcwd() + os.path.sep)
         self.init_components()
-        self.show()
+        self.showMaximized()
 
     def init_components(self):
         self.setParent(self.gui.main_window)

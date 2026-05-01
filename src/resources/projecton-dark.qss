@@ -10,6 +10,12 @@ General Theme Colors:
     Disabled: #505050
 */
 
+/*-------------------- settings_title_label --------------------*/
+QLabel[objectName="settings_title_label"] {
+    background: #5555aa;
+    color: white;
+}
+
 /*-------------------- item_widget --------------------*/
 QWidget[objectName="item_widget"] {
     background: #00000000;
@@ -95,20 +101,6 @@ QListView[objectName="lyrics_list_widget"]::item:selected {
 }
 QListView[objectName="lyrics_list_widget"] QWidget[objectName="editor_widget"] {
     background: #404040;
-}
-
-/*-------------------- FontFaceComboBox --------------------*/
-QComboBox[objectName="FontFaceComboBox"] {
-    background: #a0a0a0;
-    color: #000000;
-    selection-background-color: #444466;
-    selection-color: #e0e0e0;
-    border: 1px solid #e0e0e0;
-}
-
-QComboBox[objectName="FontFaceComboBox"] QAbstractItemView {
-    background: #a0a0a0;
-    color: #000000;
 }
 
 /*-------------------- QGroupBox --------------------*/
@@ -462,6 +454,25 @@ QProgressBar::chunk {
 
 /*-------------------- QGroupBox --------------------*/
 QGroupBox {
+    color: #e0e0e0;
+}
+
+/*-------------------- QFontComboBox --------------------*/
+QFontComboBox {
+    background: #303030;
+    color: #e0e0e0;
+}
+QFontComboBox QAbstractItemView {
+    background: #303030;
+    selection-background-color: #555588;
+    color: #e0e0e0;
+}
+QFontComboBox QAbstractItemView::item {
+    background: #303030;
+    color: #e0e0e0;
+}
+QFontComboBox QAbstractItemView::item:selected {
+    background: #555588;
     color: #e0e0e0;
 }
 

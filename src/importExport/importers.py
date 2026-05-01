@@ -215,7 +215,7 @@ class Importers:
                                 save_lyrics = True
                     else:
                         this_line = re.sub(r'\[.*?]', '', content_split[i])
-                        this_line = re.sub('\s+', ' ', this_line)
+                        this_line = re.sub(r'\s+', ' ', this_line)
                         lyrics += this_line + '\n'
 
                 lyrics = 'n'.join(segments)
@@ -288,7 +288,7 @@ class Importers:
                         for item in data_split:
                             lyric_block = re.sub('<.*?>', '', item)
                             lyric_block = re.sub('\n+', '\n', lyric_block)
-                            lyric_block = re.sub('\s+', ' ', lyric_block)
+                            lyric_block = re.sub(r'\s+', ' ', lyric_block)
                             lyrics += lyric_block.strip() + '\n'
 
                 self.save_song(song_title, author, copyright, ccli_song_number, lyrics, order)

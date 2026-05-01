@@ -256,7 +256,7 @@ class GUI(QObject):
             create_new_button = QPushButton('Create New')
             create_new_button.setFont(self.standard_font)
             create_new_button.setMinimumHeight(36)
-            create_new_button.setToolTip('Create a new data directory in a folder of your choosing')
+            create_new_button.setToolTip('Create a new data directory')
             create_new_button.pressed.connect(lambda: dialog.done(2))
             button_layout.addWidget(create_new_button)
             button_layout.addSpacing(20)
@@ -281,17 +281,17 @@ class GUI(QObject):
             elif response == -1:
                 sys.exit(-1)
             elif response == 2:
-                result = QFileDialog.getExistingDirectory(
-                    None,
-                    'New Data Directory',
-                    os.path.expanduser('~')
-                )
-                if len(result) == 0:
-                    sys.exit(-1)
+                if 'linux' in sys.platform:
+                    data_dir_string = '~/.config/ProjectOn'
                 else:
-                    #TODO: Fix permissions
-                    self.main.data_dir = result + '/projecton_data'
-                    shutil.copytree('resources/defaults/data', self.main.data_dir)
+                    data_dir_string = '~/AppData/Roaming/ProjectOn'
+
+                self.main.data_dir = os.path.expanduser(data_dir_string)
+                if not exists(self.main.data_dir):
+                    os.mkdir(self.main.data_dir)
+
+                device_specific_settings['data_dir'] = self.main.data_dir
+                shutil.copytree('resources/defaults/data', self.main.data_dir)
 
         self.main.config_file = self.main.data_dir + '/settings.json'
         self.main.database = self.main.data_dir + '/projecton.db'
@@ -647,7 +647,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2.006'
+        current_version = 'v.1.9.2.007'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -863,7 +863,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2.006')
+        title_label = QLabel('ProjectOn v.1.9.2.007')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()

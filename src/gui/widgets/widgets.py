@@ -12,7 +12,7 @@ from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
-    QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog
+    QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog, QStyledItemDelegate
 
 from importExport.openlpImport import OpenLPImport
 
@@ -31,9 +31,10 @@ class AutoSelectLineEdit(QLineEdit):
 
 class ClickableColorSwatch(QLabel):
     color_changed = pyqtSignal()
-    def __init__(self, gui):
+    def __init__(self, gui, settings_widget=None):
         super().__init__()
         self.gui = gui
+        self.settings_widget = settings_widget
 
     def make_color_swatch_pixmap(self, rgb_color):
         if 'rgba' in rgb_color:
@@ -73,6 +74,9 @@ class ClickableColorSwatch(QLabel):
         rgb_color = f'rgba({chosen_color.red()}, {chosen_color.green()}, {chosen_color.blue()}, {chosen_color.alpha()})'
         self.make_color_swatch_pixmap(rgb_color)
         self.color_changed.emit()
+        if self.settings_widget:
+            self.settings_widget.raise_()
+            self.settings_widget.activateWindow()
 
 
 class CountdownWidget(QWidget):
@@ -271,7 +275,6 @@ class DisplayWidget(QWidget):
         # or scale it down if it is bigger
         super().paintEvent(evt)
         if self.background_pixmap:
-            #self.background_label.setStyleSheet('border: 5px solid green')
             p_width = self.background_pixmap.width()
             p_height = self.background_pixmap.height()
 
@@ -590,6 +593,7 @@ class FontWidget(QWidget):
         font_face_label.setFont(self.gui.bold_font)
         font_face_layout.addWidget(font_face_label)
 
+        self.font_face_combobox.setIconSize(QSize(1, 36))
         self.font_face_combobox.setFont(self.gui.standard_font)
         self.font_face_combobox.currentIndexChanged.connect(self.change_font)
         font_face_layout.addWidget(self.font_face_combobox)
@@ -1361,7 +1365,8 @@ class NewFontWidget(QWidget):
         font_face_label.setFont(self.gui.bold_font)
         font_style_layout.addWidget(font_face_label)
 
-        self.font_face_combobox.setFont(self.gui.standard_font)
+        delegate = FontComboboxDelegate(row_height=36, font_size=16)
+        self.font_face_combobox.setItemDelegate(delegate)
         self.font_face_combobox.setMinimumHeight(30)
         self.font_face_combobox.currentIndexChanged.connect(self.change_font)
         font_style_layout.addWidget(self.font_face_combobox)
@@ -1693,6 +1698,25 @@ class NewFontWidget(QWidget):
         super().hideEvent(evt)
 
 
+class FontComboboxDelegate(QStyledItemDelegate):
+    def __init__(self, parent=None, row_height=40, font_size=12):
+        super().__init__(parent)
+        self.row_height = row_height
+        self.font_size = font_size
+
+    def sizeHint(self, option, index):
+        size = super().sizeHint(option, index)
+        size.setHeight(40)
+        return size
+
+    def paint(self, painter, option, index):
+        font_name = index.data(Qt.DisplayRole)
+        font = QFont(font_name)
+        font.setPointSize(self.font_size)
+        option.font = font
+        super().paint(painter, option, index)
+
+
 class OffsetSlider(QWidget):
     """
     Creates a widget containing a QSlider and Label which lets the user set the distance of the display's shadow offset
@@ -1896,28 +1920,23 @@ class SimpleSplash:
         self.text = text
 
         self.widget = QWidget(parent)
-        self.widget.setStyleSheet('background: #6060c0;')
         self.widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.widget.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
         main_layout = QVBoxLayout(self.widget)
 
         container = QWidget()
         container.setObjectName('container')
-        container.setStyleSheet(
-            '#container { padding: 30px 20px; border: 3px solid white;}')
         container.setMinimumWidth(300)
         layout = QGridLayout(container)
         main_layout.addWidget(container)
 
         self.label = QLabel(text)
         self.label.setFont(self.gui.bold_font)
-        self.label.setStyleSheet('color: white; padding: 10px 5px;')
         layout.addWidget(self.label, 0, 0, Qt.AlignmentFlag.AlignHCenter)
 
         if subtitle:
             self.subtitle_label = QLabel(' ')
             self.subtitle_label.setFont(self.gui.list_font)
-            self.subtitle_label.setStyleSheet('color: white; padding: 10px 5px;')
             layout.addWidget(self.subtitle_label, 1, 0, Qt.AlignmentFlag.AlignHCenter)
 
         container.adjustSize()
@@ -2133,7 +2152,6 @@ class SettingsWidget(QWidget):
 
         ccli_title_label = QLabel('CCLI Information')
         ccli_title_label.setFont(self.gui.bold_font)
-        ccli_title_label.setStyleSheet('background: #5555aa; color: white')
         ccli_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(ccli_title_label)
 
@@ -2197,7 +2215,6 @@ class SettingsWidget(QWidget):
 
         display_title_label = QLabel('Display Settings')
         display_title_label.setFont(self.gui.bold_font)
-        display_title_label.setStyleSheet('background: #5555aa; color: white;')
         display_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(display_title_label, 0, 0, 1, index + 1)
 
@@ -2209,7 +2226,6 @@ class SettingsWidget(QWidget):
 
         stage_display_title_label = QLabel('Stage Display Settings')
         stage_display_title_label.setFont(self.gui.bold_font)
-        stage_display_title_label.setStyleSheet('background: #5555aa; color: white;')
         stage_display_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(stage_display_title_label, 5, 0, 1, index + 1)
 
@@ -2241,7 +2257,6 @@ class SettingsWidget(QWidget):
         if sys.platform == 'win32':
             rendering_title_label = QLabel('Rendering')
             rendering_title_label.setFont(self.gui.bold_font)
-            rendering_title_label.setStyleSheet('background: #5555aa; color: white;')
             rendering_title_label.setContentsMargins(5, 5, 5, 5)
             layout.addWidget(rendering_title_label, 7, 0, 1, index + 1)
 
@@ -2254,7 +2269,6 @@ class SettingsWidget(QWidget):
                 'Rending web pages on some AMD radeon graphics cards may cause ProjectOn to quit unexpectedly. If you '
                 'are experiencing this behavior check this box, save your settings, and restart the program.'
             )
-            software_details.setStyleSheet('border: none; background: rgba(0, 0, 0, 0);')
             software_details.setReadOnly(True)
             software_details.setCursor(Qt.CursorShape.ArrowCursor)
             software_details.setFont(self.gui.list_font)
@@ -2273,7 +2287,6 @@ class SettingsWidget(QWidget):
 
         display_title_label = QLabel('Preview Update Settings')
         display_title_label.setFont(self.gui.bold_font)
-        display_title_label.setStyleSheet('background: #5555aa; color: white;')
         display_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(display_title_label)
 
@@ -2323,7 +2336,6 @@ class SettingsWidget(QWidget):
 
         stage_title_label = QLabel('Stage Display Font Settings')
         stage_title_label.setFont(self.gui.bold_font)
-        stage_title_label.setStyleSheet('background: #5555aa; color: white')
         stage_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(stage_title_label)
 
@@ -2346,7 +2358,6 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Font Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -2393,7 +2404,6 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Global Background Settings')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -2473,7 +2483,6 @@ class SettingsWidget(QWidget):
 
         title_label = QLabel('Service Countdown')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -2507,9 +2516,10 @@ class SettingsWidget(QWidget):
         font_face_label.setFont(self.gui.standard_font)
         options_layout.addWidget(font_face_label, 1, 0)
 
-        #self.countdown_font_combobox = FontFaceComboBox(self.gui)
         self.countdown_font_combobox = QFontComboBox()
-        self.countdown_font_combobox.setFont(self.gui.standard_font)
+        delegate = FontComboboxDelegate(parent=self.countdown_font_combobox, row_height=36, font_size=16)
+        self.countdown_font_combobox.setItemDelegate(delegate)
+        self.countdown_font_combobox.setMinimumHeight(30)
         self.countdown_font_combobox.setCurrentIndex(
             self.countdown_font_combobox.findText(self.gui.main.settings['countdown_settings']['font_face']))
         self.countdown_font_combobox.currentIndexChanged.connect(self.countdown_changed)
@@ -3032,7 +3042,6 @@ class IndexedSettingsWidget(QWidget):
         self.setObjectName('settings_container')
         self.setParent(self.gui.main_window)
         self.setWindowFlag(Qt.WindowType.Window)
-        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowTitle('ProjectOn Settings')
         self.setMinimumWidth(1400)
         self.setMinimumHeight(700)
@@ -3088,8 +3097,9 @@ class IndexedSettingsWidget(QWidget):
             self.headings_list.setItemWidget(item, widget)
 
         self.settings_container = QWidget()
+        self.settings_container.setObjectName('settings_container')
         self.settings_scroll_area = QScrollArea()
-        self.settings_scroll_area.setStyleSheet('background-color: rgba(0, 0, 0, 0);')
+        self.settings_scroll_area.setAutoFillBackground(False)
         self.settings_scroll_area.setWidget(self.settings_container)
         self.settings_scroll_area.setWidgetResizable(True)
         self.settings_scroll_area.verticalScrollBar().valueChanged.connect(self.match_list_to_scroll)
@@ -3132,8 +3142,8 @@ class IndexedSettingsWidget(QWidget):
         layout = QVBoxLayout(widget)
 
         ccli_title_label = QLabel('CCLI Information')
+        ccli_title_label.setObjectName('settings_title_label')
         ccli_title_label.setFont(self.gui.bold_font)
-        ccli_title_label.setStyleSheet('background: #5555aa; color: white')
         ccli_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(ccli_title_label)
 
@@ -3197,8 +3207,8 @@ class IndexedSettingsWidget(QWidget):
             index += 1
 
         display_title_label = QLabel('Display Settings')
+        display_title_label.setObjectName('settings_title_label')
         display_title_label.setFont(self.gui.bold_font)
-        display_title_label.setStyleSheet('background: #5555aa; color: white;')
         display_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(display_title_label, 0, 0, 1, index + 1)
 
@@ -3209,8 +3219,8 @@ class IndexedSettingsWidget(QWidget):
             id += 1
 
         stage_display_title_label = QLabel('Stage Display Settings')
+        stage_display_title_label.setObjectName('settings_title_label')
         stage_display_title_label.setFont(self.gui.bold_font)
-        stage_display_title_label.setStyleSheet('background: #5555aa; color: white;')
         stage_display_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(stage_display_title_label, 5, 0, 1, index + 1)
 
@@ -3241,8 +3251,8 @@ class IndexedSettingsWidget(QWidget):
 
         if sys.platform == 'win32':
             rendering_title_label = QLabel('Rendering')
+            rendering_title_label.setObjectName('settings_title_label')
             rendering_title_label.setFont(self.gui.bold_font)
-            rendering_title_label.setStyleSheet('background: #5555aa; color: white;')
             rendering_title_label.setContentsMargins(5, 5, 5, 5)
             layout.addWidget(rendering_title_label, 7, 0, 1, index + 1)
 
@@ -3255,7 +3265,6 @@ class IndexedSettingsWidget(QWidget):
                 'Rending web pages on some AMD radeon graphics cards may cause ProjectOn to quit unexpectedly. If you '
                 'are experiencing this behavior check this box, save your settings, and restart the program.'
             )
-            software_details.setStyleSheet('border: none; background: rgba(0, 0, 0, 0);')
             software_details.setReadOnly(True)
             software_details.setCursor(Qt.CursorShape.ArrowCursor)
             software_details.setFont(self.gui.list_font)
@@ -3273,8 +3282,8 @@ class IndexedSettingsWidget(QWidget):
         widget.setLayout(layout)
 
         display_title_label = QLabel('Preview Update Settings')
+        display_title_label.setObjectName('settings_title_label')
         display_title_label.setFont(self.gui.bold_font)
-        display_title_label.setStyleSheet('background: #5555aa; color: white;')
         display_title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(display_title_label)
 
@@ -3325,8 +3334,8 @@ class IndexedSettingsWidget(QWidget):
         widget.setLayout(layout)
 
         title_label = QLabel('Font Settings')
+        title_label.setObjectName('settings_title_label')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -3377,8 +3386,8 @@ class IndexedSettingsWidget(QWidget):
         widget.setLayout(layout)
 
         title_label = QLabel('Global Background Settings')
+        title_label.setObjectName('settings_title_label')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -3451,8 +3460,8 @@ class IndexedSettingsWidget(QWidget):
         layout = QVBoxLayout(widget)
 
         title_label = QLabel('Service Countdown')
+        title_label.setObjectName('settings_title_label')
         title_label.setFont(self.gui.bold_font)
-        title_label.setStyleSheet('background: #5555aa; color: white')
         title_label.setContentsMargins(5, 5, 5, 5)
         layout.addWidget(title_label)
 
@@ -3489,8 +3498,9 @@ class IndexedSettingsWidget(QWidget):
         font_face_label.setFont(self.gui.standard_font)
         options_layout.addWidget(font_face_label, 1, 0)
 
-        #self.countdown_font_combobox = FontFaceComboBox(self.gui)
         self.countdown_font_combobox = QFontComboBox()
+        delegate = FontComboboxDelegate(row_height=36, font_size=16)
+        self.countdown_font_combobox.setItemDelegate(delegate)
         self.countdown_font_combobox.setFont(self.gui.standard_font)
         self.countdown_font_combobox.setMinimumHeight(40)
         self.countdown_font_combobox.setCurrentIndex(
@@ -3574,7 +3584,7 @@ class IndexedSettingsWidget(QWidget):
         background_color_label.setFont(self.gui.standard_font)
         options_layout.addWidget(background_color_label, 5, 0)
 
-        self.bg_color_swatch = ClickableColorSwatch(self.gui)
+        self.bg_color_swatch = ClickableColorSwatch(self.gui, self)
         self.bg_color_swatch.make_color_swatch_pixmap(self.gui.main.settings['countdown_settings']['bg_color'])
         self.bg_color_swatch.color_changed.connect(self.countdown_changed)
         options_layout.addWidget(self.bg_color_swatch, 6, 0)
@@ -3583,7 +3593,7 @@ class IndexedSettingsWidget(QWidget):
         foreground_color_label.setFont(self.gui.standard_font)
         options_layout.addWidget(foreground_color_label, 5, 1)
 
-        self.fg_color_swatch = ClickableColorSwatch(self.gui)
+        self.fg_color_swatch = ClickableColorSwatch(self.gui, self)
         self.fg_color_swatch.make_color_swatch_pixmap(self.gui.main.settings['countdown_settings']['fg_color'])
         self.fg_color_swatch.color_changed.connect(self.countdown_changed)
         options_layout.addWidget(self.fg_color_swatch, 6, 1)
@@ -4444,6 +4454,7 @@ class Toolbar(QWidget):
 
     def open_settings(self):
         self.sw.show()
+        self.sw.setFocus()
 
     def import_background(self):
         result = QFileDialog.getOpenFileName(

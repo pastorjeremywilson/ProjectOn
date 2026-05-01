@@ -47,7 +47,7 @@ hr {
 
 .fullBlock {
     display: block;
-    width: 100vw;
+    overflow: auto;
 }
 
 .wrap {

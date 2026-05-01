@@ -18,16 +18,19 @@ Done:
     Fix re \s \{ \|
     Check styles in light theme
     Fix checked buttons in the screen buttons
-
-To Do:
     Figure out why the splash widget isn't being destroyed (edit song after initial start)
     Update the help widget
+    Standardize parsed_text - title - text across all slide types
+    Further consolidate widgets
+    Fix the dropdowns in the service countdown settings
+    fix saving settings with countdown widget changes
     Update READMEs
 
+To Do:
+    Test with a new installation
+
 Future Releases:
-    Standardize parsed_text - title - text across all slide types
     Video backgrounds
-    Further consolidate widgets
     Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
     Create module folders
 

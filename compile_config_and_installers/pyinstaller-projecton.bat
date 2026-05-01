@@ -7,6 +7,8 @@
 -i "../src/resources/branding/logo.ico" ^
 --add-data "../src/resources;resources" ^
 --add-data "../src/core/static;core/static" ^
+--add-data "../src/README.html;." ^
+--add-data "../src/README.md;." ^
 ../src/__main__.py ^
 --name="ProjectOn"
 @pause

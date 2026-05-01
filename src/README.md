@@ -16,19 +16,16 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.9.2.006?
-- Fixed a crash that can happen when deleting an item from the media library
-- Major improvements to the way images are sent from ProjectOn to the stage view website
-- Added option for changing the Frames Per Second updates on the preview widget and stage view
-- Optimized video playback from web pages
-- Added a reload button when displaying a web page
-- Added a "Slide # of #" in the bottom-right of the stage view
-- Many other tweaks and bug fixes in the GUI and behind the scenes
+# What's New in Version 1.9.2.007?
+- Redesigned the song/custom slide editor to be cleaner and more intuitive
+- Updated the help screen to reflect recent changes
+- Improved the way data is stored and handled for each type of slide
+- Lots of bug improvements under the hood as well as visual improvements to the GUI
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.9.2.006) and run
+system only. Download the current ProjectOn installer (v.1.9.2.007) and run
 it on your computer.
 
 # Using ProjectOn
