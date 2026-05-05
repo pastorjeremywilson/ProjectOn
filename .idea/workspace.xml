@@ -7,16 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed OpenLP importing">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/intro.html" afterDir="false" />
-    </list>
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed printing of song lyrics" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -248,14 +239,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00141" summary="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
-      <option name="closed" value="true" />
-      <created>1757533285655</created>
-      <option name="number" value="00141" />
-      <option name="presentableId" value="LOCAL-00141" />
-      <option name="project" value="LOCAL" />
-      <updated>1757533285656</updated>
     </task>
     <task id="LOCAL-00142" summary="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
       <option name="closed" value="true" />
@@ -641,7 +624,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778012708837</updated>
     </task>
-    <option name="localTasksCounter" value="190" />
+    <task id="LOCAL-00190" summary="Fixed printing of song lyrics">
+      <option name="closed" value="true" />
+      <created>1778014259855</created>
+      <option name="number" value="00190" />
+      <option name="presentableId" value="LOCAL-00190" />
+      <option name="project" value="LOCAL" />
+      <updated>1778014259855</updated>
+    </task>
+    <option name="localTasksCounter" value="191" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -662,7 +653,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added selection between text and mirror for the stage view to the display settings. Added slightly different background to the button widgets in settings and edit windows. Moved the edit buttons outside of the QScrollArea to keep visible. Minor tweaks to the GUI colors in light mode." />
     <MESSAGE value="Fixed single-verse bible passage not able to be added to service. Ready for release." />
     <MESSAGE value="Added &quot;Slide # of #&quot; to stage display.&#10;Redesigned settings widget." />
     <MESSAGE value="Added button to live view widget to be displayed when showing a web page, allowing the user to reload that web page." />
@@ -687,7 +677,8 @@
     <MESSAGE value="Fixed OpenLyrics and ChordPro file imports." />
     <MESSAGE value="Improved the OpenLyrics exporting." />
     <MESSAGE value="Fixed OpenLP importing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed OpenLP importing" />
+    <MESSAGE value="Fixed printing of song lyrics" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed printing of song lyrics" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

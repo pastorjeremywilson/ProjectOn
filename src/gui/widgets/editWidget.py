@@ -1761,7 +1761,7 @@ class EditWidget(QDialog):
         self.data['font_size'] = self.font_widget.font_size_spinbox.value()
 
         self.data['use_shadow'] = self.font_widget.shadow_checkbox.isChecked()
-        self.datas['shadow_color'] = self.font_widget.shadow_color_slider.color_slider.value()
+        self.data['shadow_color'] = self.font_widget.shadow_color_slider.color_slider.value()
         self.data['shadow_offset'] = self.font_widget.shadow_offset_slider.offset_slider.value()
 
         self.data['use_outline'] = self.font_widget.outline_checkbox.isChecked()
@@ -1928,6 +1928,7 @@ class EditWidget(QDialog):
 
         self.save_widget = SimpleSplash(self.gui, 'Saving...')
 
+        self.update_custom_data()
         self.gui.main.save_custom(self.data, self.old_title)
         self.gui.media_widget.populate_custom_list()
 
