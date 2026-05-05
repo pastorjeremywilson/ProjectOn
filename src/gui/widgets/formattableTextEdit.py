@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor, QFont, QTextCharFormat, QIcon, QKeyEvent
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QListWidgetItem, QListWidget
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QListWidgetItem, QListWidget, \
+    QMenu, QAction
 
 
 class FormattableTextEdit(QWidget):
@@ -171,8 +172,12 @@ class CustomTextEdit(QTextEdit):
     Provides a QTextEdit that can differentiate between plain text or mime data when inserting.
     """
 
-    def __init__(self):
+    def __init__(self, lyrics_text_edit: bool=False):
         super().__init__()
+        if lyrics_text_edit:
+            self.cursorPositionChanged.connect(self.check_for_tag)
+            self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            self.customContextMenuRequested.connect(self.context_menu)
 
     def insertFromMimeData(self, mime_data):
         # Ensure it is text.
@@ -182,41 +187,6 @@ class CustomTextEdit(QTextEdit):
         # In case not text.
         else:
             QTextEdit.insertFromMimeData(self, mime_data)
-            
-    def keyPressEvent(self, evt):
-        """
-        Override keyPressEvent to provide listeners for certain keystrokes that may indicate that the tag list
-        needs to be updated
-        """
-        super().keyPressEvent(evt)
-        if evt.key() == Qt.Key.Key_BracketRight and self.parent().parent().objectName() == 'lyrics_widget':
-            parent = self.parent()
-            while parent.parent():
-                if parent.objectName() == 'edit_widget':
-                    cursor = self.textCursor()
-                    position = cursor.position()
-                    self.setHtml(parent.renumber_tags('all', self.toHtml()))
-                    cursor.setPosition(position)
-                    self.setTextCursor(cursor)
-                    parent.populate_tag_list()
-                    break
-                else:
-                    parent = parent.parent()
-        elif ((evt.key() == Qt.Key.Key_Delete or evt.key() == Qt.Key.Key_Backspace)
-              and self.parent().parent().objectName() == 'lyrics_widget'):
-            parent = self.parent()
-            while parent.parent():
-                if parent.objectName() == 'edit_widget':
-                    cursor = self.textCursor()
-                    position = cursor.position()
-                    self.setHtml(parent.renumber_tags('all', self.toHtml()))
-                    cursor.setPosition(position)
-                    self.setTextCursor(cursor)
-                    if parent.type == 'song':
-                        parent.populate_tag_list()
-                    break
-                else:
-                    parent = parent.parent()
 
     def focusInEvent(self, evt):
         parent = self.parent()
@@ -229,3 +199,78 @@ class CustomTextEdit(QTextEdit):
             parent = parent.parent()
 
         super().focusInEvent(evt)
+
+    def check_for_tag(self):
+        cursor = self.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.StartOfLine, QTextCursor.MoveMode.MoveAnchor)
+        cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
+        text = cursor.selectedText()
+        if '[' in text and ']' in text:
+            cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.MoveAnchor)
+            cursor.movePosition(QTextCursor.MoveOperation.Right)
+            self.setTextCursor(cursor)
+
+    def context_menu(self):
+        """
+        Method to create a QMenu to be used as a custom context menu.
+        """
+        if self.objectName() == 'lyrics_text_edit':
+            self.click_pos = self.mapFromGlobal(self.cursor().pos())
+
+            cursor = self.cursorForPosition(self.click_pos)
+            cursor.movePosition(QTextCursor.MoveOperation.StartOfLine, QTextCursor.MoveMode.MoveAnchor)
+            cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
+            text = cursor.selectedText()
+
+            if '[' in text and ']' in text:
+                menu = QMenu()
+                if self.gui.main.settings['theme'] == 'dark':
+                    menu.setStyleSheet(
+                        'QMenu {'
+                        'background: #000000;'
+                        'color: #e0e0e0;'
+                        '}'
+                        'QMenu::item {'
+                        'background: #000000;'
+                        'color: #e0e0e0;'
+                        '}'
+                        'QMenu::item:hover {'
+                        'background: #555588;'
+                        '}'
+                        'QMenu::item:selected {'
+                        'background: #444466;'
+                        '}'
+                        'QMenu::item:pressed {'
+                        'background: #444466;'
+                        '}'
+                    )
+                else:
+                    menu.setStyleSheet(
+                        'QMenu {'
+                        'background: #f0f0f0;'
+                        'color: #000000;'
+                        '}'
+                        'QMenu::item {'
+                        'background: #f0f0f0;'
+                        'color: #000000;'
+                        '}'
+                        'QMenuBar::item:hover {'
+                        'background: #aaaaff;'
+                        '}'
+                        'QMenu::item:selected {'
+                        'background: #aaaaff;'
+                        '}'
+                        'QMenu::item:pressed {'
+                        'background: #aaaaff;'
+                        '}'
+                    )
+
+                remove_tag_action = QAction('Remove Tag')
+                remove_tag_action.triggered.connect(lambda: self.remove_tag(cursor))
+                menu.addAction(remove_tag_action)
+
+                menu.exec(self.mapToGlobal(self.click_pos))
+
+    def remove_tag(self, cursor):
+        if self.objectName() == 'lyrics_text_edit':
+            cursor.removeSelectedText()

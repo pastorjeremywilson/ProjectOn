@@ -7,7 +7,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed printing of song lyrics" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed saving custom slide from editor">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/formattableTextEdit.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/formattableTextEdit.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,7 +56,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/pastorjeremywilson/ProjectOn&quot;,
-    &quot;accountId&quot;: &quot;77323ad5-efde-49a4-8c47-0663058923a8&quot;
+    &quot;accountId&quot;: &quot;ba54d33c-dedf-4901-b16d-42dffa67f651&quot;
   }
 }</component>
   <component name="MarkdownSettingsMigration">
@@ -239,14 +244,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00142" summary="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
-      <option name="closed" value="true" />
-      <created>1757533362962</created>
-      <option name="number" value="00142" />
-      <option name="presentableId" value="LOCAL-00142" />
-      <option name="project" value="LOCAL" />
-      <updated>1757533362962</updated>
     </task>
     <task id="LOCAL-00143" summary="Fixed problem sending bible passage to preview when verse number has greater than 2 digits">
       <option name="closed" value="true" />
@@ -632,7 +629,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778014259855</updated>
     </task>
-    <option name="localTasksCounter" value="191" />
+    <task id="LOCAL-00191" summary="Fixed saving custom slide from editor">
+      <option name="closed" value="true" />
+      <created>1778015663207</created>
+      <option name="number" value="00191" />
+      <option name="presentableId" value="LOCAL-00191" />
+      <option name="project" value="LOCAL" />
+      <updated>1778015663208</updated>
+    </task>
+    <option name="localTasksCounter" value="192" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -653,7 +658,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed single-verse bible passage not able to be added to service. Ready for release." />
     <MESSAGE value="Added &quot;Slide # of #&quot; to stage display.&#10;Redesigned settings widget." />
     <MESSAGE value="Added button to live view widget to be displayed when showing a web page, allowing the user to reload that web page." />
     <MESSAGE value="Fixed crash when deleting a web item (moved confirmation dialog to media_widget.py's delete_item method instead of the threaded main.delete_item method)." />
@@ -678,7 +682,8 @@
     <MESSAGE value="Improved the OpenLyrics exporting." />
     <MESSAGE value="Fixed OpenLP importing" />
     <MESSAGE value="Fixed printing of song lyrics" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed printing of song lyrics" />
+    <MESSAGE value="Fixed saving custom slide from editor" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed saving custom slide from editor" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

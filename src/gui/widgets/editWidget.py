@@ -234,7 +234,7 @@ class EditWidget(QDialog):
         self.lyrics_list_widget.setAcceptDrops(True)
         self.lyrics_list_widget.setDragDropOverwriteMode(False)
 
-        self.lyrics_text_edit = LyricsTextEdit(self.gui)
+        self.lyrics_text_edit = FormattableTextEdit(self.gui)
         self.lyrics_text_edit.setObjectName('lyrics_text_edit')
         self.lyrics_text_edit.setFont(self.gui.standard_font)
         self.lyrics_text_edit.hide()
@@ -630,7 +630,7 @@ class EditWidget(QDialog):
             self.preview_label_two.hide()
             self.tool_bar.show()
         else:
-            self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+            self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
             self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
             self.update_song_data()
             self.populate_song_data()
@@ -831,7 +831,9 @@ class EditWidget(QDialog):
             lyric_widget.footer_label.setText('')
             lyric_widget.footer_label.clear()
 
-        qss_font_color = f'rgb({font_color.red()}, {font_color.green()}, {font_color.blue()})'
+        qss_font_color = (f'rgb({lyric_widget.fill_color.red()}, '
+                          f'{lyric_widget.fill_color.green()}, '
+                          f'{lyric_widget.fill_color.blue()})')
         if not font_color == 'global':
             lyric_widget.footer_label.setStyleSheet(f'color: {qss_font_color}')
         else:
@@ -992,7 +994,7 @@ class EditWidget(QDialog):
         Use the provided data to set the proper widgets.py to match the saved data
         :param list of str song_data: The song's QListWidgetItem data
         """
-        self.lyrics_text_edit.clear()
+        self.lyrics_text_edit.text_edit.clear()
         self.lyrics_list_widget.model().clear()
         self.title_line_edit.setText(self.data['title'])
         self.author_line_edit.setText(self.data['author'])
@@ -1056,7 +1058,7 @@ class EditWidget(QDialog):
             self.lyrics_list_widget.model().appendRow(item)
         
         all_lyrics = all_lyrics[:-6]
-        self.lyrics_text_edit.setHtml(all_lyrics)
+        self.lyrics_text_edit.text_edit.setHtml(all_lyrics)
 
         order_items = self.data['verse_order'].split(' ')
         for i in range(len(order_items)):
@@ -1328,7 +1330,7 @@ class EditWidget(QDialog):
         """
         self.old_title = self.data['title']
         self.title_line_edit.setText(self.data['title'])
-        self.lyrics_text_edit.setHtml(self.get_simplified_text(self.data['text']))
+        self.lyrics_text_edit.text_edit.setHtml(self.get_simplified_text(self.data['text']))
         self.font_widget.blockSignals(True)
 
         # set the override global checkbox
@@ -1538,21 +1540,21 @@ class EditWidget(QDialog):
         :return:
         """
 
-        slider_pos = self.lyrics_text_edit.verticalScrollBar().sliderPosition()
+        slider_pos = self.lyrics_text_edit.text_edit.verticalScrollBar().sliderPosition()
 
         if self.sender().text() == 'os':
-            self.lyrics_text_edit.insertPlainText('\n#optional split#')
+            self.lyrics_text_edit.text_edit.insertPlainText('\n#optional split#')
 
         else:
             # search first for previous instances of this tag; append numbers to the tag for multiple instances
             tag_name = self.sender().text()
-            lyrics_text = self.lyrics_text_edit.toHtml()
+            lyrics_text = self.lyrics_text_edit.text_edit.toHtml()
             occurrences = re.findall(r'\[' + tag_name + '.*?]', lyrics_text)
 
             # determine if breaks are needed before or after the tag
             tag_start = '<br />'
             tag_end = '<br />'
-            cursor = self.lyrics_text_edit.textCursor()
+            cursor = self.lyrics_text_edit.text_edit.textCursor()
             cursor_pos = cursor.position()
             cursor.movePosition(QTextCursor.MoveOperation.PreviousCharacter, QTextCursor.MoveMode.KeepAnchor)
             if cursor.selection().toPlainText() == '\n' or cursor.position() == 0:
@@ -1563,14 +1565,14 @@ class EditWidget(QDialog):
                 tag_end = ''
 
             if len(occurrences) == 0:
-                self.lyrics_text_edit.insertHtml(
+                self.lyrics_text_edit.text_edit.insertHtml(
                     f'{tag_start}<span style="color:darkGreen;">[{tag_name} 1]</span>{tag_end}')
             else:
-                self.lyrics_text_edit.insertHtml(
+                self.lyrics_text_edit.text_edit.insertHtml(
                     f'{tag_start}<span style="color:darkGreen;">[{tag_name + tag_name}]</span>{tag_end}')
 
-                self.lyrics_text_edit.setHtml(self.renumber_tags(tag_name, self.lyrics_text_edit.toHtml()))
-                self.lyrics_text_edit.setFocus()
+                self.lyrics_text_edit.text_edit.setHtml(self.renumber_tags(tag_name, self.lyrics_text_edit.text_edit.toHtml()))
+                self.lyrics_text_edit.text_edit.setFocus()
 
                 cursor.setPosition(cursor_pos)
                 while True:
@@ -1581,10 +1583,10 @@ class EditWidget(QDialog):
 
                 cursor.clearSelection()
                 cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.MoveAnchor)
-                self.lyrics_text_edit.setTextCursor(cursor)
+                self.lyrics_text_edit.text_edit.setTextCursor(cursor)
 
-        self.lyrics_text_edit.verticalScrollBar().setSliderPosition(slider_pos)
-        self.lyrics_text_edit.setFocus()
+        self.lyrics_text_edit.text_edit.verticalScrollBar().setSliderPosition(slider_pos)
+        self.lyrics_text_edit.text_edit.setFocus()
 
     def renumber_tags(self, tag_name, html):
         """
@@ -1637,13 +1639,13 @@ class EditWidget(QDialog):
             self.song_section_list_widget.addItem(tag)
 
         return
-        lyrics_text = self.lyrics_text_edit.toPlainText()
+        lyrics_text = self.lyrics_text_edit.text_edit.toPlainText()
         tag_list = re.findall(r'[.*?]', lyrics_text)
         for tag in tag_list:
             self.song_section_list_widget.addItem(tag.replace('[', '').replace(']', ''))
 
     def print_lyrics(self):
-        lyrics = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+        lyrics = self.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
 
         song_order = []
         for i in range(self.song_order_list_widget.count()):
@@ -1672,14 +1674,14 @@ class EditWidget(QDialog):
 
     def update_song_data(self):
         if self.override_global_button.isChecked():
-            self.data['override_global'] = 'True'
+            self.data['override_global'] = True
         else:
-            self.data['override_global'] = 'False'
+            self.data['override_global'] = False
 
         if self.footer_checkbox.isChecked():
-            self.data['use_footer'] = 'true'
+            self.data['use_footer'] = True
         else:
-            self.data['use_footer'] = 'false'
+            self.data['use_footer'] = False
 
         if self.font_widget.font_face_combobox.currentText():
             self.data['font_family'] = self.font_widget.font_face_combobox.currentText()
@@ -1738,7 +1740,7 @@ class EditWidget(QDialog):
             verse_order += tag + ' '
         self.data['verse_order'] = verse_order.strip()
 
-        self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+        self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
         self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
         self.populate_song_data()
 
@@ -1782,7 +1784,7 @@ class EditWidget(QDialog):
         else:
             self.data['background'] = self.background_combobox.currentData(Qt.ItemDataRole.UserRole)
 
-        self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+        self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
 
         audio_file = ''
         if self.add_audio_button.isChecked() and not self.audio_combobox.currentText() == 'Choose an Audio File':
@@ -1808,6 +1810,7 @@ class EditWidget(QDialog):
         Method to save user's changes for the song type editor.
         """
 
+        self.update_song_data()
         # title is essential for the database, prompt user for title if not inputted
         if len(self.title_line_edit.text()) == 0:
             QMessageBox.information(
@@ -2036,6 +2039,7 @@ class LyricsTextEdit(QTextEdit):
     def __init__(self, gui):
         super().__init__()
         self.gui = gui
+
         self.cursorPositionChanged.connect(self.check_for_tag)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.context_menu)
@@ -2062,53 +2066,53 @@ class LyricsTextEdit(QTextEdit):
         text = cursor.selectedText()
 
         if '[' in text and ']' in text:
-            menu = QMenu()
-            if self.gui.main.settings['theme'] == 'dark':
-                menu.setStyleSheet(
-                    'QMenu {'
-                        'background: #000000;'
-                        'color: #e0e0e0;'
-                    '}'
-                    'QMenu::item {'
-                        'background: #000000;'
-                        'color: #e0e0e0;'
-                    '}'
-                    'QMenu::item:hover {'
-                        'background: #555588;'
-                    '}'
-                    'QMenu::item:selected {'
-                        'background: #444466;'
-                    '}'
-                    'QMenu::item:pressed {'
-                        'background: #444466;'
-                    '}'
-                )
-            else:
-                menu.setStyleSheet(
-                    'QMenu {'
-                        'background: #f0f0f0;'
-                        'color: #000000;'
-                    '}'
-                    'QMenu::item {'
-                        'background: #f0f0f0;'
-                        'color: #000000;'
-                    '}'
-                    'QMenuBar::item:hover {'
-                        'background: #aaaaff;'
-                    '}'
-                    'QMenu::item:selected {'
-                        'background: #aaaaff;'
-                    '}'
-                    'QMenu::item:pressed {'
-                        'background: #aaaaff;'
-                    '}'
-                )
+                menu = QMenu()
+                if self.gui.main.settings['theme'] == 'dark':
+                    menu.setStyleSheet(
+                        'QMenu {'
+                            'background: #000000;'
+                            'color: #e0e0e0;'
+                        '}'
+                        'QMenu::item {'
+                            'background: #000000;'
+                            'color: #e0e0e0;'
+                        '}'
+                        'QMenu::item:hover {'
+                            'background: #555588;'
+                        '}'
+                        'QMenu::item:selected {'
+                            'background: #444466;'
+                        '}'
+                        'QMenu::item:pressed {'
+                            'background: #444466;'
+                        '}'
+                    )
+                else:
+                    menu.setStyleSheet(
+                        'QMenu {'
+                            'background: #f0f0f0;'
+                            'color: #000000;'
+                        '}'
+                        'QMenu::item {'
+                            'background: #f0f0f0;'
+                            'color: #000000;'
+                        '}'
+                        'QMenuBar::item:hover {'
+                            'background: #aaaaff;'
+                        '}'
+                        'QMenu::item:selected {'
+                            'background: #aaaaff;'
+                        '}'
+                        'QMenu::item:pressed {'
+                            'background: #aaaaff;'
+                        '}'
+                    )
 
-            remove_tag_action = QAction('Remove Tag')
-            remove_tag_action.triggered.connect(lambda: self.remove_tag(cursor))
-            menu.addAction(remove_tag_action)
+                remove_tag_action = QAction('Remove Tag')
+                remove_tag_action.triggered.connect(lambda: self.remove_tag(cursor))
+                menu.addAction(remove_tag_action)
 
-            menu.exec(self.mapToGlobal(self.click_pos))
+                menu.exec(self.mapToGlobal(self.click_pos))
 
     def remove_tag(self, cursor):
         cursor.removeSelectedText()
@@ -2226,7 +2230,7 @@ class LyricDelegate(QStyledItemDelegate):
         self.gui = gui
         self.type_combobox = QComboBox()
         self.number_spinbox = QSpinBox()
-        self.lyrics_text_edit = QTextEdit()
+        self.lyrics_text_edit = FormattableTextEdit(self.gui)
         self.editing_index = None
 
     def createEditor(self, parent, option, index):
@@ -2285,7 +2289,8 @@ class LyricDelegate(QStyledItemDelegate):
         lyrics_html = lyrics_html[:-6]
         self.gui.edit_widget.data['text'] = lyrics_html
         self.gui.edit_widget.data['parsed_text'] = parsers.parse_song_data(self.gui, self.gui.edit_widget.data)
-        self.gui.edit_widget.lyrics_text_edit.setHtml(self.gui.edit_widget.get_simplified_text(lyrics_html))
+        self.gui.edit_widget.lyrics_text_edit.text_edit.setHtml(
+            self.gui.edit_widget.get_simplified_text(lyrics_html))
 
     def destroyEditor(self, editor, index):
         # Reset the editing index when done
