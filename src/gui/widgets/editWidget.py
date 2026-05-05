@@ -1,3 +1,4 @@
+import json
 import os.path
 import re
 from os.path import exists
@@ -1644,32 +1645,30 @@ class EditWidget(QDialog):
     def print_lyrics(self):
         lyrics = self.get_simplified_text(self.lyrics_text_edit.toHtml())
 
-        if '[' in lyrics:
-            song_order = []
-            for i in range(self.song_order_list_widget.count()):
-                tag = self.song_order_list_widget.item(i).text()
-                song_order.append(tag)
-            lyric_tags = re.findall(r'[.*?]', lyrics)
+        song_order = []
+        for i in range(self.song_order_list_widget.count()):
+            tag = self.song_order_list_widget.item(i).text()
+            song_order.append(tag)
 
-            song_segments = re.split(r'[.*?]', lyrics)
-            song_dict = {}
-            index = 1
-            for tag in lyric_tags:
-                song_dict[tag] = song_segments[index]
-                index += 1
+        lyric_tags = re.findall(r'\[.*?]', lyrics)
+        song_segments = re.split(r'\[.*?]', lyrics)
+        song_segments.pop(0)
 
-            document = QTextDocument()
-            document_html = (f'<span style="font-family: \'Arial\'; font-size: 16pt; font-weight: bold;">'
-                             f'{self.title_line_edit.text()}</span><br /><br />')
-            for tag in song_order:
-                document_html += (f'<span style="font-family: \'Arial\'; font-size: 12pt; font-weight: bold;">'
-                                  f'{tag}</span><br />')
-                tag = f'[{tag}]'
-                document_html += (f'<span style="font-family: \'Arial\'; font-size: 12pt;">'
-                                  f'{song_dict[tag]}</span><br /><br />')
-            document.setHtml(document_html)
+        song_dict = {}
+        for i in range(len(lyric_tags)):
+            song_dict[lyric_tags[i].replace('[', '').replace(']', '')] = song_segments[i]
 
-            PrintDialog(document)
+        document = QTextDocument()
+        document_html = (f'<span style="font-family: \'Arial\'; font-size: 16pt; font-weight: bold;">'
+                         f'{self.title_line_edit.text()}</span><br /><br />')
+        for tag in song_order:
+            document_html += (f'<span style="font-family: \'Arial\'; font-size: 12pt; font-weight: bold;">'
+                              f'{tag}</span><br />')
+            document_html += (f'<span style="font-family: \'Arial\'; font-size: 12pt;">'
+                              f'{song_dict[tag]}</span><br /><br />')
+        document.setHtml(document_html)
+
+        PrintDialog(document)
 
     def update_song_data(self):
         if self.override_global_button.isChecked():
