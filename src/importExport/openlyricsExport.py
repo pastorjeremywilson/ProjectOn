@@ -147,14 +147,20 @@ class OpenlyricsExport(QWidget):
                             if len(segment) > 0:
                                 tag_split = segment.split(']')
                                 tag = tag_split[0]
+                                short_tag_split = tag.split(' ')
+                                short_tag = short_tag_split[0][0].lower() + short_tag_split[1].strip()
 
                                 segment_split = re.split('<br.*?>', tag_split[1])
                                 for i in range(len(segment_split)):
                                     segment_split[i] = re.sub('<.*?>', '', segment_split[i])
                                 lyrics_text = '<br />'.join(segment_split)
+                                if lyrics_text.startswith('<br />'):
+                                    lyrics_text = lyrics_text[6:]
+                                if lyrics_text.endswith('<br />'):
+                                    lyrics_text = lyrics_text[:-6]
 
                                 verse_element = ElementTree.SubElement(lyrics, 'verse')
-                                verse_element.set('name', tag)
+                                verse_element.set('name', short_tag)
 
                                 lines = ElementTree.SubElement(verse_element, 'lines')
                                 lines.text = lyrics_text
@@ -178,4 +184,14 @@ class OpenlyricsExport(QWidget):
                     with open(result + '/' + title + '.xml', 'w', encoding='utf-8') as file:
                         file.write(file_contents)
 
+                if num_songs == 1:
+                    message = 'Your song has been successfully exported.'
+                else:
+                    message = 'Your songs have been successfully exported.'
+                QMessageBox.information(
+                    self.gui.main_window,
+                    'Export Complete',
+                    message,
+                    QMessageBox.StandardButton.Ok
+                )
                 self.deleteLater()

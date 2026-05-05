@@ -7,24 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed SongSelect lyrics file import; fixed custom background not loading for songs/custom slides">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed OpenLyrics and ChordPro file imports.">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dataHandling/parsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/parsers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/widgets.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/importExport/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/importers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/importExport/songselectImport.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/songselectImport.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/defaults/data/projecton.db" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/defaults/data/projecton.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/import.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/import.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/intro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/openlyricsExport.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/openlyricsExport.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -257,14 +244,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00137" summary="Fixed no-chapter bible books not parsing correctly when capitalized">
-      <option name="closed" value="true" />
-      <created>1757439505507</created>
-      <option name="number" value="00137" />
-      <option name="presentableId" value="LOCAL-00137" />
-      <option name="project" value="LOCAL" />
-      <updated>1757439505508</updated>
     </task>
     <task id="LOCAL-00138" summary="Fixed no-chapter bible books being added to the OOS as 'custom_scripture'">
       <option name="closed" value="true" />
@@ -650,7 +629,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777655155653</updated>
     </task>
-    <option name="localTasksCounter" value="186" />
+    <task id="LOCAL-00186" summary="Fixed OpenLyrics and ChordPro file imports.">
+      <option name="closed" value="true" />
+      <created>1778008536451</created>
+      <option name="number" value="00186" />
+      <option name="presentableId" value="LOCAL-00186" />
+      <option name="project" value="LOCAL" />
+      <updated>1778008536451</updated>
+    </task>
+    <option name="localTasksCounter" value="187" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -671,7 +658,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file." />
     <MESSAGE value="Tested, ready for release." />
     <MESSAGE value="Added code to send grab of display window to the stage webpage as jpg bytes." />
     <MESSAGE value="Added selection between text and mirror for the stage view to the display settings. Added slightly different background to the button widgets in settings and edit windows. Moved the edit buttons outside of the QScrollArea to keep visible. Minor tweaks to the GUI colors in light mode." />
@@ -696,7 +682,8 @@
     <MESSAGE value="Reorganized project files into a source directory and sub-directories; fixed relative paths in the code" />
     <MESSAGE value="Fixed the rest of the deprecated regedit strings; improved the light theme QSS; fixed the operation of the checkable screen buttons; began rewriting the help contents" />
     <MESSAGE value="Some more UI tweaks - fixed the background of QFontComboBoxes, other color adjustments" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some more UI tweaks - fixed the background of QFontComboBoxes, other color adjustments" />
+    <MESSAGE value="Fixed OpenLyrics and ChordPro file imports." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed OpenLyrics and ChordPro file imports." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
