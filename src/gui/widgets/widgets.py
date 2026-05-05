@@ -1672,7 +1672,6 @@ class NewFontWidget(QWidget):
             r, g, b = int(color_split[0]), int(color_split[1]), int(color_split[2])
 
         color = QColorDialog.getColor(QColor(r, g, b), self)
-        print(color.getRgb())
         rgb = color.getRgb()
         if color.isValid():
             color_string = str(rgb[0]) + ', ' + str(rgb[1]) + ', ' + str(rgb[2])

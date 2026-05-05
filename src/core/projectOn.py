@@ -1368,7 +1368,6 @@ class ProjectOn(QObject):
                 log_text = (f'\n{date_time}:\n'
                             f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
 
-            print(message_box_text)
             message_box = QMessageBox()
             message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
             message_box.setWindowTitle('An Error Occurred')

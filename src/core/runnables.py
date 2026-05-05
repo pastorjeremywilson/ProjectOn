@@ -98,7 +98,7 @@ class CheckFiles(QRunnable):
                 try:
                     self.main.settings = json.loads(file.read())
                 except json.decoder.JSONDecodeError:
-                    self.main.settings = {}
+                    self.main.settings = default_settings
         else:
             self.main.settings = default_settings
 

@@ -223,7 +223,6 @@ class SongselectImport(QDialog):
                                        'document.getElementById("sign-in").click();'
                                        ).format(user_name=user_name, password=password)
             result = self._run_javascript(script_set_login_fields)
-            print('result:', result)
 
     def _run_javascript(self, script):
         """
@@ -373,8 +372,6 @@ class SongselectImport(QDialog):
                 if marker in song_text_split[i].lower() and len(song_text_split[i]) < len(marker) + 3:
                     segment_marker_indices.append(i)
                     break
-
-        print(segment_marker_indices)
 
         index = 0
         formatted_song_text = ''

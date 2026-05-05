@@ -31,13 +31,12 @@ Done:
     Fixed songselect lyrics text file import
     Fixed openlyrics file import
     Fixed chordpro file import
+    Fixed openlp importing
 
 To Do:
     Test with a new installation
         New installation on two screens doesn't properly detect display screen, and display screen not showing
         Changing screen settings in settings widget crashes main window
-    Test importers
-        openlp
 
 Future Releases:
     Video backgrounds

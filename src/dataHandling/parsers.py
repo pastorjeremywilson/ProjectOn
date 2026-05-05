@@ -311,7 +311,6 @@ def parse_scripture_by_verse(gui, text):
     :param GUI gui: The current instance of GUI
     :param list of str text: The bible passage to be split
     """
-    print(text)
     # configure the hidden sample widget according to the current font
     gui.sample_lyric_widget.setFont(QFont(gui.main.settings['bible_font_face'], gui.main.settings['bible_font_size']))
     gui.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
@@ -368,7 +367,6 @@ def parse_scripture_by_verse(gui, text):
         count = 0
 
         while lyric_widget_height < target_height:
-            print(f'lyric_widget_height: {lyric_widget_height}, target_height: {target_height}')
             if count > 0:
                 if verse_index < len(text):
                     gui.sample_lyric_widget.setText(
@@ -420,7 +418,6 @@ def parse_scripture_by_verse(gui, text):
                     current_segment += text[index][0] + ' ' + text[index][1] + ' '
                 slide_texts.append(current_segment.strip())
 
-    print(slide_texts)
     return slide_texts
 
 

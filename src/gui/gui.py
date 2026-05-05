@@ -1794,7 +1794,7 @@ class GUI(QObject):
             # set the font
             if 'override_global' in item_data.keys() and item_data['override_global']:
                 lyric_widget.setFont(QFont(item_data['font_family'], item_data['font_size']))
-                font_color = self.get_font_color(item_data['font_color'])
+                font_color = self.get_font_color(item_data['font_color'], item_data['type'])
                 lyric_widget.fill_color = font_color
                 lyric_widget.footer_label.setFont(QFont(item_data['font_family'], self.global_footer_font_size))
                 lyric_widget.use_shadow = item_data['use_shadow']
@@ -1814,7 +1814,7 @@ class GUI(QObject):
                     slide_type = 'bible'
                 lyric_widget.setFont(
                     QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings['bible_font_size']))
-                font_color = self.get_font_color(self.main.settings[f'{slide_type}_font_color'])
+                font_color = self.get_font_color(self.main.settings[f'{slide_type}_font_color'], item_data['type'])
                 lyric_widget.fill_color = font_color
                 lyric_widget.use_shadow = self.main.settings[f'{slide_type}_use_shadow']
                 lyric_widget.shadow_color = QColor(
@@ -2049,7 +2049,7 @@ class GUI(QObject):
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
 
-    def get_font_color(self, font_color):
+    def get_font_color(self, font_color, slide_type):
         if font_color == 'white':
             font_color = QColor(Qt.GlobalColor.white)
         elif font_color == 'black':
@@ -2065,14 +2065,24 @@ class GUI(QObject):
             font_color = QColor(
                 int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
         else:
-            if self.main.settings['font_color'] == 'black':
-                font_color = QColor(0, 0, 0)
-            elif self.main.settings['font_color'] == 'white':
-                font_color = QColor(255, 255, 255)
+            if slide_type == 'song':
+                if self.main.settings['song_font_color'] == 'black':
+                    font_color = QColor(0, 0, 0)
+                elif self.main.settings['song_font_color'] == 'white':
+                    font_color = QColor(255, 255, 255)
+                else:
+                    font_color_split = self.main.settings['font_color'].split(', ')
+                    font_color = QColor(
+                        int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
             else:
-                font_color_split = self.main.settings['font_color'].split(', ')
-                font_color = QColor(
-                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+                if self.main.settings['bible_font_color'] == 'black':
+                    font_color = QColor(0, 0, 0)
+                elif self.main.settings['bible_font_color'] == 'white':
+                    font_color = QColor(255, 255, 255)
+                else:
+                    font_color_split = self.main.settings['bible_font_color'].split(', ')
+                    font_color = QColor(
+                        int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
 
         return font_color
 
