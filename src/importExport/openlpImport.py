@@ -1,3 +1,4 @@
+import json
 import os.path
 import os.path
 import re
@@ -6,6 +7,9 @@ from xml.etree import ElementTree as ET
 
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QLineEdit, QPushButton, QProgressBar, \
     QFileDialog, QMessageBox, QDialog
+
+from dataHandling.declarations import SLIDE_DATA_DEFAULTS
+from dataHandling.parsers import parse_song_data
 
 
 class OpenLPImport:
@@ -104,39 +108,30 @@ class OpenLPImport:
                     author = author[0]
                 else:
                     author = ''
-                copyright = song[5]
-                ccli_song_number = song[7]
-                song_order = song[4]
-                lyrics = song[3]
 
-                # rearrange the song's data to conform to the order used in this program's database
-                converted_lyrics = self.convert_lyrics(lyrics)
-                self.gui.main.save_song(
-                    [
-                        title,
-                        author,
-                        copyright,
-                        ccli_song_number,
-                        converted_lyrics,
-                        song_order,
-                        'true',
-                        'global',
-                        'global',
-                        'global_song',
-                        'global',
-                        'False',
-                        0,
-                        0,
-                        'False',
-                        0,
-                        0,
-                        'False',
-                        'False',
-                        100,
-                        100
-                    ]
-                )
-                self.progress_bar.setValue(self.progress_bar.value() + 1)
+                # remove 'o' tags and convert to 't' tags
+                verse_order = song[4]
+                verse_order_split = verse_order.strip().split(' ')
+                for i in range(len(verse_order_split)):
+                    if verse_order_split[i][0] == 'o':
+                        if len(verse_order_split[i]) > 1:
+                            verse_order_split[i] = 't' + verse_order_split[i][1]
+                        else:
+                            verse_order_split[i] = 't1'
+                verse_order = ' '.join(verse_order_split)
+
+                data = SLIDE_DATA_DEFAULTS
+                data['type'] = 'song'
+                data['title'] = title
+                data['author'] = author
+                data['copyright'] = song[5]
+                data['ccli_song_number'] = song[7]
+                data['verse_order'] = verse_order
+                data['text'] = self.convert_lyrics(song[3])
+                data['parsed_text'] = parse_song_data(self.gui, data)
+
+                self.gui.main.save_song(data)
+
             self.gui.media_widget.populate_song_list()
             self.widget.done(0)
 
@@ -164,6 +159,8 @@ class OpenLPImport:
             text = text.replace('[---]\n', '')
             text = text.replace('\n', '<br />')
             type = element.attrib['type'][0].lower()
+            if type == 'o':
+                type = 't'
             converted_lyrics += '[' + type + element.attrib['label'] + ']<p>' + text + '</p>'
 
         return converted_lyrics.strip()
