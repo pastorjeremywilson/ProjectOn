@@ -1,5 +1,6 @@
 import re
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtWidgets import QMessageBox
 
@@ -310,12 +311,11 @@ def parse_scripture_by_verse(gui, text):
     :param GUI gui: The current instance of GUI
     :param list of str text: The bible passage to be split
     """
+    print(text)
     # configure the hidden sample widget according to the current font
-    gui.sample_lyric_widget.setFont(
-        QFont(gui.main.settings['bible_font_face'], gui.main.settings['bible_font_size'], QFont.Weight.Bold))
+    gui.sample_lyric_widget.setFont(QFont(gui.main.settings['bible_font_face'], gui.main.settings['bible_font_size']))
     gui.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
     gui.sample_lyric_widget.footer_label.adjustSize()
-    #gui.sample_lyric_widget.paint_text()
 
     # get the size values for the lyric widget, footer label, and font metrics
     slide_texts = []
@@ -366,19 +366,21 @@ def parse_scripture_by_verse(gui, text):
         segment_indices.append([])
         lyric_widget_height = 0
         count = 0
+
         while lyric_widget_height < target_height:
+            print(f'lyric_widget_height: {lyric_widget_height}, target_height: {target_height}')
             if count > 0:
                 if verse_index < len(text):
                     gui.sample_lyric_widget.setText(
                         gui.sample_lyric_widget.text + ' ' + text[verse_index][0] + ' ' + text[verse_index][1])
-                    #gui.sample_lyric_widget.paint_text()
+                    gui.sample_lyric_widget.calculate_painted_text()
 
                     lyric_widget_height = gui.sample_lyric_widget.total_height
                 else:
                     break
             else:
                 gui.sample_lyric_widget.setText(text[verse_index][0] + ' ' + text[verse_index][1])
-                #gui.sample_lyric_widget.paint_text()
+                gui.sample_lyric_widget.calculate_painted_text()
 
                 lyric_widget_height = gui.sample_lyric_widget.total_height
 
@@ -418,6 +420,7 @@ def parse_scripture_by_verse(gui, text):
                     current_segment += text[index][0] + ' ' + text[index][1] + ' '
                 slide_texts.append(current_segment.strip())
 
+    print(slide_texts)
     return slide_texts
 
 

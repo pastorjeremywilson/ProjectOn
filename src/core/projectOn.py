@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.2.007
+ProjectOn v.1.9.2.008
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -35,7 +35,8 @@ from datetime import datetime
 from os.path import exists
 from xml.etree import ElementTree
 
-from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication
+from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
+    qInstallMessageHandler
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
@@ -74,6 +75,18 @@ class ProjectOn(QObject):
 
     def __init__(self):
         super().__init__()
+
+        def qt_message_handler(mode, context, message):
+            # Only intercept warnings (QtWarningMsg is 1)
+            if mode == QtMsgType.QtWarningMsg and "Could not parse stylesheet" in message:
+                print(f"\n--- Qt Warning Intercepted ---")
+                print(f"Message: {message}")
+                print("Locating source...")
+                traceback.print_stack()
+                print("-----------------------------\n")
+
+        # Install the handler at the very start of your script
+        qInstallMessageHandler(qt_message_handler)
 
         # ensure we are working from the source root of the program
         self.file_dir = os.path.dirname(os.path.dirname(__file__))
@@ -182,7 +195,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.2.007')
+        version_label = QLabel('v.1.9.2.008')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)

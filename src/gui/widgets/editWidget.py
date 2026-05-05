@@ -501,13 +501,9 @@ class EditWidget(QDialog):
 
         background_song_radio_button = QRadioButton('Use Global Song Background')
         background_song_radio_button.setFont(self.gui.standard_font)
-        background_song_radio_button.clicked.connect(
-            lambda: self.background_line_edit.setText('Use Global Song Background'))
 
         background_bible_default_radio_button = QRadioButton('Use Global Bible Background')
         background_bible_default_radio_button.setFont(self.gui.standard_font)
-        background_bible_default_radio_button.clicked.connect(
-            lambda: self.background_line_edit.setText('Use Global Bible Background'))
 
         background_color_radio_button = QRadioButton('Solid Color')
         background_color_radio_button.setFont(self.gui.standard_font)
@@ -595,10 +591,8 @@ class EditWidget(QDialog):
 
         if slide_type == 'song':
             self.background_button_group.button(0).setChecked(True)
-            self.background_line_edit.setText('Use Global Song Background')
         else:
             self.background_button_group.button(1).setChecked(True)
-            self.background_line_edit.setText('Use Global Bible Background')
 
         self.font_widget.font_size_spinbox.setValue(self.gui.main.settings[slide_type + '_font_size'])
 
@@ -836,8 +830,9 @@ class EditWidget(QDialog):
             lyric_widget.footer_label.setText('')
             lyric_widget.footer_label.clear()
 
+        qss_font_color = f'rgb({font_color.red()}, {font_color.green()}, {font_color.blue()})'
         if not font_color == 'global':
-            lyric_widget.footer_label.setStyleSheet(f'color: {font_color}')
+            lyric_widget.footer_label.setStyleSheet(f'color: {qss_font_color}')
         else:
             if self.gui.main.settings['font_color'] == 'black':
                 lyric_widget.footer_label.setStyleSheet('color: black;')
@@ -1532,7 +1527,6 @@ class EditWidget(QDialog):
         if len(file[0]) > 0:
             file_split = file[0].split('/')
             file_name = file_split[len(file_split) - 1]
-            self.background_line_edit.setText(file_name)
             self.gui.main.copy_image(file[0])
         self.background_image_radio_button.setChecked(True)
 
@@ -1718,14 +1712,14 @@ class EditWidget(QDialog):
         self.data['shade_opacity'] = self.font_widget.shade_opacity_slider.color_slider.value()
 
         background_button_text = self.background_button_group.checkedButton().text()
-        if 'song' in background_button_text.lower():
+        if 'global song' in background_button_text.lower():
             self.data['background'] = 'global_song'
-        elif 'bible' in background_button_text.lower():
+        elif 'global bible' in background_button_text.lower():
             self.data['background'] = 'global_bible'
-        elif 'color' in background_button_text.lower():
+        elif 'solid color' in background_button_text.lower():
             self.data['background'] = self.background_button_group.button(2).objectName()
         else:
-            self.data['background'] = self.background_combobox.currentText()
+            self.data['background'] = self.background_combobox.currentData(Qt.ItemDataRole.UserRole)
 
         if self.lyrics_list_widget.isVisible():
             lyrics_html = ''
@@ -1787,9 +1781,9 @@ class EditWidget(QDialog):
         elif 'color' in background_button_text.lower():
             self.data['background'] = self.background_button_group.button(2).objectName()
         else:
-            self.data['background'] = self.background_combobox.currentText()
+            self.data['background'] = self.background_combobox.currentData(Qt.ItemDataRole.UserRole)
 
-        text = self.get_simplified_text(self.lyrics_text_edit.toHtml())
+        self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.toHtml())
 
         audio_file = ''
         if self.add_audio_button.isChecked() and not self.audio_combobox.currentText() == 'Choose an Audio File':

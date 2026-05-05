@@ -471,7 +471,6 @@ class FontSample(QLabel):
 
         super().paintEvent(evt)
 
-
     def make_sample_background(self, rect):
         slide_type = self.settings_widget.slide_type
 
@@ -482,16 +481,16 @@ class FontSample(QLabel):
             return sample_background
         elif self.edit_widget:
             background_button_text = self.edit_widget.background_button_group.checkedButton().text()
-            if 'song' in background_button_text.lower():
+            if 'global song' in background_button_text.lower():
                 sample_background = QImage(
                     self.edit_widget.gui.main.background_dir + '/'
                     + self.edit_widget.gui.main.settings['global_song_background'])
-            elif 'bible' in background_button_text.lower():
+            elif 'global bible' in background_button_text.lower():
                 sample_background = QImage(
                     self.edit_widget.gui.main.background_dir + '/'
                     + self.edit_widget.gui.main.settings['global_bible_background'])
-            elif 'color' in background_button_text.lower():
-                background = self.edit_widget.background_button_group.button(2).objectData()
+            elif 'solid color' in background_button_text.lower():
+                background = self.edit_widget.background_button_group.button(2).objectName()
                 background = background.replace('rgb(', '')
                 background = background.replace(')', '')
                 background_split = background.split(', ')
@@ -1148,10 +1147,22 @@ class LyricDisplayWidget(QWidget):
         :param QPaintEvent evt: paintEvent
         """
 
+        painter = QPainter(self)
+        self.calculate_painted_text(painter)
+
+    def calculate_painted_text(self, painter=None):
+        """
+        Provides a method for performing all the drawing operations for the text that will be shown on the slide,
+        but it does so outside of the paintEvent. If the text is actually to be drawn, the widget's painter can be
+        passed to this method and the text will be painted on to it. If not, it will create its own painter and will
+        return the size of the text background rect in order to give feedback on the final size of the text + background
+        :param painter: QPainter
+        :return: QRectF
+
         palette = self.footer_label.palette()
         palette.setColor(QPalette.ColorRole.WindowText, self.fill_color)
-        self.footer_label.setPalette(palette)
-        
+        self.footer_label.setPalette(palette)"""
+
         self.total_height = 0
         self.text = re.sub('<p.*?>', '', self.text)
         self.text = re.sub('</p>', '', self.text)
@@ -1161,26 +1172,6 @@ class LyricDisplayWidget(QWidget):
         BOLD = 0
         ITALIC = 1
         UNDERLINE = 2
-
-        """text_lines = self.text.split('<br />')
-        line_height = self.fontMetrics().boundingRect('Way').height()
-        lines = []
-        for this_line in text_lines:
-            this_line = this_line.strip()
-
-            # split the lines according to their drawn length
-            if self.fontMetrics().boundingRect(this_line).width() < self.gui.display_widget.width() - 20:
-                lines.append(this_line)
-            else:
-                this_line_split = this_line.split(' ')
-                current_line = ''
-                for word in this_line_split:
-                    current_line = (current_line + ' ' + word).strip()
-                    print(current_line)
-                    if self.fontMetrics().boundingRect(current_line).width() > self.gui.display_widget.width() - 20:
-                        lines.append(' '.join(current_line.split(' ')[:-1]))
-                        current_line = word
-                lines.append(current_line)"""
 
         font = self.font()
         font_size = font.pointSize() + 2
@@ -1192,7 +1183,8 @@ class LyricDisplayWidget(QWidget):
         footer_height = self.footer_label.height()
         if self.footer_label.isHidden() or len(self.footer_label.text().strip()) == 0:
             footer_height = 0
-        usable_rect = QRect(0, 0, self.gui.display_widget.width(), self.gui.display_widget.height() - footer_height - 40)
+        usable_rect = QRect(0, 0, self.gui.display_widget.width(),
+                            self.gui.display_widget.height() - footer_height - 40)
         self.total_height = -1
         while self.total_height == -1 or self.total_height > usable_rect.height():
             longest_line = 0
@@ -1204,11 +1196,11 @@ class LyricDisplayWidget(QWidget):
             font = QFont(font.family(), font_size)
             self.setFont(font)
             line_height = self.fontMetrics().boundingRect('Way').height()
-            space_width = self.fontMetrics().boundingRect('w w').width() - self.fontMetrics().boundingRect('ww').width()
+            space_width = self.fontMetrics().horizontalAdvance(' ')
 
             lines = self.text.split('<br />')
             for i in range(len(lines)):
-                #if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
+                # if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
                 x = 0
                 y = 0
                 line_words = lines[i].split(' ')
@@ -1217,7 +1209,7 @@ class LyricDisplayWidget(QWidget):
                 painter_paths.append(QPainterPath())
                 path_index += 1
                 for word in line_words:
-                    #if len(re.sub('<.*?>', '', word).strip()) > 0:
+                    # if len(re.sub('<.*?>', '', word).strip()) > 0:
                     word_path.clear()
                     if '<b>' in word:
                         font.setWeight(1000)
@@ -1246,7 +1238,7 @@ class LyricDisplayWidget(QWidget):
             # get the total size of the paths that will be drawn for creating the shading rectangle
             self.total_height = 0
             for path in painter_paths:
-                #if path.boundingRect().width() > 0:
+                # if path.boundingRect().width() > 0:
                 self.total_height += line_height
                 if path.boundingRect().width() > longest_line:
                     longest_line = path.boundingRect().width()
@@ -1258,7 +1250,8 @@ class LyricDisplayWidget(QWidget):
         # the font's ascent (to account for the path's y being the baseline of the text) plus a 20px margin at the top
         path_y = (usable_rect.height() / 2) - (self.total_height / 2) + self.fontMetrics().ascent() + 20
         starting_y = path_y
-        painter = QPainter(self)
+        if not painter:
+            painter = QPainter()
         brush = QBrush()
         painter.setBrush(brush)
         pen = QPen()
@@ -1277,7 +1270,6 @@ class LyricDisplayWidget(QWidget):
         painter.fillRect(shade_rect, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
 
         for path in painter_paths:
-            #if path.boundingRect().width() > 0:
             path_x = (self.gui.display_widget.width() / 2) - (path.boundingRect().width() / 2)
             path.translate(path_x, path_y)
 
@@ -1300,6 +1292,8 @@ class LyricDisplayWidget(QWidget):
                 painter.strokePath(path, pen)
 
             path_y += line_height
+
+        return shade_rect
 
 
 class NewFontWidget(QWidget):
@@ -3955,24 +3949,26 @@ class IndexedSettingsWidget(QWidget):
                 self.gui.main.error_log()
 
     def save(self):
+        reposition_screens = False
         if not self.screen_button_group.checkedButton().objectName() == self.gui.main.settings['selected_screen_name']:
+            reposition_screens = True
             screen_name = self.screen_button_group.checkedButton().objectName()
 
             self.gui.main.settings['selected_screen_name'] = screen_name
             primary_screen = None
             secondary_screen = None
 
+            screens = self.gui.main.app.screens()
+
             if len(self.gui.main.app.screens()) == 1:
-                primary_screen = self.gui.main.app.screens()[0]
-                secondary_screen = self.gui.main.app.screens()[0]
+                primary_screen = screens[0]
+                secondary_screen = screens[0]
             else:
-                for screen in self.gui.main.app.screens():
-                    if screen_name in screen.name():
+                for screen in screens:
+                    if screen_name == screen.name():
                         secondary_screen = screen
                     else:
                         primary_screen = screen
-
-            self.gui.position_screens(primary_screen, secondary_screen)
 
         if sys.platform == 'win32':
             self.gui.main.settings['force_software_rendering'] = self.software_checkbox.isChecked()
@@ -4040,6 +4036,9 @@ class IndexedSettingsWidget(QWidget):
         self.gui.main.save_settings()
         self.gui.apply_settings(theme_too=False)
         self.hide()
+
+        if reposition_screens:
+            self.gui.position_screens(primary_screen, secondary_screen)
 
     def cancel(self):
         self.hide()

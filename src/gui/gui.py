@@ -10,8 +10,8 @@ from os.path import exists
 
 import requests
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QRect, QByteArray, QBuffer, QIODevice, \
-    QSize
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QTextDocument
+    QSize, QCoreApplication
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QTextDocument, QScreen
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile, QWebEngineSettings
@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidg
 
 from dataHandling import parsers, declarations
 from dataHandling.getGithubEvents import get_release_notes
+from dataHandling.parsers import parse_scripture_by_verse
 from gui.widgets.help import Help
 from importExport.importers import Importers
 from gui.widgets.liveWidget import LiveWidget
@@ -162,7 +163,7 @@ class GUI(QObject):
         if len(self.screens) > 1:
             self.primary_screen = self.main.app.primaryScreen()
             for screen in self.screens:
-                if screen.name != self.primary_screen.name():
+                if screen.name() != self.primary_screen.name():
                     self.secondary_screen = screen
         else:
             self.primary_screen = self.main.app.primaryScreen()
@@ -171,8 +172,10 @@ class GUI(QObject):
         # if settings exist, set the secondary screen (the display screen) to the one in the settings
         if len(self.main.settings) > 0:
             for screen in self.screens:
-                if screen.name == self.main.settings['selected_screen_name']:
+                if screen.name() == self.main.settings['selected_screen_name']:
                     self.secondary_screen = screen
+                else:
+                    self.primary_screen = screen
 
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
@@ -194,8 +197,6 @@ class GUI(QObject):
 
         if len(self.main.settings) > 0:
             self.apply_settings()
-
-        self.main_window.showMaximized()
 
         self.check_update()
 
@@ -647,7 +648,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2.007'
+        current_version = 'v.1.9.2.008'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -863,7 +864,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2.007')
+        title_label = QLabel('ProjectOn v.1.9.2.008')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1252,13 +1253,15 @@ class GUI(QObject):
 
         self.changes = False
 
-    def position_screens(self, primary_screen, secondary_screen=None):
+    def position_screens(self, primary_screen: QScreen, secondary_screen: QScreen):
         """
         Correctly sizes and positions the GUI and display widgets.py according to the screen layout
         :param primary_screen: The main screen from the settings or from discovery
         :param secondary_screen: The second screen if it exists, the main screen if not
         :return:
         """
+        self.primary_screen = primary_screen
+        self.secondary_screen = secondary_screen
         if self.primary_screen == self.secondary_screen:
             self.primary_screen = primary_screen
             self.secondary_screen = primary_screen
@@ -1271,11 +1274,12 @@ class GUI(QObject):
             self.sample_widget.background_label.setGeometry(self.sample_widget.geometry())
             self.sample_lyric_widget.set_geometry()
 
-            self.main_window.setGeometry(self.primary_screen.geometry())
-
-            self.display_widget.move(display_geometry.left(), display_geometry.top())
-            self.sample_widget.move(display_geometry.left(), display_geometry.top())
-            self.main_window.move(self.primary_screen.geometry().left(), self.primary_screen.geometry().top())
+            self.display_widget.move(display_geometry.topLeft())
+            self.sample_widget.move(display_geometry.topLeft())
+            self.main_window.move(display_geometry.topLeft())
+            self.main_window.setWindowState(Qt.WindowState.WindowMaximized)
+            QCoreApplication.processEvents()
+            self.main_window.show()
 
             # set the initial state of the screen buttons
             self.tool_bar.black_screen_button.setChecked(False)
@@ -1286,24 +1290,28 @@ class GUI(QObject):
             self.show_hide_display_screen()
         # place the display widget in the main screen and hide it if there is only one screen
         else:
-            self.primary_screen = primary_screen
-            self.secondary_screen = secondary_screen
-
+            self.display_widget.move(self.secondary_screen.geometry().topLeft())
             self.display_widget.setFixedSize(self.secondary_screen.size())
             self.display_widget.background_label.setFixedSize(self.secondary_screen.size())
 
+            self.sample_widget.setGeometry(self.secondary_screen.geometry())
             self.sample_widget.setFixedSize(self.secondary_screen.size())
             self.sample_widget.background_label.setFixedSize(self.secondary_screen.size())
             self.sample_lyric_widget.set_geometry()
 
-            self.main_window.setGeometry(self.primary_screen.geometry())
+            self.main_window.move(self.primary_screen.geometry().topLeft())
+            self.main_window.setWindowState(Qt.WindowState.WindowMaximized)
+
+            QCoreApplication.processEvents()
+            self.main_window.show()
 
             # set the initial state of the screen buttons
             self.tool_bar.black_screen_button.setChecked(False)
+            self.display_black_screen()
             self.tool_bar.logo_screen_button.setChecked(True)
+            self.display_logo_screen()
             self.tool_bar.hide_display_button.setChecked(False)
-        #if not self.main.initial_startup:
-        #    self.main_window.showMaximized()
+            self.show_hide_display_screen()
 
     def show_server_alert(self):
         """
@@ -1721,8 +1729,9 @@ class GUI(QObject):
             # set the background
             display_widget.background_label.clear()
             display_widget.setStyleSheet('#display_widget { background-color: none } ')
+
             if item_data['type'] == 'song' or item_data['type'] == 'custom':
-                if item_data['override_global'] == 'False':
+                if not item_data['override_global']:
                     if item_data['type'] == 'song':
                         display_widget.background_label.setPixmap(self.global_song_background_pixmap)
                     else:
@@ -1783,106 +1792,49 @@ class GUI(QObject):
                         lyrics_html = '<p style="align-text: center;">Unable to load webpage</p>'
 
             # set the font
-            if 'override_global' in item_data.keys() and item_data['override_global'] == 'True':
-                font_face = item_data['font_family']
-                font_size = int(item_data['font_size'])
-                font_color = item_data['font_color']
-                use_shadow = False
-                if item_data['use_shadow'] == 'True':
-                    use_shadow = True
-                if item_data['shadow_color'] and not item_data['shadow_color'] == 'None':
-                    shadow_color = int(item_data['shadow_color'])
-                else:
-                    shadow_color = self.main.settings['shadow_color']
-                if item_data['shadow_offset'] and not item_data['shadow_offset'] == 'None':
-                    shadow_offset = int(item_data['shadow_offset'])
-                else:
-                    shadow_offset = self.main.settings['shadow_offset']
-                use_outline = False
-                if item_data['use_outline'] == 'True':
-                    use_outline = True
-                if item_data['outline_color'] and not item_data['outline_color'] == 'None':
-                    outline_color = int(item_data['outline_color'])
-                else:
-                    outline_color = self.main.settings['outline_color']
-                if item_data['outline_width'] and not item_data['outline_width'] == 'None':
-                    outline_width = int(item_data['outline_width'])
-                else:
-                    outline_width = self.main.settings['outline_width']
-                if item_data['use_shade'] == 'True':
-                    use_shade = True
-                else:
-                    use_shade = False
-                shade_color = int(item_data['shade_color'])
-                shade_opacity = int(item_data['shade_opacity'])
-            else:
-                if item_data['type'] == 'bible' or item_data['type'] == 'custom':
-                    font_face = self.main.settings['bible_font_face']
-                    font_size = self.main.settings['bible_font_size']
-                    font_color = self.main.settings['bible_font_color']
-                    use_shadow = self.main.settings['bible_use_shadow']
-                    shadow_color = self.main.settings['bible_shadow_color']
-                    shadow_offset = self.main.settings['bible_shadow_offset']
-                    use_outline = self.main.settings['bible_use_outline']
-                    outline_color = self.main.settings['bible_outline_color']
-                    outline_width = self.main.settings['bible_outline_width']
-                    use_shade = self.main.settings['bible_use_shade']
-                    shade_color = self.main.settings['bible_shade_color']
-                    shade_opacity = self.main.settings['bible_shade_opacity']
-                else:
-                    font_face = self.main.settings['song_font_face']
-                    font_size = self.main.settings['song_font_size']
-                    font_color = self.main.settings['song_font_color']
-                    use_shadow = self.main.settings['song_use_shadow']
-                    shadow_color = self.main.settings['song_shadow_color']
-                    shadow_offset = self.main.settings['song_shadow_offset']
-                    use_outline = self.main.settings['song_use_outline']
-                    outline_color = self.main.settings['song_outline_color']
-                    outline_width = self.main.settings['song_outline_width']
-                    use_shade = self.main.settings['song_use_shade']
-                    shade_color = self.main.settings['song_shade_color']
-                    shade_opacity = self.main.settings['song_shade_opacity']
+            if 'override_global' in item_data.keys() and item_data['override_global']:
+                lyric_widget.setFont(QFont(item_data['font_family'], item_data['font_size']))
+                font_color = self.get_font_color(item_data['font_color'])
+                lyric_widget.fill_color = font_color
+                lyric_widget.footer_label.setFont(QFont(item_data['font_family'], self.global_footer_font_size))
+                lyric_widget.use_shadow = item_data['use_shadow']
+                lyric_widget.shadow_color = QColor(
+                    item_data['shadow_color'], item_data['shadow_color'], item_data['shadow_color'])
+                lyric_widget.shadow_offset = item_data['shadow_offset']
+                lyric_widget.use_outline = item_data['use_outline']
+                lyric_widget.outline_color = QColor(
+                    item_data['outline_color'], item_data['outline_color'], item_data['outline_color'])
+                lyric_widget.outline_width = item_data['outline_width']
+                lyric_widget.use_shade = item_data['use_shade']
+                lyric_widget.shade_color = item_data['shade_color'] # needs to be sent as an integer so opacity can be set by the lyric widget
+                lyric_widget.shade_opacity = item_data['shade_opacity']
+            elif item_data['type'] == 'song' or item_data['type'] == 'bible' or item_data['type'] == 'custom':
+                slide_type = item_data['type']
+                if slide_type == 'custom':
+                    slide_type = 'bible'
+                lyric_widget.setFont(
+                    QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings['bible_font_size']))
+                font_color = self.get_font_color(self.main.settings[f'{slide_type}_font_color'])
+                lyric_widget.fill_color = font_color
+                lyric_widget.use_shadow = self.main.settings[f'{slide_type}_use_shadow']
+                lyric_widget.shadow_color = QColor(
+                    self.main.settings[f'{slide_type}_shadow_color'],
+                    self.main.settings[f'{slide_type}_shadow_color'],
+                    self.main.settings[f'{slide_type}_shadow_color']
+                )
+                lyric_widget.shadow_offset = self.main.settings[f'{slide_type}_shadow_offset']
+                lyric_widget.use_outline = self.main.settings[f'{slide_type}_use_outline']
+                lyric_widget.outline_color = QColor(
+                    self.main.settings[f'{slide_type}_outline_color'],
+                    self.main.settings[f'{slide_type}_outline_color'],
+                    self.main.settings[f'{slide_type}_outline_color']
+                )
+                lyric_widget.outline_width = self.main.settings[f'{slide_type}_outline_width']
+                lyric_widget.use_shade = self.main.settings[f'{slide_type}_use_shade']
+                lyric_widget.shade_color = self.main.settings[f'{slide_type}_shade_color']  # needs to be sent as an integer so opacity can be set by the lyric widget
+                lyric_widget.shade_opacity = self.main.settings[f'{slide_type}_shade_opacity']
 
-            lyric_widget.setFont(QFont(font_face, font_size))
-            lyric_widget.footer_label.setFont(QFont(font_face, self.global_footer_font_size))
-            lyric_widget.use_shadow = use_shadow
-            lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
-            lyric_widget.shadow_offset = shadow_offset
-            lyric_widget.use_outline = use_outline
-            lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
-            lyric_widget.outline_width = outline_width
-            if not use_shade:
-                shade_opacity = 0
-            lyric_widget.use_shade = use_shade
-            lyric_widget.shade_color = shade_color
-            lyric_widget.shade_opacity = shade_opacity
-
-            # set the font color
-            if not font_color == 'global':
-                if font_color == 'white':
-                    lyric_widget.fill_color = QColor(Qt.GlobalColor.white)
-                elif font_color == 'black':
-                    lyric_widget.fill_color = QColor(Qt.GlobalColor.black)
-                elif '#' in font_color:
-                    color = font_color.replace('#', '')
-                    rgb_color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
-                    lyric_widget.fill_color = QColor(rgb_color)
-                else:
-                    color = font_color.replace('rgb(', '')
-                    color = color.replace(')', '')
-                    font_color_split = color.split(', ')
-                    lyric_widget.fill_color = QColor(
-                        int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
-            else:
-                if self.main.settings['font_color'] == 'black':
-                    lyric_widget.fill_color = QColor(0, 0, 0)
-                elif self.main.settings['font_color'] == 'white':
-                    lyric_widget.fill_color = QColor(255, 255, 255)
-                else:
-                    font_color_split = self.main.settings['font_color'].split(', ')
-                    lyric_widget.fill_color = QColor(
-                        int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
-
+            qss_font_color = f'rgb({font_color.red()}, {font_color.green()}, {font_color.blue()})'
             lyric_widget.text = lyrics_html
 
             # set the footer text
@@ -1898,6 +1850,7 @@ class GUI(QObject):
                 if len(self.main.settings['ccli_num']) > 0:
                     footer_text += '\nCCLI License #: ' + self.main.settings['ccli_num']
                 lyric_widget.footer_label.setText(footer_text)
+                lyric_widget.footer_label.setStyleSheet(f'color: {qss_font_color}')
             elif item_data['type'] == 'bible':
                 lyric_widget.footer_label.setText(
                     current_item.data(
@@ -1906,19 +1859,10 @@ class GUI(QObject):
                         + current_item.data(Qt.ItemDataRole.UserRole)['author']
                         + ')'
                     )
+                lyric_widget.footer_label.setStyleSheet(f'color: {qss_font_color}')
             else:
                 lyric_widget.footer_label.setText('')
                 lyric_widget.footer_label.clear()
-
-            if not font_color == 'global':
-                lyric_widget.footer_label.setStyleSheet(f'color: {font_color}')
-            else:
-                if self.main.settings['font_color'] == 'black':
-                    lyric_widget.footer_label.setStyleSheet('color: black;')
-                elif self.main.settings['font_color'] == 'white':
-                    lyric_widget.footer_label.setStyleSheet('color: white;')
-                else:
-                    lyric_widget.footer_label.setStyleSheet(f'color: rgb({self.main.settings["font_color"]});')
 
             if lyric_widget.footer_label.text() == '':
                 lyric_widget.footer_label.hide()
@@ -2104,6 +2048,33 @@ class GUI(QObject):
                     Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
+
+    def get_font_color(self, font_color):
+        if font_color == 'white':
+            font_color = QColor(Qt.GlobalColor.white)
+        elif font_color == 'black':
+            font_color = QColor(Qt.GlobalColor.black)
+        elif '#' in font_color:
+            color = font_color.replace('#', '')
+            rgb_color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
+            font_color = QColor(rgb_color)
+        elif 'rgb' in font_color:
+            color = font_color.replace('rgb(', '')
+            color = color.replace(')', '')
+            font_color_split = color.split(', ')
+            font_color = QColor(
+                int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+        else:
+            if self.main.settings['font_color'] == 'black':
+                font_color = QColor(0, 0, 0)
+            elif self.main.settings['font_color'] == 'white':
+                font_color = QColor(255, 255, 255)
+            else:
+                font_color_split = self.main.settings['font_color'].split(', ')
+                font_color = QColor(
+                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+
+        return font_color
 
     def update_stage_image(self, jpg_bytes):
         self.main.remote_server.socketio.emit('update_display', jpg_bytes)

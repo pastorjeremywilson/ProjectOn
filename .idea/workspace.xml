@@ -7,45 +7,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed the rest of the deprecated regedit strings; improved the light theme QSS; fixed the operation of the checkable screen buttons; began rewriting the help contents">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed SongSelect lyrics file import; fixed custom background not loading for songs/custom slides">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataHandling/parsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/parsers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/widgets/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/help.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/widgets.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/importExport/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/importers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/background_settings.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/background_settings.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/edit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/export.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/export.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/file_locations.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/file_locations.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/file_menu.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/file_menu.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/font_settings.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/font_settings.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/help_menu.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/help_menu.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/songselectImport.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/songselectImport.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/defaults/data/projecton.db" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/defaults/data/projecton.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/help/import.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/import.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/import.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/import.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/import_openlp.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/import_openlp.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/live.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/live.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/main_screen.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/main_screen.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/main_screen.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/main_screen.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/media.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/media.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/media_menu.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/media_menu.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/menu_bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/menu_bar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/oos.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/oos.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/preview.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/preview.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/remote.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/screen_settings.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/screen_settings.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/settings.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/settings.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/settings.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/toolbar.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/toolbar.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/tools_menu.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/tools_menu.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-dark.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-light.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/intro.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,8 +76,24 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="McpProjectServerCommands">
-    <commands />
-    <urls />
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="" />
+      <option name="programPath" value="" />
+      <option name="arguments" value="" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="" />
+      <option name="programPath" value="" />
+      <option name="arguments" value="" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -134,7 +129,7 @@
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;X:/Documents/Python Workspace/CrossWorks&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/LBCN Camp Planning&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -226,7 +221,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
       </set>
     </attachedChunks>
   </component>
@@ -262,14 +257,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00136" summary="Redesigned Font Widget using QGroupBox for each child widget.">
-      <option name="closed" value="true" />
-      <created>1757367588708</created>
-      <option name="number" value="00136" />
-      <option name="presentableId" value="LOCAL-00136" />
-      <option name="project" value="LOCAL" />
-      <updated>1757367588708</updated>
     </task>
     <task id="LOCAL-00137" summary="Fixed no-chapter bible books not parsing correctly when capitalized">
       <option name="closed" value="true" />
@@ -655,7 +642,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777585097670</updated>
     </task>
-    <option name="localTasksCounter" value="185" />
+    <task id="LOCAL-00185" summary="Some more UI tweaks - fixed the background of QFontComboBoxes, other color adjustments">
+      <option name="closed" value="true" />
+      <created>1777655155653</created>
+      <option name="number" value="00185" />
+      <option name="presentableId" value="LOCAL-00185" />
+      <option name="project" value="LOCAL" />
+      <updated>1777655155653</updated>
+    </task>
+    <option name="localTasksCounter" value="186" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -676,7 +671,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added option to settings to force software rendering in the event crashes rendering web pages on an AMD Radeon graphics card occurs. This setting will set QMLSCENE_DEVICE to 'softwarecontext' at startup." />
     <MESSAGE value="Added ability to view web console messages. Upgraded to PyQt v5.15.11 and QtWebEngine v5.15.7. Added requirements file." />
     <MESSAGE value="Tested, ready for release." />
     <MESSAGE value="Added code to send grab of display window to the stage webpage as jpg bytes." />
@@ -701,7 +695,8 @@
     <MESSAGE value="Changed the lyrics editor textEdit to FormattableTextEdit" />
     <MESSAGE value="Reorganized project files into a source directory and sub-directories; fixed relative paths in the code" />
     <MESSAGE value="Fixed the rest of the deprecated regedit strings; improved the light theme QSS; fixed the operation of the checkable screen buttons; began rewriting the help contents" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed the rest of the deprecated regedit strings; improved the light theme QSS; fixed the operation of the checkable screen buttons; began rewriting the help contents" />
+    <MESSAGE value="Some more UI tweaks - fixed the background of QFontComboBoxes, other color adjustments" />
+    <option name="LAST_COMMIT_MESSAGE" value="Some more UI tweaks - fixed the background of QFontComboBoxes, other color adjustments" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

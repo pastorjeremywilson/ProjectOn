@@ -25,12 +25,21 @@ Done:
     Fix the dropdowns in the service countdown settings
     fix saving settings with countdown widget changes
     Update READMEs
+    Custom slide background not saving
+    Bible passages not being parsed
+    Ensure that the footer is being properly accounted for in QLyricsDisplayWidget.calculate_painted_text
+    Fixed songselect lyrics text file import
+    Fixed openlyrics file import
+    Fixed chordpro file import
 
 To Do:
     Test with a new installation
+        New installation on two screens doesn't properly detect display screen, and display screen not showing
+        Changing screen settings in settings widget crashes main window
+    Test importers
+        openlp
 
 Future Releases:
     Video backgrounds
     Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
     Create module folders
-

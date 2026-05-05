@@ -12,6 +12,8 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit
     QMessageBox, QDialog, QFileDialog, QCheckBox
 from cryptography.fernet import Fernet
 
+from dataHandling.declarations import SLIDE_DATA_DEFAULTS
+from dataHandling.parsers import parse_song_data
 from gui.widgets.widgets import SimpleSplash
 
 
@@ -372,87 +374,37 @@ class SongselectImport(QDialog):
                     segment_marker_indices.append(i)
                     break
 
+        print(segment_marker_indices)
+
         index = 0
         formatted_song_text = ''
         order = []
         while index < len(song_text_split):
             if index in segment_marker_indices:
                 marker = song_text_split[index].strip()
-                formatted_marker = f'[{marker}]\n'
-                marker_split = marker.split(' ')
-                if len(marker_split) < 2:
-                    marker_split.append('1')
-                    formatted_marker = f'[{marker} 1]\n'
-                formatted_song_text += formatted_marker
-                marker_split[0] = marker_split[0].lower().strip()[0]
-                marker = ''.join(marker_split)
+                has_digit = any(char.isdigit() for char in marker)
+                if not has_digit:
+                    marker += ' 1'
+                formatted_marker = f'[{marker.capitalize()}]'
+                formatted_song_text += formatted_marker + '\n'
+
+                marker = marker.split(' ')[0][0].lower() + marker.split(' ')[1]
                 order.append(marker)
             else:
                 formatted_song_text += song_text_split[index] + '\n'
             index += 1
+        formatted_song_text = formatted_song_text.strip()
         order = ' '.join(order)
 
-        song_data = [
-            song_title,
-            author,
-            copyright,
-            song_number,
-            formatted_song_text,
-            order,
-            'true',
-            'global',
-            'global',
-            'global_song',
-            'global',
-            'False',
-            0,
-            0,
-            'False',
-            0,
-            0,
-            'False',
-            'False',
-            100,
-            100
-        ]
-
-        if song_title in self.gui.main.get_song_titles():
-            dialog = QDialog(self.gui.main_window)
-            dialog.setLayout(QVBoxLayout())
-            dialog.setWindowTitle('Song Title Exists')
-
-            label = QLabel('Unable to save song because this title already exists\n'
-                           'in the database. Please provide a different title:')
-            label.setFont(self.gui.standard_font)
-            dialog.layout().addWidget(label)
-
-            line_edit = QLineEdit(song_title + '(1)', dialog)
-            line_edit.setFont(self.gui.standard_font)
-            dialog.layout().addWidget(line_edit)
-
-            button_widget = QWidget()
-            button_widget.setLayout(QHBoxLayout())
-            dialog.layout().addWidget(button_widget)
-
-            ok_button = QPushButton('OK')
-            ok_button.setFont(self.gui.standard_font)
-            ok_button.clicked.connect(lambda: dialog.done(1))
-            button_widget.layout().addStretch()
-            button_widget.layout().addWidget(ok_button)
-            button_widget.layout().addStretch()
-
-            cancel_button = QPushButton('Cancel')
-            cancel_button.setFont(self.gui.standard_font)
-            cancel_button.clicked.connect(lambda: dialog.done(-1))
-            button_widget.layout().addWidget(cancel_button)
-            button_widget.layout().addStretch()
-
-            result = dialog.exec()
-
-            if result == 1:
-                song_data[0] = line_edit.text()
-            else:
-                return
+        song_data = SLIDE_DATA_DEFAULTS.copy()
+        song_data['type'] = 'song'
+        song_data['title'] = song_title
+        song_data['text'] = formatted_song_text
+        song_data['author'] = author
+        song_data['copyright'] = copyright
+        song_data['ccli_song_number'] = song_number
+        song_data['verse_order'] = order
+        song_data['parsed_text'] = parse_song_data(self.gui, song_data)
 
         save_widget = SimpleSplash(self.gui, 'Saving...')
 
@@ -463,7 +415,6 @@ class SongselectImport(QDialog):
             self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
 
         save_widget.widget.deleteLater()
-        os.remove(song_filename)
         self.done(0)
 
 
