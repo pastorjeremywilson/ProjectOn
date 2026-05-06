@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.2.013
+ProjectOn v.1.9.2.014
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -75,6 +75,7 @@ class ProjectOn(QObject):
 
     def __init__(self):
         super().__init__()
+        sys.excepthook = log_unhandled_exception
 
         def qt_message_handler(mode, context, message):
             # Only intercept warnings (QtWarningMsg is 1)
@@ -195,7 +196,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.2.013')
+        version_label = QLabel('v.1.9.2.014')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)

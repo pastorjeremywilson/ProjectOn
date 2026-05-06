@@ -1176,7 +1176,7 @@ class EditWidget(QDialog):
             self.font_widget.outline_checkbox.setChecked(False)
 
         # set the outline color slider's value
-        if not 'global' in str(self.data['outline_color']):
+        if 'global' in str(self.data['outline_color']):
             self.font_widget.outline_color_slider.color_slider.setValue(self.gui.main.settings['song_outline_color'])
         else:
             self.font_widget.outline_color_slider.color_slider.setValue(self.data['outline_color'])

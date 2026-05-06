@@ -1293,7 +1293,7 @@ class LyricDisplayWidget(QWidget):
 
             path_y += line_height
 
-        return shade_rect
+        return shade_rect, footer_height
 
 
 class NewFontWidget(QWidget):

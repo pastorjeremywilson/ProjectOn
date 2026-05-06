@@ -298,6 +298,20 @@ QComboBox::down-arrow:hover {
     background: #303030;
 }
 
+QComboBox QAbstractItemView {
+    background: #303030;
+    selection-background-color: #555588;
+    color: #e0e0e0;
+}
+QComboBox QAbstractItemView::item {
+    background: #303030;
+    color: #e0e0e0;
+}
+QComboBox QAbstractItemView::item:selected {
+    background: #555588;
+    color: #e0e0e0;
+}
+
 /*-------------------- QMessageBox --------------------*/
 QMessageBox {
     background: #000000;

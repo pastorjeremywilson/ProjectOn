@@ -32,11 +32,17 @@ Done:
     Fixed openlyrics file import
     Fixed chordpro file import
     Fixed openlp importing
+    Hymn #46 - Splitting title screen
+    Days of Elijah, Shine Jesus Shine - not splitting
+    Days of Elijah - editor not opening
+    Preview Preview and Live Preview not the same
+    Fix font color on type dropdown in editor
 
 To Do:
+    Footer font size in preview doesn't match footer font size in live
     Test with a new installation
-        New installation on two screens doesn't properly detect display screen, and display screen not showing
-        Changing screen settings in settings widget crashes main window
+        Dual screens still not positioning correctly
+        Dual screens not defaulting to showing display
 
 Future Releases:
     Video backgrounds

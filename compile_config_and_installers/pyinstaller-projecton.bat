@@ -6,9 +6,6 @@
 --workpath C:\Users\pasto\Desktop\output\work ^
 -i "../src/resources/branding/logo.ico" ^
 --exclude-module PyQt5.QtQuick ^
---exclude-module PyQt5.QtQml ^
---exclude-module PyQt5.QtNetwork ^
---exclude-module PyQt5.QtSql ^
 --add-data "../src/resources;resources" ^
 --add-data "../src/core/static;core/static" ^
 --add-data "../src/README.html;." ^

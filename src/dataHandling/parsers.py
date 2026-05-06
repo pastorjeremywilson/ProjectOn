@@ -193,9 +193,9 @@ def parse_song_data(gui, song_data):
             gui.sample_lyric_widget.footer_label.setText(footer_text)
             footer_height = gui.sample_lyric_widget.footer_label.height()
 
-        #gui.sample_lyric_widget.paint_text()
-        lyric_widget_height = gui.sample_lyric_widget.total_height
-        target_height = gui.display_widget.height() - gui.sample_lyric_widget.footer_label.height() - 40
+        lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
+        lyric_widget_height = lyrics_rect.height()
+        target_height = gui.display_widget.height() - footer_height - 40
 
         # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
         if lyric_widget_height > target_height:
@@ -314,11 +314,11 @@ def parse_scripture_by_verse(gui, text):
     # configure the hidden sample widget according to the current font
     gui.sample_lyric_widget.setFont(QFont(gui.main.settings['bible_font_face'], gui.main.settings['bible_font_size']))
     gui.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
-    gui.sample_lyric_widget.footer_label.adjustSize()
 
     # get the size values for the lyric widget, footer label, and font metrics
     slide_texts = []
-    target_height = gui.display_widget.height() - gui.sample_lyric_widget.footer_label.height() - 40
+    lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
+    target_height = gui.display_widget.height() - footer_height - 40
 
     # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
     # that needs to be parsed into verses and their corresponding verse numbers
@@ -366,21 +366,17 @@ def parse_scripture_by_verse(gui, text):
         lyric_widget_height = 0
         count = 0
 
-        while lyric_widget_height < target_height:
+        while lyrics_rect.height() < target_height:
             if count > 0:
                 if verse_index < len(text):
                     gui.sample_lyric_widget.setText(
                         gui.sample_lyric_widget.text + ' ' + text[verse_index][0] + ' ' + text[verse_index][1])
-                    gui.sample_lyric_widget.calculate_painted_text()
-
-                    lyric_widget_height = gui.sample_lyric_widget.total_height
+                    lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
                 else:
                     break
             else:
                 gui.sample_lyric_widget.setText(text[verse_index][0] + ' ' + text[verse_index][1])
-                gui.sample_lyric_widget.calculate_painted_text()
-
-                lyric_widget_height = gui.sample_lyric_widget.total_height
+                lyrics_rect, footer_height = gui.sample_lyric_widget.total_height
 
             segment_indices[current_segment_index].append(verse_index)
             count += 1

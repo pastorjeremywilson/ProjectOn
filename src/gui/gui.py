@@ -163,7 +163,7 @@ class GUI(QObject):
         if len(self.screens) > 1:
             self.primary_screen = self.main.app.primaryScreen()
             for screen in self.screens:
-                if screen.name() != self.primary_screen.name():
+                if screen != self.primary_screen:
                     self.secondary_screen = screen
         else:
             self.primary_screen = self.main.app.primaryScreen()
@@ -648,7 +648,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2.013'
+        current_version = 'v.1.9.2.014'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -864,7 +864,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2.013')
+        title_label = QLabel('ProjectOn v.1.9.2.014')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1280,6 +1280,8 @@ class GUI(QObject):
             self.main_window.setWindowState(Qt.WindowState.WindowMaximized)
             QCoreApplication.processEvents()
             self.main_window.show()
+            self.main_window.raise_()
+            self.main_window.activateWindow()
 
             # set the initial state of the screen buttons
             self.tool_bar.black_screen_button.setChecked(False)
@@ -1304,6 +1306,8 @@ class GUI(QObject):
 
             QCoreApplication.processEvents()
             self.main_window.show()
+            self.main_window.raise_()
+            self.main_window.activateWindow()
 
             # set the initial state of the screen buttons
             self.tool_bar.black_screen_button.setChecked(False)
@@ -1808,9 +1812,9 @@ class GUI(QObject):
                 lyric_widget.use_shade = item_data['use_shade']
                 lyric_widget.shade_color = item_data['shade_color'] # needs to be sent as an integer so opacity can be set by the lyric widget
                 lyric_widget.shade_opacity = item_data['shade_opacity']
-            elif item_data['type'] == 'song' or item_data['type'] == 'bible' or item_data['type'] == 'custom':
+            else:
                 slide_type = item_data['type']
-                if slide_type == 'custom':
+                if not slide_type == 'song':
                     slide_type = 'bible'
                 lyric_widget.setFont(
                     QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings['bible_font_size']))
@@ -2049,7 +2053,13 @@ class GUI(QObject):
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
 
-    def get_font_color(self, font_color, slide_type):
+    def get_font_color(self, font_color: str, slide_type: str):
+        """
+        Method to convert a string font color to a QColor object
+        :param font_color: String font color (white, rgb(255, 255, 255), #ffffff, etc.)
+        :param slide_type: The type of slide this color will be applied to
+        :return QColor: QColor object
+        """
         if font_color == 'white':
             font_color = QColor(Qt.GlobalColor.white)
         elif font_color == 'black':
