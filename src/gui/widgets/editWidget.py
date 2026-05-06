@@ -847,11 +847,11 @@ class EditWidget(QDialog):
         if lyric_widget.footer_label.text() == '':
             lyric_widget.footer_label.hide()
 
-        lyric_widget_height = lyric_widget.total_height
-        target_height = display_widget.height() - lyric_widget.footer_label.height() - 40
+        lyrics_height, footer_height = lyric_widget.calculate_painted_text()
+        target_height = display_widget.height() - footer_height - 40
 
         # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
-        if lyric_widget_height > target_height:
+        if lyrics_height > target_height:
             segment_text_split = re.split('<br.*?/>', lyrics_html)
             half_lines = int(len(segment_text_split) / 2)
             if half_lines > 1:

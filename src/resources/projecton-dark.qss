@@ -10,6 +10,23 @@ General Theme Colors:
     Disabled: #505050
 */
 
+/*-------------------- simple_splash --------------------*/
+QWidget[objectName="simple_splash"] {
+    background: #444466;
+    color: #e0e0e2;
+}
+QWidget[objectName="simple_splash_container"] {
+    border: 3px solid #e0e0e2;
+}
+QWidget[objectName="simple_splash_label"] {
+    padding: 10px;
+    color: #e0e0e2
+}
+QWidget[objectName="simple_splash_subtitle_label"] {
+    color: #e0e0e2;
+    padding-bottom: 10px;
+}
+
 /*-------------------- settings_title_label --------------------*/
 QLabel[objectName="settings_title_label"] {
     background: #5555aa;

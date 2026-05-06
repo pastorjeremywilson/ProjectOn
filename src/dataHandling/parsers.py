@@ -317,8 +317,6 @@ def parse_scripture_by_verse(gui, text):
 
     # get the size values for the lyric widget, footer label, and font metrics
     slide_texts = []
-    lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
-    target_height = gui.display_widget.height() - footer_height - 40
 
     # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
     # that needs to be parsed into verses and their corresponding verse numbers
@@ -356,16 +354,17 @@ def parse_scripture_by_verse(gui, text):
     recursion_count = 0
     parse_failed = False
     while verse_index < len(text):
-        recursion_count += 1
         if recursion_count > len(text):
             parse_failed = True
             break
+        recursion_count += 1
 
         # keep adding verses until the text overflows its widget, remove the last verse, and add to the slide texts
         segment_indices.append([])
-        lyric_widget_height = 0
         count = 0
-
+        gui.sample_lyric_widget.setText('')
+        lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
+        target_height = gui.display_widget.height() - footer_height - 40
         while lyrics_rect.height() < target_height:
             if count > 0:
                 if verse_index < len(text):
@@ -376,7 +375,7 @@ def parse_scripture_by_verse(gui, text):
                     break
             else:
                 gui.sample_lyric_widget.setText(text[verse_index][0] + ' ' + text[verse_index][1])
-                lyrics_rect, footer_height = gui.sample_lyric_widget.total_height
+                lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
 
             segment_indices[current_segment_index].append(verse_index)
             count += 1
@@ -386,7 +385,7 @@ def parse_scripture_by_verse(gui, text):
             if not verse_index == len(text):
                 segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
                 verse_index -= 1
-            elif verse_index == len(text) and lyric_widget_height > target_height:
+            elif verse_index == len(text) and lyrics_rect.height() > target_height:
                 segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
                 verse_index -= 1
 

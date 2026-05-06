@@ -163,6 +163,7 @@ class GUI(QObject):
         if len(self.screens) > 1:
             self.primary_screen = self.main.app.primaryScreen()
             for screen in self.screens:
+                print(f'screen: {screen}, name: {screen.name()}')
                 if screen != self.primary_screen:
                     self.secondary_screen = screen
         else:
@@ -170,7 +171,7 @@ class GUI(QObject):
             self.secondary_screen = self.main.app.primaryScreen()
 
         # if settings exist, set the secondary screen (the display screen) to the one in the settings
-        if len(self.main.settings) > 0:
+        if len(self.main.settings) > 0 and len(self.main.settings["selected_screen_name"].strip()) > 0:
             for screen in self.screens:
                 if screen.name() == self.main.settings['selected_screen_name']:
                     self.secondary_screen = screen
@@ -648,7 +649,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2.014'
+        current_version = 'v.1.9.2.015'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -864,7 +865,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2.014')
+        title_label = QLabel('ProjectOn v.1.9.2.015')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1818,6 +1819,7 @@ class GUI(QObject):
                     slide_type = 'bible'
                 lyric_widget.setFont(
                     QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings['bible_font_size']))
+                lyric_widget.footer_label.setFont(QFont(self.global_footer_font_face, self.global_footer_font_size))
                 font_color = self.get_font_color(self.main.settings[f'{slide_type}_font_color'], item_data['type'])
                 lyric_widget.fill_color = font_color
                 lyric_widget.use_shadow = self.main.settings[f'{slide_type}_use_shadow']

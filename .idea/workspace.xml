@@ -7,19 +7,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed wrongly setting some boolean slide dict entries as str">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed calculating the text size wrongly when parsing slide text to fit the screen">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/__main__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/dataHandling/parsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/parsers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/widgets.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-dark.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-light.qss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,15 +62,31 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/pastorjeremywilson/ProjectOn&quot;,
-    &quot;accountId&quot;: &quot;79296b6e-54c2-48a3-bb48-7e0ce6c05fc7&quot;
+    &quot;accountId&quot;: &quot;ba54d33c-dedf-4901-b16d-42dffa67f651&quot;
   }
 }</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="McpProjectServerCommands">
-    <commands />
-    <urls />
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="" />
+      <option name="programPath" value="" />
+      <option name="arguments" value="" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="" />
+      <option name="programPath" value="" />
+      <option name="arguments" value="" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -200,7 +214,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
       </set>
     </attachedChunks>
   </component>
@@ -236,14 +250,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00144" summary="Now saving audio attached to Custom Slides in the database as a blob">
-      <option name="closed" value="true" />
-      <created>1758921349584</created>
-      <option name="number" value="00144" />
-      <option name="presentableId" value="LOCAL-00144" />
-      <option name="project" value="LOCAL" />
-      <updated>1758921349585</updated>
     </task>
     <task id="LOCAL-00145" summary="Updated the readmes and version numbers. Ready for release.">
       <option name="closed" value="true" />
@@ -629,7 +635,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778018489247</updated>
     </task>
-    <option name="localTasksCounter" value="193" />
+    <task id="LOCAL-00193" summary="Fixed calculating the text size wrongly when parsing slide text to fit the screen">
+      <option name="closed" value="true" />
+      <created>1778093649604</created>
+      <option name="number" value="00193" />
+      <option name="presentableId" value="LOCAL-00193" />
+      <option name="project" value="LOCAL" />
+      <updated>1778093649604</updated>
+    </task>
+    <option name="localTasksCounter" value="194" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -650,7 +664,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added button to live view widget to be displayed when showing a web page, allowing the user to reload that web page." />
     <MESSAGE value="Fixed crash when deleting a web item (moved confirmation dialog to media_widget.py's delete_item method instead of the threaded main.delete_item method)." />
     <MESSAGE value="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch." />
     <MESSAGE value="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps." />
@@ -675,7 +688,8 @@
     <MESSAGE value="Fixed printing of song lyrics" />
     <MESSAGE value="Fixed saving custom slide from editor" />
     <MESSAGE value="Fixed wrongly setting some boolean slide dict entries as str" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed wrongly setting some boolean slide dict entries as str" />
+    <MESSAGE value="Fixed calculating the text size wrongly when parsing slide text to fit the screen" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed calculating the text size wrongly when parsing slide text to fit the screen" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

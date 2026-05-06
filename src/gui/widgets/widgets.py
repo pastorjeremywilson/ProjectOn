@@ -1913,22 +1913,25 @@ class SimpleSplash:
         self.text = text
 
         self.widget = QWidget(parent)
+        self.widget.setObjectName('simple_splash')
         self.widget.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.widget.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
         main_layout = QVBoxLayout(self.widget)
 
         container = QWidget()
-        container.setObjectName('container')
+        container.setObjectName('simple_splash_container')
         container.setMinimumWidth(300)
         layout = QGridLayout(container)
         main_layout.addWidget(container)
 
         self.label = QLabel(text)
+        self.label.setObjectName('simple_splash_label')
         self.label.setFont(self.gui.bold_font)
         layout.addWidget(self.label, 0, 0, Qt.AlignmentFlag.AlignHCenter)
 
         if subtitle:
             self.subtitle_label = QLabel(' ')
+            self.subtitle_label.setObjectName('simple_splash_subtitle_label')
             self.subtitle_label.setFont(self.gui.list_font)
             layout.addWidget(self.subtitle_label, 1, 0, Qt.AlignmentFlag.AlignHCenter)
 

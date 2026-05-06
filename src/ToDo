@@ -37,14 +37,12 @@ Done:
     Days of Elijah - editor not opening
     Preview Preview and Live Preview not the same
     Fix font color on type dropdown in editor
+    Footer font size in preview doesn't match footer font size in live
+    "Loading Service" splash is the wrong color
+    Test with a new installation
 
 To Do:
-    Footer font size in preview doesn't match footer font size in live
-    Test with a new installation
-        Dual screens still not positioning correctly
-        Dual screens not defaulting to showing display
 
 Future Releases:
     Video backgrounds
-    Create single CustomListWidget for media_widget, oos_widget, preview_widget, and live_widget?
-    Create module folders
+    Allow sorting media into folders
