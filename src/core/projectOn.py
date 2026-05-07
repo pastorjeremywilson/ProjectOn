@@ -77,9 +77,10 @@ class ProjectOn(QObject):
         super().__init__()
         sys.excepthook = log_unhandled_exception
 
+        ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
             # Only intercept warnings (QtWarningMsg is 1)
-            if mode == QtMsgType.QtWarningMsg and "Could not parse stylesheet" in message:
+            if mode == QtMsgType.QtWarningMsg:
                 print(f"\n--- Qt Warning Intercepted ---")
                 print(f"Message: {message}")
                 print("Locating source...")
@@ -87,7 +88,8 @@ class ProjectOn(QObject):
                 print("-----------------------------\n")
 
         # Install the handler at the very start of your script
-        qInstallMessageHandler(qt_message_handler)
+        #qInstallMessageHandler(qt_message_handler)
+        ################################################################
 
         # ensure we are working from the source root of the program
         self.file_dir = os.path.dirname(os.path.dirname(__file__))
@@ -1467,7 +1469,9 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
                 f'    {exc_type}\n'
                 f'    {exc_value}\n'
                 f'    {full_traceback}')
-    with open('./error.log', 'a') as file:
+
+    user_dir = os.getenv('APPDATA') + '/ProjectOn'
+    with open(user_dir + '/error.log', 'a') as file:
         file.write(log_text)
 
     message_box = QMessageBox()
