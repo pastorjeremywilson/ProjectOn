@@ -40,10 +40,10 @@ Done:
     Footer font size in preview doesn't match footer font size in live
     "Loading Service" splash is the wrong color
     Test with a new installation
-
-To Do:
     Previews not showing in edit widget
     Unhandled exception popup not showing when running frozen from exe
+
+To Do:
 
 Future Releases:
     Video backgrounds

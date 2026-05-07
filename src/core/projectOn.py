@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.2.015
+ProjectOn v.1.9.2.016
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -198,7 +198,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.2.015')
+        version_label = QLabel('v.1.9.2.016')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1470,7 +1470,10 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
                 f'    {exc_value}\n'
                 f'    {full_traceback}')
 
-    user_dir = os.getenv('APPDATA') + '/ProjectOn'
+    if 'linux' in sys.platform:
+        user_dir = os.path.expanduser('~/.config/ProjectOn')
+    else:
+        user_dir = os.getenv('APPDATA') + '/ProjectOn'
     with open(user_dir + '/error.log', 'a') as file:
         file.write(log_text)
 
@@ -1483,4 +1486,5 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
         f'{exc_value}<br>'
         f'{full_traceback}')
     message_box.setStandardButtons(QMessageBox.StandardButton.Close)
+    message_box.adjustSize()
     message_box.exec()
