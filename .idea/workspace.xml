@@ -7,21 +7,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed font color in editor dropdown; fixed footer size mismatch on previews; added QSS for SimpleSplash; tested with a new installation. A little more testing and it should be ready for release.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added &quot;Move Data Folder&quot; and &quot;Select Existing Data Folder&quot; options to menu, added code to do those things">
+      <change afterPath="$PROJECT_DIR$/src/resources/projecton-dark.qss.bak" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/resources/projecton-light.qss.bak" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/runnables.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dataHandling/declarations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/declarations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dataHandling/getGithubEvents.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/getGithubEvents.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/widgets/mediaWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/mediaWidget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/widgets.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/intro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/menu_bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/menu_bar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-dark.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-light.qss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,43 +98,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Node.js.foobar.js.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.__main__.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.generate_pydocs.executor&quot;: &quot;Run&quot;,
-    &quot;Python.get_github_events.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.powerpoint_viewer.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;development&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/hymn_helper&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Node.js.foobar.js.executor": "Debug",
+    "Python.__main__.executor": "Debug",
+    "Python.generate_pydocs.executor": "Run",
+    "Python.get_github_events.executor": "Debug",
+    "Python.main.executor": "Debug",
+    "Python.powerpoint_viewer.executor": "Debug",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "development",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/pasto/Documents/Python Workspace/project_on/src/resources",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySupportGeventDebugging" value="true" />
     <option name="mySupportQtDebugging" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\pasto\Documents\Python Workspace\project_on\src\resources" />
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -254,14 +247,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00146" summary="Fixed edited scriptures not saving/loading correctly.">
-      <option name="closed" value="true" />
-      <created>1759982530212</created>
-      <option name="number" value="00146" />
-      <option name="presentableId" value="LOCAL-00146" />
-      <option name="project" value="LOCAL" />
-      <updated>1759982530212</updated>
     </task>
     <task id="LOCAL-00147" summary="Updated version number and Readmes. Ready for release.">
       <option name="closed" value="true" />
@@ -647,7 +632,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778106080160</updated>
     </task>
-    <option name="localTasksCounter" value="195" />
+    <task id="LOCAL-00195" summary="Added &quot;Move Data Folder&quot; and &quot;Select Existing Data Folder&quot; options to menu, added code to do those things">
+      <option name="closed" value="true" />
+      <created>1778268690694</created>
+      <option name="number" value="00195" />
+      <option name="presentableId" value="LOCAL-00195" />
+      <option name="project" value="LOCAL" />
+      <updated>1778268690694</updated>
+    </task>
+    <option name="localTasksCounter" value="196" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -668,7 +661,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch." />
     <MESSAGE value="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps." />
     <MESSAGE value="Added optimizations for videos playing in QtWebEngine" />
     <MESSAGE value="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides." />
@@ -693,7 +685,8 @@
     <MESSAGE value="Fixed wrongly setting some boolean slide dict entries as str" />
     <MESSAGE value="Fixed calculating the text size wrongly when parsing slide text to fit the screen" />
     <MESSAGE value="Fixed font color in editor dropdown; fixed footer size mismatch on previews; added QSS for SimpleSplash; tested with a new installation. A little more testing and it should be ready for release." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed font color in editor dropdown; fixed footer size mismatch on previews; added QSS for SimpleSplash; tested with a new installation. A little more testing and it should be ready for release." />
+    <MESSAGE value="Added &quot;Move Data Folder&quot; and &quot;Select Existing Data Folder&quot; options to menu, added code to do those things" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added &quot;Move Data Folder&quot; and &quot;Select Existing Data Folder&quot; options to menu, added code to do those things" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
