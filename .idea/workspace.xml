@@ -7,14 +7,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed previews not showing in edit widget; moved error.log file from program dir to user dir">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Fixed font color in editor dropdown; fixed footer size mismatch on previews; added QSS for SimpleSplash; tested with a new installation. A little more testing and it should be ready for release.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/runnables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataHandling/declarations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/declarations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataHandling/getGithubEvents.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/getGithubEvents.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/mediaWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/mediaWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/intro.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -247,6 +254,14 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
+    </task>
+    <task id="LOCAL-00146" summary="Fixed edited scriptures not saving/loading correctly.">
+      <option name="closed" value="true" />
+      <created>1759982530212</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1759982530212</updated>
     </task>
     <task id="LOCAL-00147" summary="Updated version number and Readmes. Ready for release.">
       <option name="closed" value="true" />
@@ -632,15 +647,7 @@
       <option name="project" value="LOCAL" />
       <updated>1778106080160</updated>
     </task>
-    <task id="LOCAL-00195" summary="Fixed previews not showing in edit widget; moved error.log file from program dir to user dir">
-      <option name="closed" value="true" />
-      <created>1778170188527</created>
-      <option name="number" value="00195" />
-      <option name="presentableId" value="LOCAL-00195" />
-      <option name="project" value="LOCAL" />
-      <updated>1778170188527</updated>
-    </task>
-    <option name="localTasksCounter" value="196" />
+    <option name="localTasksCounter" value="195" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -661,6 +668,7 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="Shortened the scroll distance on the image and video list widgets so that they don't scroll almost an entire page per mouse wheel notch." />
     <MESSAGE value="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps." />
     <MESSAGE value="Added optimizations for videos playing in QtWebEngine" />
     <MESSAGE value="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides." />
@@ -685,8 +693,7 @@
     <MESSAGE value="Fixed wrongly setting some boolean slide dict entries as str" />
     <MESSAGE value="Fixed calculating the text size wrongly when parsing slide text to fit the screen" />
     <MESSAGE value="Fixed font color in editor dropdown; fixed footer size mismatch on previews; added QSS for SimpleSplash; tested with a new installation. A little more testing and it should be ready for release." />
-    <MESSAGE value="Fixed previews not showing in edit widget; moved error.log file from program dir to user dir" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed previews not showing in edit widget; moved error.log file from program dir to user dir" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed font color in editor dropdown; fixed footer size mismatch on previews; added QSS for SimpleSplash; tested with a new installation. A little more testing and it should be ready for release." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

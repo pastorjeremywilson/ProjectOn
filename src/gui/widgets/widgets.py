@@ -1901,7 +1901,7 @@ class SimpleSplash:
     Provides a simple and standardized popup for showing messages
     """
 
-    def __init__(self, gui, text='', subtitle=False, parent=None):
+    def __init__(self, gui, text: str='', subtitle: bool=False, parent: QWidget=None):
         """
         Provides a simple and standardized popup for showing messages
         :param gui.GUI gui: the current instance of GUI

@@ -42,6 +42,9 @@ Done:
     Test with a new installation
     Previews not showing in edit widget
     Unhandled exception popup not showing when running frozen from exe
+    Fix or table move data folder (and remove from menu if tabled)
+    Finish select data folder
+    Test bible on new installation
 
 To Do:
 

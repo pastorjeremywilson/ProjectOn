@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.2.016
+ProjectOn v.1.9.2.017
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -36,7 +36,7 @@ from os.path import exists
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
-    qInstallMessageHandler
+    qInstallMessageHandler, QThread
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
@@ -180,7 +180,7 @@ class ProjectOn(QObject):
         self.splash_widget = QWidget()
         self.splash_widget.setObjectName('splash_widget')
         self.splash_widget.setMinimumWidth(610)
-        self.splash_widget.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.splash_widget.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.splash_widget.setStyleSheet(
             '#splash_widget { background: #6060c0; }')
         splash_layout = QHBoxLayout(self.splash_widget)
@@ -198,7 +198,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.2.016')
+        version_label = QLabel('v.1.9.2.017')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -242,6 +242,7 @@ class ProjectOn(QObject):
         container_layout.addWidget(self.info_label)
 
         self.splash_widget.show()
+        self.splash_widget.raise_()
         self.splash_widget.setFocus()
 
     def get_all_songs(self):
@@ -1434,6 +1435,178 @@ class ProjectOn(QObject):
             self.error_log(log_text)
 
         connection.close()
+
+    def move_data_folder(self):
+        response = QMessageBox.information(
+            self.gui.main_window,
+            'Move Data Folder',
+            'Would you like to move the ProjectOn data folder to a new location?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+        )
+        if not response == QMessageBox.StandardButton.Yes:
+            return
+
+        result = QFileDialog.getExistingDirectory(
+            self.gui.main_window,
+            'Choose Data Folder Location',
+            os.path.expanduser('~')
+        )
+        if len(result) == 0:
+            return
+
+        old_path = self.data_dir
+        new_path = result + '/data'
+        if 'win' in sys.platform:
+            old_path = old_path.replace('/', '\\')
+            new_path = new_path.replace('/', '\\')
+
+        splash = SimpleSplash(
+            self.gui, 'Moving data folder. This may take a while...', subtitle=True, parent=self.gui.main_window)
+        splash.widget.raise_()
+        self.app.processEvents()
+
+        def copy_update(src, dst, *, follow_symlinks=True):
+            splash.subtitle_label.setText('Copying ' + src)
+            if splash.subtitle_label.width() > splash.widget.width() - 40:
+                splash.widget.adjustSize()
+            self.app.processEvents()
+            result = shutil.copy2(src, dst, follow_symlinks=follow_symlinks)
+
+        try:
+            shutil.copytree(old_path, new_path, copy_function=copy_update)
+        except Exception as ex:
+            QMessageBox.critical(
+                self.gui.main_window,
+                'Error Moving Data Folder',
+                f'There was an error moving the Data folder (see below). Your folder has not been moved.<br><br>{ex}',
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
+        splash.widget.deleteLater()
+        self.app.processEvents()
+
+        ending = '.'
+        result = QMessageBox.question(
+            self.gui.main_window,
+            'Delete Old Data Folder?',
+            'Would you like to delete the old ProjectOn Data Folder?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+
+        if result == QMessageBox.StandardButton.Yes:
+            splash = SimpleSplash(self.gui, 'Deleting old data folder...', parent=self.gui.main_window)
+            splash.widget.raise_()
+            self.app.processEvents()
+
+            shutil.rmtree(old_path)
+            ending = f' and the old data folder at\n{old_path}\nhas been deleted.'
+            splash.widget.deleteLater()
+
+        QMessageBox.information(
+            self.gui.main_window,
+            'Move Complete',
+            f'Your new data folder has been moved to\n{new_path}{ending}',
+            QMessageBox.StandardButton.Ok
+        )
+
+        new_path = new_path.replace('\\', '/')
+        self.data_dir = new_path
+        self.settings['data_dir'] = new_path
+        save_settings = SaveSettings(self)
+        thread = threading.Thread(target=save_settings.run())
+        thread.start()
+        thread.join()
+
+        self.gui.check_files()
+
+    def select_data_folder(self):
+        response = QMessageBox.question(
+            self.gui.main_window,
+            'Select Data Folder',
+            'Would you like to choose a different ProjectOn Data Folder?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+        )
+        if not response == QMessageBox.StandardButton.Yes:
+            return
+
+        result = QFileDialog.getExistingDirectory(
+            self.gui.main_window,
+            'Choose Data Folder Location',
+            os.path.expanduser('~')
+        )
+        if len(result) == 0:
+            return
+        target_directory = result
+
+        if not exists(result + '/projecton.db'):
+            QMessageBox.critical(
+                self.gui.main_window,
+                'Invalid Data Folder',
+                'The selected folder does not contain a ProjectOn database. Please try again.',
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
+        common_folders = [
+            'videos',
+            'images',
+            'backgrounds',
+            'bibles'
+        ]
+        list_dir = os.listdir(target_directory)
+        missing_folders = []
+        for folder in common_folders:
+            folder_found = False
+            for file in list_dir:
+                full_path = os.path.join(target_directory, file)
+                if os.path.isdir(full_path) and file == folder:
+                    folder_found = True
+            if not folder_found:
+                missing_folders.append(folder)
+
+        recreate_folders = False
+        if len(missing_folders) > 0:
+            result = QMessageBox.question(
+                self.gui.main_window,
+                'Data folder(s) missing',
+                f'The data folder(s), {", ".join(missing_folders)}, are missing from this folder. '
+                f'Would you like to recreate them?',
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+            )
+            if not result == QMessageBox.StandardButton.Yes:
+                return
+            if result == QMessageBox.StandardButton.Yes:
+                recreate_folders = True
+
+        if recreate_folders:
+            for folder in missing_folders:
+                shutil.copytree(f'resources/defaults/data/{folder}', f'{target_directory}/{folder}')
+
+        self.data_dir = target_directory
+        self.settings['data_dir'] = target_directory
+        save_settings = SaveSettings(self)
+        thread = threading.Thread(target=save_settings.run())
+        thread.start()
+        thread.join()
+
+        self.gui.check_files()
+        self.gui.apply_settings()
+        self.gui.media_widget.populate_song_list()
+        self.gui.media_widget.populate_custom_list()
+        self.gui.media_widget.populate_image_list()
+        self.gui.media_widget.populate_video_list()
+        self.gui.media_widget.populate_web_list()
+
+        if 'win' in sys.platform:
+            target_directory = target_directory.replace('/', '\\')
+
+        QMessageBox.information(
+            self.gui.main_window,
+            'New Data Folder Selected',
+            f'You are now working with the data folder located at\n{target_directory}.',
+            QMessageBox.StandardButton.Ok
+        )
 
 
 def log_unhandled_exception(exc_type, exc_value, exc_traceback):

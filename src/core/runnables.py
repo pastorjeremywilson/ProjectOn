@@ -300,7 +300,7 @@ class SaveSettings(QRunnable):
                 device_specific_settings['force_software_rendering'] = False
             else:
                 device_specific_settings['force_software_rendering'] = self.main.settings['force_software_rendering']
-            with open(self.main.device_specific_config_file, 'w') as file:
+            with open(os.path.expanduser(self.main.user_dir + '/localConfig.json'), 'w') as file:
                 file.write(json.dumps(device_specific_settings, indent=4))
 
         except Exception:

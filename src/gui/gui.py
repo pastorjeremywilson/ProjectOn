@@ -21,7 +21,8 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidg
 from numpy.f2py.auxfuncs import throw_error
 
 from dataHandling import parsers, declarations
-from dataHandling.getGithubEvents import get_release_notes
+from dataHandling.declarations import DEFAULT_SETTINGS
+from dataHandling.getGithubEvents import get_release_notes, show_notes
 from dataHandling.parsers import parse_scripture_by_verse
 from gui.widgets.help import Help
 from importExport.importers import Importers
@@ -133,7 +134,6 @@ class GUI(QObject):
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        # ensure all needed files exist; thread it and wait until done before moving on
         self.check_files()
 
         self.main.make_splash_screen(self.main.settings['last_status_count'])
@@ -164,7 +164,6 @@ class GUI(QObject):
         if len(self.screens) > 1:
             self.primary_screen = self.main.app.primaryScreen()
             for screen in self.screens:
-                print(f'screen: {screen}, name: {screen.name()}')
                 if screen != self.primary_screen:
                     self.secondary_screen = screen
         else:
@@ -304,45 +303,8 @@ class GUI(QObject):
         self.main.video_dir = self.main.data_dir + '/videos'
 
         # provide default settings should the settings file not exist
-        default_settings = {
-            'selected_screen_name': '',
-            'global_song_background': 'choose_global',
-            'global_bible_background': 'choose_global',
-            'logo_image': 'choose_logo',
-            'last_save_dir': os.path.expanduser('~/Documents'),
-            'last_status_count': 0,
-            'stage_font_size': 60,
-            'used_services': [],
-            'data_dir': self.main.data_dir,
-            'default_bible': '',
-            'theme': 'light',
-            'skip_update': -1,
-            "song_font_face": "Arial",
-            "song_font_size": 60,
-            "song_font_color": "white",
-            "song_use_shadow": True,
-            "song_shadow_color": 0,
-            "song_shadow_offset": 4,
-            "song_use_outline": True,
-            "song_outline_color": 0,
-            "song_outline_width": 3,
-            "song_use_shade": False,
-            "song_shade_color": 0,
-            "song_shade_opacity": 75,
-            "bible_font_face": "Arial",
-            "bible_font_size": 60,
-            "bible_font_color": "white",
-            "bible_use_shadow": True,
-            "bible_shadow_color": 0,
-            "bible_shadow_offset": 4,
-            "bible_use_outline": True,
-            "bible_outline_color": 0,
-            "bible_outline_width": 3,
-            "bible_use_shade": False,
-            "bible_shade_color": 0,
-            "bible_shade_opacity": 75,
-            "ccli_num": ""
-        }
+        default_settings = DEFAULT_SETTINGS
+        default_settings['data_dir'] = self.main.data_dir
 
         if exists(self.main.config_file):
             with open(self.main.config_file, 'r') as file:
@@ -620,8 +582,14 @@ class GUI(QObject):
         import_bible_action = tool_menu.addAction('Import XML Bible')
         import_bible_action.triggered.connect(self.main.import_xml_bible)
 
-        ccli_credentials_action = tool_menu.addAction('Save/Change CCLI SongSelect Password')
-        ccli_credentials_action.triggered.connect(self.save_ccli_password)
+        """ccli_credentials_action = tool_menu.addAction('Save/Change CCLI SongSelect Password')
+        ccli_credentials_action.triggered.connect(self.save_ccli_password)"""
+
+        move_data_action = tool_menu.addAction('Move Data Folder')
+        move_data_action.triggered.connect(self.main.move_data_folder)
+
+        select_data_action = tool_menu.addAction('Select Existing Data Folder')
+        select_data_action.triggered.connect(self.main.select_data_folder)
 
         help_menu = menu_bar.addMenu('Help')
 
@@ -650,7 +618,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2.016'
+        current_version = 'v.1.9.2.017'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -729,7 +697,7 @@ class GUI(QObject):
 
                 release_notes_button = QPushButton('View Release Notes')
                 release_notes_button.setFont(self.standard_font)
-                release_notes_button.pressed.connect(get_release_notes)
+                release_notes_button.pressed.connect(lambda: show_notes(commits=False))
                 button_layout.addWidget(release_notes_button)
                 button_layout.addStretch()
 
@@ -866,7 +834,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2.016')
+        title_label = QLabel('ProjectOn v.1.9.2.017')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -904,6 +872,11 @@ class GUI(QObject):
         stage_url_label.setFont(self.standard_font)
         remote_layout.addWidget(stage_url_label, 3, 1)
 
+        database_label = QLabel(f'Database Location: {self.main.database}')
+        database_label.setFont(self.standard_font)
+        widget.layout().addWidget(database_label)
+        widget.layout().addSpacing(20)
+
         about_text = QTextBrowser()
         about_text.setOpenExternalLinks(True)
         about_text.setHtml('''
@@ -927,11 +900,16 @@ class GUI(QObject):
                 ''')
         widget.layout().addWidget(about_text)
 
+        release_notes_wiget = QWidget()
+        widget.layout().addWidget(release_notes_wiget)
+        release_notes_layout = QHBoxLayout(release_notes_wiget)
+
         release_notes_button = QPushButton('View Release Notes')
         release_notes_button.setFont(self.standard_font)
-        release_notes_button.setStyleSheet('background: none; border: none;')
-        release_notes_button.pressed.connect(get_release_notes)
-        widget.layout().addWidget(release_notes_button)
+        release_notes_button.pressed.connect(show_notes)
+        release_notes_layout.addStretch()
+        release_notes_layout.addWidget(release_notes_button)
+        release_notes_layout.addStretch()
 
         ok_button = QPushButton('OK')
         ok_button.setFont(self.standard_font)

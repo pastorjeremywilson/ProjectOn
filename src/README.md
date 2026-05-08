@@ -16,18 +16,19 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.9.2.016?
+# What's New in Version 1.9.2.017?
 - Redesigned the song/custom slide editor to be cleaner and more intuitive
 - Updated the help screen to reflect recent changes
 - More accuracy and consistency when positioning text on the slides
 - Improved the reliability of the various types of song imports
+- Added to the "Tools" menu "Move Data Folder" and "Select Existing Data Folder" for more control over where the data folder is stored, and to select an existing data folder that is different from the one currently being used
 - Major improvements to the way data is stored and handled for each type of slide
 - Lots of bug improvements under the hood as well as visual improvements to the GUI
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.9.2.016) and run
+system only. Download the current ProjectOn installer (v.1.9.2.017) and run
 it on your computer.
 
 # Using ProjectOn

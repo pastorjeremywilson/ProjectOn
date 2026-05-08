@@ -1,3 +1,74 @@
+DEFAULT_SETTINGS = {
+    "selected_screen_name": "",
+    "global_song_background": "Blue Wave.png",
+    "global_bible_background": "Pastel Blobs.png",
+    "logo_image": "background.png",
+    "last_save_dir": "",
+    "last_status_count": 100,
+    "stage_font_size": 60,
+    "used_services": [],
+    "data_dir": "",
+    "default_bible": "",
+    "theme": "light",
+    "skip_update": -1,
+    "song_font_face": "Arial",
+    "song_font_size": 60,
+    "song_font_color": "white",
+    "song_use_shadow": True,
+    "song_shadow_color": 0,
+    "song_shadow_offset": 3,
+    "song_use_outline": True,
+    "song_outline_color": 0,
+    "song_outline_width": 2,
+    "song_use_shade": True,
+    "song_shade_color": 0,
+    "song_shade_opacity": 75,
+    "bible_font_face": "Arial",
+    "bible_font_size": 75,
+    "bible_font_color": "white",
+    "bible_use_shadow": True,
+    "bible_shadow_color": 0,
+    "bible_shadow_offset": 3,
+    "bible_use_outline": True,
+    "bible_outline_color": 0,
+    "bible_outline_width": 2,
+    "bible_use_shade": True,
+    "bible_shade_color": 0,
+    "bible_shade_opacity": 75,
+    "ccli_num": "",
+    "show_songselect_warning": True,
+    "countdown_settings": {
+        "use_countdown": False,
+        "font_face": "Arial",
+        "font_size": 36,
+        "font_bold": True,
+        "position": "bottom_full",
+        "bg_color": "rgba(85, 0, 0, 255)",
+        "fg_color": "rgb(255, 255, 255)",
+        "start_time": [
+            10,
+            00
+        ],
+        "display_time": [
+            9,
+            55
+        ]
+    },
+    "force_software_rendering": False,
+    "mirror_stage_display": False,
+    "update_fps": 10
+}
+
+DEVICE_SPECIFIC_SETTINGS = {
+"used_services": [],
+    "last_save_dir": "",
+    "last_status_count": 100,
+    "selected_screen_name": "",
+    "data_dir": "",
+    "show_songselect_warning": True,
+    "force_software_rendering": False
+}
+
 DB_STRUCTURE = {
     'audio': {
         'name': 'TEXT',

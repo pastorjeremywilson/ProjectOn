@@ -1,6 +1,7 @@
 @"..\win_venv\Scripts\pyinstaller.exe" ^
 --noconfirm ^
 --clean ^
+--noconsole ^
 --paths "../src" ^
 --hidden-import=PyQt5.sip ^
 --distpath C:\Users\pasto\Desktop\output ^

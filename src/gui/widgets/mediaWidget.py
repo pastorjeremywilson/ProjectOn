@@ -156,7 +156,7 @@ class MediaWidget(QTabWidget):
         self.bible_selector_combobox.setFont(self.gui.standard_font)
         bibles = self.get_bibles()
 
-        if len(bibles[0]) > 0:
+        if len(bibles) > 0 and len(bibles[0]) > 0:
             for bible in bibles:
                 self.bible_selector_combobox.addItem(bible[1])
                 self.bible_selector_combobox.setItemData(
