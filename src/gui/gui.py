@@ -119,8 +119,8 @@ class GUI(QObject):
             self.list_font.setPointSize(8)
             self.toolbar_icon_size = QSize(24, 24)
 
-        self.live_from_remote_signal.connect(self.live_from_remote)
-        self.live_slide_from_remote_signal.connect(self.live_slide_from_remote)
+        self.live_from_remote_signal.connect(self.live_from_remote, Qt.QueuedConnection)
+        self.live_slide_from_remote_signal.connect(self.live_slide_from_remote, Qt.QueuedConnection)
         self.display_black_screen_signal.connect(self.display_black_screen)
         self.display_logo_screen_signal.connect(self.display_logo_screen)
         self.grab_display_signal.connect(self.grab_display)
@@ -618,7 +618,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.9.2.018'
+        current_version = 'v.1.9.2.020'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -834,7 +834,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.9.2.018')
+        title_label = QLabel('ProjectOn v.1.9.2.020')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1314,9 +1314,10 @@ class GUI(QObject):
         then calls send_to_live.
         :param int num: The row number signaled from the web remote
         """
-        self.oos_widget.oos_list_widget.setCurrentRow(num)
-        self.main.app.processEvents()
-        self.send_to_live()
+        if not self.oos_widget.oos_list_widget.currentRow() == num:
+            self.oos_widget.oos_list_widget.setCurrentRow(num)
+            self.main.app.processEvents()
+            self.send_to_live()
 
     def live_slide_from_remote(self, num):
         """
@@ -1854,7 +1855,8 @@ class GUI(QObject):
 
             # hide or show the appropriate widgets.py
             if widget == 'live':
-                if not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video' and not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
+                if (not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video'
+                        and not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'web'):
                     if not self.web_view.isHidden():
                         self.web_view.hide()
                     if not self.blackout_widget.isHidden():

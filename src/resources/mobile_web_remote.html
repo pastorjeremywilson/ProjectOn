@@ -160,7 +160,7 @@
 				font-size: 2.5vh;
 			}
 
-			.current {
+			button.current {
 				padding-top: 30px;
 				padding-bottom: 30px;
 				font-size: 2.5vh;
@@ -301,33 +301,28 @@
 
 		function oosClick(evt) {
 			evt.preventDefault();
+
+			const previous = document.querySelector("#oos_form .current");
+			if (previous) {
+			    previous.classList.remove("current");
+            }
+			evt.currentTarget.classList.add("current");
+
 			num = document.activeElement.getAttribute('value');
-
-			var request = new XMLHttpRequest();
-			request.open('POST', '/remote');
-			formData = new FormData();
-			formData.append('oos_title', num);
-			request.send(formData);
-
-			oos_html = document.getElementById("oos_form").innerHTML;
-			oos_html = oos_html.replace('class="current" ', '');
-
-			let regex = new RegExp('<button id=oos"' + num + '".*?>');
-			replacement = '<button id=oos"' + num + '" class="current" type="submit" name="oos_button" value="' + num + '">';
-			oos_html = oos_html.replace(regex, replacement);
-
-			document.getElementById("oos_form").innerHTML = oos_html;
+			fetch('/remote', { method: "POST", body: new URLSearchParams({ "oos_title": num }) });
 		}
 
 		function slideClick(evt) {
 			evt.preventDefault();
-			num = document.activeElement.getAttribute('value');
 
-			var request = new XMLHttpRequest();
-			request.open('POST', '/remote');
-			formData = new FormData();
-			formData.append('slide_title', num);
-			request.send(formData);
+			const previous = document.querySelector("#slide_form .current");
+			if (previous) {
+			    previous.classList.remove("current");
+			}
+			evt.currentTarget.classList.add("current");
+
+			num = document.activeElement.getAttribute('value');
+            fetch('/remote', { method: "POST", body: new URLSearchParams({ "slide_title": num }) });
 		}
 	</script>
 </html>

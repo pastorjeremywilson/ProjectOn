@@ -59,7 +59,7 @@
 			#buttons {
 				display: flex;
 				flex-direction: row;
-				justify-content: space-between
+				justify-content: space-between;
 			}
 
 			.screen:hover {
@@ -133,11 +133,11 @@
 				overflow-y: scroll;
 			}
 
-			#oos {
+			#oos, #oos_form {
 				margin-right: 5px;
 			}
 
-			#slides {
+			#slides, #slide_form{
 				margin-left: 5px;
 			}
 
@@ -159,7 +159,7 @@
 				font-weight: bold;
 			}
 
-			.current {
+			button.current {
 				padding-top: 20px;
 				padding-bottom: 20px;
 				font-size: 2.5vh;
@@ -244,7 +244,9 @@
 			oos_html = oos_html.replace(regex, replacement);
 
 			document.getElementById("oos_form").innerHTML = oos_html;
-			document.getElementById("oos" + num).scrollIntoView({ behavior:"smooth", block:"center" });
+			if (document.getElementById("oos" + num)) {
+			    document.getElementById("oos" + num).scrollIntoView({ behavior:"smooth", block:"center" });
+            }
 		});
 
 		socket.on('change_current_slide', function(num) {
@@ -256,7 +258,9 @@
 			slide_html = slide_html.replace(regex, replacement);
 
 			document.getElementById("slide_form").innerHTML = slide_html;
-			document.getElementById("slide" + num).scrollIntoView({ behavior: "smooth", block: "start"})
+			if (document.getElementById("slide" + num)) {
+			    document.getElementById("slide" + num).scrollIntoView({ behavior: "smooth", block: "start"})
+			}
 		});
 
 		form = document.getElementById('oos_form');
@@ -305,35 +309,30 @@
 			fetch('/remote', {method: "POST", body: "item_forward"});
 		}
 
-		function oosClick(evt) {
+		async function oosClick(evt) {
 			evt.preventDefault();
+
+			const previous = document.querySelector("#oos_form .current");
+			if (previous) {
+			    previous.classList.remove("current");
+            }
+			evt.currentTarget.classList.add("current");
+
 			num = document.activeElement.getAttribute('value');
-
-			var request = new XMLHttpRequest();
-			request.open('POST', '/remote');
-			formData = new FormData();
-			formData.append('oos_title', num);
-			request.send(formData);
-
-			oos_html = document.getElementById("oos_form").innerHTML;
-			oos_html = oos_html.replace('class="current" ', '');
-
-			let regex = new RegExp('<button id="oos' + num + '".*?>');
-			replacement = '<button id="oos' + num + '" class="current" type="submit" name="oos_button" value="' + num + '">';
-			oos_html = oos_html.replace(regex, replacement);
-
-			document.getElementById("oos_form").innerHTML = oos_html;
+			fetch('/remote', { method: "POST", body: new URLSearchParams({ "oos_title": num }) });
 		}
 
 		function slideClick(evt) {
 			evt.preventDefault();
-			num = document.activeElement.getAttribute('value');
 
-			var request = new XMLHttpRequest();
-			request.open('POST', '/remote');
-			formData = new FormData();
-			formData.append('slide_title', num);
-			request.send(formData);
+			const previous = document.querySelector("#slide_form .current");
+			if (previous) {
+			    previous.classList.remove("current");
+			}
+			evt.currentTarget.classList.add("current");
+
+			num = document.activeElement.getAttribute('value');
+            fetch('/remote', { method: "POST", body: new URLSearchParams({ "slide_title": num }) });
 		}
 	</script>
 </html>

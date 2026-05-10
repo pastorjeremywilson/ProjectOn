@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.9.2.018
+ProjectOn v.1.9.2.020
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -17,8 +17,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from gevent import monkey
-monkey.patch_all(ssl=False)
 
 import threading
 import json
@@ -198,7 +196,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.9.2.018')
+        version_label = QLabel('v.1.9.2.020')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1371,6 +1369,7 @@ class ProjectOn(QObject):
                 date_time = time.ctime(time.time())
                 log_text = (f'\n{date_time}:\n'
                             f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
+            print(log_text)
 
             message_box = QMessageBox()
             message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
@@ -1642,6 +1641,7 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
                 f'    {exc_type}\n'
                 f'    {exc_value}\n'
                 f'    {full_traceback}')
+    print(log_text)
 
     if 'linux' in sys.platform:
         user_dir = os.path.expanduser('~/.config/ProjectOn')

@@ -7,13 +7,88 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added &quot;Move Data Folder&quot; and &quot;Select Existing Data Folder&quot; options to menu, added code to do those things">
-      <change afterPath="$PROJECT_DIR$/src/resources/projecton-dark.qss.bak" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/resources/projecton-light.qss.bak" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/resources/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/PythonSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/PythonSettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/VSWorkspaceState.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/VSWorkspaceState.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/compile.txt" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/compile.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/pyinstaller-projecton.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/__main__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/runnables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/webRemote.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/webRemote.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataHandling/declarations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/declarations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataHandling/getGithubEvents.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/getGithubEvents.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataHandling/getScripture.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/getScripture.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataHandling/parsers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/parsers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/formattableTextEdit.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/formattableTextEdit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/help.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/liveWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/liveWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/mediaWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/mediaWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/oosWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/oosWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/previewWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/previewWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/importers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/openlpImport.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/openlpImport.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/openlyricsExport.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/openlyricsExport.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/songselectImport.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/songselectImport.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/branding/install_image_large.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/branding/install_image_large.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/branding/install_image_small.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/branding/install_image_small.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/defaults/data/bibles/KJV.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/defaults/data/bibles/KJV.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/defaults/data/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/defaults/data/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/defaults/localConfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/defaults/localConfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gpl-3.0.rtf" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gpl-3.0.rtf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/add_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/add_icon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/add_to_service_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/add_to_service_icon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/black_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/black_display.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/browser_back.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/browser_back.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/font_settings.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/font_settings.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/import.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/import.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/item_down.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/item_down.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/item_up.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/item_up.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/logo_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/logo_display.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/new.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/new.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/next.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/next.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/no_display.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/no_display.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/open.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/open.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/play_pause.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/play_pause.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/previous.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/previous.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/save.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/save.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/scroll_down_arrow.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/scroll_down_arrow.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/scroll_up_arrow.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/scroll_up_arrow.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/send_to_live_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/send_to_live_icon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/settings.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/settings.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/stop.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/stop.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/to_beginning.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/to_beginning.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/gui_icons/x_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/gui_icons/x_icon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/file_locations.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/file_locations.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/import.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/import.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/intro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/main_screen.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/main_screen.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/media_box.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/media_box.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/help/menu_bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/menu_bar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/remote.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/settings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/mobile_web_remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/mobile_web_remote.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-dark.qss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-light.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/stage_view.html.bak" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/stage_view.html.bak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/web_remote.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/web_remote.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,8 +100,8 @@
       <list>
         <option value="Setup Script" />
         <option value="JavaScript File" />
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -65,24 +140,8 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="McpProjectServerCommands">
-    <McpServerCommand sourceId="UserConfigurationSource">
-      <option name="allowedToolsNames" />
-      <option name="enabled" value="true" />
-      <option name="name" value="" />
-      <option name="programPath" value="" />
-      <option name="arguments" value="" />
-      <option name="workingDirectory" value="" />
-      <envs />
-    </McpServerCommand>
-    <McpServerCommand sourceId="UserConfigurationSource">
-      <option name="allowedToolsNames" />
-      <option name="enabled" value="true" />
-      <option name="name" value="" />
-      <option name="programPath" value="" />
-      <option name="arguments" value="" />
-      <option name="workingDirectory" value="" />
-      <envs />
-    </McpServerCommand>
+    <commands />
+    <urls />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -98,37 +157,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Node.js.foobar.js.executor": "Debug",
-    "Python.__main__.executor": "Debug",
-    "Python.generate_pydocs.executor": "Run",
-    "Python.get_github_events.executor": "Debug",
-    "Python.main.executor": "Debug",
-    "Python.powerpoint_viewer.executor": "Debug",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "ai.playground.ignore.import.keys.banner.in.settings": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "development",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/pasto/Documents/Python Workspace/project_on/src/resources",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Node.js.foobar.js.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.__main__.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.generate_pydocs.executor&quot;: &quot;Run&quot;,
+    &quot;Python.get_github_events.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.powerpoint_viewer.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;development&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/pasto/Documents/Python Workspace/project_on/src/resources&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="PyDebuggerOptionsProvider">
     <option name="mySupportGeventDebugging" value="true" />
     <option name="mySupportQtDebugging" value="false" />
@@ -165,6 +224,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/__main__.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -188,6 +248,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/linecount.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -211,7 +272,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173" />
       </set>
     </attachedChunks>
   </component>
@@ -247,14 +308,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00147" summary="Updated version number and Readmes. Ready for release.">
-      <option name="closed" value="true" />
-      <created>1760039058265</created>
-      <option name="number" value="00147" />
-      <option name="presentableId" value="LOCAL-00147" />
-      <option name="project" value="LOCAL" />
-      <updated>1760039058266</updated>
     </task>
     <task id="LOCAL-00148" summary="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file.">
       <option name="closed" value="true" />
@@ -640,7 +693,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778268690694</updated>
     </task>
-    <option name="localTasksCounter" value="196" />
+    <task id="LOCAL-00196" summary="Organized projecton-dark.qss and projecton-light.qss alphabetically and edited for consistency between the two.">
+      <option name="closed" value="true" />
+      <created>1778278663176</created>
+      <option name="number" value="00196" />
+      <option name="presentableId" value="LOCAL-00196" />
+      <option name="project" value="LOCAL" />
+      <updated>1778278663177</updated>
+    </task>
+    <option name="localTasksCounter" value="197" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -661,7 +722,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Made the fps of preview and stage display updates changeable by the user. Values are 1, 5, 10, and 24 fps." />
     <MESSAGE value="Added optimizations for videos playing in QtWebEngine" />
     <MESSAGE value="Made further improvements to the stage view when image_display is being rapidly updated. Begun work on an improved edit widget for songs and custom slides." />
     <MESSAGE value="Switched image_display from img to canvas, optimized the conversion of images to bytes for use on a canvas" />
@@ -686,7 +746,8 @@
     <MESSAGE value="Fixed calculating the text size wrongly when parsing slide text to fit the screen" />
     <MESSAGE value="Fixed font color in editor dropdown; fixed footer size mismatch on previews; added QSS for SimpleSplash; tested with a new installation. A little more testing and it should be ready for release." />
     <MESSAGE value="Added &quot;Move Data Folder&quot; and &quot;Select Existing Data Folder&quot; options to menu, added code to do those things" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added &quot;Move Data Folder&quot; and &quot;Select Existing Data Folder&quot; options to menu, added code to do those things" />
+    <MESSAGE value="Organized projecton-dark.qss and projecton-light.qss alphabetically and edited for consistency between the two." />
+    <option name="LAST_COMMIT_MESSAGE" value="Organized projecton-dark.qss and projecton-light.qss alphabetically and edited for consistency between the two." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
