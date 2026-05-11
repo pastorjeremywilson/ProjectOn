@@ -43,5 +43,4 @@ __pycache__/widgets.cpython-310.pyc
 __pycache__/widgets.cpython-311.pyc
 .idea/.gitignore
 .idea/workspace.xml
-error.log
 .unusedCode/powerpoint_viewer.py

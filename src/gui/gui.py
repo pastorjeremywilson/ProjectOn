@@ -1,0 +1,2398 @@
+import base64
+import json
+import os
+import re
+import shutil
+import sys
+import tempfile
+from datetime import datetime
+from os.path import exists
+
+import requests
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QRect, QByteArray, QBuffer, QIODevice, \
+    QSize, QCoreApplication
+from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QTextDocument, QScreen
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile, QWebEngineSettings
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
+    QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
+    QGraphicsView, QGraphicsScene, QTextEdit, QApplication
+from numpy.f2py.auxfuncs import throw_error
+
+from dataHandling import parsers, declarations
+from dataHandling.declarations import DEFAULT_SETTINGS
+from dataHandling.getGithubEvents import get_release_notes, show_notes
+from dataHandling.parsers import parse_scripture_by_verse
+from gui.widgets.help import Help
+from importExport.importers import Importers
+from gui.widgets.liveWidget import LiveWidget
+from gui.widgets.mediaWidget import MediaWidget
+from gui.widgets.oosWidget import OOSWidget
+from importExport.openlyricsExport import OpenlyricsExport
+from gui.widgets.previewWidget import PreviewWidget
+from core.runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
+from gui.widgets.widgets import Toolbar, IndexedSettingsWidget, CustomMainWindow, DisplayWidget, \
+    LyricDisplayWidget, StandardItemWidget, CountdownWidget
+from importExport.songselectImport import SongselectImport
+
+
+class GUI(QObject):
+    """
+    Creates the user interface and handles user input that will change the interface or the display widget.
+    :param main ProjectOn: The current instance of ProjectOn
+    """
+    media_widget = None
+    oos_widget = None
+    preview_widget = None
+    live_widget = None
+    display_widget = None
+    lyric_label = None
+    preview_display_widget = None
+    tool_bar = None
+    current_file = None
+    default_bible = None
+
+    current_background = None
+    global_song_background_pixmap = None
+    global_bible_background_pixmap = None
+    custom_pixmap = None
+    last_pixmap = None
+    sample_widget = None
+    lyric_widget = None
+    sample_lyric_widget = None
+    blackout_widget = None
+    logo_widget = None
+    web_view = None
+    video_widget = None
+    media_player = None
+    timed_update = None
+    slide_auto_play = None
+    central_widget = None
+    central_layout = None
+    edit_widget = None
+    countdown_widget = None
+    countdown_timer = None
+    font_pixmaps = None
+    audio_buffer = None
+    error_in_loop = False
+
+    standard_font = QFont('Helvetica', 12)
+    bold_font = QFont('Helvetica', 12, QFont.Weight.Bold)
+    list_title_font = QFont('Helvetica', 10, QFont.Weight.Bold)
+    list_font = QFont('Helvetica', 10)
+    toolbar_icon_size = QSize(36, 36)
+    global_font_face = 'Helvetica'
+    global_font_size = 48
+    global_font_color = 'rgb(255, 255, 255)'
+    global_footer_font_face = 'Helvetica'
+    global_footer_font_size = 24
+    stage_font_size = 60
+    block_remote_input = False
+    black_display = False
+    current_display_background_color = None
+    changes = False
+    web_engine_page = None
+
+    live_from_remote_signal = pyqtSignal(int)
+    live_slide_from_remote_signal = pyqtSignal(int)
+    display_black_screen_signal = pyqtSignal()
+    display_logo_screen_signal = pyqtSignal()
+    grab_display_signal = pyqtSignal()
+    server_alert_signal = pyqtSignal()
+    change_current_live_item_signal = pyqtSignal()
+
+    def __init__(self, main):
+        """
+        :param ProjectOn main: The current instance of ProjectOn
+        """
+        super().__init__()
+
+        self.audio_output = None
+        self.main = main
+
+        display_geometry = self.main.app.primaryScreen().geometry()
+        if display_geometry.width() < 1920:
+            self.standard_font.setPointSize(10)
+            self.bold_font.setPointSize(10)
+            self.list_title_font.setPointSize(8)
+            self.list_font.setPointSize(8)
+            self.toolbar_icon_size = QSize(24, 24)
+
+        self.live_from_remote_signal.connect(self.live_from_remote, Qt.QueuedConnection)
+        self.live_slide_from_remote_signal.connect(self.live_slide_from_remote, Qt.QueuedConnection)
+        self.display_black_screen_signal.connect(self.display_black_screen)
+        self.display_logo_screen_signal.connect(self.display_logo_screen)
+        self.grab_display_signal.connect(self.grab_display)
+        self.server_alert_signal.connect(self.show_server_alert)
+        self.change_current_live_item_signal.connect(self.change_current_live_item)
+        self.shadow_color = 0
+        self.shadow_offset = 6
+        self.widget_item_background_color = 'white'
+        self.widget_item_font_color = 'black'
+
+        self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
+        self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
+
+        self.check_files()
+
+        self.main.make_splash_screen(self.main.settings['last_status_count'])
+
+        self.main.update_status_signal.emit('Checking Database Integrity', 'status')
+        self.main.app.processEvents()
+        self.main.check_db(self.main.database)
+
+        self.main.get_song_titles()
+
+        self.main.update_status_signal.emit('Indexing Images', 'status')
+        self.main.app.processEvents()
+
+        from core.runnables import IndexImages
+
+        ii = IndexImages(self.main, 'backgrounds')
+        self.main.thread_pool.start(ii)
+        self.main.thread_pool.waitForDone()
+
+        ii = IndexImages(self.main, 'images')
+        self.main.thread_pool.start(ii)
+        self.main.thread_pool.waitForDone()
+
+        self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
+
+        # check number of screens, set the primary to the app's primary screen and the secondary to the same if only one
+        self.screens = self.main.app.screens()
+        if len(self.screens) > 1:
+            self.primary_screen = self.main.app.primaryScreen()
+            for screen in self.screens:
+                if screen != self.primary_screen:
+                    self.secondary_screen = screen
+        else:
+            self.primary_screen = self.main.app.primaryScreen()
+            self.secondary_screen = self.main.app.primaryScreen()
+
+        # if settings exist, set the secondary screen (the display screen) to the one in the settings
+        if len(self.main.settings) > 0 and len(self.main.settings["selected_screen_name"].strip()) > 0:
+            for screen in self.screens:
+                if screen.name() == self.main.settings['selected_screen_name']:
+                    self.secondary_screen = screen
+                else:
+                    self.primary_screen = screen
+
+        self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
+
+        self.init_components()
+        self.add_widgets()
+
+        self.main.update_status_signal.emit('Creating GUI: Building Menu Bar', 'status')
+        self.create_menu_bar()
+        self.main.update_status_signal.emit('Creating GUI: Creating Special Display Widgets', 'status')
+        self.make_special_display_widgets()
+
+        self.position_screens(self.primary_screen, self.secondary_screen)
+        self.sample_widget.show()
+        self.sample_widget.hide()
+
+        self.main.update_status_signal.emit('Finalizing', 'status')
+        self.tool_bar.sw = IndexedSettingsWidget(self)
+        QApplication.processEvents()
+
+        if len(self.main.settings) > 0:
+            self.apply_settings()
+
+        self.check_update()
+
+    def check_files(self):
+        if 'linux' in sys.platform:
+            self.main.user_dir = os.path.expanduser('~/.config/ProjectOn')
+        else:
+            self.main.user_dir = os.path.expanduser('~/AppData/Roaming/ProjectOn')
+        if not exists(self.main.user_dir):
+            os.mkdir(self.main.user_dir)
+        self.main.device_specific_config_file = os.path.expanduser(self.main.user_dir + '/localConfig.json')
+
+        if not exists(self.main.device_specific_config_file):
+            device_specific_settings = {
+                'used_services': [],
+                'last_save_dir': '',
+                'last_status_count': 100,
+                'data_dir': '',
+                'selected_screen_name': ''
+            }
+            with open(self.main.device_specific_config_file, 'w') as file:
+                file.write(json.dumps(device_specific_settings))
+        else:
+            with open(self.main.device_specific_config_file, 'r') as file:
+                device_specific_settings = json.loads(file.read())
+
+        data_dir = False
+        if 'data_dir' in device_specific_settings.keys():
+            if '~' in device_specific_settings['data_dir']:
+                self.main.data_dir = os.path.expanduser(device_specific_settings['data_dir'])
+            else:
+                self.main.data_dir = device_specific_settings['data_dir']
+
+            if exists(self.main.data_dir):
+                data_dir = True
+
+        if not data_dir:
+            dialog = QDialog()
+            dialog.setWindowTitle('Locate Data Directory')
+            layout = QVBoxLayout(dialog)
+
+            label = QLabel('Unable to locate the data directory. Would you like to locate it yourself?<br /><br />'
+                           '(The Data Directory contains "projecton.db")')
+            layout.addWidget(label)
+
+            button_widget = QWidget()
+            layout.addWidget(button_widget)
+            button_layout = QHBoxLayout(button_widget)
+
+            ok_button = QPushButton('Locate')
+            ok_button.setFont(self.standard_font)
+            ok_button.setMinimumHeight(36)
+            ok_button.pressed.connect(lambda: dialog.done(1))
+            button_layout.addStretch()
+            button_layout.addWidget(ok_button)
+            button_layout.addSpacing(20)
+
+            create_new_button = QPushButton('Create New')
+            create_new_button.setFont(self.standard_font)
+            create_new_button.setMinimumHeight(36)
+            create_new_button.setToolTip('Create a new data directory')
+            create_new_button.pressed.connect(lambda: dialog.done(2))
+            button_layout.addWidget(create_new_button)
+            button_layout.addSpacing(20)
+
+            cancel_button = QPushButton('Quit')
+            cancel_button.setFont(self.standard_font)
+            cancel_button.setMinimumHeight(36)
+            cancel_button.pressed.connect(lambda: dialog.done(-1))
+            button_layout.addWidget(cancel_button)
+            button_layout.addStretch()
+
+            response = dialog.exec()
+            if response == 1:
+                result = QFileDialog.getExistingDirectory(
+                    None,
+                    'Data Directory',
+                    os.path.expanduser('~/Documents')
+                )
+                if len(result) == 0:
+                    sys.exit(-1)
+                self.main.data_dir = result
+            elif response == -1:
+                sys.exit(-1)
+            elif response == 2:
+                if 'linux' in sys.platform:
+                    data_dir_string = '~/.config/ProjectOn'
+                else:
+                    data_dir_string = '~/AppData/Roaming/ProjectOn'
+
+                self.main.data_dir = os.path.expanduser(data_dir_string)
+                if not exists(self.main.data_dir):
+                    os.mkdir(self.main.data_dir)
+
+                device_specific_settings['data_dir'] = self.main.data_dir
+                shutil.copytree('resources/defaults/data', self.main.data_dir)
+
+        self.main.config_file = self.main.data_dir + '/settings.json'
+        self.main.database = self.main.data_dir + '/projecton.db'
+        self.main.background_dir = self.main.data_dir + '/backgrounds'
+        self.main.image_dir = self.main.data_dir + '/images'
+        self.main.bible_dir = self.main.data_dir + '/bibles'
+        self.main.video_dir = self.main.data_dir + '/videos'
+
+        # provide default settings should the settings file not exist
+        default_settings = DEFAULT_SETTINGS
+        default_settings['data_dir'] = self.main.data_dir
+
+        if exists(self.main.config_file):
+            with open(self.main.config_file, 'r') as file:
+                try:
+                    self.main.settings = json.loads(file.read())
+                except json.decoder.JSONDecodeError:
+                    self.main.settings = default_settings
+
+            # make sure the new font keys exist; copy them from the old if not
+            if 'song_font_face' not in self.main.settings.keys() or 'bible_font_face' not in self.main.settings.keys():
+                self.main.settings['song_font_face'] = self.main.settings['font_face']
+                self.main.settings['song_font_size'] = self.main.settings['font_size']
+                self.main.settings['song_font_color'] = self.main.settings['font_color']
+                self.main.settings['song_use_shadow'] = self.main.settings['use_shadow']
+                self.main.settings['song_shadow_color'] = self.main.settings['shadow_color']
+                self.main.settings['song_shadow_offset'] = self.main.settings['shadow_offset']
+                self.main.settings['song_use_outline'] = self.main.settings['use_outline']
+                self.main.settings['song_outline_color'] = self.main.settings['outline_color']
+                self.main.settings['song_outline_width'] = self.main.settings['outline_width']
+
+                self.main.settings['bible_font_face'] = self.main.settings['font_face']
+                self.main.settings['bible_font_size'] = self.main.settings['font_size']
+                self.main.settings['bible_font_color'] = self.main.settings['font_color']
+                self.main.settings['bible_use_shadow'] = self.main.settings['use_shadow']
+                self.main.settings['bible_shadow_color'] = self.main.settings['shadow_color']
+                self.main.settings['bible_shadow_offset'] = self.main.settings['shadow_offset']
+                self.main.settings['bible_use_outline'] = self.main.settings['use_outline']
+                self.main.settings['bible_outline_color'] = self.main.settings['outline_color']
+                self.main.settings['bible_outline_width'] = self.main.settings['outline_width']
+
+                self.main.settings.pop('font_face')
+                self.main.settings.pop('font_size')
+                self.main.settings.pop('font_color')
+                self.main.settings.pop('use_shadow')
+                self.main.settings.pop('shadow_color')
+                self.main.settings.pop('shadow_offset')
+                self.main.settings.pop('use_outline')
+                self.main.settings.pop('outline_color')
+                self.main.settings.pop('outline_width')
+
+                self.main.save_settings()
+
+        else:
+            self.main.settings = default_settings
+
+        # check for any missing keys in what was pulled from the config file
+        for key in default_settings:
+            if key not in self.main.settings.keys():
+                self.main.settings[key] = default_settings[key]
+
+        self.main.save_settings()
+
+        if (sys.platform == 'win32'
+                and 'force_software_rendering' in self.main.settings.keys()
+                and self.main.settings['force_software_rendering']):
+            os.environ['QMLSCENE_DEVICE'] = 'softwarecontext'
+
+        self.main.settings['used_services'] = device_specific_settings['used_services']
+        self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']
+        if 'selected_screen_name' in device_specific_settings.keys():
+            self.main.settings['selected_screen_name'] = device_specific_settings['selected_screen_name']
+        else:
+            self.main.settings['selected_screen_name'] = ''
+        if 'last_status_count' in device_specific_settings.keys():
+            self.main.settings['last_status_count'] = device_specific_settings['last_status_count']
+        self.main.settings['data_dir'] = self.main.data_dir
+        if 'show_songselect_warning' in device_specific_settings.keys():
+            self.main.settings['show_songselect_warning'] = device_specific_settings['show_songselect_warning']
+
+        # check for the rest of the necessary files/directories
+        if not exists(self.main.database):
+            shutil.copy('resources/defaults/data/projecton.db', self.main.database)
+
+        if not exists(self.main.background_dir):
+            shutil.copytree('resources/defaults/data/backgrounds', self.main.background_dir)
+            from core.runnables import IndexImages
+            ii = IndexImages(self.main, 'backgrounds')
+            self.main.thread_pool.start(ii)
+            self.main.thread_pool.waitForDone()
+
+        if not exists(self.main.image_dir):
+            shutil.copytree('resources/defaults/data/images', self.main.image_dir)
+            from core.runnables import IndexImages
+            ii = IndexImages(self.main, 'images')
+            self.main.thread_pool.start(ii)
+            self.main.thread_pool.waitForDone()
+
+        if not exists(self.main.bible_dir):
+            shutil.copytree('resources/defaults/data/bibles', self.main.bible_dir)
+
+        if not exists(self.main.video_dir):
+            shutil.copytree('resources/defaults/data/videos', self.main.video_dir)
+
+    def init_components(self):
+        """
+        Creates and positions the main window, the display widget, and the hidden sample_widget needed for properly
+        formatting the display widget.
+        """
+
+        self.main_window = CustomMainWindow(self)
+        self.main_window.setObjectName('main_window')
+        self.main_window.setWindowIcon(QIcon('resources/branding/logo.svg'))
+        self.main_window.setWindowTitle('ProjectOn')
+
+        self.central_widget = QWidget()
+        self.central_widget.setObjectName('central_widget')
+
+        self.main_window.setCentralWidget(self.central_widget)
+        self.central_layout = QGridLayout()
+        self.central_widget.setLayout(self.central_layout)
+
+        self.main.update_status_signal.emit('Creating GUI: Building Display Widget', 'status')
+        self.display_widget = DisplayWidget(self)
+        self.display_widget.setWindowIcon(QIcon('resources/branding/logo.svg'))
+        self.display_widget.setWindowTitle('ProjectOn Display Window')
+        self.display_widget.setCursor(Qt.CursorShape.BlankCursor)
+
+        self.display_layout = QVBoxLayout()
+        self.display_layout.setContentsMargins(0, 0, 0, 0)
+        self.display_widget.setLayout(self.display_layout)
+        self.lyric_widget = LyricDisplayWidget(self)
+        self.display_layout.addWidget(self.lyric_widget)
+
+        self.main.update_status_signal.emit('Creating GUI: Building Sample Widget', 'status')
+        self.sample_widget = DisplayWidget(self, sample=True)
+        self.sample_widget.setWindowTitle('Sample Widget')
+        self.sample_layout = QVBoxLayout()
+        self.sample_layout.setContentsMargins(0, 0, 0, 0)
+        self.sample_widget.setLayout(self.sample_layout)
+        self.sample_lyric_widget = LyricDisplayWidget(self, for_sample=True)
+        self.sample_layout.addWidget(self.sample_lyric_widget)
+
+    def add_widgets(self):
+        """
+        Adds all the necessary widgets.py to the main window, display screen, and sample widget
+        """
+        self.main.update_status_signal.emit('Creating GUI: Adding Tool Bar', 'status')
+        tool_bar_container = QWidget()
+        tool_bar_container.setObjectName('tool_bar_container')
+        tool_bar_container.setAutoFillBackground(True)
+        tool_bar_layout = QVBoxLayout(tool_bar_container)
+        tool_bar_layout.setContentsMargins(0, 0, 0, 0)
+        self.central_layout.addWidget(tool_bar_container, 0, 0, 1, 4)
+
+        self.tool_bar = Toolbar(self)
+        self.tool_bar.init_components()
+        tool_bar_layout.addWidget(self.tool_bar)
+
+        tool_bar_divider = QWidget()
+        tool_bar_divider.setContentsMargins(0, 0, 0, 0)
+        tool_bar_divider.setStyleSheet('background: #6060c0')
+        tool_bar_divider.setFixedHeight(2)
+        tool_bar_layout.addWidget(tool_bar_divider)
+
+        self.main.update_status_signal.emit('Creating GUI: Adding Media Widget', 'status')
+        self.media_widget = MediaWidget(self)
+        self.central_layout.addWidget(self.media_widget, 2, 0)
+        self.main.update_status_signal.emit('', 'info')
+
+        self.main.update_status_signal.emit('Creating GUI: Adding OOS Widget', 'status')
+        self.oos_widget = OOSWidget(self)
+        self.central_layout.addWidget(self.oos_widget, 1, 0)
+
+        self.main.update_status_signal.emit('Creating GUI: Adding Preview Widget', 'status')
+        self.preview_widget = PreviewWidget(self)
+        self.central_layout.addWidget(self.preview_widget, 1, 2, 2, 1)
+
+        self.main.update_status_signal.emit('Creating GUI: Adding Live Widget', 'status')
+        self.live_widget = LiveWidget(self)
+        self.central_layout.addWidget(self.live_widget, 1, 3, 2, 1)
+
+    def create_menu_bar(self):
+        """
+        Creates the main window's menu bar
+        """
+        menu_bar = self.main_window.menuBar()
+        file_menu = menu_bar.addMenu('File')
+
+        new_action = file_menu.addAction('Create a New Service')
+        new_action.setShortcut(QKeySequence('Ctrl+N'))
+        new_action.triggered.connect(self.new_service)
+
+        open_action = file_menu.addAction('Open a Service')
+        open_action.setShortcut(QKeySequence('Ctrl+O'))
+        open_action.triggered.connect(self.main.load_service)
+
+        self.open_recent_menu = file_menu.addMenu('Open Recent Service')
+        if 'used_services' in self.main.settings.keys():
+            for item in self.main.settings['used_services']:
+                open_recent_action = QAction(item[1], self.open_recent_menu)
+                path = item[0] + '/' + item[1]
+                open_recent_action.triggered.connect(lambda checked, path=path: self.main.load_service(path))
+                self.open_recent_menu.addAction(open_recent_action)
+
+        save_action = file_menu.addAction('Save Service')
+        save_action.setShortcut(QKeySequence('Ctrl+S'))
+        save_action.triggered.connect(self.main.save_service)
+
+        print_action = file_menu.addAction('Print Order of Service')
+        print_action.setShortcut(QKeySequence('Ctrl+P'))
+        print_action.triggered.connect(self.print_oos)
+
+        file_menu.addSeparator()
+
+        import_menu = file_menu.addMenu('Import')
+
+        openlp_import_action = import_menu.addAction('Import Songs from OpenLP')
+        openlp_import_action.triggered.connect(self.tool_bar.import_songs)
+
+        ccli_import_action = import_menu.addAction('Import SongSelect Lyrics File')
+        ccli_import_action.triggered.connect(self.ccli_import)
+
+        chord_pro_import_action = import_menu.addAction('Import a ChordPro Song')
+        chord_pro_import_action.triggered.connect(self.chord_pro_import)
+
+        open_lyrics_import_action = import_menu.addAction('Import an OpenLyrics Song')
+        open_lyrics_import_action.triggered.connect(self.open_lyrics_import)
+
+        export_action = file_menu.addAction('Export Songs')
+        export_action.triggered.connect(lambda: OpenlyricsExport(self))
+
+        backup_menu = file_menu.addMenu('Backup')
+
+        backup_action = backup_menu.addAction('Backup Your Data')
+        backup_action.triggered.connect(self.main.do_backup)
+
+        restore_action = backup_menu.addAction('Restore from Backup')
+        restore_action.triggered.connect(self.main.restore_from_backup)
+
+        file_menu.addSeparator()
+
+        exit_action = file_menu.addAction('Exit')
+        exit_action.triggered.connect(self.main_window.close)
+
+        tool_menu = menu_bar.addMenu('Tools')
+
+        hide_action = tool_menu.addAction('Show/Hide Display Screen')
+        hide_action.setShortcut(QKeySequence('Ctrl+D'))
+        hide_action.triggered.connect(self.show_hide_display_screen)
+
+        black_action = tool_menu.addAction('Show/Hide Black Screen')
+        black_action.setShortcut(QKeySequence('Ctrl+B'))
+        black_action.triggered.connect(self.display_black_screen)
+
+        logo_action = tool_menu.addAction('Show/Hide Logo Screen')
+        logo_action.setShortcut(QKeySequence('Ctrl+L'))
+        logo_action.triggered.connect(self.display_logo_screen)
+
+        tool_menu.addSeparator()
+
+        block_remote_action = tool_menu.addAction('Block Remote Inputs')
+        block_remote_action.setCheckable(True)
+        block_remote_action.setChecked(False)
+        block_remote_action.triggered.connect(self.block_unblock_remote)
+
+        view_web_messages_action = tool_menu.addAction('View Web Page Messages')
+        view_web_messages_action.triggered.connect(self.view_web_messages)
+
+        tool_menu.addSeparator()
+
+        settings_action = tool_menu.addAction('Settings')
+        settings_action.setShortcut(QKeySequence('Ctrl+Alt+S'))
+        settings_action.triggered.connect(self.tool_bar.open_settings)
+
+        theme_menu = tool_menu.addMenu('Theme')
+
+        light_action = theme_menu.addAction('Light')
+        light_action.triggered.connect(lambda: self.set_theme('light'))
+
+        dark_action = theme_menu.addAction('Dark')
+        dark_action.triggered.connect(lambda: self.set_theme('dark'))
+
+        tool_menu.addSeparator()
+
+        import_bible_action = tool_menu.addAction('Import XML Bible')
+        import_bible_action.triggered.connect(self.main.import_xml_bible)
+
+        """ccli_credentials_action = tool_menu.addAction('Save/Change CCLI SongSelect Password')
+        ccli_credentials_action.triggered.connect(self.save_ccli_password)"""
+
+        move_data_action = tool_menu.addAction('Move Data Folder')
+        move_data_action.triggered.connect(self.main.move_data_folder)
+
+        select_data_action = tool_menu.addAction('Select Existing Data Folder')
+        select_data_action.triggered.connect(self.main.select_data_folder)
+
+        help_menu = menu_bar.addMenu('Help')
+
+        about_action = help_menu.addAction('About')
+        about_action.setShortcut(QKeySequence('Ctrl+A'))
+        about_action.triggered.connect(self.show_about)
+
+        help_action = help_menu.addAction('Help Contents')
+        help_action.setShortcut(QKeySequence('F1'))
+        help_action.triggered.connect(self.show_help)
+
+        video_action = help_menu.addAction('Video Tutorial')
+        video_url = 'https://youtu.be/hUmMZhuyVJ8'
+        if os.name == 'nt':
+            video_action.triggered.connect(lambda: os.system(f'start \"\" {video_url}'))
+        elif os.name == 'linux':
+            video_action.triggered.connect(lambda: os.system(f'xdg-open \'\' {video_url}'))
+
+    def set_theme(self, theme):
+        if theme == 'light':
+            self.main.settings['theme'] = 'light'
+            self.main.app.setStyleSheet(self.light_style_sheet)
+        else:
+            self.main.settings['theme'] = 'dark'
+            self.main.app.setStyleSheet(self.dark_style_sheet)
+        QApplication.processEvents()
+
+    def check_update(self):
+        current_version = 'v.1.10.0'
+        current_version = current_version.replace('v.', '')
+        current_version = current_version.replace('rc', '')
+        current_version_split = current_version.split('.')
+        current_major = int(current_version_split[0])
+        current_minor = int(current_version_split[1])
+        current_patch = int(current_version_split[2])
+
+        try:
+            response = requests.get('https://api.github.com/repos/pastorjeremywilson/ProjectOn/releases', timeout=20)
+        except Exception:
+            return
+
+        if response and response.status_code == 200:
+            text = response.text
+            release_info = json.loads(text)
+            if len(release_info) == 0:
+                return
+
+            newest_version = release_info[0]
+            newest_version_tag = newest_version['tag_name']
+            newest_version_tag = newest_version_tag.replace('v.', '')
+            newest_version_tag = newest_version_tag.replace('rc', '')
+            this_version_split = newest_version_tag.split('.')
+            this_major = int(this_version_split[0])
+            this_minor = int(this_version_split[1])
+            this_patch = int(this_version_split[2])
+
+            ask_update = False
+            if this_major > current_major:
+                ask_update = True
+            elif this_major == current_major and this_minor > current_minor:
+                ask_update = True
+            elif this_minor == current_minor and this_patch > current_patch:
+                ask_update = True
+
+            if 'skip_update' in self.main.settings.keys():
+                if self.main.settings['skip_update'] == newest_version['tag_name']:
+                    return
+                
+            if ask_update:
+                release_notes = newest_version['body'].split('[!')[0].strip()
+
+                dialog = QDialog()
+                dialog.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
+                layout = QVBoxLayout(dialog)
+                dialog.setWindowTitle('Update ProjectOn')
+
+                label = QLabel(f'An updated version of ProjectOn is available ({newest_version["tag_name"]}). '
+                               f'Would you like to update now?')
+                label.setFont(self.standard_font)
+                layout.addWidget(label)
+
+                notes_label = QLabel(release_notes)
+                label.setFont(self.standard_font)
+                layout.addWidget(notes_label)
+
+                checkbox = QCheckBox('Don\'t remind me again for this version')
+                layout.addWidget(checkbox, Qt.AlignmentFlag.AlignCenter)
+
+                button_widget = QWidget()
+                button_layout = QHBoxLayout(button_widget)
+                layout.addWidget(button_widget)
+
+                yes_button = QPushButton('Yes')
+                yes_button.setFont(self.standard_font)
+                yes_button.pressed.connect(lambda: dialog.done(1))
+                button_layout.addStretch()
+                button_layout.addWidget(yes_button)
+                button_layout.addSpacing(20)
+
+                no_button = QPushButton('No')
+                no_button.setFont(self.standard_font)
+                no_button.pressed.connect(lambda: dialog.done(0))
+                button_layout.addWidget(no_button)
+                button_layout.addSpacing(20)
+
+                release_notes_button = QPushButton('View Release Notes')
+                release_notes_button.setFont(self.standard_font)
+                release_notes_button.pressed.connect(lambda: show_notes(commits=False))
+                button_layout.addWidget(release_notes_button)
+                button_layout.addStretch()
+
+                response = dialog.exec()
+
+                if checkbox.isChecked():
+                    self.main.settings['skip_update'] = newest_version['tag_name']
+                else:
+                    self.main.settings['skip_update'] = 'none'
+
+                if response == 1:
+                    download_url = newest_version['assets'][0]['browser_download_url']
+                    download_dir = tempfile.gettempdir()
+                    file_name_split = download_url.split('/')
+                    file_name = file_name_split[len(file_name_split) - 1]
+                    save_location = download_dir + '/' + file_name
+
+                    self.dialog = None
+                    self.progress_bar = QProgressBar()
+                    def show_progress(block_num, block_size, total_size):
+                        if not self.dialog:
+                            self.dialog = QWidget(self.main_window)
+                            dialog_layout = QVBoxLayout(self.dialog)
+
+                            label = QLabel(f'Downloading {file_name}')
+                            label.setFont(self.bold_font)
+                            dialog_layout.addWidget(label)
+
+                            self.progress_bar.setRange(0, total_size)
+                            self.progress_bar.setValue(block_size)
+                            self.progress_bar.setTextVisible(True)
+                            self.progress_bar.setFont(self.standard_font)
+                            dialog_layout.addWidget(self.progress_bar)
+
+                            self.dialog.adjustSize()
+                            x = int((self.main_window.width() / 2) - (self.dialog.width() / 2))
+                            y = int((self.main_window.height() / 2) - (self.dialog.height() / 2))
+                            self.dialog.move(x, y)
+                            self.dialog.show()
+                            self.main.app.processEvents()
+
+                        self.progress_bar.setValue(self.progress_bar.value() + block_size)
+                        self.main.app.processEvents()
+                        if self.progress_bar.value() + block_size >= total_size:
+                            self.dialog.deleteLater()
+
+                    from urllib.request import urlretrieve
+                    urlretrieve(download_url, save_location, show_progress)
+
+                    QMessageBox.information(
+                        self.main_window,
+                        'Closing Program',
+                        'ProjectOn will now close to install the new version.',
+                        QMessageBox.StandardButton.Ok
+                    )
+                    os.system(f'start \"\" {save_location}')
+                    self.main_window.close()
+                    sys.exit(0)
+
+    def print_oos(self):
+        """
+        Provides a method to create a printout of the current order of service
+        """
+
+        document_html = '<table>'
+        for i in range(self.oos_widget.oos_list_widget.count()):
+            item = self.oos_widget.oos_list_widget.item(i)
+            widget = self.oos_widget.oos_list_widget.itemWidget(item)
+            if widget:
+                pixmap = widget.icon.pixmap()
+                type = widget.subtitle.text()
+                title = widget.title.text()
+
+                byte_array = QByteArray()
+                buffer = QBuffer(byte_array)
+                pixmap.save(buffer, "PNG")
+                base64_data = base64.b64encode(byte_array.data()).decode()
+                document_html += (f'<tr>'
+                                  f'    <td>'
+                                  f'        <span style="font-family: \'Arial\'; font-size: 12pt; font-weight: bold;">'
+                                  f'            {i + 1}.'
+                                  f'        </span>'
+                                  f'    </td>'
+                                  f'    <td><img src="data:image/png;base64,{base64_data}" /></td>'
+                                  f'    <td>'
+                                  f'        <span style="font-family: \'Arial\'; font-size: 12pt; font-weight: bold;">'
+                                  f'            {title}'
+                                  f'        </span>'
+                                  f'        <br />'
+                                  f'        <span style="font-family: \'Arial\'; font-size: 10pt;">{type}</span>'
+                                  f'        <br />'
+                                  f'    </td>'
+                                  f'</tr>')
+        document_html += '</table>'
+
+        document = QTextDocument()
+        document.setHtml(document_html)
+        from gui.widgets.widgets import PrintDialog
+        PrintDialog(document)
+
+    def ccli_import(self):
+        from importExport.songselectImport import SongselectImport
+        SongselectImport(self)
+
+    def chord_pro_import(self):
+        importer = Importers(self)
+        importer.do_import(importer.CHORDPRO)
+
+    def open_lyrics_import(self):
+        importer = Importers(self)
+        importer.do_import(importer.OPENLYRICS)
+
+    def save_ccli_password(self):
+        importer = SongselectImport(self, suppress_browser=True)
+        importer.store_credentials()
+
+    def show_help(self):
+        self.help = Help(self)
+
+    def show_about(self):
+        widget = QDialog()
+        widget.setObjectName('widget')
+        widget.setParent(self.main_window)
+        widget.setLayout(QVBoxLayout())
+
+        title_widget = QWidget()
+        title_widget.setLayout(QHBoxLayout())
+        widget.layout().addWidget(title_widget)
+
+        title_pixmap = QPixmap('resources/branding/logo.svg')
+        title_pixmap = title_pixmap.scaled(
+            36, 36, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        title_pixmap_label = QLabel()
+        title_pixmap_label.setPixmap(title_pixmap)
+        title_widget.layout().addWidget(title_pixmap_label)
+
+        title_label = QLabel('ProjectOn v.1.10.0')
+        title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
+        title_widget.layout().addWidget(title_label)
+        title_widget.layout().addStretch()
+
+        remote_widget = QWidget()
+        remote_layout = QGridLayout()
+        remote_widget.setLayout(remote_layout)
+        widget.layout().addWidget(remote_widget)
+
+        remote_title_label = QLabel('Remote Web Pages:')
+        remote_title_label.setFont(self.standard_font)
+        remote_layout.addWidget(remote_title_label, 0, 0)
+
+        remote_label = QLabel('Standard Remote-Control:')
+        remote_label.setFont(self.bold_font)
+        remote_layout.addWidget(remote_label, 1, 0)
+
+        remote_url_label = QLabel('http://' + self.main.ip + ':15171/remote')
+        remote_url_label.setFont(self.standard_font)
+        remote_layout.addWidget(remote_url_label, 1, 1)
+
+        mremote_label = QLabel('Mobile-Friendly Remote-Control:')
+        mremote_label.setFont(self.bold_font)
+        remote_layout.addWidget(mremote_label, 2, 0)
+
+        mremote_url_label = QLabel('http://' + self.main.ip + ':15171/mremote')
+        mremote_url_label.setFont(self.standard_font)
+        remote_layout.addWidget(mremote_url_label, 2, 1)
+
+        stage_label = QLabel('Stage View:')
+        stage_label.setFont(self.bold_font)
+        remote_layout.addWidget(stage_label, 3, 0)
+
+        stage_url_label = QLabel('http://' + self.main.ip + ':15171/stage')
+        stage_url_label.setFont(self.standard_font)
+        remote_layout.addWidget(stage_url_label, 3, 1)
+
+        database_label = QLabel(f'Database Location: {self.main.database}')
+        database_label.setFont(self.standard_font)
+        widget.layout().addWidget(database_label)
+        widget.layout().addSpacing(20)
+
+        about_text = QTextBrowser()
+        about_text.setOpenExternalLinks(True)
+        about_text.setHtml('''
+                    <p>ProjectOn is free software: you can redistribute it and/or
+                    modify it under the terms of the GNU General Public License (GNU GPL)
+                    published by the Free Software Foundation, either version 3 of the
+                    License, or (at your option) any later version.</p>
+
+                    <p>This program is distributed in the hope that it will be useful,
+                    but WITHOUT ANY WARRANTY; without even the implied warranty of
+                    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+                    GNU General Public License for more details.</p>
+
+                    <p>You should have received a copy of the GNU General Public License
+                    along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+
+                    <p>This program is a work-in-progress by a guy who is not, in no way, a
+                    professional programmer. If you run into any problems, unexpected behavior,
+                    missing features, or attempts to assimilate your unique biological and
+                    technological distinctiveness, email <a href="mailto:pastorjeremywilson@gmail.com">pastorjeremywilson@gmail.com</a></p>
+                ''')
+        widget.layout().addWidget(about_text)
+
+        release_notes_wiget = QWidget()
+        widget.layout().addWidget(release_notes_wiget)
+        release_notes_layout = QHBoxLayout(release_notes_wiget)
+
+        release_notes_button = QPushButton('View Release Notes')
+        release_notes_button.setFont(self.standard_font)
+        release_notes_button.pressed.connect(show_notes)
+        release_notes_layout.addStretch()
+        release_notes_layout.addWidget(release_notes_button)
+        release_notes_layout.addStretch()
+
+        ok_button = QPushButton('OK')
+        ok_button.setFont(self.standard_font)
+        ok_button.setObjectName('ok_button')
+        ok_button.setMaximumWidth(60)
+        ok_button.clicked.connect(lambda: widget.done(0))
+        widget.layout().addWidget(ok_button, Qt.AlignmentFlag.AlignCenter)
+
+        widget.show()
+
+    def block_unblock_remote(self):
+        """
+        Provides a method for blocking signals coming in through the remote interface. Needed during live situations
+        when someone on the remote may perform undesired clicks.
+        """
+        if self.block_remote_input:
+            if self.main_window.menuBar().findChild(QLabel, 'block_label'):
+                self.main_window.menuBar().findChild(QLabel, 'block_label').setText('')
+            self.block_remote_input = False
+        else:
+            self.block_remote_input = True
+            if self.main_window.menuBar().findChild(QLabel, 'block_label'):
+                self.main_window.menuBar().findChild(QLabel, 'block_label').setText('REMOTE INPUT IS BLOCKED')
+            else:
+                block_label = QLabel('REMOTE INPUT IS BLOCKED')
+                block_label.setParent(self.main_window.menuBar())
+                block_label.setObjectName('block_label')
+                block_label.setStyleSheet('background: white; color: red;')
+                block_label.setFont(self.bold_font)
+                block_label.adjustSize()
+                block_label.move(int(self.main_window.menuBar().width() / 2) - int(block_label.width() / 2),
+                                 int(self.main_window.menuBar().height() / 2) - int(block_label.height() / 2))
+                block_label.show()
+
+    def view_web_messages(self):
+        dialog = QDialog(self.main_window)
+        layout = QVBoxLayout(dialog)
+
+        dialog.setWindowTitle('Web Page Messages')
+        dialog.setWindowIcon(QIcon('resources/branding/logo.svg'))
+        dialog.setMinimumWidth(800)
+
+        label = QLabel('Messages from loaded web pages:')
+        label.setFont(self.standard_font)
+        layout.addWidget(label)
+
+        text_edit = QTextEdit()
+        text_edit.setFont(self.standard_font)
+        text_edit.setReadOnly(True)
+        text_edit.setHtml(self.web_engine_page.messages)
+        layout.addWidget(text_edit)
+
+        button_widget = QWidget()
+        layout.addWidget(button_widget)
+        button_layout = QHBoxLayout(button_widget)
+
+        ok_button = QPushButton('OK')
+        ok_button.setFont(self.standard_font)
+        ok_button.pressed.connect(lambda: dialog.done(0))
+        button_layout.addStretch()
+        button_layout.addWidget(ok_button)
+        button_layout.addStretch()
+
+        dialog.exec()
+
+    def grab_display(self):
+        """
+        Provides a method to grab the display widget and scale it down as a preview.
+        """
+        if self.error_in_loop:
+            return
+        pixmap = self.display_widget.grab()
+
+        try:
+            if pixmap:
+                if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
+                    buffer = QBuffer()
+                    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                    success = pixmap.save(buffer, 'JPEG', 70)
+
+                    if success:
+                        jpg_bytes = buffer.data().data()
+                        self.main.remote_server.socketio.emit('update_display', [jpg_bytes, ''])
+                    else:
+                        print("Failed to save pixmap as JPEG!")
+
+                    buffer.close()
+                pixmap = pixmap.scaled(
+                    int(self.display_widget.width() / 5), int(self.display_widget.height() / 5),
+                    Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                self.live_widget.preview_label.setPixmap(pixmap)
+        except Exception:
+            self.main.error_log()
+            self.error_in_loop = True
+
+    def size_background_to_screen(self, pixmap):
+        width = pixmap.width()
+        height = pixmap.height()
+        display_width = self.secondary_screen.size().width()
+        display_height = self.secondary_screen.size().height()
+        if width < display_width and height >= display_height:
+            pixmap = pixmap.scaledToWidth(display_width)
+            y = int((pixmap.height() - display_height) / 2)
+            pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
+        elif height < display_height and width >= display_width:
+            pixmap = pixmap.scaledToHeight(display_height)
+            x = int((pixmap.width() - display_width) / 2)
+            pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
+        elif width < display_width and height < display_height:
+            wdiff = display_width - width
+            hdiff = display_height - height
+            if wdiff > hdiff and not pixmap.isNull():
+                pixmap = pixmap.scaledToWidth(display_width)
+                y = int((pixmap.height() - display_height) / 2)
+                pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
+            elif not pixmap.isNull():
+                pixmap = pixmap.scaledToHeight(display_height)
+                x = int((pixmap.width() - display_width) / 2)
+                pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
+        else:
+            wdiff = width - display_width
+            hdiff = height - display_height
+            if wdiff < hdiff:
+                pixmap = pixmap.scaledToWidth(display_width)
+                y = int((pixmap.height() - display_height) / 2)
+                pixmap = pixmap.copy(QRect(0, y, display_width, display_height))
+            else:
+                pixmap = pixmap.scaledToHeight(display_height)
+                x = int((pixmap.width() - display_width) / 2)
+                pixmap = pixmap.copy(QRect(x, 0, display_width, display_height))
+
+        return pixmap
+
+    def apply_settings(self, theme_too=True):
+        """
+        Provides a method to apply all of the settings obtained from the settings json file.
+        Args:
+            theme_too (bool): Whether also to apply theme settings.
+        Returns:
+            None
+        """
+        try:
+            # if/else the settings because things occur
+            if 'global_song_background' in self.main.settings.keys() and self.main.settings['global_song_background']:
+                pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['global_song_background'])
+            else:
+                self.main.settings['global_song_background'] = self.tool_bar.song_background_combobox.itemData(
+                    2, Qt.ItemDataRole.UserRole)
+                pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['global_song_background'])
+            self.global_song_background_pixmap = self.size_background_to_screen(pixmap)
+
+            if 'global_bible_background' in self.main.settings.keys() and self.main.settings['global_bible_background']:
+                pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['global_bible_background'])
+            else:
+                self.main.settings['global_bible_background'] = self.tool_bar.bible_background_combobox.itemData(
+                    2, Qt.ItemDataRole.UserRole)
+                pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['global_bible_background'])
+            self.global_bible_background_pixmap = self.size_background_to_screen(pixmap)
+
+            if theme_too:
+                if 'theme' in self.main.settings.keys():
+                    if self.main.settings['theme'] == 'light':
+                        self.set_theme('light')
+                    else:
+                        self.set_theme('dark')
+                else:
+                    self.set_theme('dark')
+
+            self.tool_bar.song_background_combobox.blockSignals(True)
+            self.tool_bar.bible_background_combobox.blockSignals(True)
+
+            # check that the saved song backgrounds exists in the comboboxes
+            index = None
+            for i in range(self.tool_bar.bible_background_combobox.count()):
+                if self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole):
+                    if (self.main.settings['global_song_background']
+                            in self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole)):
+                        index = i
+
+            # set the song background combobox to the saved song background
+            if index and not index == -1:
+                self.tool_bar.song_background_combobox.setCurrentIndex(index)
+                pixmap = QPixmap(self.main.background_dir + '/' + self.main.settings['global_song_background'])
+                pixmap = self.size_background_to_screen(pixmap)
+                self.global_song_background_pixmap = pixmap
+            # show a message and set to default if the song background wasn't found
+            else:
+                if not self.main.settings["global_song_background"] == 'choose_global':
+                    QMessageBox.information(
+                        self.main_window,
+                        'Song Background Missing',
+                        f'Saved song background "{self.main.settings["global_song_background"]}" not found in current list. Using current default.',
+                        QMessageBox.StandardButton.Ok
+                    )
+
+            # check that the saved bible background exists in the combobox
+            index = None
+            for i in range(self.tool_bar.bible_background_combobox.count()):
+                if self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole):
+                    if (self.main.settings['global_bible_background']
+                            in self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole)):
+                        index = i
+
+            # set the bible background combobox to the saved bible background
+            if index and not index == -1:
+                self.tool_bar.bible_background_combobox.setCurrentIndex(index)
+
+                pixmap = QPixmap(self.main.background_dir + '/' + self.main.settings['global_bible_background'])
+                pixmap = self.size_background_to_screen(pixmap)
+                self.global_bible_background_pixmap = pixmap
+            # show a message and set to default if the song background wasn't found
+            else:
+                if not self.main.settings["global_song_background"] == 'choose_global':
+                    QMessageBox.information(
+                        self.main_window,
+                        'Song Background Missing',
+                        f'Saved song background "{self.main.settings["global_bible_background"]}" '
+                        f'not found in current list. Using current default.',
+                        QMessageBox.StandardButton.Ok
+                    )
+
+            self.tool_bar.song_font_widget.apply_settings()
+            self.tool_bar.bible_font_widget.apply_settings()
+
+            self.tool_bar.song_background_combobox.blockSignals(False)
+            self.tool_bar.bible_background_combobox.blockSignals(False)
+
+            self.set_logo_image(self.main.image_dir + '/' + self.main.settings['logo_image'])
+            self.change_display('live')
+            self.change_display('sample')
+
+            if self.main.settings['countdown_settings']['use_countdown']:
+                if self.countdown_widget:
+                    self.countdown_widget.deleteLater()
+                    self.main.app.processEvents()
+                if self.countdown_timer:
+                    self.countdown_timer.stop()
+
+                font = QFont(
+                    self.main.settings['countdown_settings']['font_face'],
+                    self.main.settings['countdown_settings']['font_size']
+                )
+                if self.main.settings['countdown_settings']['font_bold']:
+                    font.setBold(True)
+                self.countdown_widget = CountdownWidget(
+                    self,
+                    font,
+                    self.main.settings['countdown_settings']['position'],
+                    self.main.settings['countdown_settings']['bg_color'],
+                    self.main.settings['countdown_settings']['fg_color']
+                )
+                self.countdown_widget.hide()
+
+                now_time = datetime.now()
+                start_time = datetime(
+                    now_time.year,
+                    now_time.month,
+                    now_time.day,
+                    self.main.settings['countdown_settings']['start_time'][0],
+                    self.main.settings['countdown_settings']['start_time'][1],
+                    0,
+                    0
+                )
+                display_time = datetime(
+                    now_time.year,
+                    now_time.month,
+                    now_time.day,
+                    self.main.settings['countdown_settings']['display_time'][0],
+                    self.main.settings['countdown_settings']['display_time'][1],
+                    0,
+                    0
+                )
+                self.countdown_timer = CountdownTimer(self.main.settings, self.countdown_widget, start_time, display_time)
+                self.countdown_timer.start()
+            else:
+                if self.countdown_widget:
+                    self.countdown_widget.deleteLater()
+                    self.main.app.processEvents()
+                if self.countdown_timer:
+                    self.countdown_timer.stop()
+
+        except Exception:
+            self.main.error_log()
+
+    def new_service(self):
+        """
+        Provides a function for clearing the order of service, preview, and live list widgets.py when
+        the user wants to create a new service. Checks for changes first.
+        """
+        response = -1
+        if self.oos_widget.oos_list_widget.count() > 0 and self.changes:
+            response = QMessageBox.question(
+                self.main_window,
+                'Save Changes',
+                'Changes have been made. Save changes?',
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+            )
+
+        save_result = 1
+        if response == QMessageBox.StandardButton.Cancel:
+            return
+        elif response == QMessageBox.StandardButton.Yes:
+            save_result = self.main.save_service()
+
+        if save_result == -1:
+            return
+
+        self.oos_widget.oos_list_widget.blockSignals(True)
+        self.preview_widget.slide_list.blockSignals(True)
+        self.live_widget.slide_list.blockSignals(True)
+
+        self.oos_widget.oos_list_widget.clear()
+        self.preview_widget.slide_list.clear()
+        self.live_widget.slide_list.clear()
+        self.current_file = None
+
+        self.oos_widget.oos_list_widget.blockSignals(False)
+        self.preview_widget.slide_list.blockSignals(False)
+        self.live_widget.slide_list.blockSignals(False)
+
+        self.changes = False
+
+    def position_screens(self, primary_screen: QScreen, secondary_screen: QScreen):
+        """
+        Correctly sizes and positions the GUI and display widgets.py according to the screen layout
+        :param primary_screen: The main screen from the settings or from discovery
+        :param secondary_screen: The second screen if it exists, the main screen if not
+        :return:
+        """
+        self.primary_screen = primary_screen
+        self.secondary_screen = secondary_screen
+        if self.primary_screen == self.secondary_screen:
+            self.primary_screen = primary_screen
+            self.secondary_screen = primary_screen
+
+            display_geometry = self.primary_screen.geometry()
+            self.display_widget.setFixedSize(self.primary_screen.size())
+            self.display_widget.background_label.setGeometry(self.display_widget.geometry())
+
+            self.sample_widget.setFixedSize(self.primary_screen.size())
+            self.sample_widget.background_label.setGeometry(self.sample_widget.geometry())
+            self.sample_lyric_widget.set_geometry()
+
+            self.display_widget.move(display_geometry.topLeft())
+            self.sample_widget.move(display_geometry.topLeft())
+            self.main_window.move(display_geometry.topLeft())
+            self.main_window.setWindowState(Qt.WindowState.WindowMaximized)
+            QCoreApplication.processEvents()
+            self.main_window.show()
+            self.main_window.raise_()
+            self.main_window.activateWindow()
+
+            # set the initial state of the screen buttons
+            self.tool_bar.black_screen_button.setChecked(False)
+            self.display_black_screen()
+            self.tool_bar.logo_screen_button.setChecked(True)
+            self.display_logo_screen()
+            self.tool_bar.hide_display_button.setChecked(True)
+            self.show_hide_display_screen()
+        # place the display widget in the main screen and hide it if there is only one screen
+        else:
+            self.display_widget.move(self.secondary_screen.geometry().topLeft())
+            self.display_widget.setFixedSize(self.secondary_screen.size())
+            self.display_widget.background_label.setFixedSize(self.secondary_screen.size())
+
+            self.sample_widget.setGeometry(self.secondary_screen.geometry())
+            self.sample_widget.setFixedSize(self.secondary_screen.size())
+            self.sample_widget.background_label.setFixedSize(self.secondary_screen.size())
+            self.sample_lyric_widget.set_geometry()
+
+            self.main_window.move(self.primary_screen.geometry().topLeft())
+            self.main_window.setWindowState(Qt.WindowState.WindowMaximized)
+
+            QCoreApplication.processEvents()
+            self.main_window.show()
+            self.main_window.raise_()
+            self.main_window.activateWindow()
+
+            # set the initial state of the screen buttons
+            self.tool_bar.black_screen_button.setChecked(False)
+            self.display_black_screen()
+            self.tool_bar.logo_screen_button.setChecked(True)
+            self.display_logo_screen()
+            self.tool_bar.hide_display_button.setChecked(False)
+            self.show_hide_display_screen()
+
+    def show_server_alert(self):
+        """
+        Provides a message box if the server check has failed.
+        """
+        QMessageBox.critical(
+            self.main_window,
+            'Server Error',
+            'The remote server has failed. Save your work and restart the program to restart the server.',
+            QMessageBox.StandardButton.Ok
+        )
+
+    def live_from_remote(self, num):
+        """
+        Takes a row number from remote input's order of service and sets the order of service list widget to that row,
+        then calls send_to_live.
+        :param int num: The row number signaled from the web remote
+        """
+        if not self.oos_widget.oos_list_widget.currentRow() == num:
+            self.oos_widget.oos_list_widget.setCurrentRow(num)
+            self.main.app.processEvents()
+            self.send_to_live()
+
+    def live_slide_from_remote(self, num):
+        """
+        Takes a row number from the remote input's live slides and sets the live widget to that row.
+        :param int num: The row number signaled from the web remote
+        """
+        self.live_widget.slide_list.setCurrentRow(num)
+
+    def set_song_background(self, file):
+        """
+        Provides a method for setting the global_song_background_pixmap variable, scaling it to the display size
+        :param str file: The location of the background image file
+        """
+        self.global_song_background_pixmap = self.size_background_to_screen(QPixmap(file))
+
+        file_name_split = file.split('/')
+        file_name = file_name_split[len(file_name_split) - 1]
+        self.main.settings['global_song_background'] = file_name
+        self.main.save_settings()
+
+    def set_bible_background(self, file):
+        """
+        Provides a method for setting the global_bible_background_pixmap variable, scaling it to the display size
+        :param str file: The location of the background image file
+        """
+        self.global_bible_background_pixmap = self.size_background_to_screen(QPixmap(file))
+
+        file_name_split = file.split('/')
+        file_name = file_name_split[len(file_name_split) - 1]
+        self.main.settings['global_bible_background'] = file_name
+        self.main.save_settings()
+
+    def set_logo_image(self, file):
+        """
+        Provides a method for setting the logo_pixmap variable, scaling it to the display size
+        :param str file: The location of the background image file
+        """
+        self.logo_pixmap = self.size_background_to_screen(QPixmap(file))
+        self.logo_label.setPixmap(self.logo_pixmap)
+
+        file_name_split = file.split('/')
+        file_name = file_name_split[len(file_name_split) - 1]
+        self.main.settings['logo_image'] = file_name
+        self.main.save_settings()
+
+    def send_to_preview(self, item):
+        """
+        Provides a method for sending an item, selected in the order of service list widget, to the preview list widget.
+        :param QListWidgetItem item: The item selected
+        """
+        if not item or not item.data(Qt.ItemDataRole.UserRole): # don't continue if there is no item or data dictionary
+            return
+        slide_data = item.data(Qt.ItemDataRole.UserRole).copy()
+        self.preview_widget.slide_list.clear()
+
+        if slide_data['type'] == 'song':
+            if len(slide_data['parsed_text']) > 0:
+                for segment in slide_data['parsed_text']:
+                    # reduce parsed text for this item to only this item's title and text
+                    slide_data['parsed_text'] = {
+                        'title': segment['title'],
+                        'text': segment['text']
+                    }
+                    list_item = QListWidgetItem()
+                    list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+                    lyric_widget = StandardItemWidget(
+                        self, slide_data['parsed_text']['title'], slide_data['parsed_text']['text'])
+                    list_item.setSizeHint(lyric_widget.sizeHint())
+                    self.preview_widget.slide_list.addItem(list_item)
+                    self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+
+        elif slide_data['type'] == 'custom':
+            # parse the text if we're splitting it into individual slides
+            slide_text = slide_data['text']
+            if slide_data['split_slides']:
+                slide_text = re.sub(r'(<br />)\1+', '<split>', slide_text)
+                slide_data['parsed_text'] = re.split('<split>', slide_text)
+            else:
+                slide_data['parsed_text'] = [slide_text]
+            item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+            for text in slide_data['parsed_text']:
+                if len(text.strip()) > 0:
+                    lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
+                    list_item = QListWidgetItem()
+                    slide_data['parsed_text'] = text
+                    list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                    list_item.setSizeHint(lyric_widget.sizeHint())
+                    self.preview_widget.slide_list.addItem(list_item)
+                    self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+
+        elif slide_data['type'] == 'bible' or slide_data['type'] == 'custom_bible':
+            title = slide_data['title']
+
+            # check for a chapterless book reference
+            if ':' in title:
+                book_chapter = title.split(':')[0]
+                book = ' '.join(book_chapter.split(' ')[:-1]).strip()
+                current_chapter = book_chapter.replace(book, '').strip()
+            else:
+                book = title.split(' ')[0]
+                current_chapter = ''
+
+            # find the verse range for each segment of scripture
+            slide_texts = slide_data['parsed_text']
+            for i in range(len(slide_texts)):
+                list_item = QListWidgetItem()
+                first_num_found = False
+                first_num = ''
+                last_num = ''
+
+                scripture_text = re.sub(
+                    '<.*?>', '', slide_texts[i])
+                next_chapter = False
+                index = 0
+                while index < len(scripture_text): # iterate through the characters in this text to find all the numbers
+                    this_number = ''
+                    if scripture_text[index].isnumeric(): # work through the next few characters until no longer a number
+                        while scripture_text[index].isnumeric():
+                            this_number += scripture_text[index]
+                            index += 1
+
+                        if not first_num_found:
+                            first_num = this_number
+                            first_num_found = True
+                        else:
+                            last_num = this_number
+
+                        if i > 0 and this_number == '1':
+                            next_chapter = True
+
+                    index += 1
+
+                if next_chapter:
+                    current_chapter = str(int(current_chapter) + 1)
+
+                if last_num == '':
+                    if ':' in title:
+                        new_title = f'{book} {current_chapter}:{first_num}'
+                    else:
+                        new_title = f'{book} {first_num}'
+                else:
+                    if ':' in title:
+                        if int(first_num) > int(last_num):
+                            new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                        else:
+                            new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
+                    else:
+                        new_title = f'{book} {first_num}-{last_num}'
+
+                slide_data['type'] = 'bible'
+                slide_data['title'] = new_title
+                slide_data['parsed_text'] = slide_texts[i]
+                slide_data['author'] = slide_data['author']
+                list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+                lyric_widget = StandardItemWidget(self, new_title, slide_texts[i], None, True)
+                list_item.setSizeHint(lyric_widget.sizeHint())
+                self.preview_widget.slide_list.addItem(list_item)
+                self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+
+        elif slide_data['type'] == 'image':
+            lyric_widget = StandardItemWidget(self, slide_data['file_name'])
+            list_item = QListWidgetItem()
+            list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+            list_item.setSizeHint(lyric_widget.sizeHint())
+            self.preview_widget.slide_list.addItem(list_item)
+            self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+
+        elif slide_data['type'] == 'video':
+            self.preview_widget.slide_list.clear()
+
+            pixmap = QPixmap(
+                self.main.video_dir + '/' + slide_data['file_name'].split('.')[0] + '.jpg')
+            pixmap = pixmap.scaled(
+                96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+            widget = StandardItemWidget(
+                self, slide_data['file_name'].split('.')[0], '', pixmap)
+
+            list_item = QListWidgetItem()
+            list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+            list_item.setSizeHint(widget.sizeHint())
+
+            self.preview_widget.slide_list.addItem(list_item)
+            self.preview_widget.slide_list.setItemWidget(list_item, widget)
+
+        elif slide_data['type'] == 'web':
+            lyric_widget = StandardItemWidget(self, slide_data['title'], slide_data['url'])
+            list_item = QListWidgetItem()
+            list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+            list_item.setSizeHint(lyric_widget.sizeHint())
+            self.preview_widget.slide_list.addItem(list_item)
+            self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+
+        self.preview_widget.slide_list.setFocus()
+        self.preview_widget.slide_list.setCurrentRow(0)
+
+    def send_to_live(self):
+        """
+        Method to send the current order of service item to live, using the current index of the preview widget,
+        if available.
+        """
+        try:
+            self.oos_widget.oos_list_widget.blockSignals(True)
+            self.live_widget.blockSignals(True)
+            self.live_widget.slide_list.clear()
+
+            item_index = self.preview_widget.slide_list.currentRow()
+            item_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+            for i in range(self.preview_widget.slide_list.count()):
+                original_item = self.preview_widget.slide_list.item(i)
+                item_data = original_item.data(Qt.ItemDataRole.UserRole).copy()
+                item = QListWidgetItem()
+                item.setData(Qt.ItemDataRole.UserRole, item_data)
+
+                if item_data['type'] == 'song':
+                    lyric_widget = StandardItemWidget(
+                        self,
+                        item_data['parsed_text']['title'],
+                        item_data['parsed_text']['text'],
+                        wrap_subtitle=True
+                    )
+                elif item_data['type'] == 'bible':
+                    lyric_widget = StandardItemWidget(
+                        self,
+                        item_data['title'],
+                        item_data['parsed_text'],
+                        wrap_subtitle=True
+                    )
+                elif item_data['type'] == 'custom':
+                    lyric_widget = StandardItemWidget(
+                        self,
+                        item_data['title'],
+                        item_data['parsed_text'],
+                        wrap_subtitle=True
+                    )
+                elif item_data['type'] == 'image':
+                    lyric_widget = StandardItemWidget(
+                        self, item_data['file_name'], '')
+                elif item_data['type'] == 'video':
+                    lyric_widget = StandardItemWidget(self, item_data['file_name'], '')
+                else:
+                    lyric_widget = StandardItemWidget(self, item_data['title'], item_data['url'], wrap_subtitle=True)
+
+                item.setSizeHint(lyric_widget.sizeHint())
+                self.live_widget.slide_list.addItem(item)
+                self.live_widget.slide_list.setItemWidget(item, lyric_widget)
+
+            if item_index:
+                self.live_widget.slide_list.setCurrentRow(item_index)
+            else:
+                self.live_widget.slide_list.setCurrentRow(0)
+
+            # create the slide buttons to be sent to the remote web page
+            slide_buttons = ''
+            for i in range(self.live_widget.slide_list.count()):
+                slide_data = self.live_widget.slide_list.item(i).data(Qt.ItemDataRole.UserRole)
+                if isinstance(slide_data['parsed_text'], dict):
+                    title = slide_data['parsed_text']['title']
+                    text = slide_data['parsed_text']['text']
+                else:
+                    title = slide_data['title']
+                    text = slide_data['parsed_text']
+                text = text.replace('text-align: center', 'text-align: left')
+
+                if i == 0:
+                    class_tag = 'class="current"'
+                else:
+                    class_tag = ''
+
+                slide_buttons += f"""
+                    <button id="slide{str(i)}" {class_tag} type="submit" name="slide_button" value="{str(i)}">
+                        <span class="title">{title}</span>
+                        <br>
+                        <div class="text">{text}</div>
+                    </button>
+                    <br>"""
+            self.main.remote_server.socketio.emit('update_slides', slide_buttons)
+            self.main.remote_server.socketio.emit(
+                'change_current_oos', str(self.oos_widget.oos_list_widget.currentRow()))
+
+            # send the next item in the order of service to the preview so the user can see what's next
+            if self.oos_widget.oos_list_widget.currentRow() < self.oos_widget.oos_list_widget.count() - 1:
+                self.send_to_preview(
+                    self.oos_widget.oos_list_widget.item(self.oos_widget.oos_list_widget.currentRow() + 1))
+            elif self.oos_widget.oos_list_widget.currentRow() == self.oos_widget.oos_list_widget.count() - 1:
+                self.send_to_preview(self.oos_widget.oos_list_widget.currentItem())
+
+            # show the play/pause/stop controls if this is a video or a custom slide with audio
+            if (item_data['type'] == 'video'
+                    or (item_data['type'] == 'custom' and item_data['audio_file'] and len(item_data['audio_file']) > 0)):
+                self.live_widget.web_controls.hide()
+                self.live_widget.player_controls.show()
+            elif item_data['type'] == 'web':
+                self.live_widget.player_controls.hide()
+                self.live_widget.web_controls.show()
+            else:
+                self.live_widget.player_controls.hide()
+                self.live_widget.web_controls.hide()
+
+            self.live_widget.blockSignals(False)
+            self.oos_widget.oos_list_widget.blockSignals(False)
+            self.live_widget.slide_list.setFocus()
+        except Exception:
+            self.main.error_log()
+
+    def change_display(self, widget):
+        """
+        Method to change what it being displayed in the display widget or the hidden sample widget.
+        :param str widget: 'live' or 'sample' widget that is being changed
+        """
+        # we don't need things being futzed with while the program is still starting up
+        if self.main.initial_startup:
+            return
+
+        display_widget = None
+        lyric_widget = None
+        current_item = None
+        auto_play_text = None
+
+        if widget == 'live':
+            # stop timed update and auto-play runnables
+            if self.timed_update:
+                self.timed_update.keep_running = False
+                self.timed_update = None
+
+            display_widget = self.display_widget
+            lyric_widget = self.lyric_widget
+            current_item = self.live_widget.slide_list.currentItem()
+
+            self.live_widget.preview_label.clear()
+            if self.timed_update:
+                self.timed_update.stop = True
+                self.main.thread_pool.waitForDone()
+
+            # hide the black and logo screens and show the display widget
+            if self.tool_bar.hide_display_button.isChecked():
+                if not self.primary_screen == self.secondary_screen:
+                    display_widget.show()
+                    self.tool_bar.hide_display_button.setChecked(False)
+            if self.tool_bar.black_screen_button.isChecked():
+                self.tool_bar.black_screen_button.setChecked(False)
+            if self.tool_bar.logo_screen_button.isChecked():
+                self.tool_bar.logo_screen_button.setChecked(False)
+
+        elif widget == 'sample':
+            display_widget = self.sample_widget
+            lyric_widget = self.sample_lyric_widget
+            current_item = self.preview_widget.slide_list.currentItem()
+
+        display_widget.background_label.clear()
+        display_widget.background_pixmap = None
+
+        if current_item:
+            item_data = current_item.data(Qt.ItemDataRole.UserRole).copy()
+            # stop slide auto-play and media player if the current item is not also auto-play
+            if self.slide_auto_play and widget == 'live':
+                if not item_data['auto_play'] or not item_data['auto_play'] == 'True':
+                    self.slide_auto_play.keep_running = False
+                    self.slide_auto_play = None
+
+                    # handle stopping the media player carefully to avoid an Access Violation
+                    if self.media_player:
+                        if self.media_player.state() == QMediaPlayer.PlayingState:
+                            self.media_player.stop()
+                            if self.timed_update:
+                                self.timed_update.stop = True
+                        self.media_player.deleteLater()
+                        if self.video_widget:
+                            self.video_widget.deleteLater()
+                            self.graphics_view.deleteLater()
+                        self.media_player = None
+                        self.video_widget = None
+                        self.graphics_view = None
+                        self.audio_output = None
+            elif widget == 'live':
+                # handle stopping the media player carefully to avoid an Access Violation
+                if self.media_player:
+                    if self.media_player.state() == QMediaPlayer.PlayingState:
+                        self.media_player.stop()
+                        if self.timed_update:
+                            self.timed_update.stop = True
+                    self.media_player.deleteLater()
+                    if self.video_widget:
+                        self.video_widget.deleteLater()
+                        self.graphics_view.deleteLater()
+                    self.media_player = None
+                    self.video_widget = None
+                    self.graphics_view = None
+                    self.audio_output = None
+
+            # set the background
+            display_widget.background_label.clear()
+            display_widget.setStyleSheet('#display_widget { background-color: none } ')
+
+            if item_data['type'] == 'song' or item_data['type'] == 'custom':
+                if not item_data['override_global']:
+                    if item_data['type'] == 'song':
+                        display_widget.background_label.setPixmap(self.global_song_background_pixmap)
+                    else:
+                        display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
+                elif item_data['background'] == 'global_song':
+                    display_widget.background_label.setPixmap(self.global_song_background_pixmap)
+                elif item_data['background'] == 'global_bible':
+                    display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
+                elif 'rgb(' in item_data['background']:
+                    display_widget.setStyleSheet(
+                        '#display_widget { background-color: ' + item_data['background'] + '}')
+                elif exists(self.main.background_dir + '/' + item_data['background']):
+                    pixmap = QPixmap(self.main.background_dir + '/' + item_data['background'])
+                    self.custom_pixmap = self.size_background_to_screen(pixmap)
+                    display_widget.background_label.setPixmap(self.custom_pixmap)
+                else:
+                    display_widget.background_label.setPixmap(self.global_song_background_pixmap)
+            elif item_data['type'] == 'bible':
+                display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
+            elif item_data['type'] == 'image':
+                if exists(self.main.image_dir + '/' + item_data['file_name']):
+                    display_widget.background_pixmap = QPixmap(self.main.image_dir + '/' + item_data['file_name'])
+            elif item_data['type'] == 'video':
+                display_widget.background_label.setStyleSheet('background: black;')
+                display_widget.background_label.clear()
+                pixmap = QPixmap(self.main.video_dir + '/' + item_data['file_name'].split('.')[0] + '.jpg')
+                pixmap = pixmap.scaled(
+                    display_widget.width(),
+                    display_widget.height(),
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                display_widget.background_label.setPixmap(pixmap)
+            elif item_data['type'] == 'web':
+                display_widget.background_label.setStyleSheet('background: black;')
+
+            # set the lyrics html
+            lyrics_html = ''
+            if current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+                lyrics_html = current_item.data(Qt.ItemDataRole.UserRole)['parsed_text']['text']
+            elif current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                lyrics_html = current_item.data(Qt.ItemDataRole.UserRole)['parsed_text']
+            elif item_data['type'] == 'bible' or item_data['type'] == 'custom':
+                lyrics_html = current_item.data(Qt.ItemDataRole.UserRole)['parsed_text']
+            elif item_data['type'] == 'image':
+                lyrics_html = ''
+            elif item_data['type'] == 'video':
+                if widget == 'sample':
+                    lyrics_html = '<p style="align-text: center;">' + item_data['title'] + '</p>'
+                else:
+                    lyrics_html = ''
+            elif item_data['type'] == 'web':
+                if widget == 'sample':
+                    lyrics_html = '<p style="align-text: center;">' + item_data['title'] + '</p>'
+                else:
+                    url_ok, url = self.test_url(item_data['url'])
+                    if not url_ok:
+                        lyrics_html = '<p style="align-text: center;">Unable to load webpage</p>'
+
+            # set the font
+            if 'override_global' in item_data.keys() and item_data['override_global']:
+                lyric_widget.setFont(QFont(item_data['font_family'], item_data['font_size']))
+                font_color = self.get_font_color(item_data['font_color'], item_data['type'])
+                lyric_widget.fill_color = font_color
+                lyric_widget.footer_label.setFont(QFont(item_data['font_family'], self.global_footer_font_size))
+                lyric_widget.use_shadow = item_data['use_shadow']
+                lyric_widget.shadow_color = QColor(
+                    item_data['shadow_color'], item_data['shadow_color'], item_data['shadow_color'])
+                lyric_widget.shadow_offset = item_data['shadow_offset']
+                lyric_widget.use_outline = item_data['use_outline']
+                lyric_widget.outline_color = QColor(
+                    item_data['outline_color'], item_data['outline_color'], item_data['outline_color'])
+                lyric_widget.outline_width = item_data['outline_width']
+                lyric_widget.use_shade = item_data['use_shade']
+                lyric_widget.shade_color = item_data['shade_color'] # needs to be sent as an integer so opacity can be set by the lyric widget
+                lyric_widget.shade_opacity = item_data['shade_opacity']
+            else:
+                slide_type = item_data['type']
+                if not slide_type == 'song':
+                    slide_type = 'bible'
+                lyric_widget.setFont(
+                    QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings['bible_font_size']))
+                lyric_widget.footer_label.setFont(QFont(self.global_footer_font_face, self.global_footer_font_size))
+                font_color = self.get_font_color(self.main.settings[f'{slide_type}_font_color'], item_data['type'])
+                lyric_widget.fill_color = font_color
+                lyric_widget.use_shadow = self.main.settings[f'{slide_type}_use_shadow']
+                lyric_widget.shadow_color = QColor(
+                    self.main.settings[f'{slide_type}_shadow_color'],
+                    self.main.settings[f'{slide_type}_shadow_color'],
+                    self.main.settings[f'{slide_type}_shadow_color']
+                )
+                lyric_widget.shadow_offset = self.main.settings[f'{slide_type}_shadow_offset']
+                lyric_widget.use_outline = self.main.settings[f'{slide_type}_use_outline']
+                lyric_widget.outline_color = QColor(
+                    self.main.settings[f'{slide_type}_outline_color'],
+                    self.main.settings[f'{slide_type}_outline_color'],
+                    self.main.settings[f'{slide_type}_outline_color']
+                )
+                lyric_widget.outline_width = self.main.settings[f'{slide_type}_outline_width']
+                lyric_widget.use_shade = self.main.settings[f'{slide_type}_use_shade']
+                lyric_widget.shade_color = self.main.settings[f'{slide_type}_shade_color']  # needs to be sent as an integer so opacity can be set by the lyric widget
+                lyric_widget.shade_opacity = self.main.settings[f'{slide_type}_shade_opacity']
+
+            qss_font_color = f'rgb({font_color.red()}, {font_color.green()}, {font_color.blue()})'
+            lyric_widget.text = lyrics_html
+
+            # set the footer text
+            lyric_widget.footer_label.show()
+            footer_text = ''
+            if 'use_footer' in item_data.keys() and item_data['use_footer']:
+                if len(item_data['author']) > 0:
+                    footer_text += item_data['author']
+                if len(item_data['copyright']) > 0:
+                    footer_text += '\n\u00A9' + item_data['copyright'].replace('\n', ' ')
+                if len(item_data['ccli_song_number']) > 0:
+                    footer_text += '\nCCLI Song #: ' + item_data['ccli_song_number']
+                if len(self.main.settings['ccli_num']) > 0:
+                    footer_text += '\nCCLI License #: ' + self.main.settings['ccli_num']
+                lyric_widget.footer_label.setText(footer_text)
+                lyric_widget.footer_label.setStyleSheet(f'color: {qss_font_color}')
+            elif item_data['type'] == 'bible':
+                lyric_widget.footer_label.setText(
+                    current_item.data(
+                        Qt.ItemDataRole.UserRole)['title']
+                        + ' ('
+                        + current_item.data(Qt.ItemDataRole.UserRole)['author']
+                        + ')'
+                    )
+                lyric_widget.footer_label.setStyleSheet(f'color: {qss_font_color}')
+            else:
+                lyric_widget.footer_label.setText('')
+                lyric_widget.footer_label.clear()
+
+            if lyric_widget.footer_label.text() == '':
+                lyric_widget.footer_label.hide()
+
+            # hide or show the appropriate widgets.py
+            if widget == 'live':
+                if (not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video'
+                        and not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'web'):
+                    if not self.web_view.isHidden():
+                        self.web_view.hide()
+                    if not self.blackout_widget.isHidden():
+                        self.blackout_widget.hide()
+                    if not self.logo_widget.isHidden():
+                        self.logo_widget.hide()
+                    if self.lyric_widget.isHidden():
+                        self.lyric_widget.show()
+                        self.lyric_widget.repaint()
+                    if current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'image':
+                        self.lyric_widget.hide()
+
+                elif current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
+                    self.make_video_widget()
+                    self.video_widget.show()
+                    self.media_player.setMedia(
+                        QMediaContent(QUrl.fromLocalFile(self.main.video_dir + '/' + item_data['file_name'])))
+                    self.media_player.play()
+
+                    self.timed_update = TimedPreviewUpdate(self)
+                    self.main.thread_pool.start(self.timed_update)
+
+                    if not self.lyric_widget.isHidden():
+                        self.lyric_widget.hide()
+                    if not self.web_view.isHidden():
+                        self.web_view.hide()
+                    if not self.blackout_widget.isHidden():
+                        self.blackout_widget.hide()
+                    if not self.logo_widget.isHidden():
+                        self.logo_widget.hide()
+
+                elif item_data['type'] == 'web':
+                    if not self.lyric_widget.isHidden() and 'Unable' not in lyric_widget.text:
+                        self.lyric_widget.hide()
+                    elif 'Unable' in lyric_widget.text:
+                        self.lyric_widget.show()
+                    if not self.blackout_widget.isHidden():
+                        self.blackout_widget.hide()
+                    if not self.logo_widget.isHidden():
+                        self.logo_widget.hide()
+                    self.web_view.show()
+                    if url_ok:
+                        self.timeout_timer = QTimer()
+                        timeout_value = 12
+
+                        #self.timeout_timer.singleShot(timeout_value * 1000, self.request_timed_out)
+                        self.web_view.load(QUrl(url))
+
+                    self.timed_update = TimedPreviewUpdate(self)
+                    self.main.thread_pool.start(self.timed_update)
+                    self.live_widget.slide_list.setFocus()
+
+                # start playing audio if this is a custom slide with audio, but only if audio isn't already playing
+                if (item_data['type'] == 'custom'
+                        and item_data['audio_file']
+                        and len(item_data['audio_file']) > 0
+                        and not self.media_player):
+                    audio_data = self.main.get_audio_data(item_data['audio_file'])
+                    if audio_data == -2:
+                        QMessageBox.critical(
+                            self.main_window,
+                            'Missing Audio File',
+                            f'The audio named {item_data["audio_file"]} is missing. Unable to play sound.',
+                            QMessageBox.StandardButton.Ok
+                        )
+                        return
+                    elif audio_data == -1:
+                        QMessageBox.critical(
+                            self.main_window,
+                            'Audio Data Error',
+                            'Error loading the audio. Unable to play sound.',
+                            QMessageBox.StandardButton.Ok
+                        )
+
+                    self.media_player = QMediaPlayer(self.main_window)
+                    self.media_player.error.connect(self.media_error)
+
+                    byte_array = QByteArray(audio_data[0])
+                    self.audio_buffer = QBuffer()
+                    self.audio_buffer.setData(byte_array)
+                    self.audio_buffer.open(QIODevice.ReadOnly)
+                    self.media_player.setMedia(QMediaContent(), self.audio_buffer)
+
+                    if item_data['loop_audio'] == 'True':
+                        def repeat_media():
+                            if self.media_player.mediaStatus() == QMediaPlayer.EndOfMedia:
+                                self.media_player.play()
+                        self.media_player.mediaStatusChanged.connect(repeat_media)
+                    else:
+                        self.media_player.stateChanged.connect(self.media_playing_change)
+
+                    self.media_player.play()
+
+                # cycle through text paragraphs if auto-play is enabled for this slide
+                if item_data['auto_play'] == 'True' and not self.slide_auto_play:
+                    self.slide_auto_play = SlideAutoPlay(self, auto_play_text, item_data['slide_delay'])
+                    self.main.thread_pool.start(self.slide_auto_play)
+
+            # change the preview image
+            if widget == 'live':
+                full_size_pixmap = display_widget.grab(display_widget.rect())
+                pixmap = full_size_pixmap.scaled(
+                    int(display_widget.width() / 5),
+                    int(display_widget.height() / 5),
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                stage_html = re.sub('<p.*?>', '', lyrics_html)
+                stage_html = stage_html.replace('</p>', '')
+                stage_html = f'<p style="align-text: center;">{stage_html}</p>'
+
+                slide_number = self.live_widget.slide_list.currentRow() + 1
+                num_slides = self.live_widget.slide_list.count()
+                slide_info = f'Slide {slide_number} of {num_slides}'
+
+                if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
+                    self.live_widget.preview_label.setPixmap(pixmap)
+
+                    if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
+                        buffer = QBuffer()
+                        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                        success = full_size_pixmap.save(buffer, 'JPEG', 70)
+
+                        if success:
+                            jpg_bytes = buffer.data().data()
+                            self.main.remote_server.socketio.emit('update_display', [jpg_bytes, slide_info])
+                        else:
+                            print("Failed to save pixmap as JPEG!")
+
+                        buffer.close()
+                    else:
+                        self.main.remote_server.update_stage_text(
+                            stage_html, self.main.settings['stage_font_size'], slide_info)
+                elif auto_play_text:
+                    self.live_widget.preview_label.setPixmap(pixmap)
+                    if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings['mirror_stage_display']:
+                        buffer = QBuffer()
+                        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                        success = full_size_pixmap.save(buffer, 'JPEG', 70)
+
+                        if success:
+                            jpg_bytes = buffer.data().data()
+                            self.main.remote_server.socketio.emit('update_display', [jpg_bytes, slide_info])
+                        else:
+                            print("Failed to save pixmap as JPEG!")
+
+                        buffer.close()
+                    else:
+                        self.main.remote_server.update_stage_text(
+                            stage_html, self.main.settings['stage_font_size'], slide_info)
+                else:
+                    if 'mirror_stage_display' in self.main.settings.keys() and self.main.settings[
+                            'mirror_stage_display']:
+                        buffer = QBuffer()
+                        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                        success = full_size_pixmap.save(buffer, 'JPEG', 70)
+
+                        if success:
+                            jpg_bytes = buffer.data().data()
+                            self.main.remote_server.socketio.emit('update_display', [jpg_bytes, ''])
+                        else:
+                            print("Failed to save pixmap as JPEG!")
+
+                        buffer.close()
+                    else:
+                        self.main.remote_server.update_stage_text(
+                            stage_html, self.main.settings['stage_font_size'], '')
+
+            elif widget == 'sample':
+                pixmap = display_widget.grab(display_widget.rect())
+                pixmap = pixmap.scaled(
+                    int(display_widget.width() / 5), int(display_widget.height() / 5),
+                    Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+                self.preview_widget.preview_label.setPixmap(pixmap)
+
+    def get_font_color(self, font_color: str, slide_type: str):
+        """
+        Method to convert a string font color to a QColor object
+        :param font_color: String font color (white, rgb(255, 255, 255), #ffffff, etc.)
+        :param slide_type: The type of slide this color will be applied to
+        :return QColor: QColor object
+        """
+        if font_color == 'white':
+            font_color = QColor(Qt.GlobalColor.white)
+        elif font_color == 'black':
+            font_color = QColor(Qt.GlobalColor.black)
+        elif '#' in font_color:
+            color = font_color.replace('#', '')
+            rgb_color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
+            font_color = QColor(rgb_color)
+        elif 'rgb' in font_color:
+            color = font_color.replace('rgb(', '')
+            color = color.replace(')', '')
+            font_color_split = color.split(', ')
+            font_color = QColor(
+                int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+        else:
+            if slide_type == 'song':
+                if self.main.settings['song_font_color'] == 'black':
+                    font_color = QColor(0, 0, 0)
+                elif self.main.settings['song_font_color'] == 'white':
+                    font_color = QColor(255, 255, 255)
+                else:
+                    font_color_split = self.main.settings['font_color'].split(', ')
+                    font_color = QColor(
+                        int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+            else:
+                if self.main.settings['bible_font_color'] == 'black':
+                    font_color = QColor(0, 0, 0)
+                elif self.main.settings['bible_font_color'] == 'white':
+                    font_color = QColor(255, 255, 255)
+                else:
+                    font_color_split = self.main.settings['bible_font_color'].split(', ')
+                    font_color = QColor(
+                        int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+
+        return font_color
+
+    def update_stage_image(self, jpg_bytes):
+        self.main.remote_server.socketio.emit('update_display', jpg_bytes)
+
+    def test_url(self, url):
+        response = None
+        try:
+            response = requests.get(url)
+        except requests.exceptions.MissingSchema:
+            pass
+        except requests.exceptions.ConnectionError:
+            pass
+        except requests.exceptions.InvalidSchema:
+            new_url = 'http://' + url.split('//')[1]
+            try:
+                response = requests.get(new_url)
+            except requests.exceptions.ConnectionError:
+                pass
+            if response and response.ok:
+                return True, new_url
+        if response and response.ok:
+            return True, url
+        else:
+            if not '//' in url:
+                new_url = 'http://' + url
+                try:
+                    response = requests.get(new_url)
+                except requests.exceptions.ConnectionError:
+                    pass
+                if response and response.ok:
+                    return True, new_url
+                else:
+                    new_url = 'https://' + url
+                    try:
+                        response = requests.get(new_url)
+                    except requests.exceptions.ConnectionError:
+                        pass
+                    if response and response.ok:
+                        return True, new_url
+            else:
+                new_url = '//www.'.join(url.split('//'))
+                try:
+                    response = requests.get(new_url)
+                except requests.exceptions.ConnectionError:
+                    pass
+                if response and response.ok:
+                    return True, new_url
+
+        return False, url
+
+    def request_timed_out(self):
+        print('request timed out')
+        self.timeout_timer.stop()
+        self.web_view.stop()
+        self.web_view.loadFinished.emit(False)
+
+    def change_current_live_item(self):
+        """
+        slot for the change_lyric_widget_text_signal
+        changes the text of the lyric widget and repaints
+        :param str text: the text to change to
+        """
+        if self.live_widget.slide_list.currentRow() + 1 == self.live_widget.slide_list.count():
+            self.live_widget.slide_list.setCurrentRow(0)
+        else:
+            self.live_widget.slide_list.setCurrentRow(self.live_widget.slide_list.currentRow() + 1)
+
+    def make_special_display_widgets(self):
+        """
+        Create all the widgets.py that could be used on the display widget.
+        """
+        self.web_view = QWebEngineView()
+        self.web_view.page().setBackgroundColor(Qt.GlobalColor.transparent)
+        self.web_view.setStyleSheet("background: transparent;")
+        settings = self.web_view.settings()
+        settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)
+        settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)  # rarely needed for video
+        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+        self.web_engine_page = CustomWebEnginePage()
+        self.web_engine_page.setParent(self.web_view)
+        self.web_view.setPage(self.web_engine_page)
+        self.display_layout.addWidget(self.web_view)
+
+        self.blackout_widget = QWidget()
+        self.blackout_widget.setStyleSheet('background-color: black;')
+        self.display_layout.addWidget(self.blackout_widget)
+
+        self.logo_widget = QWidget()
+        self.logo_widget.setContentsMargins(0, 0, 0, 0)
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.logo_widget.setLayout(layout)
+
+        self.logo_label = QLabel()
+        layout.addWidget(self.logo_label)
+        self.display_layout.addWidget(self.logo_widget)
+
+        if len(self.main.settings['logo_image'].strip()) == 0:
+            self.main.settings['logo_image'] = 'background.png'
+        pixmap = QPixmap(self.main.image_dir + '/' + self.main.settings['logo_image'])
+        if not pixmap.isNull():
+            pixmap = pixmap.scaled(
+                self.display_widget.size().width(), self.display_widget.size().height(),
+                Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation
+            )
+        self.logo_label.setPixmap(pixmap)
+
+        if 'countdown_settings' not in self.main.settings.keys():
+            self.main.settings['countdown_settings'] = {}
+            self.main.settings['countdown_settings']['use_countdown'] = False
+            self.main.settings['countdown_settings']['font_face'] = 'Arial'
+            self.main.settings['countdown_settings']['font_size'] = 36
+            self.main.settings['countdown_settings']['font_bold'] = False
+            self.main.settings['countdown_settings']['position'] = 'bottom_full'
+            self.main.settings['countdown_settings']['bg_color'] = 'rgba(0, 0, 255, 255)'
+            self.main.settings['countdown_settings']['fg_color'] = 'rgb(255, 255, 255)'
+            self.main.settings['countdown_settings']['start_time'] = [10, 45]
+            self.main.settings['countdown_settings']['display_time'] = [10, 40]
+            self.main.save_settings()
+
+        self.lyric_widget.hide()
+        self.web_view.hide()
+        self.blackout_widget.hide()
+        self.logo_widget.hide()
+
+    def make_video_widget(self):
+        self.graphics_view = QGraphicsView()
+        self.graphics_view.setGeometry(self.display_widget.geometry())
+        self.graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.display_layout.addWidget(self.graphics_view)
+
+        self.scene = QGraphicsScene(self.graphics_view)
+        self.graphics_view.setScene(self.scene)
+
+        self.video_widget = QGraphicsVideoItem()
+        self.video_widget.setSize(QSizeF(self.display_widget.width(), self.display_widget.height()))
+        self.graphics_view.scene().addItem(self.video_widget)
+
+        self.media_player = QMediaPlayer()
+        self.media_player.stateChanged.connect(self.media_playing_change)
+        self.media_player.error.connect(self.media_error)
+        self.media_player.setVideoOutput(self.video_widget)
+
+    def media_playing_change(self):
+        if self.media_player.state() == QMediaPlayer.StoppedState:
+            self.media_player.setPosition(0)
+
+    def media_error(self):
+        """
+        Show a message box letting the user know that an error occurred playing the video.
+        """
+        QMessageBox.information(self.main_window, 'Media Error', 'Unable to play video.', QMessageBox.StandardButton.Ok)
+
+    def show_hide_display_screen(self):
+        """
+        Method to toggle between showing and hiding the display screen.
+        """
+        if self.tool_bar.hide_display_button.isChecked():
+            self.display_widget.hide()
+        else:
+            self.display_widget.show()
+        self.live_widget.slide_list.setFocus()
+
+    def display_black_screen(self):
+        """
+        Method to toggle a black screen on and off
+        """
+        if self.tool_bar.black_screen_button.isChecked():
+            # ensure the display widget is not being hidden
+            if self.tool_bar.hide_display_button.isChecked():
+                self.tool_bar.hide_display_button.setChecked(False)
+                self.show_hide_display_screen()
+
+            # ensure that the logo widget is not being shown
+            if self.tool_bar.logo_screen_button.isChecked():
+                self.tool_bar.logo_screen_button.setChecked(False)
+                self.display_logo_screen()
+
+            self.blackout_widget.show()
+
+            # hide all the other widgets in the display widget
+            if not self.lyric_widget.isHidden():
+                self.lyric_widget.hide()
+            if self.video_widget and not self.video_widget.isHidden():
+                self.video_widget.hide()
+            if self.web_view and not self.web_view.isHidden():
+                self.web_view.hide()
+        else:
+            self.blackout_widget.hide()
+
+            # if there is a currently-selected live item, show that
+            if self.live_widget.slide_list.currentItem():
+                if self.tool_bar.logo_screen_button.isChecked():
+                    self.tool_bar.logo_screen_button.setChecked(False)
+
+                data = self.live_widget.slide_list.currentItem().data(Qt.ItemDataRole.UserRole)
+                if data['type'] == 'web':
+                    self.web_view.show()
+                elif data['type'] == 'video':
+                    self.video_widget.show()
+                else:
+                    self.lyric_widget.show()
+
+    def display_logo_screen(self):
+        """
+        Method to toggle the logo widget on and off
+        """
+        # make sure a logo image is set, use default if not
+        if len(self.main.settings['logo_image'].strip()) == 0 or 'choose' in self.main.settings['logo_image'].lower():
+            self.main.settings['logo_image'] = 'background.png'
+
+        if self.tool_bar.logo_screen_button.isChecked():
+            #ensure the display widget is not being hidden
+            if self.tool_bar.hide_display_button.isChecked():
+                self.tool_bar.hide_display_button.setChecked(False)
+                self.show_hide_display_screen()
+
+            # ensure the black widget is not being shown
+            if self.tool_bar.black_screen_button.isChecked():
+                self.tool_bar.black_screen_button.setChecked(False)
+                self.display_black_screen()
+
+            self.logo_widget.show()
+            self.logo_label.show()
+
+            if not self.lyric_widget.isHidden():
+                self.lyric_widget.hide()
+            if self.video_widget and not self.video_widget.isHidden():
+                self.video_widget.hide()
+            if not self.web_view.isHidden():
+                self.web_view.hide()
+        else:
+            self.logo_widget.hide()
+
+            if self.live_widget.slide_list.currentItem():
+                if self.tool_bar.black_screen_button.isChecked():
+                    self.tool_bar.black_screen_button.setChecked(False)
+
+                data = self.live_widget.slide_list.currentItem().data(Qt.ItemDataRole.UserRole)
+                if data['type'] == 'web':
+                    self.web_view.show()
+                elif data['type'] == 'video':
+                    self.video_widget.show()
+                else:
+                    self.lyric_widget.show()
+
+        self.live_widget.slide_list.setFocus()
+
+    def add_scripture_item(self, reference, text, version, scripture_edited):
+        """
+        Method to take a block of scripture and add it as a QListWidgetItem to the order of service widget.
+        :param str reference: The scripture passage's reference from the bible
+        :param list[str] text: The text of the scripture passage
+        :param str version: The version of the bible this passage is from
+        :param bool scripture_edited: Whether this text was edited
+        :return:
+        """
+
+        item = QListWidgetItem()
+        slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+        if scripture_edited:
+            slide_data['type'] = 'custom_bible'
+        else:
+            slide_data['type'] = 'bible'
+        slide_data['title'] = reference
+        slide_data['text'] = text
+        slide_data['parsed_text'] = parsers.parse_scripture_by_verse(self, text)
+        slide_data['author'] = version
+        item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+        if len(slide_data['parsed_text']) == 0:
+            QMessageBox.information(
+                self.main_window,
+                'No Verses',
+                'No verses were found in the passage. Please ensure that your scripture passage includes verse numbers.',
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
+        label_pixmap = self.global_bible_background_pixmap.scaled(
+            50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        if scripture_edited:
+            widget = StandardItemWidget(self, reference, 'Scripture (edited)', label_pixmap)
+        else:
+            widget = StandardItemWidget(self, reference, 'Scripture', label_pixmap)
+        item.setSizeHint(widget.sizeHint())
+        self.oos_widget.oos_list_widget.addItem(item)
+        self.oos_widget.oos_list_widget.setItemWidget(item, widget)
+
+
+class CustomWebEnginePage(QWebEnginePage):
+    def __init__(self):
+        self.messages = ''
+        profile = QWebEngineProfile.defaultProfile()
+        profile.setHttpUserAgent(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/129.0.0.0 Safari/537.36"
+        )
+        super().__init__(profile)
+
+    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
+        url = self.parent().url().toString()
+        self.messages += (
+            f'<p>'
+            f'  <strong>Web console message: </strong>{message}'
+            f'  <ul>'
+            f'      <li><strong>at: </strong>{url}</li>'
+            f'      <li><strong>line: </strong>{lineNumber}</li>'
+            f'      <li><strong>level: </strong>{level}</li>'
+            f'      <li><strong>sourceID: </strong>{sourceID}</li>'
+            f'  </ul>'
+            f'</p>'
+        )
+        super().javaScriptConsoleMessage(level, message, lineNumber, sourceID)

@@ -1,0 +1,534 @@
+/*-------------------- Light Stylesheet for ProjectOn --------------------
+General Theme Colors:
+    Background, usable widget: #ffffff
+    Background, widget: #f0f0f2
+    Font color: #000000
+    Hover: #aaaaff
+    Selected/Pressed: #5555aa
+    Disabled: #505052
+*/
+
+/*-------------------- edit_main_widget --------------------*/
+QWidget[objectName="edit_main_widget"] {
+    background: #ffffff;
+    color: #000000;
+}
+
+/*-------------------- font_widget --------------------*/
+QWidget[objectName="font_widget"] {
+    background: #eeeeff;
+    color: #000000;
+}
+
+/*-------------------- help_label --------------------*/
+QLabel[objectName="help_label"] {
+    color: #505052;
+}
+
+/*-------------------- item_widget --------------------*/
+QWidget[objectName="item_widget"] {
+    background: #00000000;
+    color: #000000;
+}
+
+/*-------------------- lyrics_list_widget --------------------*/
+QListView[objectName="lyrics_list_widget"] {
+    background: #ffffff;
+}
+QListView[objectName="lyrics_list_widget"]::item {
+    background: #eeeeff;
+    color: #000000;
+}
+QListView[objectName="lyrics_list_widget"]::item:hover {
+    background: #e0e0e2;
+    color: #000000;
+}
+QListView[objectName="lyrics_list_widget"]::item:selected {
+    background: #aaaaff;
+}
+QListView[objectName="lyrics_list_widget"] QWidget[objectName="editor_widget"] {
+    background: #aaaaff;
+}
+
+/*-------------------- lyrics_toggle --------------------*/
+QPushButton[objectName="lyrics_toggle"] {
+    border: none;
+    background: none;
+    icon: url(resources/gui_icons/toggle_switch_off.svg);
+    icon-size: 48px 24px;
+}
+QPushButton[objectName="lyrics_toggle"]:hover {
+    icon: url(resources/gui_icons/toggle_switch_hover.svg);
+}
+QPushButton[objectName="lyrics_toggle"]:checked {
+    border: none;
+    background: none;
+    icon: url(resources/gui_icons/toggle_switch_on.svg);
+    icon-size: 48px 24px;
+}
+
+/*-------------------- settings_container --------------------*/
+QWidget[objectName="settings_container"] {
+    background: #eeeeff;
+    color: #000000;
+    border: 2px solid #5555aa;
+}
+
+/*-------------------- settings_title_label --------------------*/
+QLabel[objectName="settings_title_label"] {
+    background: #5555aa;
+    color: white;
+}
+
+/*-------------------- simple_splash --------------------*/
+QWidget[objectName="simple_splash"] {
+    background: #5555aa;
+    color: #ffffff;
+}
+QWidget[objectName="simple_splash_container"] {
+    border: 3px solid white;
+}
+QWidget[objectName="simple_splash_label"] {
+    padding: 10px;
+    color: #ffffff;
+}
+QWidget[objectName="simple_splash_subtitle_label"] {
+    color: #ffffff;
+    padding-bottom: 10px;
+}
+
+/*-------------------- song_item_widget --------------------*/
+QWidget[objectName="song_item_widget"] {
+    background: #00000000;
+    color: #000000;
+}
+
+/*-------------------- tab_widget --------------------*/
+QWidget[objectName="tab_widget"] {
+    background: #f0f0f2;
+}
+
+/*-------------------- tool_bar_container --------------------*/
+QWidget[objectName="tool_bar_container"] {
+    background: #eeeeff;
+}
+
+/*-------------------- QCheckBox --------------------*/
+QCheckBox {
+    color: #000000;
+}
+QCheckBox::indicator {
+    background: #ffffff;
+    border: 1px solid black;
+}
+QCheckBox::indicator:checked {
+    background: #5555aa;
+    border: 1px solid black;
+}
+
+/*-------------------- QComboBox --------------------*/
+QComboBox {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+}
+QComboBox::drop-down {
+    background: #ffffff;
+    color: #000000;
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border: 0;
+}
+QComboBox::drop-down:hover {
+    background: #aaaaff;
+}
+QComboBox::down-arrow {
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
+}
+QComboBox::down-arrow:hover {
+    background: #aaaaff;
+}
+QComboBox QAbstractItemView {
+    background: #ffffff;
+    selection-background-color: #aaaaff;
+    color: #000000;
+}
+QComboBox QAbstractItemView::item {
+    background: #ffffff;
+    color: #000000;
+}
+QComboBox QAbstractItemView::item:selected {
+    background: #555588;
+    color: #ffffff;
+}
+
+/*-------------------- QDialog --------------------*/
+QDialog {
+    background: #ffffff;
+    color: #000000;
+    border: 3px solid #ffffff;
+}
+
+/*-------------------- QFontComboBox --------------------*/
+QFontComboBox {
+    background: #ffffff;
+    color: #000000;
+}
+QFontComboBox::drop-down {
+    background: #ffffff;
+    color: #000000;
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border: 0;
+}
+QFontComboBox QAbstractItemView {
+    background: #ffffff;
+    selection-background-color: #aaaaff;
+    color: #000000;
+}
+QFontComboBox QAbstractItemView::item {
+    background: #ffffff;
+    color: #000000;
+}
+QFontComboBox QAbstractItemView::item:selected {
+    background: #aaaaff;
+    color: #000000;
+}
+
+/*-------------------- QGroupBox --------------------*/
+QGroupBox {
+    border: 1px solid #aaaaff;
+    margin-top: 8px;
+    padding: 10px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    color: #000000;
+}
+
+/*-------------------- QLabel --------------------*/
+QLabel {
+    background: transparent;
+    color: #000000;
+}
+
+/*-------------------- QLineEdit --------------------*/
+QLineEdit {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #cccccf;
+    padding: 2px;
+}
+QLineEdit:focus {
+    background: #ffffff;
+    border: 2px solid #cccccf;
+    border-bottom: 2px solid #5555aa;
+    padding: 2px;
+}
+
+/*-------------------- QListView --------------------*/
+QListView {
+    background: #f0f0f2;
+}
+QListView::item {
+    background: #eeeeff;
+    color: #000000;
+}
+QListView::item:hover {
+    background: #e0e0e2;
+    color: #000000;
+}
+QListView::item:selected {
+    background: #aaaaff;
+    color: #000000;
+}
+
+/*-------------------- QListWidget --------------------*/
+QListWidget {
+    background: #ffffff;
+    color: #000000;
+}
+
+/*-------------------- QMainWindow --------------------*/
+QMainWindow {
+    background: #ffffff;
+}
+
+/*-------------------- QMenu --------------------*/
+QMenu {
+    background: #eeeeff;
+    color: #000000;
+}
+QMenu::item {
+    background: #eeeeff;
+    color: #000000;
+}
+QMenu::item:selected {
+    background: #aaaaff;
+}
+QMenu::item:pressed {
+    background: #aaaaff;
+}
+QMenu::separator {
+    height: 1px;
+    background: #555588;
+}
+
+/*-------------------- QMenuBar --------------------*/
+QMenuBar {
+    background: #eeeeff;
+    color: #000000;
+}
+QMenuBar::item {
+    background: #eeeeff;
+    color: #000000;
+}
+QMenuBar::item:hover {
+    background: #aaaaff;
+}
+QMenuBar::item:selected {
+    background: #aaaaff;
+}
+QMenuBar::item:pressed {
+    background: #aaaaff;
+}
+
+/*-------------------- QMessageBox --------------------*/
+QMessageBox {
+    background: #ffffffff !important;
+    color: #000000;
+}
+
+/*-------------------- QProgressBar --------------------*/
+QProgressBar {
+    color: #000000;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    text-align: right;
+}
+QProgressBar::chunk {
+    background-color: #5555aa;
+    color: #ffffff;
+}
+
+/*-------------------- QPushButton --------------------*/
+QPushButton {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid grey;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-style: outset;
+}
+QPushButton:hover {
+    background: #aaaaff;
+}
+QPushButton:pressed {
+    background: #5555aa;
+    border-style: inset;
+}
+QPushButton:disabled {
+    background: #a0a0a2;
+    color: grey;
+}
+QPushButton:checked {
+    background: #aaaaff;
+    border-style: inset;
+}
+QPushButton:unchecked {
+    border-style: outset;
+}
+
+/*-------------------- QRadioButton --------------------*/
+QRadioButton {
+    color: #000000;
+}
+QRadioButton::indicator {
+    background: #ffffff;
+    border: 1px solid black;
+    border-radius: 6px;
+}
+QRadioButton::indicator:checked {
+    background: #5555aa;
+    border: 1px solid black;
+    border-radius: 6px;
+}
+
+/*-------------------- QScrollArea --------------------*/
+QScrollArea {
+    background: #ffffff;
+}
+
+/*-------------------- QScrollBar --------------------*/
+QScrollBar {
+    background: #f0f0f2;
+    color: #000000;
+}
+QScrollBar:vertical {
+    background: #f0f0f2;
+    width: 15px;
+    margin: 22px 0 22px 0;
+}
+QScrollBar::handle:vertical {
+    background: #aaaaff;
+    min-height: 20px;
+}
+QScrollBar::add-line:vertical {
+    height: 20px;
+    background: #aaaaff;
+    border: none;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical {
+    height: 20px;
+    background: #aaaaff;
+    border: none;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+QScrollBar::up-arrow:vertical {
+    image: url('resources/gui_icons/scroll_up_arrow.svg');
+}
+QScrollBar::down-arrow:vertical {
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
+}
+QScrollBar::add-page:vertical {
+    background: #f0f0f2;
+}
+QScrollBar::sub-page:vertical {
+    background: #f0f0f2;
+}
+
+/*-------------------- QSlider --------------------*/
+QSlider::handle {
+    background-color: #aaaaff;
+}
+QSlider::handle:hover {
+    background-color: #5555aa;
+}
+
+/*-------------------- QSpinBox --------------------*/
+QSpinBox {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+}
+QSpinBox QLineEdit {
+    background: #ffffff;
+    color: #000000;
+}
+QSpinBox::up-button, QSpinBox::down-button {
+    background: #ffffff;
+}
+QSpinBox::up-button {
+    image: url('resources/gui_icons/scroll_up_arrow.svg');
+    min-width: 20px;
+    min-height: 15px;
+}
+QSpinBox::down-button {
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
+    min-width: 20px;
+    min-height: 15px;
+}
+QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+    background: #aaaaff;
+}
+
+/*-------------------- QTabBar --------------------*/
+QTabBar {
+    background: #f0f0f2;
+    color: #000000;
+}
+QTabBar::tab {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 20px;
+    margin-right: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background: #eeeeff;
+}
+QTabBar::tab:hover {
+    background: #e0e0e2;
+}
+QTabBar::tab:selected {
+    background: #aaaaff;
+    color: #000000;
+}
+QTabBar::tab:!selected {
+    color: #000000;
+}
+QTabBar::tab:last {
+    margin-right: 0px;
+}
+
+/*-------------------- QTabWidget --------------------*/
+QTabWidget::pane {
+    background: #ffffff;
+}
+
+/*-------------------- QTextEdit --------------------*/
+QTextEdit {
+    background: white;
+    color: #000000;
+    border: 1px solid #f0f0f2;
+}
+
+/*-------------------- QTimeEdit --------------------*/
+QTimeEdit {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+}
+QTimeEdit QLineEdit {
+    background: #ffffff;
+    color: #000000;
+}
+QTimeEdit::up-button, QTimeEdit::down-button {
+    background: #ffffff;
+}
+QTimeEdit::up-button {
+    image: url('resources/gui_icons/scroll_up_arrow.svg');
+    min-width: 20px;
+    min-height: 15px;
+}
+QTimeEdit::down-button {
+    image: url('resources/gui_icons/scroll_down_arrow.svg');
+    min-width: 20px;
+    min-height: 15px;
+}
+QTimeEdit::up-button:hover, QTimeEdit::down-button:hover {
+    background: #aaaaff;
+}
+
+/*-------------------- QWebEngineView --------------------*/
+QWebEngineView {
+    background: #ffffff;
+    color: #000000;
+}
+
+QWebEngineView {
+    id: thisWeb
+
+    anchors.fill: parent
+    url: dlViewModel.targetUrl
+
+    onNewViewRequested: function (request) {
+        // Any user can trigger newViewRequested by simply holding the CTRL key while clicking any hyperlink.
+        // per Qt Docs: "If this signal is not handled, the requested load will fail."
+        // Using 5.15 on Linux, "fail" for us meant CRASH.
+        // (refer to: https://doc.qt.io/qt-5/qml-qtwebengine-webengineview.html#newViewRequested-signal)
+        // Some of their sample code make it seem like just using an empty
+        // function body would be sufficient to avoid the crash. However, in our
+        // testing that was not the case. This is the ONLY thing that managed
+        // to avoid a crash:
+        request.openIn(thisWeb)
+    }
+}
