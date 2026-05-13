@@ -8,7 +8,8 @@ from xml.etree import ElementTree
 from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
-    QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, QAction
+    QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, QAction, \
+    QApplication
 
 from dataHandling import parsers, declarations
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
@@ -758,6 +759,8 @@ class MediaWidget(QTabWidget):
         )
         if len(result[0]) > 0:
             try:
+                simple_splash = SimpleSplash(self.gui, 'Importing image, please wait...')
+
                 file_name_split = result[0].split('/')
                 file_name = file_name_split[len(file_name_split) - 1]
                 shutil.copy(result[0], self.gui.main.image_dir + '/' + file_name)
@@ -769,6 +772,8 @@ class MediaWidget(QTabWidget):
                 self.populate_image_list()
                 self.image_list.update()
                 self.image_list.blockSignals(False)
+
+                simple_splash.widget.deleteLater()
             except Exception:
                 self.gui.main.error_log()
 
@@ -786,11 +791,17 @@ class MediaWidget(QTabWidget):
         )
 
         if response == QMessageBox.StandardButton.Yes:
+            simple_splash = SimpleSplash(self.gui, 'Removing image, please wait...')
+
             try:
                 os.remove(self.gui.main.image_dir + '/' + file_name)
             except FileNotFoundError:
                 QMessageBox.information(
-                    self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
+                    self.gui.main_window,
+                    'Not Found',
+                    'File not found. Reindexing images.',
+                    QMessageBox.StandardButton.Ok
+                )
 
             from core.runnables import IndexImages
             ii = IndexImages(self.gui.main, 'images')
@@ -798,6 +809,8 @@ class MediaWidget(QTabWidget):
             self.gui.main.thread_pool.waitForDone()
             self.populate_image_list()
             self.image_list.update()
+
+            simple_splash.widget.deleteLater()
 
     def add_web(self):
         """
@@ -881,13 +894,16 @@ class MediaWidget(QTabWidget):
         )
 
         if len(result[0]) > 0:
-            wait_widget = SimpleSplash(self.gui, 'Please wait...')
+            wait_widget = SimpleSplash(self.gui, 'Importing video, please wait...')
 
             file_name_split = result[0].split('/')
             file_name = file_name_split[len(file_name_split) - 1]
             shutil.copy(result[0], self.gui.main.video_dir + '/' + file_name)
 
             try:
+                wait_widget.label.setText('Getting thumbnails, please wait...')
+                wait_widget.widget.adjustSize()
+                QApplication.processEvents()
                 import cv2
                 cap = cv2.VideoCapture(self.gui.main.video_dir + '/' + file_name)
                 iteration = 0
@@ -1030,6 +1046,8 @@ class MediaWidget(QTabWidget):
             else:
                 self.gui.oos_widget.oos_list_widget.insertItem(row, item)
             self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
             self.gui.changes = True
 
         if item and from_load_service:
@@ -1067,6 +1085,8 @@ class MediaWidget(QTabWidget):
             widget_item.setSizeHint(widget.sizeHint())
             self.gui.oos_widget.oos_list_widget.addItem(widget_item)
             self.gui.oos_widget.oos_list_widget.setItemWidget(widget_item, widget)
+            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
 
     def add_scripture_to_service(self):
         """
@@ -1139,6 +1159,8 @@ class MediaWidget(QTabWidget):
         else:
             self.gui.oos_widget.oos_list_widget.insertItem(row, item)
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+        self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
         self.gui.changes = True
 
     def add_image_to_service(self, item=None, row=None):
@@ -1167,6 +1189,8 @@ class MediaWidget(QTabWidget):
             else:
                 self.gui.oos_widget.oos_list_widget.insertItem(row, item)
             self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
             self.gui.changes = True
 
     def add_web_to_service(self, item=None, row=None):
@@ -1203,6 +1227,8 @@ class MediaWidget(QTabWidget):
             else:
                 self.gui.oos_widget.oos_list_widget.insertItem(row, item)
             self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
             self.gui.changes = True
 
     def add_video_to_service(self, item=None, row=None):
@@ -1233,6 +1259,8 @@ class MediaWidget(QTabWidget):
             else:
                 self.gui.oos_widget.oos_list_widget.insertItem(row, item)
             self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
             self.gui.changes = True
 
 

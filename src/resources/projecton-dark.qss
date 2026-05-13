@@ -508,10 +508,10 @@ QTimeEdit::up-button:hover, QTimeEdit::down-button:hover {
 
 /*-------------------- QWebEngineView --------------------*/
 QWebEngineView {
-    id: thisWeb
+    id: thisWeb;
 
-    anchors.fill: parent
-    url: dlViewModel.targetUrl
+    anchors.fill: parent;
+    url: dlViewModel.targetUrl;
 
     onNewViewRequested: function (request) {
         // Any user can trigger newViewRequested by simply holding the CTRL key while clicking any hyperlink.
@@ -523,5 +523,5 @@ QWebEngineView {
         // However, in our testing that was not the case.
         // This is the ONLY thing that managed to avoid a crash:
         request.openIn(thisWeb)
-    }
+    };
 }

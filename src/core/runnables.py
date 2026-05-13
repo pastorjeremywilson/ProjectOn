@@ -146,62 +146,68 @@ class IndexImages(QRunnable):
             self.directory = self.main.image_dir
 
     def run(self):
-        connection = sqlite3.connect(self.main.database)
-        cursor = connection.cursor()
+        connection = None
+        try:
+            connection = sqlite3.connect(self.main.database)
+            cursor = connection.cursor()
 
-        thumbnails = cursor.execute('SELECT fileName FROM ' + self.table).fetchall()
-        database_list = []
-        for record in thumbnails:
-            database_list.append(record[0])
+            thumbnails = cursor.execute('SELECT fileName FROM ' + self.table).fetchall()
+            database_list = []
+            for record in thumbnails:
+                database_list.append(record[0])
 
-        file_list = os.listdir(self.directory)
-        file_types = ['jpg', 'png', 'svg', 'bmp']
-        filtered_files = []
-        for file in file_list:
-            file_type = file.split('.')[1]
-            if file_type in file_types:
-                filtered_files.append(file)
+            file_list = os.listdir(self.directory)
+            file_types = ['jpg', 'png', 'svg', 'bmp']
+            filtered_files = []
+            for file in file_list:
+                file_type = file.split('.')[1]
+                if file_type in file_types:
+                    filtered_files.append(file)
 
-        reindex = False
-        for file in database_list:
-            if self.main.initial_startup:
-                self.main.update_status_signal.emit(f'Checking Database for {file}', 'info')
-            if file not in filtered_files:
-                reindex = True
-                break
-
-        for file in filtered_files:
-            if self.main.initial_startup:
-                self.main.update_status_signal.emit(f'Checking Folder for {file}', 'info')
-            if file not in database_list:
-                reindex = True
-                break
-
-        if not reindex and not self.force:
-            return
-
-        cursor.execute('DELETE FROM ' + self.table)
-        connection.commit()
-        for file in file_list:
-            file_type = file.split('.')[1]
-            if file_type in file_types:
+            reindex = False
+            for file in database_list:
                 if self.main.initial_startup:
-                    self.main.update_status_signal.emit(f'Indexing {file}', 'info')
-                pixmap = QPixmap(self.directory + '/' + file)
-                scaled_pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                    self.main.update_status_signal.emit(f'Checking Database for {file}', 'info')
+                if file not in filtered_files:
+                    reindex = True
+                    break
 
-                thumbnail_array = QByteArray()
-                thumbnail_buffer = QBuffer(thumbnail_array)
-                thumbnail_buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-                scaled_pixmap.save(thumbnail_buffer, 'JPG')
-                thumbnail_blob = bytes(thumbnail_array.data())
-                thumbnail_buffer.close()
+            for file in filtered_files:
+                if self.main.initial_startup:
+                    self.main.update_status_signal.emit(f'Checking Folder for {file}', 'info')
+                if file not in database_list:
+                    reindex = True
+                    break
 
-                cursor.execute(f'INSERT INTO {self.table} (fileName, image) '
-                               f'VALUES("{file}", ?)', (thumbnail_blob,))
+            if not reindex and not self.force:
+                return
 
-        connection.commit()
-        connection.close()
+            cursor.execute('DELETE FROM ' + self.table)
+            connection.commit()
+            for file in file_list:
+                file_type = file.split('.')[1]
+                if file_type in file_types:
+                    if self.main.initial_startup:
+                        self.main.update_status_signal.emit(f'Indexing {file}', 'info')
+                    pixmap = QPixmap(self.directory + '/' + file)
+                    scaled_pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+                    thumbnail_array = QByteArray()
+                    thumbnail_buffer = QBuffer(thumbnail_array)
+                    thumbnail_buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                    scaled_pixmap.save(thumbnail_buffer, 'JPG')
+                    thumbnail_blob = bytes(thumbnail_array.data())
+                    thumbnail_buffer.close()
+
+                    cursor.execute(f'INSERT INTO {self.table} (fileName, image) '
+                                   f'VALUES("{file}", ?)', (thumbnail_blob,))
+
+            connection.commit()
+            connection.close()
+        except Exception as ex:
+            self.main.error_log(f'Error in IndexImages.run: {str(ex)}')
+            if connection:
+                connection.close()
 
     def add_image_index(self, file, type):
         """

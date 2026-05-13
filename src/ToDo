@@ -1,54 +1,11 @@
 Done:
-    Fix "has been removed" when clicking "no" on delete song confirmation
-    Check for QPainter outside of paintEvent
-    Remove calls to LyricDisplayWidget.paint_text or change them to repaint. Remove LyricDisplayWidget.paint_text.
-    Get rid of song_info list and replace with song_data dict for everything
-    Fix startup progress bar shrinking at end
-    Improve lyrics editing with modular editing spaces (verse/chorus and number at top as dropdowns, lyrics below).
-        Probably as a custom list widget.
-
-    Not updating order of service
-    Double-click edits not sticking
-    Title and author disappeared toggling back to list view
-    Add instructions on toggling back to set song order
-    More definition to the lyrics edit list widget
-    Pasting after tag turns green sometimes
-    Switch lyric editor textEdit to formattable text edit
-    Fix web remote icons
-    Fix re \s \{ \|
-    Check styles in light theme
-    Fix checked buttons in the screen buttons
-    Figure out why the splash widget isn't being destroyed (edit song after initial start)
-    Update the help widget
-    Standardize parsed_text - title - text across all slide types
-    Further consolidate widgets
-    Fix the dropdowns in the service countdown settings
-    fix saving settings with countdown widget changes
-    Update READMEs
-    Custom slide background not saving
-    Bible passages not being parsed
-    Ensure that the footer is being properly accounted for in QLyricsDisplayWidget.calculate_painted_text
-    Fixed songselect lyrics text file import
-    Fixed openlyrics file import
-    Fixed chordpro file import
-    Fixed openlp importing
-    Hymn #46 - Splitting title screen
-    Days of Elijah, Shine Jesus Shine - not splitting
-    Days of Elijah - editor not opening
-    Preview Preview and Live Preview not the same
-    Fix font color on type dropdown in editor
-    Footer font size in preview doesn't match footer font size in live
-    "Loading Service" splash is the wrong color
-    Test with a new installation
-    Previews not showing in edit widget
-    Unhandled exception popup not showing when running frozen from exe
-    Fix or table move data folder (and remove from menu if tabled)
-    Finish select data folder
-    Test bible on new installation
-    Fix remote item press sometimes loading the next slide
+    Auto-scroll OOS list when adding an item
+    Except no server check timer on shutdown (for quick shutdowns)
+    Add wait splash after importing image (maybe video too?)
 
 To Do:
 
 Future Releases:
     Video backgrounds
     Allow sorting media into folders
+    When running under Linux, removing an image results in a hard crash with no feedback

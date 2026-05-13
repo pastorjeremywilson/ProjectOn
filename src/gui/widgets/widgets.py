@@ -187,22 +187,26 @@ class CustomMainWindow(QMainWindow):
                 self.gui.audio_output = None
                 self.gui.video_probe = None
 
-            self.gui.main.server_check_timer.stop()
+            # shut down the server check timer
+            if self.gui.main.server_check_timer:
+                self.gui.main.server_check_timer.keep_checking = False
+                self.gui.main.server_check_timer.stop()
+
+            # shut down the countdown timer and remove the countdown widget
             if self.gui.countdown_timer:
                 self.gui.countdown_timer.stop()
             if self.gui.countdown_widget:
                 self.gui.countdown_widget.deleteLater()
 
-            try:
-                self.gui.main.server_check.keep_checking = False
-            except AttributeError:
-                pass
-            self.gui.main.save_settings()
-
+            # shut down the timed_update
             if self.gui.timed_update:
                 self.gui.timed_update.keep_running = False
+
+            # shut down the slide auto-play
             if self.gui.slide_auto_play:
                 self.gui.slide_auto_play.keep_running = False
+
+            self.gui.main.save_settings()
             evt.accept()
             self.gui.display_widget.deleteLater()
 
