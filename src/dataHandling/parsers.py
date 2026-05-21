@@ -1,15 +1,14 @@
 import re
 
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtWidgets import QMessageBox
 
 
-def parse_song_data(gui, song_data):
+def parse_song_data(gui, song_data: dict):
     """
     Method to take the stored lyrics of a song and parse them out according to their segment markers (i.e. [V1])
     :param GUI gui: The current instance of GUI
-    :param str lyrics: The raw lyrics data
+    :param dict song_data: The raw lyrics data
     """
     if 'text' not in song_data.keys() or len(song_data['text'].strip()) == 0:
         return
@@ -242,7 +241,7 @@ def parse_song_data(gui, song_data):
 
     return segments
 
-def parse_scripture_item(gui, text):
+def parse_scripture_item(gui, text: str):
     """
     Method to take a scripture passage and divide it up according to what will fit on the screen given the current
     font and size.
@@ -304,19 +303,19 @@ def parse_scripture_item(gui, text):
 
     return slide_texts
 
-def parse_scripture_by_verse(gui, text):
+def parse_scripture_by_verse(gui, text: str | list[str]):
     """
     Take a passage of scripture and split it according to how many verses will fit on the display screen, given
     the current font and size.
     :param GUI gui: The current instance of GUI
-    :param list of str text: The bible passage to be split
+    :param str | list of str text: The bible passage to be split
     """
     # configure the hidden sample widget according to the current font
     gui.sample_lyric_widget.setFont(QFont(gui.main.settings['bible_font_face'], gui.main.settings['bible_font_size']))
     gui.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
 
     # get the size values for the lyric widget, footer label, and font metrics
-    slide_texts = []
+    slide_texts: list[str] = []
 
     # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
     # that needs to be parsed into verses and their corresponding verse numbers
@@ -346,7 +345,7 @@ def parse_scripture_by_verse(gui, text):
                 )
             else:
                 text_split.append([verse_numbers[i], text[verse_index + number_length:]])
-        text = text_split
+        text: list[str] = text_split
 
     verse_index = 0
     segment_indices = []
@@ -408,7 +407,7 @@ def parse_scripture_by_verse(gui, text):
     else:
         for indices in segment_indices:
             if len(indices) > 0:
-                current_segment = ''
+                current_segment: str = ''
                 for index in indices:
                     current_segment += text[index][0] + ' ' + text[index][1] + ' '
                 slide_texts.append(current_segment.strip())

@@ -10,7 +10,7 @@ from os.path import exists
 import requests
 from PyQt5.QtCore import QRunnable, Qt, QByteArray, QBuffer, QIODevice, QTimer
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QFileDialog, QWidget
 
 
 class CheckFiles(QRunnable):
@@ -30,6 +30,7 @@ class CheckFiles(QRunnable):
             os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
         self.main.device_specific_config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')
 
+        device_specific_settings = {}
         if not exists(self.main.device_specific_config_file):
             device_specific_settings = {
                 'used_services': '',
@@ -129,7 +130,7 @@ class IndexImages(QRunnable):
     :param str type: Directory to index - 'backgrounds' or 'images'
     :param bool force: Optional, force a reindexing whether needed or not
     """
-    def __init__(self, main, type, force=False):
+    def __init__(self, main, type: str, force: bool | None = False):
         """
         :param ProjectOn main: The current instance of ProjectOn
         :param str type: Directory to index - 'backgrounds' or 'images'
@@ -209,7 +210,7 @@ class IndexImages(QRunnable):
             if connection:
                 connection.close()
 
-    def add_image_index(self, file, type):
+    def add_image_index(self, file: str, type: str):
         """
         Does the work of adding the file name and image blob to the proper table in the program's database.
         :param str file: The file location
@@ -321,7 +322,7 @@ class TimedPreviewUpdate(QRunnable):
     def __init__(self, gui):
         """
         Used to update the preview image in the live widget when a video is playing.
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -337,7 +338,7 @@ class TimedPreviewUpdate(QRunnable):
 
 
 class SlideAutoPlay(QRunnable):
-    def __init__(self, gui, text, interval):
+    def __init__(self, gui, text: str, interval: int):
         """
         Cycles through the text in a list of strings, changing the display widget's lyrics based on a given interval
         :param gui: the current instance of GUI
@@ -367,7 +368,7 @@ class CountdownTimer(QTimer):
         start_time (datetime.time): The start time of the service.
         display_time (datetime.time): The time to start showing the countdown widget.
     """
-    def __init__(self, settings, countdown_widget, start_time, display_time):
+    def __init__(self, settings: dict, countdown_widget: QWidget, start_time: datetime, display_time: datetime):
         super().__init__()
         self.settings = settings
         self.countdown_widget = countdown_widget

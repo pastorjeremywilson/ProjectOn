@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.002
+ProjectOn v.1.10.0.003
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -30,21 +30,21 @@ import time
 import traceback
 import zipfile
 from datetime import datetime
-from email.mime import image
 from os.path import exists
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
-    qInstallMessageHandler, QThread, QByteArray, QBuffer, QIODevice
+    QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
+    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QTreeWidgetItem
 
-from dataHandling.declarations import SLIDE_DATA_DEFAULTS, SQL_COLUMN_TO_DICTIONARY_SONG, SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN, \
-    SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN, DB_STRUCTURE, SLIDE_DATA_DATA_TYPES, SQL_COLUMN_TO_DICTIONARY_CUSTOM
-from gui.gui import GUI
+from dataHandling.declarations import SLIDE_DATA_DEFAULTS, SQL_COLUMN_TO_DICTIONARY_SONG, \
+    SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN, SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN, DB_STRUCTURE, SLIDE_DATA_DATA_TYPES, \
+    SQL_COLUMN_TO_DICTIONARY_CUSTOM
+from guiElements.gui import GUI
 from core.runnables import SaveSettings, ServerCheckTimer
-from gui.widgets.widgets import SimpleSplash, StandardItemWidget
+from guiElements.widgets.widgets import SimpleSplash, StandardItemWidget
 from core.webRemote import RemoteServer
 
 
@@ -56,10 +56,14 @@ class ProjectOn(QObject):
     app = None
     data_dir = None
     user_dir = None
+    config_file = None
     database = None
+    background_dir = None
+    image_dir = None
     bible_dir = None
+    video_dir = None
     get_scripture = None
-    settings = None
+    settings = {}
     remote_server = None
     splash_widget = None
     status_label = None
@@ -150,7 +154,7 @@ class ProjectOn(QObject):
 
         self.app.exec()
 
-    def update_status_label(self, text, type):
+    def update_status_label(self, text: str, type: str):
         """
         Updates the splash widget with the given text.
         :param str text: The text to be displayed
@@ -172,7 +176,7 @@ class ProjectOn(QObject):
             self.updating_label = False
             self.status_update_count += 1
 
-    def make_splash_screen(self, last_status_count):
+    def make_splash_screen(self, last_status_count: int):
         """
         Create the splash screen that will show progress as the program is loading
         """
@@ -197,7 +201,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.0.002')
+        version_label = QLabel('v.1.10.0.003')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -514,7 +518,7 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_song_data(self, title):
+    def get_song_data(self, title: str):
         """
         Gets the song data for a particular song where the 'title' column matches 'title'
         :param str title: the song title
@@ -533,7 +537,7 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_custom_data(self, title):
+    def get_custom_data(self, title: str):
         """
         Gets the song data for a particular custom slide where the 'title' column matches 'title'
         :param str title: the title (name) of the custom slide
@@ -552,7 +556,7 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_folders(self, type):
+    def get_folders(self, type: str):
         connection = sqlite3.connect(self.database)
         cursor = connection.cursor()
         result = ''
@@ -592,7 +596,7 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_audio_data(self, name):
+    def get_audio_data(self, name: str):
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -608,7 +612,7 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def save_audio(self, name, audio_format, audio_data):
+    def save_audio(self, name: str, audio_format: str, audio_data: bytes):
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -627,7 +631,7 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def copy_image(self, file):
+    def copy_image(self, file: str):
         """
         Creates a copy of an image file chosen by the user and stores it in this program's data folder
         :param str file: the image's file name
@@ -641,11 +645,11 @@ class ProjectOn(QObject):
         except Exception:
             self.error_log()
 
-    def save_song(self, data, old_title=None):
+    def save_song(self, data: dict, old_title: str=None):
         """
         Takes song data as a string list, ordered by the column order of the 'songs' table of the program's database,
         and inserts or updates that data in the database.
-        :param list of str song_data: The song's data in columnar order
+        :param dict data: The song's data in columnar order
         :param str old_title: Optional, the song's original title so that it can be updated instead of inserted
         """
         connection = None
@@ -711,11 +715,11 @@ class ProjectOn(QObject):
 
         return custom_titles
 
-    def save_custom(self, data, old_title):
+    def save_custom(self, data: dict, old_title: str | None = None):
         """
         Takes custom slide data as a string list, ordered by the column order of the 'customSlides' table of the
         program's database, and inserts or updates that data in the database.
-        :param list of str custom_data: The custom slide's data in columnar order
+        :param dict data: The custom slide's data in columnar order
         :param str old_title: Optional, the custom slide's original title so that it can be updated instead of inserted
         """
         connection = None
@@ -753,7 +757,7 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
 
-    def save_image(self, data, old_title=None):
+    def save_image(self, data: dict, old_title: str | None = None):
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -812,7 +816,7 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
 
-    def save_video(self, data, old_title=None):
+    def save_video(self, data: dict, old_title: str | None = None):
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -861,12 +865,12 @@ class ProjectOn(QObject):
             self.error_log()
             return -1
 
-    def save_web_item(self, data, old_title=None):
+    def save_web_item(self, data: dict, old_title: str | None = None):
         """
         Stores the title and url of a web slide to the program's database. Checks the database first to see if the
         given title already exists.
-        :param str title: The title of the web slide
-        :param url: The url the web slide is to fetch
+        :param dict data: The title of the web slide
+        :param str old_title: The url the web slide is to fetch
         """
         connection = None
         try:
@@ -900,7 +904,7 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def delete_item(self, item):
+    def delete_item(self, item: QTreeWidgetItem):
         """
         Provides a method of deleting a given item from the program's database.
         :param QListWidgetItem item: The item to be removed
@@ -920,16 +924,20 @@ class ProjectOn(QObject):
                 title = item.data(0, Qt.ItemDataRole.UserRole)['title']
                 column = 'filename'
                 os.remove(self.image_dir + '/' + title)
-            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
-                file_name = item.data(Qt.ItemDataRole.UserRole)['file_name']
+            elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'video':
+                file_name = item.data(0, Qt.ItemDataRole.UserRole)['file_name']
                 os.remove(self.video_dir + '/' + file_name)
                 filename_split = file_name.split('.')
                 thumbnail_filename = '.'.join(filename_split[:len(filename_split) - 1]) + '.jpg'
                 os.remove(self.video_dir + '/' + thumbnail_filename)
-                return
-            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
+
+                table = 'videos'
+                title = item.data(0, Qt.ItemDataRole.UserRole)['title']
+                column = 'filename'
+            elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'web':
                 table = 'web'
-                title = item.data(Qt.ItemDataRole.UserRole)['title']
+                title = item.data(0, Qt.ItemDataRole.UserRole)['title']
+                column = 'title'
             else:
                 return
 
@@ -1010,7 +1018,7 @@ class ProjectOn(QObject):
                 'There are no Order of Service items to save.',
                 QMessageBox.StandardButton.Ok
             )
-            return
+            return 0
 
         try:
             service_items = {
@@ -1053,13 +1061,12 @@ class ProjectOn(QObject):
                 elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                     service_items[i]['text'] = item_data['parsed_text']
 
+            save_dir = os.path.expanduser('~' + '/Documents')
             dialog_needed = True
             if self.gui.current_file:
                 dialog_needed = False
             elif len(self.settings['last_save_dir']) > 0:
                 save_dir = self.settings['last_save_dir']
-            else:
-                save_dir = os.path.expanduser('~' + '/Documents')
 
             result = 'saved'
             if dialog_needed:
@@ -1070,12 +1077,10 @@ class ProjectOn(QObject):
                     'ProjectOn Service File (*.pro)')
 
             if len(result[0]) > 0:
+                file_loc = result[0]
+                if result == 'saved':
+                    file_loc = self.gui.current_file
                 try:
-                    if result == 'saved':
-                        file_loc = self.gui.current_file
-                    else:
-                        file_loc = result[0]
-
                     with open(file_loc, 'w') as file:
                         json.dump(service_items, file, indent=4)
 
@@ -1097,7 +1102,7 @@ class ProjectOn(QObject):
                     self.gui.current_file = file_loc
                     self.gui.changes = False
                     self.gui.main_window.setWindowTitle(f'ProjectOn - {filename}')
-                    return 1
+                    return 0
                 except Exception as ex:
                     QMessageBox.information(
                         self.gui.main_window,
@@ -1113,7 +1118,7 @@ class ProjectOn(QObject):
             self.error_log()
             return -1
 
-    def load_service(self, filename=None):
+    def load_service(self, filename: str | None = None):
         """
         Provides a method for loading an order of service from a service file. Will open a file dialog to the user's
         last-accessed directory (if available) if a filename is not supplied.
@@ -1138,7 +1143,7 @@ class ProjectOn(QObject):
         if save_result == -1:
             return
 
-        # open a file dialog if flename was not provided
+        # open a file dialog if filename was not provided
         if not filename:
             if len(self.settings['last_save_dir']) > 0:
                 open_dir = self.settings['last_save_dir']
@@ -1444,7 +1449,7 @@ class ProjectOn(QObject):
 
             self.gui.main_window.setWindowTitle(f'ProjectOn - {file_name}')
 
-    def add_to_recently_used(self, directory, file_name):
+    def add_to_recently_used(self, directory: str, file_name: str):
         """
         Provides a method to add a file to the user's recently used file menu if this file doesn't already exist
         there.
@@ -1656,12 +1661,13 @@ class ProjectOn(QObject):
             QMessageBox.StandardButton.Ok
         )
 
-    def error_log(self, log_text=None):
+    def error_log(self, log_text: str | None = None):
         """
         Method to write a traceback to the program's error log file as well as show the user the error.
         """
         if not log_text: # if text was provided, we're only logging information
             tb = traceback.walk_tb(sys.exc_info()[2])
+            message_box_text = ''
             for frame, line_no in tb:
                 clss = ''
                 if 'self' in frame.f_locals.keys():
@@ -1709,7 +1715,7 @@ class ProjectOn(QObject):
         with open(log_location, 'a') as file:
             file.write(log_text)
 
-    def check_db(self, db_file):
+    def check_db(self, db_file: str):
         db_structure = DB_STRUCTURE.copy()
         connection = sqlite3.connect(db_file)
         cursor = connection.cursor()

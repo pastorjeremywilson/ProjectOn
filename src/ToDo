@@ -5,6 +5,8 @@ Done:
     Do all slide parsing when populating widget or finishing editing; remove calls to do so from everywhere else
     Fix folder expand arrow color on dark theme
     Allow sorting media into folders
+    Added types to method/function arguments
+    Make sure delete is only removing the tree item, not running populate
 
 To Do:
 

@@ -37,7 +37,7 @@ class GetScripture:
                 QMessageBox.StandardButton.Ok
             )
 
-    def get_passage(self, reference):
+    def get_passage(self, reference: str):
         """
         Method to parse the user's inputted reference and retrieve the passage from the user's xml bible.
         :param str reference: The user-provided scripture reference

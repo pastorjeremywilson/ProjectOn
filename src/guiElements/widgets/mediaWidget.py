@@ -1,24 +1,21 @@
 import os
 import re
 import shutil
-import sqlite3
-import threading
 from os.path import exists
 from threading import Thread
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QSize, QPoint
-from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
+from PyQt5.QtGui import QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
-    QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, QAction, \
+    QListWidgetItem, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, \
     QApplication, QTreeWidgetItem
 
 from dataHandling import parsers, declarations
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
-from dataHandling.parsers import parse_song_data
-from gui.widgets.editWidget import EditWidget
+from guiElements.widgets.editWidget import EditWidget
 from dataHandling.getScripture import GetScripture
-from gui.widgets.widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash, CustomTreeWidget
+from guiElements.widgets.widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash, CustomTreeWidget
 
 
 class MediaWidget(QTabWidget):
@@ -31,7 +28,7 @@ class MediaWidget(QTabWidget):
     def __init__(self, gui):
         """
         Creates a custom QTabWidget to hold the various types of media that can be displayed.
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -782,7 +779,6 @@ class MediaWidget(QTabWidget):
         folder_items = {}
         for folder in all_folders:
             folder_items[folder] = self.web_list.add_folder(name=folder, from_populate=True)
-        print(folder_items)
 
         # then, add the image slides, putting them under their folder, if applicable
         for data in all_web:
@@ -866,7 +862,7 @@ class MediaWidget(QTabWidget):
 
     def change_bible(self):
         """
-        Method to change the gui's default_bible variable to the currently selected bible in the bible widget's
+        Method to change the guiElements's default_bible variable to the currently selected bible in the bible widget's
         bible_selector_combobox. Re-calls get_scripture() if there is text in the bible_search_line_edit.
         """
         self.gui.main.get_scripture = None
@@ -917,7 +913,7 @@ class MediaWidget(QTabWidget):
 
             self.formatted_reference = None
 
-    def add_song(self, type):
+    def add_song(self, type: str):
         """
         Method to create an instance of EditWidget.
         :param str type: Whether the type to be added is a 'song' or a 'custom' slide
@@ -982,7 +978,7 @@ class MediaWidget(QTabWidget):
         Method to remove an image from the program's database and data directory. Creates a QMessageBox to
         ask for confirmation, then deletes the file from the data directory and reindexes the images in the database.
         """
-        file_name = self.image_list.currentItem().data(Qt.ItemDataRole.UserRole)['file_name']
+        file_name = self.image_list.currentItem().data(0, Qt.ItemDataRole.UserRole)['file_name']
         response = QMessageBox.question(
             self.gui.main_window,
             'Really Delete',
@@ -1070,7 +1066,7 @@ class MediaWidget(QTabWidget):
             url = url_line_edit.text().strip()
             self.save_web(title, url)
 
-    def save_web(self, title, url, old_title=None):
+    def save_web(self, title: str, url: str, old_title: str | None = None):
         message = None
         if len(title) == 0:
             message = 'Title is required to save a web item. Please try again.'
@@ -1183,7 +1179,7 @@ class MediaWidget(QTabWidget):
             except Exception:
                 self.gui.main.error_log()
 
-    def copy_video(self, video_file, image_file, dialog):
+    def copy_video(self, video_file: str, image_file: str, dialog: QFileDialog):
         """
         Method to copy the user's video file and its thumbnail image file to the video subdirectory of the data
         directory, then repopulate the video widget's QListWidget. Provides a QMessageBox to confirm that the
@@ -1213,7 +1209,10 @@ class MediaWidget(QTabWidget):
 
         self.populate_video_list()
 
-    def add_song_to_service(self, item=None, row=None, from_load_service=False):
+    def add_song_to_service(self,
+                            item: QTreeWidgetItem | None = None,
+                            row: int | None = None,
+                            from_load_service: bool | None = False):
         """
         Method to add a song QListWidgetItem to the order of service's QListWidget
         :param QListWidgetItem item: Optional: a specific song item
@@ -1331,7 +1330,7 @@ class MediaWidget(QTabWidget):
         self.gui.add_scripture_item(reference, passages, version, self.scripture_text_edited)
         self.gui.changes = True
 
-    def add_custom_to_service(self, item=None, row=None):
+    def add_custom_to_service(self, item: QTreeWidgetItem | None = None, row: int | None = None):
         """
         Method to add a custom slide QListWidgetItem to the order of service's QListWidget
         :param QListWidgetItem item: Optional: a specific custom slide item
@@ -1345,7 +1344,7 @@ class MediaWidget(QTabWidget):
             return
         else:
             data = item.data(0, Qt.ItemDataRole.UserRole)
-            item.setData(Qt.ItemDataRole.DisplayRole, data['title'])
+            item.setData(0, Qt.ItemDataRole.DisplayRole, data['title'])
 
         if data['override_global'] == 'False' or not data['background']:
             pixmap = self.gui.global_bible_background_pixmap
@@ -1377,7 +1376,7 @@ class MediaWidget(QTabWidget):
         self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
         self.gui.changes = True
 
-    def add_image_to_service(self, item=None, row=None):
+    def add_image_to_service(self, item: QTreeWidgetItem | None = None, row: int | None = None):
         """
         Method to add an image QListWidgetItem to the order of service's QListWidget
         :param QListWidgetItem item: Optional: a specific image item
@@ -1409,7 +1408,7 @@ class MediaWidget(QTabWidget):
         self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
         self.gui.changes = True
 
-    def add_video_to_service(self, item=None, row=None):
+    def add_video_to_service(self, item: QTreeWidgetItem | None = None, row: int | None = None):
         """
         Method to add a video QListWidgetItem to the order of service's QListWidget
         :param QListWidgetItem item: Optional: a specific video item
@@ -1443,7 +1442,7 @@ class MediaWidget(QTabWidget):
         self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
         self.gui.changes = True
 
-    def add_web_to_service(self, item=None, row=None):
+    def add_web_to_service(self, item: QTreeWidgetItem | None = None, row: int | None = None):
         """
         Method to add a web QListWidgetItem to the order of service's QListWidget
         :param QListWidgetItem item: Optional: a specific web item
@@ -1482,210 +1481,3 @@ class MediaWidget(QTabWidget):
         self.gui.oos_widget.oos_list_widget.scrollToItem(item)
         self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
         self.gui.changes = True
-
-
-class CustomListWidget(QListWidget):
-    """
-    Implements QListWidget to add custom functionality.
-    """
-    def __init__(self, gui, type):
-        """
-        Implements QListWidget to add custom functionality.
-        :param gui.GUI gui: The current instance of GUI
-        :param str type: Whether this QListWidget will contain 'song' or 'custom' slides
-        """
-        super().__init__()
-        self.gui = gui
-        self.type = type
-        self.item_pos = None
-        self.setObjectName('song_list_widget')
-
-        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.context_menu)
-        self.currentItemChanged.connect(self.current_item_changed)
-
-    def context_menu(self):
-        """
-        Creates a QMenu to be used as a custom context menu.
-        """
-        self.item_pos = self.mapFromGlobal(self.cursor().pos())
-        menu = QMenu()
-
-        add_to_service_action = QAction('Add to Order of Service')
-        if self.type == 'song':
-            add_to_service_action.triggered.connect(self.gui.media_widget.add_song_to_service)
-        elif self.type == 'custom':
-            add_to_service_action.triggered.connect(self.gui.media_widget.add_custom_to_service)
-        elif self.type == 'image':
-            add_to_service_action.triggered.connect(self.gui.media_widget.add_image_to_service)
-        elif self.type == 'video':
-            add_to_service_action.triggered.connect(self.gui.media_widget.add_video_to_service)
-        elif self.type == 'web':
-            add_to_service_action.triggered.connect(self.gui.media_widget.add_web_to_service)
-        menu.addAction(add_to_service_action)
-
-        edit_action = None
-        if self.type == 'song':
-            edit_action = QAction('Edit Song')
-        elif self.type == 'custom':
-            edit_action = QAction('Edit Slide')
-        elif self.type == 'web':
-            edit_action = QAction('Edit Web Item')
-
-        if edit_action:
-            if self.type == 'web':
-                edit_action.triggered.connect(self.edit_web)
-            else:
-                edit_action.triggered.connect(self.edit_song)
-            menu.addAction(edit_action)
-
-        delete_action = None
-        if self.type == 'image':
-            delete_action = QAction('Remove Image')
-            delete_action.triggered.connect(self.gui.media_widget.delete_image) # TODO: move this to self.delete_item
-        elif self.type == 'custom':
-            delete_action = QAction('Delete Slide')
-            delete_action.triggered.connect(self.delete_item)
-        elif self.type == 'song':
-            delete_action = QAction('Delete Song')
-            delete_action.triggered.connect(self.delete_item)
-        elif self.type == 'video':
-            delete_action = QAction('Remove Video')
-            delete_action.triggered.connect(self.delete_item)
-        elif self.type == 'web':
-            delete_action = QAction('Remove Web Item')
-            delete_action.triggered.connect(self.delete_item)
-
-        if delete_action:
-            menu.addAction(delete_action)
-
-        menu.exec(QCursor.pos())
-
-    def mouseDoubleClickEvent(self, evt):
-        """
-        Overrides mouseDoubleClickEvent to provide the ability to add an item to the order of service upon double-click.
-        :param QMouseEvent evt: mouseEvent
-        """
-        if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
-            self.gui.media_widget.add_song_to_service()
-        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
-            self.gui.media_widget.add_custom_to_service()
-        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'web':
-            self.gui.media_widget.add_web_to_service()
-        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'image':
-            self.gui.media_widget.add_image_to_service()
-        elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'video':
-            self.gui.media_widget.add_video_to_service()
-
-        self.gui.oos_widget.oos_list_widget.setCurrentRow(self.gui.oos_widget.oos_list_widget.count() - 1)
-        self.gui.oos_widget.oos_list_widget.setFocus()
-
-    def current_item_changed(self):
-        """
-        Method to send the current item to the preview widget upon the current item being changed.
-        """
-        if self.currentItem():
-            self.gui.send_to_preview(self.currentItem())
-
-    def edit_song(self):
-        """
-        Method to create a EditWidget for a song or custom slide.
-        """
-
-        if self.itemAt(self.item_pos):
-            data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
-            if data['type'] == 'song':
-                self.gui.edit_widget = EditWidget(self.gui, data, 'song')
-            elif data['type'] == 'custom':
-                self.gui.edit_widget = EditWidget(self.gui, data, 'custom')
-
-    def edit_web(self):
-        if self.itemAt(self.item_pos):
-            data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
-            dialog = QDialog(self.gui.main_window)
-            dialog.setMinimumWidth(500)
-            dialog.setWindowTitle('Edit Web Item')
-            dialog.setWindowIcon(QIcon('resources/branding/logo.svg'))
-            layout = QVBoxLayout(dialog)
-            layout.setSpacing(0)
-
-            layout.addSpacing(20)
-            title_label = QLabel('Title')
-            title_label.setFont(self.gui.bold_font)
-            layout.addWidget(title_label)
-
-            title_line_edit = QLineEdit(data['title'])
-            title_line_edit.setFont(self.gui.standard_font)
-            layout.addWidget(title_line_edit)
-            layout.addSpacing(20)
-
-            url_label = QLabel('URL')
-            url_label.setFont(self.gui.bold_font)
-            layout.addWidget(url_label)
-
-            url_line_edit = QLineEdit(data['url'])
-            url_line_edit.setFont(self.gui.standard_font)
-            layout.addWidget(url_line_edit)
-            layout.addSpacing(20)
-
-            button_widget = QWidget()
-            layout.addWidget(button_widget)
-            button_layout = QHBoxLayout(button_widget)
-
-            ok_button = QPushButton('Save')
-            ok_button.setFont(self.gui.standard_font)
-            ok_button.pressed.connect(lambda: dialog.done(1))
-            button_layout.addStretch()
-            button_layout.addWidget(ok_button)
-
-            cancel_button = QPushButton('Cancel')
-            cancel_button.setFont(self.gui.standard_font)
-            cancel_button.pressed.connect(lambda: dialog.done(-1))
-            button_layout.addWidget(cancel_button)
-            button_layout.addStretch()
-
-            result = dialog.exec()
-            if result == 1:
-                self.gui.main.save_web_item(title_line_edit.text(), url_line_edit.text())
-                self.gui.media_widget.populate_web_list()
-
-    def delete_item(self):
-        """
-        Method to remove an item from this widget. Creates a QMessageBox to confirm removal.
-        """
-        if not self.currentItem():
-            return
-
-        response = QMessageBox.question(
-            self.gui.main_window,
-            'Really Delete',
-            'Really delete '
-                + self.currentItem().data(Qt.ItemDataRole.UserRole)['type']
-                + '? This action cannot be undone.',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
-        )
-
-        if response == QMessageBox.StandardButton.Yes:
-            thread = threading.Thread(target=self.gui.main.delete_item, args=(self.currentItem(),))
-            thread.start()
-            thread.join()
-
-            QMessageBox.information(
-                self.gui.main_window,
-                'Removed',
-                self.currentItem().data(Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
-                QMessageBox.StandardButton.Ok
-            )
-
-            if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
-                self.gui.media_widget.populate_song_list()
-            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
-                self.gui.media_widget.populate_custom_list()
-            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'image':
-                self.gui.media_widget.populate_image_list()
-            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'video':
-                self.gui.media_widget.populate_video_list()
-            elif self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'web':
-                self.gui.media_widget.populate_web_list()
-
-            self.gui.preview_widget.slide_list.clear()

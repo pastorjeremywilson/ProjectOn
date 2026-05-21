@@ -174,13 +174,15 @@ class RemoteServer:
         except Exception:
             self.gui.main.error_log()
 
-    def update_stage_text(self, stage_html, font_size, slide_info):
+    def update_stage_text(self, stage_html: str, font_size: int, slide_info: str):
         with self.app.app_context():
             self.socketio.emit('update_stage', [stage_html, font_size, slide_info])
+            return '', 200
 
-    def update_stage_image(self, jpg_bytes, slide_info):
+    def update_stage_image(self, jpg_bytes: bytes, slide_info: str):
         with self.app.app_context():
             self.socketio.emit('update_display', [jpg_bytes, slide_info])
+            return '', 200
 
     def get_all_gui_data(self):
         class_tag = ''
@@ -236,9 +238,10 @@ class RemoteServer:
 
         return remote_oos_buttons, slide_buttons
     
-    def slide_button(self, button):
-        self.gui.live_widget.web_button_signal.emit(button)
-        return '', 200
+    def slide_button(self, button: str):
+        with self.app.app_context():
+            self.gui.live_widget.web_button_signal.emit(button)
+            return '', 200
 
 
 class RemoteServerHandler(BaseHTTPRequestHandler):

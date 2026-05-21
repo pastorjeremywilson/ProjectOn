@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QGridLayout, QAbstractItemView
 
 
@@ -9,7 +10,7 @@ class PreviewWidget(QWidget):
     def __init__(self, gui):
         """
         Implements QWidget to create a widget containing all the necessary components for the program's preview widget.
-        :param gui.GUI gui: the current instance of GUI
+        :param guiElements.GUI gui: the current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -72,12 +73,12 @@ class CustomListWidget(QListWidget):
         self.gui = gui
         self.setObjectName('CustomListWidget')
 
-    def keyPressEvent(self, evt):
+    def keyPressEvent(self, evt: QKeyEvent):
         if evt.key() == Qt.Key.Key_Space:
             self.gui.send_to_live()
         super().keyPressEvent(evt)
 
-    def mouseDoubleClickEvent(self, evt):
+    def mouseDoubleClickEvent(self, evt: QMouseEvent):
         if evt.button() == Qt.MouseButton.LeftButton:
             self.gui.send_to_live()
         super().mouseDoubleClickEvent(evt)

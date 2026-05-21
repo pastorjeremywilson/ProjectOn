@@ -79,7 +79,7 @@ def get_commits():
 
     return html
 
-def show_notes(release=True, commits=True):
+def show_notes(release: bool | None = True, commits: bool | None = True):
     dialog = QDialog()
     dialog.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
     dialog.setWindowTitle('Release Notes')

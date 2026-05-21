@@ -5,18 +5,19 @@ import sqlite3
 import sys
 import threading
 
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF, QTime
-from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
-    QImage, QFontDatabase, QFontMetrics, QDropEvent, QDragMoveEvent
+from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF, QTime, \
+    QModelIndex, QObject
+from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QBrush, QPen, QPainter, \
+    QImage, QFontDatabase, QFontMetrics, QFocusEvent, QMouseEvent, QResizeEvent, \
+    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
     QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog, QStyledItemDelegate, QTreeWidget, \
-    QTreeWidgetItem, QMenu, QAction
+    QTreeWidgetItem, QMenu, QAction, QStyleOptionViewItem
 
-from dataHandling import parsers
 from importExport.openlpImport import OpenLPImport
 
 
@@ -27,19 +28,19 @@ class AutoSelectLineEdit(QLineEdit):
     def __init__(self):
         super().__init__()
 
-    def focusInEvent(self, evt):
+    def focusInEvent(self, evt: QFocusEvent):
         super().focusInEvent(evt)
         QTimer.singleShot(0, self.selectAll)
 
 
 class ClickableColorSwatch(QLabel):
     color_changed = pyqtSignal()
-    def __init__(self, gui, settings_widget=None):
+    def __init__(self, gui, settings_widget: QWidget = None):
         super().__init__()
         self.gui = gui
         self.settings_widget = settings_widget
 
-    def make_color_swatch_pixmap(self, rgb_color):
+    def make_color_swatch_pixmap(self, rgb_color: str):
         if 'rgba' in rgb_color:
             bg_color = rgb_color.replace('rgba(', '').replace(')', '')
         else:
@@ -69,7 +70,7 @@ class ClickableColorSwatch(QLabel):
         self.setPixmap(pixmap)
         self.repaint()
 
-    def mouseReleaseEvent(self, evt):
+    def mouseReleaseEvent(self, evt: QMouseEvent):
         super().mouseReleaseEvent(evt)
         image = self.pixmap().toImage()
         current_color = image.pixelColor(10, 10)
@@ -87,7 +88,7 @@ class CountdownWidget(QWidget):
     show_self_signal = pyqtSignal()
     hide_self_signal = pyqtSignal()
 
-    def __init__(self, gui, font, position, bg, fg):
+    def __init__(self, gui, font: QFont, position: str, bg: str, fg: str):
         super().__init__()
         self.gui = gui
 
@@ -95,12 +96,11 @@ class CountdownWidget(QWidget):
         self.show_self_signal.connect(self.show_self)
         self.hide_self_signal.connect(self.hide_self)
 
-        #self.setParent(self.gui.display_widget)
         self.setWindowFlag(Qt.WindowType.ToolTip)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
         self.setStyleSheet('background-color: ' + bg)
-        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         layout = QGridLayout(self)
 
         self.label = QLabel()
@@ -112,6 +112,9 @@ class CountdownWidget(QWidget):
         font_height = font_metrics.height()
         height = font_height + 40
 
+        x = 0
+        y = 0
+        width = 0
         if position == 'top_full':
             x = gui.display_widget.x()
             y = gui.display_widget.y()
@@ -143,12 +146,12 @@ class CustomMainWindow(QMainWindow):
     def __init__(self, gui):
         """
         Provides added functionality to QMainWindow, such as save on close and key bindings
-        :param gui.GUI gui:
+        :param guiElements.GUI gui:
         """
         super().__init__()
         self.gui = gui
 
-    def closeEvent(self, evt):
+    def closeEvent(self, evt: QEvent):
         """
         Checks for unsaved changes and prompts the user to save
         :param QEvent evt: closeEvent
@@ -210,8 +213,8 @@ class CustomMainWindow(QMainWindow):
                 self.gui.slide_auto_play.keep_running = False
 
             self.gui.main.save_settings()
-            evt.accept()
             self.gui.display_widget.deleteLater()
+            evt.accept()
 
 
 class CustomScrollArea(QScrollArea):
@@ -221,7 +224,7 @@ class CustomScrollArea(QScrollArea):
     def __init__(self):
         super().__init__()
 
-    def resizeEvent(self, evt):
+    def resizeEvent(self, evt: QResizeEvent):
         self.widget().setFixedWidth(self.width())
 
 
@@ -230,11 +233,11 @@ class CustomSlider(QSlider):
         super().__init__()
         self.mouse_pressed = False
 
-    def mousePressEvent(self, evt):
+    def mousePressEvent(self, evt: QMouseEvent):
         self.mouse_pressed = True
         super().mousePressEvent(evt)
 
-    def mouseReleaseEvent(self, evt):
+    def mouseReleaseEvent(self, evt: QMouseEvent):
         self.mouse_pressed = False
         super().mouseReleaseEvent(evt)
 
@@ -243,10 +246,10 @@ class DisplayWidget(QWidget):
     """
     Provides a custom QWidget to be used as the display widget
     """
-    def __init__(self, gui, sample=False):
+    def __init__(self, gui, sample: bool | None = False):
         """
         Provides a custom QWidget to be used as the display widget
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         :param bool sample: Whether this is intended to be the sample widget
         """
         super().__init__()
@@ -277,7 +280,7 @@ class DisplayWidget(QWidget):
         else:
             self.hide()
 
-    def paintEvent(self, evt):
+    def paintEvent(self, evt: QPaintEvent):
         # in the case of a background pixmap, either center it if the pixmap is smaller than the display widget,
         # or scale it down if it is bigger
         super().paintEvent(evt)
@@ -317,11 +320,11 @@ class DisplayWidget(QWidget):
 class FontFaceListWidget(QListWidget):
     """
     Creates a custom QListWidget that displays all fonts on the system in their own style.
-    :param gui.GUI gui: The current instance of GUI
+    :param guiElements.GUI gui: The current instance of GUI
     """
     def __init__(self, gui):
         """
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -354,19 +357,19 @@ class FontFaceListWidget(QListWidget):
 class FontFaceComboBox(QComboBox):
     """
     Creates a custom QComboBox that displays all fonts on the system in their own style.
-    :param gui.GUI gui: The current instance of GUI
+    :param guiElements.GUI gui: The current instance of GUI
     """
     current_font = None
 
     def __init__(self, gui):
         """
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         super().__init__()
         self.setObjectName('FontFaceComboBox')
         self.gui = gui
         self.setEditable(True)
-        self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.populate_widget()
 
     def populate_widget(self):
@@ -374,7 +377,7 @@ class FontFaceComboBox(QComboBox):
             for i in range(len(self.gui.font_pixmaps)):
                 if i == len(self.gui.font_pixmaps) - 1:
                     self.setIconSize(QSize(self.gui.font_pixmaps[i][0], self.gui.font_pixmaps[i][1]))
-                    #self.setMinimumWidth(self.gui.font_pixmaps[i][0])
+                    #self.setMinimumWidth(self.guiElements.font_pixmaps[i][0])
                 else:
                     self.addItem(QIcon(self.gui.font_pixmaps[i][1]), self.gui.font_pixmaps[i][0])
         except Exception:
@@ -385,24 +388,24 @@ class FontFaceComboBox(QComboBox):
                 self.setCurrentIndex(i)
                 break
 
-    def wheelEvent(self, evt):
+    def wheelEvent(self, evt: QWheelEvent):
         evt.ignore()
 
 
 class FontSample(QLabel):
     text = ''
-    def __init__(self, settings_widget,
-                 use_outline=True,
-                 outline_color=QColor(0, 0, 0),
-                 outline_width=8,
-                 fill_color=QColor(255, 255, 255),
-                 use_shadow=True,
-                 shadow_color=QColor(0, 0, 0),
-                 shadow_offset=5,
-                 use_shade=False,
-                 shade_color=0,
-                 shade_opacity=50,
-                 edit_widget=None):
+    def __init__(self, settings_widget: QWidget,
+                 use_outline: bool | None = True,
+                 outline_color: QColor | None = QColor(0, 0, 0),
+                 outline_width: int | None = 8,
+                 fill_color: QColor | None = QColor(255, 255, 255),
+                 use_shadow: bool | None = True,
+                 shadow_color: QColor | None = QColor(0, 0, 0),
+                 shadow_offset: int | None = 5,
+                 use_shade: bool | None = False,
+                 shade_color: int | None = 0,
+                 shade_opacity: int | None = 50,
+                 edit_widget: QWidget | None = None):
         super().__init__()
         self.settings_widget = settings_widget
         self.use_outline = use_outline
@@ -423,7 +426,7 @@ class FontSample(QLabel):
         self.widget = self.settings_widget.findChild(QWidget, 'font_sample_widget')
         self.background_label = self.settings_widget.findChild(QLabel, 'font_sample_background_label')
 
-    def paintEvent(self, evt):
+    def paintEvent(self, evt: QPaintEvent):
         brush = QBrush()
         pen = QPen()
 
@@ -478,7 +481,7 @@ class FontSample(QLabel):
 
         super().paintEvent(evt)
 
-    def make_sample_background(self, rect):
+    def make_sample_background(self, rect: QRect):
         slide_type = self.settings_widget.slide_type
 
         if self.settings_widget.applies_to_global:
@@ -552,7 +555,7 @@ class FontWidget(QWidget):
         self.draw_border = draw_border
         self.applies_to_global = applies_to_global
 
-        #self.font_face_combobox = FontFaceComboBox(self.gui)
+        #self.font_face_combobox = FontFaceComboBox(self.guiElements)
         self.font_face_combobox = QFontComboBox()
         self.font_size_spinbox = QSpinBox()
         self.white_radio_button = QRadioButton('White')
@@ -723,7 +726,7 @@ class FontWidget(QWidget):
         self.shade_opacity_slider.max_label.setText('Opaque')
         shade_layout.addWidget(self.shade_opacity_slider)
 
-    def blockSignals(self, block):
+    def blockSignals(self, block: bool):
         """
         method to block the signals of all widgets that would be updated during apply_settings
         """
@@ -795,9 +798,9 @@ class FontWidget(QWidget):
 
         self.change_font_sample()
 
-    def change_font(self, value=None):
+    def change_font(self, value: int | None = None):
         """
-        applies the currently chosen font settings to gui's global_font_face, global_footer_font_face, and settings
+        applies the currently chosen font settings to guiElements's global_font_face, global_footer_font_face, and settings
         """
 
         shadow_color = None
@@ -815,7 +818,6 @@ class FontWidget(QWidget):
                 elif self.sender().objectName() == 'outline_width_slider':
                     outline_width = value
 
-            #new_font_face = self.font_list_widget.currentItem().data(20)
             new_font_face = self.font_face_combobox.currentText()
             self.gui.global_font_face = new_font_face
             self.gui.global_footer_font_face = new_font_face
@@ -933,7 +935,7 @@ class FontWidget(QWidget):
 
         self.show()
 
-    def hideEvent(self, evt):
+    def hideEvent(self, evt: QHideEvent):
         """
         overrides hideEvent to save settings when the widget is hidden
         """
@@ -946,9 +948,9 @@ class ImageCombobox(QComboBox):
     """
     Creates a custom QComboBox that displays a thumbnail of an image to be used.
     """
-    def __init__(self, gui, type, suppress_autosave=False):
+    def __init__(self, gui, type: str, suppress_autosave: bool | None = False):
         """
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         :param str type: Whether this is creating a combobox of 'logo', 'song', or 'bible' images
         """
         super().__init__()
@@ -1063,7 +1065,7 @@ class ImageCombobox(QComboBox):
                 connection.close()
             self.blockSignals(False)
 
-    def wheelEvent(self, evt):
+    def wheelEvent(self, evt: QWheelEvent):
         # prevent wheel scrolling, which is undesirable in the settings layout
         evt.ignore()
 
@@ -1075,20 +1077,20 @@ class LyricDisplayWidget(QWidget):
     def __init__(
             self,
             gui,
-            for_sample=False,
-            use_outline=True,
-            outline_color=QColor(0, 0, 0),
-            outline_width=8,
-            fill_color=QColor(255, 255, 255),
-            use_shadow=True,
-            shadow_color=QColor(0, 0, 0),
-            shadow_offset=5,
-            use_shade=False,
-            shade_color=0,
-            shade_opacity=75):
+            for_sample: bool | None = False,
+            use_outline: bool | None = True,
+            outline_color: QColor | None = QColor(0, 0, 0),
+            outline_width: int | None = 8,
+            fill_color: QColor | None = QColor(255, 255, 255),
+            use_shadow: bool | None = True,
+            shadow_color: QColor | None = QColor(0, 0, 0),
+            shadow_offset: int | None = 5,
+            use_shade: bool | None = False,
+            shade_color: int | None = 0,
+            shade_opacity: int | None = 75):
         """
         Provide a standardized QWidget to be used for showing lyrics on the display and sample widgets.py
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         :param bool for_sample: Whether this widget is intended for the sample widget or not
         :param bool use_outline: Whether the font is to be outlined
         :param int outline_color: The shade of the font outline (QColor(x, x, x))
@@ -1132,7 +1134,7 @@ class LyricDisplayWidget(QWidget):
         self.footer_label.setObjectName('footer_label')
         layout.addWidget(self.footer_label, 1, 0)
 
-    def setText(self, text):
+    def setText(self, text: str):
         """
         Convenience method to set the text variable
         :param str text: Text to be shown
@@ -1148,7 +1150,7 @@ class LyricDisplayWidget(QWidget):
             self.setGeometry(self.gui.sample_widget.geometry())
             self.move(self.gui.sample_widget.x(), self.gui.sample_widget.y())
 
-    def paintEvent(self, evt):
+    def paintEvent(self, evt: QPaintEvent):
         """
         Overrides paintEvent to custom paint the text onto the widget
         :param QPaintEvent evt: paintEvent
@@ -1157,7 +1159,7 @@ class LyricDisplayWidget(QWidget):
         painter = QPainter(self)
         self.calculate_painted_text(painter)
 
-    def calculate_painted_text(self, painter=None):
+    def calculate_painted_text(self, painter: QPainter | None = None):
         """
         Provides a method for performing all the drawing operations for the text that will be shown on the slide,
         but it does so outside of the paintEvent. If the text is actually to be drawn, the widget's painter can be
@@ -1193,6 +1195,7 @@ class LyricDisplayWidget(QWidget):
         usable_rect = QRect(0, 0, self.gui.display_widget.width(),
                             self.gui.display_widget.height() - footer_height - 40)
         self.total_height = -1
+        line_height = 0
         while self.total_height == -1 or self.total_height > usable_rect.height():
             longest_line = 0
             painter_paths = []
@@ -1309,7 +1312,12 @@ class NewFontWidget(QWidget):
     """
     mouse_release_signal = pyqtSignal(int)
 
-    def __init__(self, gui, slide_type, draw_border=True, applies_to_global=True, edit_widget=None):
+    def __init__(self,
+                 gui,
+                 slide_type: str,
+                 draw_border: bool | None = True,
+                 applies_to_global: bool | None = True,
+                 edit_widget: QWidget | None = None):
         """
         Implements QWidget that contains all of the settings that can be applied to the display font
         :param GUI gui: the current instance of GUI
@@ -1322,7 +1330,6 @@ class NewFontWidget(QWidget):
         self.applies_to_global = applies_to_global
         self.edit_widget = edit_widget
 
-        #self.font_face_combobox = FontFaceComboBox(self.gui)
         self.font_face_combobox = QFontComboBox()
         self.font_size_spinbox = QSpinBox()
         self.white_radio_button = QRadioButton('White')
@@ -1476,7 +1483,7 @@ class NewFontWidget(QWidget):
         self.shade_opacity_slider.max_label.setText('Opaque')
         shade_layout.addWidget(self.shade_opacity_slider)
 
-    def blockSignals(self, block):
+    def blockSignals(self, block: bool):
         """
         method to block the signals of all widgets that would be updated during apply_settings
         """
@@ -1548,9 +1555,9 @@ class NewFontWidget(QWidget):
 
         self.change_font_sample()
 
-    def change_font(self, value=None):
+    def change_font(self, value: int | None = None):
         """
-        applies the currently chosen font settings to gui's global_font_face, global_footer_font_face, and settings
+        applies the currently chosen font settings to guiElements's global_font_face, global_footer_font_face, and settings
         """
 
         shadow_color = None
@@ -1689,7 +1696,7 @@ class NewFontWidget(QWidget):
 
         self.show()
 
-    def hideEvent(self, evt):
+    def hideEvent(self, evt: QHideEvent):
         """
         overrides hideEvent to save settings when the widget is hidden
         """
@@ -1699,17 +1706,17 @@ class NewFontWidget(QWidget):
 
 
 class FontComboboxDelegate(QStyledItemDelegate):
-    def __init__(self, parent=None, row_height=40, font_size=12):
+    def __init__(self, parent: QWidget | None = None, row_height: int | None = 40, font_size: int | None = 12):
         super().__init__(parent)
         self.row_height = row_height
         self.font_size = font_size
 
-    def sizeHint(self, option, index):
+    def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex):
         size = super().sizeHint(option, index)
         size.setHeight(40)
         return size
 
-    def paint(self, painter, option, index):
+    def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex):
         font_name = index.data(Qt.DisplayRole)
         font = QFont(font_name)
         font.setPointSize(self.font_size)
@@ -1720,7 +1727,7 @@ class FontComboboxDelegate(QStyledItemDelegate):
 class OffsetSlider(QWidget):
     """
     Creates a widget containing a QSlider and Label which lets the user set the distance of the display's shadow offset
-    :param gui.GUI gui: The current instance of GUI
+    :param guiElements.GUI gui: The current instance of GUI
     """
     def __init__(self, gui):
         super().__init__()
@@ -1763,7 +1770,7 @@ class OffsetSlider(QWidget):
         self.max_label.setFont(self.gui.list_font)
         slider_layout.addWidget(self.max_label, 1, 2, Qt.AlignmentFlag.AlignRight)
 
-    def eventFilter(self, obj, evt):
+    def eventFilter(self, obj: QObject, evt: QEvent):
         if obj == self.offset_slider and evt.type() == QEvent.Type.Wheel:
             return True
         elif obj == self.offset_slider and evt.type() == QEvent.Type.MouseButtonRelease:
@@ -1780,7 +1787,9 @@ class OffsetSlider(QWidget):
 
 
 class PrintDialog(QDialog):
-    def __init__(self, document):
+    def __init__(self, document: QTextDocument):
+        super().__init__()
+
         printer = QPrinter(QPrinter.PrinterMode.HighResolution)
         resolution = printer.resolution()
         document_size = QSizeF(8.5 * resolution, 11 * resolution)
@@ -1833,12 +1842,12 @@ class PrintDialog(QDialog):
 class ShadowSlider(QWidget):
     """
     Creates a widget containing a QSlider and Label which lets the user set the greyness of the display's shadow
-    :param gui.GUI gui: The current instance of GUI
+    :param guiElements.GUI gui: The current instance of GUI
     """
     def __init__(self, gui):
         """
         Creates a widget containing a QSlider and Label which lets the user set the greyness of the display's shadow
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -1882,12 +1891,12 @@ class ShadowSlider(QWidget):
         self.max_label.setFont(self.gui.list_font)
         slider_layout.addWidget(self.max_label, 1, 2, Qt.AlignmentFlag.AlignRight)
 
-    def change_sample(self, value):
+    def change_sample(self, value: int):
         new_pixmap = QPixmap(20, 20)
         new_pixmap.fill(QColor(value, value, value))
         self.color_label.setPixmap(new_pixmap)
 
-    def eventFilter(self, obj, evt):
+    def eventFilter(self, obj: QObject, evt: QEvent):
         if obj == self.color_slider and evt.type() == QEvent.Type.Wheel:
             return True
         elif obj == self.color_slider and evt.type() == QEvent.Type.MouseButtonRelease:
@@ -1908,10 +1917,10 @@ class SimpleSplash:
     Provides a simple and standardized popup for showing messages
     """
 
-    def __init__(self, gui, text: str='', subtitle: bool=False, parent: QWidget=None):
+    def __init__(self, gui, text: str | None = '', subtitle: bool | None = False, parent: QWidget | None = None):
         """
         Provides a simple and standardized popup for showing messages
-        :param gui.GUI gui: the current instance of GUI
+        :param guiElements.GUI gui: the current instance of GUI
         :param str text: the text to be displayed
         :param str subtitle: optional: subtitle to be displayed under the text
         :param obj parent: optional: parent widget for SimpleSplash's main widget
@@ -1952,7 +1961,12 @@ class SimpleSplash:
 
 
 class StandardDialog(QDialog):
-    def __init__(self, gui, message, icon=None, temporary=False, buttons=['yes', 'no', 'cancel']):
+    def __init__(self,
+                 gui,
+                 message: str,
+                 icon: QPixmap | None = None,
+                 temporary: bool | None = False,
+                 buttons: list[str] | None = None):
         """
         Custom QDialog to standardize dialogs across the program.
         :param str message: Message to display
@@ -1967,7 +1981,7 @@ class StandardDialog(QDialog):
         self.message = message
         self.icon = icon
         self.temporary = temporary
-        self.buttons = buttons
+        self.buttons = buttons if buttons is not None else ['yes', 'no', 'cancel']
 
         self.OK = 1
         self.YES = 2
@@ -1982,7 +1996,7 @@ class StandardDialog(QDialog):
             message_layout = QHBoxLayout(message_widget)
 
             icon_label = QLabel()
-            self.icon = self.icon.scaledToHeight(50, Qt.SmoothTransformation)
+            self.icon = self.icon.scaledToHeight(50, Qt.TransformationMode.SmoothTransformation)
             icon_label.setPixmap(self.icon)
             message_layout.addWidget(icon_label)
             message_layout.addSpacing(10)
@@ -2002,13 +2016,13 @@ class StandardDialog(QDialog):
         for i in range(len(self.buttons)):
             this_button = QPushButton(self.buttons[i].capitalize())
             this_button.setFont(self.gui.standard_font)
-            if this_button == 'ok':
+            if self.buttons[i].lower() == 'ok':
                 this_button.pressed.connect(lambda: self.done(self.OK))
-            elif this_button == 'yes':
+            elif self.buttons[i].lower() == 'yes':
                 this_button.pressed.connect(lambda: self.done(self.YES))
-            elif this_button == 'no':
+            elif self.buttons[i].lower() == 'no':
                 this_button.pressed.connect(lambda: self.done(self.NO))
-            elif this_button == 'cancel':
+            elif self.buttons[i].lower() == 'cancel':
                 this_button.pressed.connect(lambda: self.done(self.CANCEL))
 
             button_layout.addWidget(this_button)
@@ -2024,7 +2038,12 @@ class StandardItemWidget(QWidget):
     """
     Provides a standardized QWidget to be used as a QListWidget ItemWidget
     """
-    def __init__(self, gui, title, subtitle=None, icon=None, wrap_subtitle=False):
+    def __init__(self,
+                 gui,
+                 title: str,
+                 subtitle: str | None = None,
+                 icon: QPixmap | None = None,
+                 wrap_subtitle: bool | None = False):
         super().__init__()
         self.gui = gui
         self.setObjectName('item_widget')
@@ -2072,6 +2091,7 @@ class StandardItemWidget(QWidget):
 
 class SettingsWidget(QWidget):
     wait_widget = None
+    song_background_combobox: ImageCombobox = None
 
     def __init__(self, gui):
         super().__init__()
@@ -2095,7 +2115,7 @@ class SettingsWidget(QWidget):
 
         self.accept_font_changes = True
         #self.wait_widget.subtitle_label.setText('Creating Font Sample')
-        #self.gui.main.app.processEvents()
+        #self.guiElements.main.app.processEvents()
         #self.wait_widget.widget.deleteLater()
 
     def show_wait_widget(self):
@@ -2397,8 +2417,6 @@ class SettingsWidget(QWidget):
         return scroll_area
 
     def background_settings(self):
-        from gui.widgets.widgets import ImageCombobox
-
         widget = QWidget()
         widget.setObjectName('settings_container')
         widget.setMinimumWidth(self.min_width)
@@ -2620,7 +2638,7 @@ class SettingsWidget(QWidget):
 
         return widget
 
-    def use_countdown_changed(self, options_widget):
+    def use_countdown_changed(self, options_widget: QWidget):
         if self.use_countdown_checkbox.isChecked():
             options_widget.show()
         else:
@@ -2651,13 +2669,13 @@ class SettingsWidget(QWidget):
             QMessageBox.StandardButton.Ok
         )
 
-    def eventFilter(self, obj, evt):
+    def eventFilter(self, obj: QObject, evt: QEvent):
         if evt.type() == QEvent.Type.Wheel:
             return True
         else:
             return super().eventFilter(obj, evt)
 
-    def draw_screen_pixmap(self, name, primary, size):
+    def draw_screen_pixmap(self, name: str, primary: bool, size: QSize):
         ratio = size.width() / size.height()
         height = 100
         width = int(100 * ratio)
@@ -2716,6 +2734,7 @@ class SettingsWidget(QWidget):
         result = QFileDialog.getOpenFileName(
             self.gui.main_window, 'Choose Background Image', os.path.expanduser('~') + '/Pictures')
         if len(result[0]) > 0:
+            file_name = ''
             try:
                 file_name_split = result[0].split('/')
                 file_name = file_name_split[len(file_name_split) - 1]
@@ -2756,29 +2775,34 @@ class SettingsWidget(QWidget):
 
             self.gui.apply_settings()
 
-    def delete_background(self, type):
+    def delete_background(self, type: str):
         dialog = QDialog()
         layout = QVBoxLayout()
         dialog.setLayout(layout)
 
+        label = QLabel()
+        current_song_background = ''
+        current_bible_background = ''
+        current_image = ''
         if type == 'background':
-            label = QLabel('Choose a background to remove:')
+            label.setText('Choose a background to remove:')
             current_bible_background = self.bible_background_combobox.currentData(Qt.ItemDataRole.UserRole)
             current_song_background = self.song_background_combobox.currentData(Qt.ItemDataRole.UserRole)
         elif type == 'image':
-            label = QLabel('Choose an image item to remove:')
+            label.setText('Choose an image item to remove:')
             current_image = self.logo_background_combobox.currentData(Qt.ItemDataRole.UserRole)
         label.setFont(self.gui.standard_font)
         layout.addWidget(label)
 
-        from gui.widgets.widgets import ImageCombobox
+        combobox = None
         if type == 'background':
             combobox = ImageCombobox(self.gui, type='delete_background')
         elif type == 'image':
             combobox = ImageCombobox(self.gui, type='delete_image')
-        combobox.removeItem(1)
-        combobox.removeItem(0)
-        layout.addWidget(combobox)
+        if combobox:
+            combobox.removeItem(1)
+            combobox.removeItem(0)
+            layout.addWidget(combobox)
 
         button_widget = QWidget()
         button_layout = QHBoxLayout()
@@ -3058,7 +3082,7 @@ class IndexedSettingsWidget(QWidget):
 
         self.accept_font_changes = True
 
-    def paintEvent(self, evt):
+    def paintEvent(self, evt: QPaintEvent):
         super().paintEvent(evt)
         self.widget_positions = []
         for widget in self.settings_container.findChildren(QWidget, 'settings_container'):
@@ -3625,7 +3649,7 @@ class IndexedSettingsWidget(QWidget):
             self.headings_list.setCurrentRow(item_number)
             self.headings_list.blockSignals(False)
 
-    def use_countdown_changed(self, options_widget):
+    def use_countdown_changed(self, options_widget: QWidget):
         if self.use_countdown_checkbox.isChecked():
             options_widget.show()
         else:
@@ -3656,13 +3680,13 @@ class IndexedSettingsWidget(QWidget):
             QMessageBox.StandardButton.Ok
         )
 
-    def eventFilter(self, obj, evt):
+    def eventFilter(self, obj: QObject, evt: QEvent):
         if evt.type() == QEvent.Type.Wheel:
             return True
         else:
             return super().eventFilter(obj, evt)
 
-    def draw_screen_pixmap(self, name, primary, size):
+    def draw_screen_pixmap(self, name: str, primary: bool, size: QSize):
         ratio = size.width() / size.height()
         height = 100
         width = int(100 * ratio)
@@ -3721,6 +3745,7 @@ class IndexedSettingsWidget(QWidget):
         result = QFileDialog.getOpenFileName(
             self.gui.main_window, 'Choose Background Image', os.path.expanduser('~') + '/Pictures')
         if len(result[0]) > 0:
+            file_name = ''
             try:
                 file_name_split = result[0].split('/')
                 file_name = file_name_split[len(file_name_split) - 1]
@@ -3761,29 +3786,34 @@ class IndexedSettingsWidget(QWidget):
 
             self.gui.apply_settings()
 
-    def delete_background(self, type):
+    def delete_background(self, type: str):
         dialog = QDialog()
         layout = QVBoxLayout()
         dialog.setLayout(layout)
 
+        label = QLabel()
+        current_song_background = ''
+        current_bible_background = ''
+        current_image = ''
         if type == 'background':
-            label = QLabel('Choose a background to remove:')
+            label.setText('Choose a background to remove:')
             current_bible_background = self.bible_background_combobox.currentData(Qt.ItemDataRole.UserRole)
             current_song_background = self.song_background_combobox.currentData(Qt.ItemDataRole.UserRole)
         elif type == 'image':
-            label = QLabel('Choose an image item to remove:')
+            label.setText('Choose an image item to remove:')
             current_image = self.logo_background_combobox.currentData(Qt.ItemDataRole.UserRole)
         label.setFont(self.gui.standard_font)
         layout.addWidget(label)
 
-        from gui.widgets.widgets import ImageCombobox
+        combobox = None
         if type == 'background':
             combobox = ImageCombobox(self.gui, type='delete_background')
         elif type == 'image':
             combobox = ImageCombobox(self.gui, type='delete_image')
-        combobox.removeItem(1)
-        combobox.removeItem(0)
-        layout.addWidget(combobox)
+        if combobox:
+            combobox.removeItem(1)
+            combobox.removeItem(0)
+            layout.addWidget(combobox)
 
         button_widget = QWidget()
         button_layout = QHBoxLayout()
@@ -3959,6 +3989,8 @@ class IndexedSettingsWidget(QWidget):
 
     def save(self):
         reposition_screens = False
+        primary_screen = None
+        secondary_screen = None
         if not self.screen_button_group.checkedButton().objectName() == self.gui.main.settings['selected_screen_name']:
             reposition_screens = True
             screen_name = self.screen_button_group.checkedButton().objectName()
@@ -4057,22 +4089,22 @@ class TextLayoutWidget(QWidget):
     def __init__(
             self,
             gui,
-            for_sample=False,
-            font_face='Sans',
-            font_size=72,
-            use_outline=True,
-            outline_color=QColor(0, 0, 0),
-            outline_width=8,
-            fill_color=QColor(255, 255, 255),
-            use_shadow=True,
-            shadow_color=QColor(0, 0, 0),
-            shadow_offset=5,
-            use_shade=False,
-            shade_color=0,
-            shade_opacity=75,
-            background_pixmap=None,
-            sample_text=None,
-            footer_text=None):
+            for_sample: bool | None = False,
+            font_face: str | None = 'Sans',
+            font_size: int | None = 72,
+            use_outline: bool | None = True,
+            outline_color: QColor | None = QColor(0, 0, 0),
+            outline_width: int | None = 8,
+            fill_color: QColor | None = QColor(255, 255, 255),
+            use_shadow: bool | None = True,
+            shadow_color: QColor | None = QColor(0, 0, 0),
+            shadow_offset: int | None = 5,
+            use_shade: bool | None = False,
+            shade_color: int | None = 0,
+            shade_opacity: int | None = 75,
+            background_pixmap: bool | None = None,
+            sample_text: bool | None = None,
+            footer_text: bool | None = None):
         super().__init__()
         self.gui = gui
         self.for_sample = for_sample
@@ -4163,19 +4195,19 @@ class TextLayoutLyricWidget(QWidget):
     def __init__(
             self,
             gui,
-            for_sample=False,
-            font_face='Sans',
-            font_size=72,
-            use_outline=True,
-            outline_color=QColor(0, 0, 0),
-            outline_width=8,
-            fill_color=QColor(255, 255, 255),
-            use_shadow=True,
-            shadow_color=QColor(0, 0, 0),
-            shadow_offset=5,
-            use_shade=False,
-            shade_color=0,
-            shade_opacity=75):
+            for_sample: bool | None = False,
+            font_face: str | None = 'Sans',
+            font_size: int | None = 72,
+            use_outline: bool | None = True,
+            outline_color: QColor | None = QColor(0, 0, 0),
+            outline_width: int | None = 8,
+            fill_color: QColor | None = QColor(255, 255, 255),
+            use_shadow: bool | None = True,
+            shadow_color: QColor | None = QColor(0, 0, 0),
+            shadow_offset: int | None = 5,
+            use_shade: bool | None = False,
+            shade_color: int | None = 0,
+            shade_opacity: int | None = 75):
         super().__init__()
         self.gui = gui
         self.for_sample = for_sample
@@ -4197,7 +4229,7 @@ class TextLayoutLyricWidget(QWidget):
     def setText(self, text):
         self.text = text
 
-    def paintEvent(self, evt):
+    def paintEvent(self, evt: QPaintEvent):
         self.total_height = 0
         self.text = re.sub('<p.*?>', '', self.text)
         self.text = re.sub('</p>', '', self.text)
@@ -4208,7 +4240,7 @@ class TextLayoutLyricWidget(QWidget):
         ITALIC = 1
         UNDERLINE = 2
 
-        font = self.font()
+        font = self.font
         font_size = font.pointSize() + 2
         painter_paths = []
         longest_line = 0
@@ -4216,6 +4248,7 @@ class TextLayoutLyricWidget(QWidget):
         # build paths for each line, creating a new path whenever the line becomes too long
         usable_rect = QRect(0, 0, self.width(), self.height())
         self.total_height = -1
+        line_height = 0
         while self.total_height == -1 or self.total_height > usable_rect.height():
             longest_line = 0
             painter_paths = []
@@ -4296,7 +4329,6 @@ class TextLayoutLyricWidget(QWidget):
         painter.fillRect(shade_rect, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
 
         for path in painter_paths:
-            # if path.boundingRect().width() > 0:
             path_x = (self.gui.display_widget.width() / 2) - (path.boundingRect().width() / 2)
             path.translate(path_x, path_y)
 
@@ -4436,7 +4468,7 @@ class Toolbar(QWidget):
         self.logo_screen_button.released.connect(self.gui.display_logo_screen)
         self.layout.addWidget(self.logo_screen_button)
 
-    def show_font_widget(self, slide_type):
+    def show_font_widget(self, slide_type: str):
         if slide_type == 'song':
             font_widget = self.song_font_widget
             font_button = self.song_font_button
@@ -4468,6 +4500,7 @@ class Toolbar(QWidget):
         result = QFileDialog.getOpenFileName(
             self.gui.main_window, 'Choose Background Image', os.path.expanduser('~') + '/Pictures')
         if len(result[0]) > 0:
+            file_name = ''
             try:
                 file_name_split = result[0].split('/')
                 file_name = file_name_split[len(file_name_split) - 1]
@@ -4851,7 +4884,7 @@ class CustomTreeWidget(QTreeWidget):
         Method to create a EditWidget for a song or custom slide.
         """
 
-        from gui.widgets.editWidget import EditWidget
+        from guiElements.widgets.editWidget import EditWidget
         if self.currentItem():
             data = self.currentItem().data(0, Qt.ItemDataRole.UserRole)
             if data['type'] == 'song':
@@ -4971,6 +5004,7 @@ class CustomTreeWidget(QTreeWidget):
             return
 
         data = self.currentItem().data(0, Qt.ItemDataRole.UserRole)
+        title = data['title']
         if data['type'] == 'folder':
             message = f'Really delete the {data['title']} folder? All items in the folder will be kept.'
         else:
@@ -5001,23 +5035,14 @@ class CustomTreeWidget(QTreeWidget):
                 thread.start()
                 thread.join()
 
+                self.model().removeRows(self.currentIndex().row(), 1)
+
                 QMessageBox.information(
                     self.gui.main_window,
                     'Removed',
-                    self.currentItem().data(0, Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
+                    f'{title} has been removed.',
                     QMessageBox.StandardButton.Ok
                 )
-
-                if self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'song':
-                    self.gui.media_widget.populate_song_list()
-                elif self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'custom':
-                    self.gui.media_widget.populate_custom_list()
-                elif self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'image':
-                    self.gui.media_widget.populate_image_list()
-                elif self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'video':
-                    self.gui.media_widget.populate_video_list()
-                elif self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'web':
-                    self.gui.media_widget.populate_web_list()
 
             self.gui.preview_widget.slide_list.clear()
         self.custom_sort()

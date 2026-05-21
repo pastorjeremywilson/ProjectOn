@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt, QSize, QPoint
-from PyQt5.QtGui import QCursor, QIcon, QDropEvent
+from PyQt5.QtGui import QCursor, QIcon, QDropEvent, QKeyEvent, QMouseEvent, QDragEnterEvent
 from PyQt5.QtWidgets import QWidget, QListWidget, QVBoxLayout, QLabel, QMenu, QGridLayout, \
-    QPushButton, QSizePolicy, QMessageBox, QAction, QAbstractItemView
+    QPushButton, QSizePolicy, QMessageBox, QAction, QAbstractItemView, QTreeWidgetItem
 
-from gui.widgets.editWidget import EditWidget
+from guiElements.widgets.editWidget import EditWidget
 
 
 class OOSWidget(QWidget):
@@ -13,7 +13,7 @@ class OOSWidget(QWidget):
     def __init__(self, gui):
         """
         Creates a QWidget containing all the necessary components of the program's order of service widget.
-        :param gui.GUI gui: the current instance of GUI
+        :param guiElements.GUI gui: the current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -100,7 +100,7 @@ class CustomListWidget(QListWidget):
     def __init__(self, gui):
         """
         Implements QListWidget to add custom functionality.
-        :param gui.GUI gui: the current instance of GUI
+        :param guiElements.GUI gui: the current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -124,7 +124,7 @@ class CustomListWidget(QListWidget):
             self.gui.send_to_preview(self.currentItem())
             self.gui.main.app.processEvents()
 
-    def keyPressEvent(self, evt):
+    def keyPressEvent(self, evt: QKeyEvent):
         """
         Overrides keyPressEvent to send the current item to live when space key is pressed.
         :param QKeyEvent evt: keyEvent
@@ -132,7 +132,7 @@ class CustomListWidget(QListWidget):
         if evt.key() == Qt.Key.Key_Space:
             self.gui.send_to_live()
 
-    def mouseDoubleClickEvent(self, evt):
+    def mouseDoubleClickEvent(self, evt: QMouseEvent):
         """
         Overrides mouseDoubleClickEvent to send the current item to live on double-click.
         :param evt:
@@ -140,15 +140,15 @@ class CustomListWidget(QListWidget):
         """
         self.gui.send_to_live()
 
-    def dragEnterEvent(self, evt):
+    def dragEnterEvent(self, evt: QDragEnterEvent):
         """
         Overrides dragEnterEvent to globalize the event's source widget.
         :param QDragEnterEvent evt: dragEnterEvent
         """
-        evt.accept()
+        super().dragEnterEvent(evt)
         self.source_list_widget = evt.source()
 
-    def dropEvent(self, evt):
+    def dropEvent(self, evt: QDropEvent):
         """
         Overrides dropEvent to properly add a QListWidget item to this widget based on the type.
         :param QDropEvent evt: dropEvent
@@ -157,21 +157,22 @@ class CustomListWidget(QListWidget):
         if evt.source() == self:
             super().dropEvent(evt)
             return
+
         item = evt.source().currentItem().clone()
         item.setText('')
         row = self.row(self.itemAt(QPoint(int(evt.pos().x()), int(evt.pos().y()))))
         if row == -1:
             row = self.count()
 
-        if evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+        if item.data(Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.add_song_to_service(item, row)
-        elif evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+        elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
             self.gui.media_widget.add_custom_to_service(item, row)
-        elif evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'image':
+        elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'image':
             self.gui.media_widget.add_image_to_service(item, row)
-        elif evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'video':
+        elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
             self.gui.media_widget.add_video_to_service(item, row)
-        elif evt.source().currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'web':
+        elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
             self.gui.media_widget.add_web_to_service(item, row)
 
         remote_oos_buttons = ''

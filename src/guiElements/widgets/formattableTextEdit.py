@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QTextCursor, QFont, QTextCharFormat, QIcon, QKeyEvent
+from PyQt5.QtCore import Qt, QMimeData
+from PyQt5.QtGui import QTextCursor, QFont, QTextCharFormat, QIcon, QKeyEvent, QFocusEvent
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QListWidgetItem, QListWidget, \
     QMenu, QAction
 
@@ -13,7 +13,7 @@ class FormattableTextEdit(QWidget):
     def __init__(self, gui):
         """
         Provides a QTextEdit whose text is changeable using Bold, Italic, and Underline QPushButtons.
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         self.gui = gui
         super().__init__()
@@ -124,7 +124,7 @@ class FormattableTextEdit(QWidget):
         else:
             self.underline_button.setChecked(False)
 
-    def get_char_format(self, cursor):
+    def get_char_format(self, cursor: QTextCursor):
         if cursor.hasSelection():
             # move the cursor one character to the right or left in case the selection encloses the beginning of a tag
             cursor.movePosition(QTextCursor.MoveOperation.NextCharacter, QTextCursor.MoveMode.KeepAnchor)
@@ -172,14 +172,14 @@ class CustomTextEdit(QTextEdit):
     Provides a QTextEdit that can differentiate between plain text or mime data when inserting.
     """
 
-    def __init__(self, lyrics_text_edit: bool=False):
+    def __init__(self, lyrics_text_edit: bool | None = False):
         super().__init__()
         if lyrics_text_edit:
             self.cursorPositionChanged.connect(self.check_for_tag)
             self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             self.customContextMenuRequested.connect(self.context_menu)
 
-    def insertFromMimeData(self, mime_data):
+    def insertFromMimeData(self, mime_data: QMimeData):
         # Ensure it is text.
         if (mime_data.hasText()):
             text = mime_data.text()
@@ -188,7 +188,7 @@ class CustomTextEdit(QTextEdit):
         else:
             QTextEdit.insertFromMimeData(self, mime_data)
 
-    def focusInEvent(self, evt):
+    def focusInEvent(self, evt: QFocusEvent):
         parent = self.parent()
         while parent.parent():
             if type(parent) == QListWidget:
@@ -271,6 +271,6 @@ class CustomTextEdit(QTextEdit):
 
                 menu.exec(self.mapToGlobal(self.click_pos))
 
-    def remove_tag(self, cursor):
+    def remove_tag(self, cursor: QTextCursor):
         if self.objectName() == 'lyrics_text_edit':
             cursor.removeSelectedText()

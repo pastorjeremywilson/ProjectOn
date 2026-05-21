@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLab
 
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
 from dataHandling.parsers import parse_song_data
-from gui.widgets.widgets import SimpleSplash
+from guiElements.widgets.widgets import SimpleSplash
 
 
 class Importers:
@@ -21,7 +21,7 @@ class Importers:
     def __init__(self, gui):
         self.gui = gui
 
-    def do_import(self, import_type):
+    def do_import(self, import_type: int):
         self.import_type = import_type
 
         dialog = QDialog(self.gui.main_window)
@@ -151,7 +151,7 @@ class Importers:
 
         return files
 
-    def import_chordpro(self, files):
+    def import_chordpro(self, files: list[str]):
         for file in files:
             file_contents = ''
             with open(file, 'r', encoding='utf-8') as current_file:
@@ -253,7 +253,7 @@ class Importers:
 
                 self.save_song(data)
 
-    def import_openlyrics(self, files):
+    def import_openlyrics(self, files: list[str]):
         for file in files:
             file_contents = ''
             with open(file, 'r', encoding='utf-8') as current_file:
@@ -329,7 +329,7 @@ class Importers:
 
                 self.save_song(data)
 
-    def save_song(self, song_data):
+    def save_song(self, song_data: dict):
         if song_data['title'] in self.gui.main.get_song_titles():
             dialog = QDialog(self.gui.main_window)
             dialog.setLayout(QVBoxLayout())
@@ -375,6 +375,6 @@ class Importers:
         self.gui.media_widget.populate_song_list()
 
         self.gui.media_widget.song_list.setCurrentItem(
-            self.gui.media_widget.song_list.findItems(song_data['title'], Qt.MatchFlag.MatchExactly)[0])
+            self.gui.media_widget.song_list.findItems(song_data['title'].lower(), Qt.MatchFlag.MatchExactly)[0])
 
         save_widget.widget.deleteLater()

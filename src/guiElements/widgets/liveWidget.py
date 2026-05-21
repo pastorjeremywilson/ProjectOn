@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QKeyEvent
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout, QAbstractItemView
 
@@ -13,7 +13,7 @@ class LiveWidget(QWidget):
     def __init__(self, gui):
         """
         Provides the 'Live' widget that contains the parts of the current item being shown live.
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -134,7 +134,7 @@ class LiveWidget(QWidget):
         """
         self.gui.web_view.reload()
 
-    def web_buttons(self, button):
+    def web_buttons(self, button: str):
         """
         Method to handle input coming from the web remote's buttons.
         :param str button: 'slide_forward', 'slide_back', 'item_forward', or 'item_back'
@@ -181,7 +181,7 @@ class CustomListWidget(QListWidget):
         """
         Provides a customized QListWidget that will call changes to the display when items are changed and perform certain
         tasks based on key presses.
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -197,7 +197,7 @@ class CustomListWidget(QListWidget):
         if self.currentItem():
             self.gui.main.remote_server.socketio.emit('change_current_slide', str(self.currentRow()))
 
-    def keyPressEvent(self, evt):
+    def keyPressEvent(self, evt: QKeyEvent):
         """
         Handle arrow key presses as well as standard PowerPoint remote inputs.
         :param QKeyEvent evt: keyPressEvent

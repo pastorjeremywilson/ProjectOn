@@ -19,7 +19,7 @@ class OpenLPImport:
     def __init__(self, gui):
         """
         Provides the ability to import and parse songs from an OpenLP sqlite database.
-        :param gui.GUI gui: the current instance of GUI
+        :param guiElements.GUI gui: the current instance of GUI
         """
         self.gui = gui
         self.init_components()
@@ -144,7 +144,7 @@ class OpenLPImport:
                 'File is not a valid OpenLP Database' + str(ex),
                 QMessageBox.StandardButton.Ok)
 
-    def convert_lyrics(self, lyrics):
+    def convert_lyrics(self, lyrics: str):
         """
         Method to change OpenLp's segment tags to this program's segment tags.
         :param str lyrics: The song's lyrics
@@ -154,7 +154,7 @@ class OpenLPImport:
         lyrics = root.find('lyrics')
         converted_lyrics = ''
         for element in lyrics:
-            text = re.sub(r'\{.*?\}', '', element.text).strip()
+            text = re.sub(r'\{.*?}', '', element.text).strip()
             text = text.replace('[---]\n', '')
             text = text.replace('\n', '<br />')
             type = element.attrib['type'][0].lower()

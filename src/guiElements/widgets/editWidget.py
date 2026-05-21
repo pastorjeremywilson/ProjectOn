@@ -14,8 +14,8 @@ from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, 
 
 from dataHandling import parsers
 from dataHandling.parsers import parse_song_data
-from gui.widgets.formattableTextEdit import FormattableTextEdit
-from gui.widgets.widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
+from guiElements.widgets.formattableTextEdit import FormattableTextEdit
+from guiElements.widgets.widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
 
 
 class EditWidget(QDialog):
@@ -25,8 +25,8 @@ class EditWidget(QDialog):
 
     def __init__(self, gui, data: dict=None, type: str=None, from_oos: bool=False):
         """
-        Provides a QDialog containing the necessary widgets.py to edit a song or custom slide.
-        :param gui.GUI gui: The current instance of GUI
+        Provides a QDialog containing the necessary widgets to edit a song or custom slide.
+        :param guiElements.GUI gui: The current instance of GUI
         :param dict data: The dictionary of data for this song/custom
         :param str type: The type of slide being edited: 'song' or 'custom'
         :param bool from_oos: Whether the slide is being edited from OOS
@@ -74,7 +74,7 @@ class EditWidget(QDialog):
 
     def init_components(self):
         """
-        Create and add the necessary widgets.py to this dialog
+        Create and add the necessary widgets to this dialog
         """
         button_size = QSize(36, 36)
         self.setParent(self.gui.main_window)
@@ -512,7 +512,7 @@ class EditWidget(QDialog):
         background_color_radio_button.setFont(self.gui.standard_font)
         background_color_radio_button.clicked.connect(self.color_chooser)
 
-        from gui.widgets.widgets import ImageCombobox
+        from guiElements.widgets.widgets import ImageCombobox
         self.background_combobox = ImageCombobox(self.gui, 'edit')
         self.background_combobox.currentIndexChanged.connect(self.background_combobox_change)
 
@@ -992,7 +992,7 @@ class EditWidget(QDialog):
 
     def populate_song_data(self):
         """
-        Use the provided data to set the proper widgets.py to match the saved data
+        Use the provided data to set the proper widgets to match the saved data
         :param list of str song_data: The song's QListWidgetItem data
         """
         self.lyrics_text_edit.text_edit.clear()
@@ -1229,7 +1229,7 @@ class EditWidget(QDialog):
         self.lyrics_list_widget.edit(index)
         self.lyrics_list_widget.scrollTo(index, QListView.ScrollHint.EnsureVisible)
 
-    def create_lyric_item_widget(self, tag=None, text=None):
+    def create_lyric_item_widget(self, tag: str | None = None, text: str | None = None):
         if not tag or not text:
             tag = 'Verse 1'
             text = ''
@@ -1326,8 +1326,7 @@ class EditWidget(QDialog):
 
     def populate_custom_data(self):
         """
-        Use the provided data to set the proper widgets.py to match the saved data
-        :param list of str custom_data: The custom slide's QListWidgetItem data
+        Use the current data to set the proper widgets to match the saved data
         """
         self.old_title = self.data['title']
         self.title_line_edit.setText(self.data['title'])
@@ -1498,7 +1497,7 @@ class EditWidget(QDialog):
             self.advanced_options_widget.hide()
             self.show_hide_advanced_button.setText('+')
 
-    def disambiguate_background_click(self, background_button_group):
+    def disambiguate_background_click(self, background_button_group: QButtonGroup):
         """
         Method to call the proper function when user selects a color from a QButtonGroup.
         :param QButtonGroup background_button_group: The QButtonGroup that was changed
@@ -1537,8 +1536,7 @@ class EditWidget(QDialog):
     def add_tag(self):
         """
         Method to add tags to the song lyrics based on button push.
-        :param str type: The tag type to be inserted
-        :return:
+        :return:None
         """
 
         slider_pos = self.lyrics_text_edit.text_edit.verticalScrollBar().sliderPosition()
@@ -1589,7 +1587,7 @@ class EditWidget(QDialog):
         self.lyrics_text_edit.text_edit.verticalScrollBar().setSliderPosition(slider_pos)
         self.lyrics_text_edit.text_edit.setFocus()
 
-    def renumber_tags(self, tag_name, html):
+    def renumber_tags(self, tag_name: str, html: str):
         """
         Searches the html of a QTextEdit for a given song tag and renumbers all similar tags
         :param str tag_name: Verse, Chorus, Pre-Chorus, Bridge, Tag, Ending, or all
@@ -1640,10 +1638,6 @@ class EditWidget(QDialog):
             self.song_section_list_widget.addItem(tag)
 
         return
-        lyrics_text = self.lyrics_text_edit.text_edit.toPlainText()
-        tag_list = re.findall(r'[.*?]', lyrics_text)
-        for tag in tag_list:
-            self.song_section_list_widget.addItem(tag.replace('[', '').replace(']', ''))
 
     def print_lyrics(self):
         lyrics = self.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
@@ -1839,21 +1833,20 @@ class EditWidget(QDialog):
                 dialog.layout().addWidget(line_edit)
 
                 button_widget = QWidget()
-                button_widget.setLayout(QHBoxLayout())
+                button_layout = QHBoxLayout(button_widget)
                 dialog.layout().addWidget(button_widget)
 
                 ok_button = QPushButton('OK')
                 ok_button.setFont(self.gui.standard_font)
                 ok_button.clicked.connect(lambda: dialog.done(1))
-                button_widget.layout().addStretch()
-                button_widget.layout().addWidget(ok_button)
-                button_widget.layout().addStretch()
+                button_layout.addStretch()
+                button_layout.addWidget(ok_button)
 
                 cancel_button = QPushButton('Cancel')
                 cancel_button.setFont(self.gui.standard_font)
                 cancel_button.clicked.connect(lambda: dialog.done(-1))
-                button_widget.layout().addWidget(cancel_button)
-                button_widget.layout().addStretch()
+                button_layout.addWidget(cancel_button)
+                button_layout.addStretch()
 
                 result = dialog.exec()
 
@@ -1967,7 +1960,7 @@ class EditWidget(QDialog):
         self.done(0)
         self.save_widget.widget.deleteLater()
 
-    def get_simplified_text(self, lyrics):
+    def get_simplified_text(self, lyrics: str):
         break_tag = '<br />'
 
         # 'flatten' the html if this is directly from the QTextEdit's toHtml function
@@ -2015,7 +2008,7 @@ class EditWidget(QDialog):
 
         return lyrics
 
-    def change_thumbnail(self, item):
+    def change_thumbnail(self, item: QListWidgetItem):
         """
         Change the thumbnail image of this song/custom slide's QListWidget ItemWidget to what has just been saved.
         :param QListWidgetItem item: The edited song/custom slide's QListWidgetItem

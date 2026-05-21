@@ -15,7 +15,7 @@ class Help(QMainWindow):
     def __init__(self, gui):
         """
         Implements a QMainWindow containing all of the help topics.
-        :param gui.GUI gui: the current instance of GUI
+        :param guiElements.GUI gui: the current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -31,7 +31,7 @@ class Help(QMainWindow):
 
         tab_widget = QTabWidget()
         tab_widget.setObjectName('help_tab_widget')
-        tab_widget.currentChanged.connect(lambda: self.refresh_html(tab_widget))
+        tab_widget.currentChanged.connect(self.refresh_html)
         tab_widget.setFont(QFont('Helvetica', 12, QFont.Weight.Bold))
         self.setCentralWidget(tab_widget)
 
@@ -45,7 +45,7 @@ class Help(QMainWindow):
         tab_widget.addTab(self.import_widget(), 'Importing Songs')
         tab_widget.addTab(self.file_widget(), 'File Locations')
 
-    def refresh_html(self, tab_widget):
+    def refresh_html(self):
         QApplication.processEvents()
 
     def intro_widget(self):

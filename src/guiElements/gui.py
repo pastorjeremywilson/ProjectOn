@@ -3,7 +3,6 @@ import json
 import os
 import re
 import shutil
-import sqlite3
 import sys
 import tempfile
 from datetime import datetime
@@ -24,15 +23,15 @@ from dataHandling import parsers, declarations
 from dataHandling.declarations import DEFAULT_SETTINGS
 from dataHandling.getGithubEvents import show_notes
 from dataHandling.parsers import parse_song_data
-from gui.widgets.help import Help
+from guiElements.widgets.help import Help
 from importExport.importers import Importers
-from gui.widgets.liveWidget import LiveWidget
-from gui.widgets.mediaWidget import MediaWidget
-from gui.widgets.oosWidget import OOSWidget
+from guiElements.widgets.liveWidget import LiveWidget
+from guiElements.widgets.mediaWidget import MediaWidget
+from guiElements.widgets.oosWidget import OOSWidget
 from importExport.openlyricsExport import OpenlyricsExport
-from gui.widgets.previewWidget import PreviewWidget
+from guiElements.widgets.previewWidget import PreviewWidget
 from core.runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
-from gui.widgets.widgets import Toolbar, IndexedSettingsWidget, CustomMainWindow, DisplayWidget, \
+from guiElements.widgets.widgets import Toolbar, IndexedSettingsWidget, CustomMainWindow, DisplayWidget, \
     LyricDisplayWidget, StandardItemWidget, CountdownWidget
 from importExport.songselectImport import SongselectImport
 
@@ -40,7 +39,6 @@ from importExport.songselectImport import SongselectImport
 class GUI(QObject):
     """
     Creates the user interface and handles user input that will change the interface or the display widget.
-    :param main ProjectOn: The current instance of ProjectOn
     """
     media_widget = None
     oos_widget = None
@@ -64,8 +62,10 @@ class GUI(QObject):
     blackout_widget = None
     logo_widget = None
     web_view = None
-    video_widget = None
-    media_player = None
+    video_widget: QGraphicsVideoItem = None
+    media_player: QMediaPlayer = None
+    graphics_view: QGraphicsView = None
+    scene: QGraphicsScene = None
     timed_update = None
     slide_auto_play = None
     central_widget = None
@@ -107,6 +107,10 @@ class GUI(QObject):
         :param ProjectOn main: The current instance of ProjectOn
         """
         super().__init__()
+        if int(sys.version.split()[0].split('.')[0]) < 3:
+            QMessageBox.information(None, 'Incompatible Python Version', 'This program requires Python version 3.x')
+            print('This program requires Python version 3.x')
+            sys.exit(0)
 
         self.audio_output = None
         self.main = main
@@ -210,6 +214,7 @@ class GUI(QObject):
             os.mkdir(self.main.user_dir)
         self.main.device_specific_config_file = os.path.expanduser(self.main.user_dir + '/localConfig.json')
 
+        device_specific_settings = {}
         if not exists(self.main.device_specific_config_file):
             device_specific_settings = {
                 'used_services': [],
@@ -450,7 +455,7 @@ class GUI(QObject):
 
     def add_widgets(self):
         """
-        Adds all the necessary widgets.py to the main window, display screen, and sample widget
+        Adds all the necessary widgets to the main window, display screen, and sample widget
         """
         self.main.update_status_signal.emit('Creating GUI: Adding Tool Bar', 'status')
         tool_bar_container = QWidget()
@@ -619,7 +624,7 @@ class GUI(QObject):
         elif os.name == 'linux':
             video_action.triggered.connect(lambda: os.system(f'xdg-open \'\' {video_url}'))
 
-    def set_theme(self, theme):
+    def set_theme(self, theme: str):
         if theme == 'light':
             self.main.settings['theme'] = 'light'
             self.main.app.setStyleSheet(self.light_style_sheet)
@@ -629,7 +634,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0.002'
+        current_version = 'v.1.10.0.003'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -806,7 +811,7 @@ class GUI(QObject):
 
         document = QTextDocument()
         document.setHtml(document_html)
-        from gui.widgets.widgets import PrintDialog
+        from guiElements.widgets.widgets import PrintDialog
         PrintDialog(document)
 
     def ccli_import(self):
@@ -832,28 +837,28 @@ class GUI(QObject):
         widget = QDialog()
         widget.setObjectName('widget')
         widget.setParent(self.main_window)
-        widget.setLayout(QVBoxLayout())
+        layout = QVBoxLayout(widget)
 
         title_widget = QWidget()
-        title_widget.setLayout(QHBoxLayout())
-        widget.layout().addWidget(title_widget)
+        title_layout = QHBoxLayout(title_widget)
+        layout.addWidget(title_widget)
 
         title_pixmap = QPixmap('resources/branding/logo.svg')
         title_pixmap = title_pixmap.scaled(
             36, 36, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
         title_pixmap_label = QLabel()
         title_pixmap_label.setPixmap(title_pixmap)
-        title_widget.layout().addWidget(title_pixmap_label)
+        title_layout.addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0.002')
+        title_label = QLabel('ProjectOn v.1.10.0.003')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
-        title_widget.layout().addWidget(title_label)
-        title_widget.layout().addStretch()
+        title_layout.addWidget(title_label)
+        title_layout.addStretch()
 
         remote_widget = QWidget()
         remote_layout = QGridLayout()
         remote_widget.setLayout(remote_layout)
-        widget.layout().addWidget(remote_widget)
+        layout.addWidget(remote_widget)
 
         remote_title_label = QLabel('Remote Web Pages:')
         remote_title_label.setFont(self.standard_font)
@@ -885,8 +890,8 @@ class GUI(QObject):
 
         database_label = QLabel(f'Database Location: {self.main.database}')
         database_label.setFont(self.standard_font)
-        widget.layout().addWidget(database_label)
-        widget.layout().addSpacing(20)
+        layout.addWidget(database_label)
+        layout.addSpacing(20)
 
         about_text = QTextBrowser()
         about_text.setOpenExternalLinks(True)
@@ -909,10 +914,10 @@ class GUI(QObject):
                     missing features, or attempts to assimilate your unique biological and
                     technological distinctiveness, email <a href="mailto:pastorjeremywilson@gmail.com">pastorjeremywilson@gmail.com</a></p>
                 ''')
-        widget.layout().addWidget(about_text)
+        layout.addWidget(about_text)
 
         release_notes_wiget = QWidget()
-        widget.layout().addWidget(release_notes_wiget)
+        layout.addWidget(release_notes_wiget)
         release_notes_layout = QHBoxLayout(release_notes_wiget)
 
         release_notes_button = QPushButton('View Release Notes')
@@ -927,7 +932,7 @@ class GUI(QObject):
         ok_button.setObjectName('ok_button')
         ok_button.setMaximumWidth(60)
         ok_button.clicked.connect(lambda: widget.done(0))
-        widget.layout().addWidget(ok_button, Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(ok_button, Qt.AlignmentFlag.AlignCenter)
 
         widget.show()
 
@@ -1017,7 +1022,7 @@ class GUI(QObject):
             self.main.error_log()
             self.error_in_loop = True
 
-    def size_background_to_screen(self, pixmap):
+    def size_background_to_screen(self, pixmap: QPixmap):
         width = pixmap.width()
         height = pixmap.height()
         display_width = self.secondary_screen.size().width()
@@ -1055,7 +1060,7 @@ class GUI(QObject):
 
         return pixmap
 
-    def apply_settings(self, theme_too=True):
+    def apply_settings(self, theme_too: bool | None = True):
         """
         Provides a method to apply all of the settings obtained from the settings json file.
         Args:
@@ -1208,7 +1213,7 @@ class GUI(QObject):
 
     def new_service(self):
         """
-        Provides a function for clearing the order of service, preview, and live list widgets.py when
+        Provides a function for clearing the order of service, preview, and live list widgets when
         the user wants to create a new service. Checks for changes first.
         """
         response = -1
@@ -1246,7 +1251,7 @@ class GUI(QObject):
 
     def position_screens(self, primary_screen: QScreen, secondary_screen: QScreen):
         """
-        Correctly sizes and positions the GUI and display widgets.py according to the screen layout
+        Correctly sizes and positions the GUI and display widgets according to the screen layout
         :param primary_screen: The main screen from the settings or from discovery
         :param secondary_screen: The second screen if it exists, the main screen if not
         :return:
@@ -1319,7 +1324,7 @@ class GUI(QObject):
             QMessageBox.StandardButton.Ok
         )
 
-    def live_from_remote(self, num):
+    def live_from_remote(self, num: int):
         """
         Takes a row number from remote input's order of service and sets the order of service list widget to that row,
         then calls send_to_live.
@@ -1330,14 +1335,14 @@ class GUI(QObject):
             self.main.app.processEvents()
             self.send_to_live()
 
-    def live_slide_from_remote(self, num):
+    def live_slide_from_remote(self, num: int):
         """
         Takes a row number from the remote input's live slides and sets the live widget to that row.
         :param int num: The row number signaled from the web remote
         """
         self.live_widget.slide_list.setCurrentRow(num)
 
-    def set_song_background(self, file):
+    def set_song_background(self, file: str):
         """
         Provides a method for setting the global_song_background_pixmap variable, scaling it to the display size
         :param str file: The location of the background image file
@@ -1349,7 +1354,7 @@ class GUI(QObject):
         self.main.settings['global_song_background'] = file_name
         self.main.save_settings()
 
-    def set_bible_background(self, file):
+    def set_bible_background(self, file: str):
         """
         Provides a method for setting the global_bible_background_pixmap variable, scaling it to the display size
         :param str file: The location of the background image file
@@ -1361,7 +1366,7 @@ class GUI(QObject):
         self.main.settings['global_bible_background'] = file_name
         self.main.save_settings()
 
-    def set_logo_image(self, file):
+    def set_logo_image(self, file: str):
         """
         Provides a method for setting the logo_pixmap variable, scaling it to the display size
         :param str file: The location of the background image file
@@ -1374,13 +1379,17 @@ class GUI(QObject):
         self.main.settings['logo_image'] = file_name
         self.main.save_settings()
 
-    def send_to_preview(self, item):
+    def send_to_preview(self, item: QTreeWidgetItem | QListWidgetItem):
         """
         Provides a method for sending an item, selected in the order of service list widget, to the preview list widget.
-        :param QListWidgetItem item: The item selected
+        :param QTreeWidgetItem | QListWidgetItem item: The item selected
         """
-        if not item: # don't continue if there is no item or data dictionary
+        # don't continue if there is no item
+        if not item:
             return
+
+        # send_to_preview called from the bible widget comes in as a QListWidgetItem, so get the data differently
+        # also, don't continue if there is no item data
         if type(item) == QTreeWidgetItem:
             if not item.data(0, Qt.ItemDataRole.UserRole):
                 return
@@ -1388,7 +1397,8 @@ class GUI(QObject):
         else:
             if not item.data(Qt.ItemDataRole.UserRole):
                 return
-            slide_data = item.data(Qt.ItemDataRole.UserRole).copy()
+            slide_data = item.data(Qt.ItemDataRole.UserRole)
+
         self.preview_widget.slide_list.clear()
 
         if slide_data['type'] == 'song':
@@ -1421,7 +1431,7 @@ class GUI(QObject):
             if type(item) == QTreeWidgetItem:
                 item.setData(0, Qt.ItemDataRole.UserRole, slide_data)
             else:
-                item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                item.setData(0, Qt.ItemDataRole.UserRole, slide_data)
             for text in slide_data['parsed_text']:
                 if len(text.strip()) > 0:
                     lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
@@ -1452,8 +1462,7 @@ class GUI(QObject):
                 first_num = ''
                 last_num = ''
 
-                scripture_text = re.sub(
-                    '<.*?>', '', slide_texts[i])
+                scripture_text = re.sub('<.*?>', '', slide_texts[i])
                 next_chapter = False
                 index = 0
                 while index < len(scripture_text): # iterate through the characters in this text to find all the numbers
@@ -1648,7 +1657,7 @@ class GUI(QObject):
         except Exception:
             self.main.error_log()
 
-    def change_display(self, widget):
+    def change_display(self, widget: str):
         """
         Method to change what it being displayed in the display widget or the hidden sample widget.
         :param str widget: 'live' or 'sample' widget that is being changed
@@ -1660,7 +1669,7 @@ class GUI(QObject):
         display_widget = None
         lyric_widget = None
         current_item = None
-        auto_play_text = None
+        auto_play_text = ''
 
         if widget == 'live':
             # stop timed update and auto-play runnables
@@ -1713,10 +1722,6 @@ class GUI(QObject):
                         if self.video_widget:
                             self.video_widget.deleteLater()
                             self.graphics_view.deleteLater()
-                        self.media_player = None
-                        self.video_widget = None
-                        self.graphics_view = None
-                        self.audio_output = None
             elif widget == 'live':
                 # handle stopping the media player carefully to avoid an Access Violation
                 if self.media_player:
@@ -1728,10 +1733,6 @@ class GUI(QObject):
                     if self.video_widget:
                         self.video_widget.deleteLater()
                         self.graphics_view.deleteLater()
-                    self.media_player = None
-                    self.video_widget = None
-                    self.graphics_view = None
-                    self.audio_output = None
 
             # set the background
             display_widget.background_label.clear()
@@ -1776,6 +1777,8 @@ class GUI(QObject):
                 display_widget.background_label.setStyleSheet('background: black;')
 
             # set the lyrics html
+            url_ok = False
+            url = ''
             lyrics_html = ''
             if current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'song':
                 lyrics_html = current_item.data(Qt.ItemDataRole.UserRole)['parsed_text']['text']
@@ -1875,7 +1878,7 @@ class GUI(QObject):
             if lyric_widget.footer_label.text() == '':
                 lyric_widget.footer_label.hide()
 
-            # hide or show the appropriate widgets.py
+            # hide or show the appropriate widgets
             if widget == 'live':
                 if (not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'video'
                         and not current_item.data(Qt.ItemDataRole.UserRole)['type'] == 'web'):
@@ -2104,7 +2107,7 @@ class GUI(QObject):
     def update_stage_image(self, jpg_bytes):
         self.main.remote_server.socketio.emit('update_display', jpg_bytes)
 
-    def test_url(self, url):
+    def test_url(self, url: str):
         response = None
         try:
             response = requests.get(url)
@@ -2160,7 +2163,6 @@ class GUI(QObject):
         """
         slot for the change_lyric_widget_text_signal
         changes the text of the lyric widget and repaints
-        :param str text: the text to change to
         """
         if self.live_widget.slide_list.currentRow() + 1 == self.live_widget.slide_list.count():
             self.live_widget.slide_list.setCurrentRow(0)
@@ -2169,7 +2171,7 @@ class GUI(QObject):
 
     def make_special_display_widgets(self):
         """
-        Create all the widgets.py that could be used on the display widget.
+        Create all the widgets that could be used on the display widget.
         """
         self.web_view = QWebEngineView()
         self.web_view.page().setBackgroundColor(Qt.GlobalColor.transparent)
@@ -2230,8 +2232,8 @@ class GUI(QObject):
     def make_video_widget(self):
         self.graphics_view = QGraphicsView()
         self.graphics_view.setGeometry(self.display_widget.geometry())
-        self.graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.display_layout.addWidget(self.graphics_view)
 
         self.scene = QGraphicsScene(self.graphics_view)
@@ -2351,7 +2353,7 @@ class GUI(QObject):
 
         self.live_widget.slide_list.setFocus()
 
-    def add_scripture_item(self, reference, text, version, scripture_edited):
+    def add_scripture_item(self, reference: str, text: str | list[str], version: str, scripture_edited: bool):
         """
         Method to take a block of scripture and add it as a QListWidgetItem to the order of service widget.
         :param str reference: The scripture passage's reference from the bible
