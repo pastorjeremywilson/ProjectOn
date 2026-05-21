@@ -3,17 +3,20 @@ import re
 import shutil
 import sqlite3
 import sys
+import threading
 
 from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF, QTime
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QPalette, QBrush, QPen, QPainter, \
-    QImage, QFontDatabase, QFontMetrics
+    QImage, QFontDatabase, QFontMetrics, QDropEvent, QDragMoveEvent
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
-    QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog, QStyledItemDelegate
+    QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog, QStyledItemDelegate, QTreeWidget, \
+    QTreeWidgetItem, QMenu, QAction
 
+from dataHandling import parsers
 from importExport.openlpImport import OpenLPImport
 
 
@@ -288,7 +291,7 @@ class DisplayWidget(QWidget):
             if width_diff > 0 and height_diff > 0:
                 if width_diff > height_diff:
                     ratio = self.width() / p_width
-                else:
+                elif height_diff > width_diff:
                     ratio = self.height() / p_height
             elif width_diff > 0 and height_diff > 0:
                 if width_diff > height_diff:
@@ -4522,3 +4525,541 @@ class Toolbar(QWidget):
                     if self.gui.logo_widget.isVisible():
                         self.gui.logo_label.clear()
                         self.gui.logo_label.setPixmap(self.gui.logo_pixmap)
+
+
+class CustomTreeWidget(QTreeWidget):
+    def __init__(self, gui, parent=None):
+        super().__init__(parent)
+        self.gui = gui
+        self.copied_items = None
+        self.sorting = False
+
+        self.header().hide()
+
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDragDropMode(QTreeWidget.DragDropMode.DragDrop)
+        self.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_context_menu)
+        self.currentItemChanged.connect(self.current_item_changed)
+        self.setSelectionMode(self.SelectionMode.ExtendedSelection)
+
+    def add_item(self, item_text: str, item_data: dict, item_pixmap: QPixmap=None, item_parent: QTreeWidgetItem=None):
+        widget = QWidget()
+        layout = QHBoxLayout(widget)
+
+        if item_pixmap:
+            pixmap_label = QLabel()
+            pixmap_label.setPixmap(item_pixmap)
+            layout.addWidget(pixmap_label)
+
+        label = QLabel(item_text)
+        label.setFont(self.gui.standard_font)
+        layout.addWidget(label)
+        layout.addStretch()
+
+        item = QTreeWidgetItem((item_text,), 0)
+        item.setData(0, Qt.ItemDataRole.UserRole, item_data)
+
+        if item_parent:
+            item_parent.addChild(item)
+        else:
+            self.addTopLevelItem(item)
+        self.setItemWidget(item, 0, widget)
+        self.custom_sort()
+
+        return item
+
+    def add_folder(self, name=None, from_populate=False):
+        if not name:
+            result = self.get_folder_name()
+            if result == -1:
+                return
+            name = result
+
+        if len(name.strip()) == 0:
+            return
+
+        # check that name isn't a duplicate of existing top level items
+        for i in range(self.topLevelItemCount()):
+            if self.topLevelItem(i).data(0, Qt.ItemDataRole.UserRole)['title'] == name:
+                name = f'{name} (1)'
+                break
+
+        widget = QWidget()
+        layout = QHBoxLayout(widget)
+
+        icon_label = QLabel()
+        pixmap = QPixmap('resources/gui_icons/folder.svg').scaled(
+            20,
+            20,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        icon_label.setPixmap(pixmap)
+        layout.addWidget(icon_label)
+
+        title_label = QLabel(name)
+        title_label.setObjectName('title_label')
+        title_label.setFont(self.gui.bold_font)
+        layout.addWidget(title_label)
+        layout.addStretch()
+
+        item = QTreeWidgetItem((name,), 0)
+        item.setForeground(0, QBrush(Qt.GlobalColor.transparent))
+        item.setData(0, Qt.ItemDataRole.UserRole, {'type': 'folder', 'title': name})
+        item.setSizeHint(0, widget.sizeHint())
+        self.addTopLevelItem(item)
+        self.setItemWidget(item, 0, widget)
+
+        if not from_populate:
+            self.custom_sort()
+            self.scrollToItem(item)
+
+        return item
+
+    def show_context_menu(self):
+        click_pos = self.cursor().pos()
+        item = self.currentItem()
+        item_data = item.data(0, Qt.ItemDataRole.UserRole)
+        menu = QMenu()
+
+        if not item_data['type'] == 'folder':
+            copy_action = menu.addAction('Copy')
+            copy_action.triggered.connect(lambda: self.copy_item(click_pos))
+
+        if self.copied_items:
+            paste_action = menu.addAction('Paste')
+            paste_action.triggered.connect(lambda: self.paste_item(click_pos))
+
+        menu.addSeparator()
+
+        if not item_data['type'] == 'folder':
+            add_to_service_action = QAction('Add to Order of Service')
+            if item_data['type'] == 'song':
+                add_to_service_action.triggered.connect(self.gui.media_widget.add_song_to_service)
+            elif item_data['type'] == 'custom':
+                add_to_service_action.triggered.connect(self.gui.media_widget.add_custom_to_service)
+            elif item_data['type'] == 'image':
+                add_to_service_action.triggered.connect(self.gui.media_widget.add_image_to_service)
+            elif item_data['type'] == 'video':
+                add_to_service_action.triggered.connect(self.gui.media_widget.add_video_to_service)
+            elif item_data['type'] == 'web':
+                add_to_service_action.triggered.connect(self.gui.media_widget.add_web_to_service)
+            menu.addAction(add_to_service_action)
+
+            edit_action = None
+            if item_data['type'] == 'song':
+                edit_action = QAction('Edit Song')
+            elif item_data['type'] == 'custom':
+                edit_action = QAction('Edit Slide')
+            elif item_data['type'] == 'web':
+                edit_action = QAction('Edit Web Item')
+
+            if edit_action:
+                if item_data['type'] == 'web':
+                    edit_action.triggered.connect(self.edit_web)
+                else:
+                    edit_action.triggered.connect(self.edit_song)
+            menu.addAction(edit_action)
+        else:
+            rename_action = QAction('Rename Folder')
+            rename_action.triggered.connect(self.rename_folder)
+            menu.addAction(rename_action)
+
+        delete_action = None
+        if item_data['type'] == 'image':
+            delete_action = QAction('Remove Image')
+            delete_action.triggered.connect(self.delete_item)
+        elif item_data['type'] == 'custom':
+            delete_action = QAction('Delete Slide')
+            delete_action.triggered.connect(self.delete_item)
+        elif item_data['type'] == 'song':
+            delete_action = QAction('Delete Song')
+            delete_action.triggered.connect(self.delete_item)
+        elif item_data['type'] == 'video':
+            delete_action = QAction('Remove Video')
+            delete_action.triggered.connect(self.delete_item)
+        elif item_data['type'] == 'web':
+            delete_action = QAction('Remove Web Item')
+            delete_action.triggered.connect(self.delete_item)
+        elif item_data['type'] == 'folder':
+            delete_action = QAction('Delete Folder')
+            delete_action.triggered.connect(self.delete_item)
+
+        if delete_action:
+            menu.addAction(delete_action)
+
+        menu.exec(click_pos)
+
+    def current_item_changed(self):
+        """
+        Method to send the current item to the preview widget upon the current item being changed.
+        """
+        if self.currentItem():
+            self.gui.send_to_preview(self.currentItem())
+
+    def copy_item(self, click_pos):
+        self.copied_items = self.selectedItems()
+
+    def paste_item(self, click_pos):
+        if not self.copied_items:
+            return
+
+        target_item = self.itemAt(self.mapFromGlobal(click_pos))
+        target_item_data = None
+        if target_item:
+            target_item_data = target_item.data(0, Qt.ItemDataRole.UserRole)
+
+        if ((not target_item_data or not target_item_data['type'] == 'folder')
+                and self.rect().contains(self.mapFromGlobal(click_pos))):
+            self.complete_move(self.copied_items)
+        elif target_item_data and target_item_data['type'] == 'folder':
+            self.complete_move(self.copied_items, target_item)
+
+        self.copied_items = None
+        self.custom_sort()
+
+    def complete_move(self, items, target_item=None):
+        if not items:
+            return
+
+        simple_splash = None
+        if len(items) > 5:
+            simple_splash = SimpleSplash(self.gui, 'Moving items...', True)
+
+        for item in items:
+            if (target_item
+                    and item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder'
+                    and target_item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder'):
+                # we don't want folders nested into folders
+                QMessageBox(
+                    self.gui.main_window,
+                    'Unsupported Action',
+                    'Placing folders inside other folders is not currently supported.'
+                )
+                return
+
+        if not target_item:
+            for item in items:
+                if simple_splash:
+                    simple_splash.subtitle_label.setText(item.data(0, Qt.ItemDataRole.UserRole)['title'])
+                    QApplication.processEvents()
+                dragged_widget = self.itemWidget(item, 0)
+                new_item = item.clone()
+                self.addTopLevelItem(new_item)
+                self.setItemWidget(new_item, 0, dragged_widget)
+
+                data = new_item.data(0, Qt.ItemDataRole.UserRole)
+                data['folder'] = ''
+                item.setData(0, Qt.ItemDataRole.UserRole, data)
+                if data['type'] == 'song':
+                    self.gui.main.save_song(data, old_title=data['title'])
+                elif data['type'] == 'custom':
+                    self.gui.main.save_custom(data, old_title=data['title'])
+                elif data['type'] == 'image':
+                    self.gui.main.save_image(data, old_title=data['title'])
+                elif data['type'] == 'video':
+                    self.gui.main.save_video(data, old_title=data['title'])
+                elif data['type'] == 'web':
+                    self.gui.main.save_web_item(data, old_title=data['title'])
+        else:
+            for item in items:
+                if simple_splash:
+                    simple_splash.subtitle_label.setText(item.data(0, Qt.ItemDataRole.UserRole)['title'])
+                    QApplication.processEvents()
+                dragged_widget = self.itemWidget(item, 0)
+                new_item = item.clone()
+                target_item.addChild(new_item)
+                target_item.setExpanded(True)
+                self.setItemWidget(new_item, 0, dragged_widget)
+
+                data = new_item.data(0, Qt.ItemDataRole.UserRole)
+                data['folder'] = target_item.data(0, Qt.ItemDataRole.UserRole)['title']
+                item.setData(0, Qt.ItemDataRole.UserRole, data)
+                if data['type'] == 'song':
+                    self.gui.main.save_song(data, old_title=data['title'])
+                elif data['type'] == 'custom':
+                    self.gui.main.save_custom(data, old_title=data['title'])
+                elif data['type'] == 'image':
+                    self.gui.main.save_image(data, old_title=data['title'])
+                elif data['type'] == 'video':
+                    self.gui.main.save_video(data, old_title=data['title'])
+                elif data['type'] == 'web':
+                    self.gui.main.save_web_item(data, old_title=data['title'])
+
+        for item in items:
+            parent = item.parent()
+            if parent:
+                parent.removeChild(item)
+            else:
+                self.takeTopLevelItem(self.indexOfTopLevelItem(item))
+
+        self.custom_sort()
+        self.scrollToItem(target_item)
+
+    def custom_sort(self):
+        if self.sorting:
+            return
+        self.sorting = True
+
+        folder_items = []
+        other_items = []
+
+        for i in range(self.topLevelItemCount()):
+            item = self.topLevelItem(i)
+            data = item.data(0, Qt.ItemDataRole.UserRole)
+
+            if data and data.get('type') == 'folder':
+                folder_items.append((data.get('title', '').lower(), item))
+            else:
+                title = data.get('title', '') if data else item.text(0)
+                other_items.append((title.lower(), item))
+
+        # Sort alphabetically in memory
+        folder_items.sort(key=lambda x: x[0])
+        other_items.sort(key=lambda x: x[0])
+
+        # 2. Apply a strict sequential "Sort Text" or "Sort Weight" to column 0.
+        # To make Qt sort them exactly in this order without breaking widgets,
+        # we can temporarily inject a hidden sort key into the item's display role,
+        # sort it, and then put the original widgets/text right back.
+
+        # Combine them: Folders first, then others
+        master_list = folder_items + other_items
+
+        # Store original text values so we can restore them if needed
+        # (Though if you are using setItemWidget, the text is hidden behind the widget anyway!)
+        original_texts = []
+
+        for index, (title, item) in enumerate(master_list):
+            original_texts.append((item, title))
+            # Pad the index with zeros (e.g., "00001", "00002") so string sorting matches numerical sorting
+            item.setText(0, f"{index:05d}")
+
+        super().sortItems(0, Qt.SortOrder.AscendingOrder)
+
+        # 4. Restore the original text values.
+        # Because we aren't changing their positions anymore, the widgets stay perfectly intact!
+        for item, item_text in original_texts:
+            item.setText(0, item_text)
+        self.sorting = False
+
+    def edit_song(self):
+        """
+        Method to create a EditWidget for a song or custom slide.
+        """
+
+        from gui.widgets.editWidget import EditWidget
+        if self.currentItem():
+            data = self.currentItem().data(0, Qt.ItemDataRole.UserRole)
+            if data['type'] == 'song':
+                self.gui.edit_widget = EditWidget(self.gui, data, 'song')
+            elif data['type'] == 'custom':
+                self.gui.edit_widget = EditWidget(self.gui, data, 'custom')
+
+        self.custom_sort()
+
+    def edit_web(self):
+        if not self.currentItem():
+            return
+
+        data = self.currentItem().data(0, Qt.ItemDataRole.UserRole)
+        dialog = QDialog(self.gui.main_window)
+        dialog.setMinimumWidth(500)
+        dialog.setWindowTitle('Edit Web Item')
+        dialog.setWindowIcon(QIcon('resources/branding/logo.svg'))
+        layout = QVBoxLayout(dialog)
+        layout.setSpacing(0)
+
+        layout.addSpacing(20)
+        title_label = QLabel('Title')
+        title_label.setFont(self.gui.bold_font)
+        layout.addWidget(title_label)
+
+        title_line_edit = QLineEdit(data['title'])
+        title_line_edit.setFont(self.gui.standard_font)
+        layout.addWidget(title_line_edit)
+        layout.addSpacing(20)
+
+        url_label = QLabel('URL')
+        url_label.setFont(self.gui.bold_font)
+        layout.addWidget(url_label)
+
+        url_line_edit = QLineEdit(data['url'])
+        url_line_edit.setFont(self.gui.standard_font)
+        layout.addWidget(url_line_edit)
+        layout.addSpacing(20)
+
+        button_widget = QWidget()
+        layout.addWidget(button_widget)
+        button_layout = QHBoxLayout(button_widget)
+
+        ok_button = QPushButton('Save')
+        ok_button.setFont(self.gui.standard_font)
+        ok_button.pressed.connect(lambda: dialog.done(1))
+        button_layout.addStretch()
+        button_layout.addWidget(ok_button)
+
+        cancel_button = QPushButton('Cancel')
+        cancel_button.setFont(self.gui.standard_font)
+        cancel_button.pressed.connect(lambda: dialog.done(-1))
+        button_layout.addWidget(cancel_button)
+        button_layout.addStretch()
+
+        result = dialog.exec()
+        if result == 1:
+            self.gui.media_widget.save_web(title_line_edit.text(), url_line_edit.text(), old_title=data['title'])
+            self.gui.media_widget.populate_web_list()
+            self.custom_sort()
+
+    def rename_folder(self):
+        result = self.get_folder_name()
+
+        if result == -1:
+            return
+
+        item = self.currentItem()
+        item.setData(0, Qt.ItemDataRole.DisplayRole, result)
+        widget = self.itemWidget(item, 0)
+        widget.findChild(QLabel, 'title_label').setText(result)
+
+        self.custom_sort()
+
+    def get_folder_name(self):
+        dialog = QDialog(self.gui.main_window)
+        dialog_layout = QVBoxLayout(dialog)
+
+        dialog_label = QLabel('Please enter your new folder name:')
+        dialog_label.setFont(self.gui.standard_font)
+        dialog_layout.addWidget(dialog_label)
+
+        dialog_line_edit = QLineEdit('Folder Name')
+        dialog_line_edit.setFont(self.gui.standard_font)
+        dialog_line_edit.setFocus()
+        dialog_line_edit.selectAll()
+        dialog_layout.addWidget(dialog_line_edit)
+
+        dialog_button_widget = QWidget()
+        dialog_layout.addWidget(dialog_button_widget)
+        dialog_button_layout = QHBoxLayout(dialog_button_widget)
+        dialog_button_layout.setContentsMargins(0, 0, 0, 0)
+
+        ok_button = QPushButton('Ok')
+        ok_button.setFont(self.gui.standard_font)
+        ok_button.pressed.connect(lambda: dialog.done(1))
+        dialog_button_layout.addStretch()
+        dialog_button_layout.addWidget(ok_button)
+
+        cancel_button = QPushButton('Cancel')
+        cancel_button.setFont(self.gui.standard_font)
+        cancel_button.pressed.connect(lambda: dialog.done(-1))
+        dialog_button_layout.addWidget(cancel_button)
+        dialog_button_layout.addStretch()
+
+        result = dialog.exec()
+        if not result == 1:
+            return -1
+        return dialog_line_edit.text()
+
+    def delete_item(self):
+        """
+        Method to remove an item from this widget. Creates a QMessageBox to confirm removal.
+        """
+        if not self.currentItem():
+            return
+
+        data = self.currentItem().data(0, Qt.ItemDataRole.UserRole)
+        if data['type'] == 'folder':
+            message = f'Really delete the {data['title']} folder? All items in the folder will be kept.'
+        else:
+            message = f'Really delete {data['title']}? This action cannot be undone.'
+
+        response = QMessageBox.question(
+            self.gui.main_window,
+            'Really Delete',
+            message,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+        )
+
+        if response == QMessageBox.StandardButton.Yes:
+            if data['type'] == 'folder':
+                # first, move all of the items out of this folder and into the top level
+                children = []
+                for i in range(self.currentItem().childCount()):
+                    children.append(self.currentItem().child(i))
+                self.complete_move(children)
+
+                # remove the folder from its parent or the top level
+                if self.currentItem().parent():
+                    self.currentItem().parent().removeChild(self.currentItem())
+                else:
+                    self.takeTopLevelItem(self.indexOfTopLevelItem(self.currentItem()))
+            else:
+                thread = threading.Thread(target=self.gui.main.delete_item, args=(self.currentItem(),))
+                thread.start()
+                thread.join()
+
+                QMessageBox.information(
+                    self.gui.main_window,
+                    'Removed',
+                    self.currentItem().data(0, Qt.ItemDataRole.UserRole)['title'] + ' has been removed.',
+                    QMessageBox.StandardButton.Ok
+                )
+
+                if self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'song':
+                    self.gui.media_widget.populate_song_list()
+                elif self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                    self.gui.media_widget.populate_custom_list()
+                elif self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'image':
+                    self.gui.media_widget.populate_image_list()
+                elif self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'video':
+                    self.gui.media_widget.populate_video_list()
+                elif self.currentItem().data(0, Qt.ItemDataRole.UserRole)['type'] == 'web':
+                    self.gui.media_widget.populate_web_list()
+
+            self.gui.preview_widget.slide_list.clear()
+        self.custom_sort()
+
+    def dropEvent(self, evt):
+        target_item = self.itemAt(evt.pos())
+        target_item_data = None
+        if target_item:
+            target_item_data = target_item.data(0, Qt.ItemDataRole.UserRole)
+
+        if (not target_item_data or not target_item_data['type'] == 'folder') and evt.pos() in self.rect():
+            self.complete_move(self.selectedItems())
+        elif target_item_data and target_item_data['type'] == 'folder':
+            self.complete_move(self.selectedItems(), target_item)
+
+    def mouseDoubleClickEvent(self, evt):
+        """
+        Overrides mouseDoubleClickEvent to provide the ability to add an item to the order of service upon double-click.
+        :param QMouseEvent evt: mouseEvent
+        """
+        if not self.currentItem():
+            return
+
+        data = self.currentItem().data(0, Qt.ItemDataRole.UserRole)
+        if not data:
+            return
+
+        if data['type'] == 'song':
+            self.gui.media_widget.add_song_to_service()
+        elif data['type'] == 'custom':
+            self.gui.media_widget.add_custom_to_service()
+        elif data['type'] == 'web':
+            self.gui.media_widget.add_web_to_service()
+        elif data['type'] == 'image':
+            self.gui.media_widget.add_image_to_service()
+        elif data['type'] == 'video':
+            self.gui.media_widget.add_video_to_service()
+        elif data['type'] == 'folder':
+            if self.currentItem().isExpanded():
+                self.currentItem().setExpanded(False)
+            else:
+                self.currentItem().setExpanded(True)
+
+        self.gui.oos_widget.oos_list_widget.setCurrentRow(self.gui.oos_widget.oos_list_widget.count() - 1)
+        self.gui.oos_widget.oos_list_widget.setFocus()

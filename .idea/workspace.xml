@@ -7,17 +7,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Last edits to the Readmes. Ready for release.">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/project_on.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/project_on.iml" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="OOS list scrolls to newly added item; fixed server check timer error on shutdown; added wait splash for importing/removing images">
+      <change afterPath="$PROJECT_DIR$/src/resources/gui_icons/folder.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/resources/gui_icons/new_folder.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/runnables.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/runnables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/dataHandling/declarations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataHandling/declarations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/editWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/widgets/mediaWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/mediaWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/widgets/widgets.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/importers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/importers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/openlpImport.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/openlpImport.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/importExport/songselectImport.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/importExport/songselectImport.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/defaults/data/projecton.db" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/defaults/data/projecton.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/projecton-dark.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-dark.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/projecton-light.qss" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/projecton-light.qss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,12 +65,12 @@
     &quot;assignee&quot;: &quot;pastorjeremywilson&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/pastorjeremywilson/ProjectOn",
-    "accountId": "ba54d33c-dedf-4901-b16d-42dffa67f651"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/pastorjeremywilson/ProjectOn&quot;,
+    &quot;accountId&quot;: &quot;ba54d33c-dedf-4901-b16d-42dffa67f651&quot;
   }
-}]]></component>
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -215,7 +221,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
       </set>
     </attachedChunks>
   </component>
@@ -251,14 +257,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00150" summary="CCLI SongSelect's new Cloudflare Turnstile login does not work with the built-in browser (QWebEngineView). Changed to a simple file browser to import an already-downloaded SongSelect lyrics file.">
-      <option name="closed" value="true" />
-      <created>1760471802586</created>
-      <option name="number" value="00150" />
-      <option name="presentableId" value="LOCAL-00150" />
-      <option name="project" value="LOCAL" />
-      <updated>1760471802586</updated>
     </task>
     <task id="LOCAL-00151" summary="Removed superfluous painter begin calls.&#10;Improved slide background scaling.&#10;Added QSS to prevent QWebEngineView crash on pop-up calls.">
       <option name="closed" value="true" />
@@ -644,7 +642,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778488664413</updated>
     </task>
-    <option name="localTasksCounter" value="199" />
+    <task id="LOCAL-00199" summary="OOS list scrolls to newly added item; fixed server check timer error on shutdown; added wait splash for importing/removing images">
+      <option name="closed" value="true" />
+      <created>1778712955482</created>
+      <option name="number" value="00199" />
+      <option name="presentableId" value="LOCAL-00199" />
+      <option name="project" value="LOCAL" />
+      <updated>1778712955482</updated>
+    </task>
+    <option name="localTasksCounter" value="200" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -665,7 +671,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Switched image_display from img to canvas, optimized the conversion of images to bytes for use on a canvas" />
     <MESSAGE value="Tweaked some GUI visuals, ensured that the delete all song data asked twice and returned unles &quot;Yes&quot; was clicked" />
     <MESSAGE value="Updated the readmes, changed version number, ready for release" />
     <MESSAGE value="Began redesigning the lyrics edit widget; particularly the lyrics editing area" />
@@ -690,7 +695,8 @@
     <MESSAGE value="Organized projecton-dark.qss and projecton-light.qss alphabetically and edited for consistency between the two." />
     <MESSAGE value="Added a landing page for the root of the Flask server with buttons to select the desired page." />
     <MESSAGE value="Last edits to the Readmes. Ready for release." />
-    <option name="LAST_COMMIT_MESSAGE" value="Last edits to the Readmes. Ready for release." />
+    <MESSAGE value="OOS list scrolls to newly added item; fixed server check timer error on shutdown; added wait splash for importing/removing images" />
+    <option name="LAST_COMMIT_MESSAGE" value="OOS list scrolls to newly added item; fixed server check timer error on shutdown; added wait splash for importing/removing images" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

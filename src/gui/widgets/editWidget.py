@@ -2,6 +2,7 @@ import json
 import os.path
 import re
 from os.path import exists
+from threading import Thread
 
 from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument, QDrag, \
@@ -9,9 +10,10 @@ from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, Q
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QSpinBox, QComboBox, QListWidgetItem, QTextEdit, QGroupBox, QAbstractItemView, QStyledItemDelegate, QListView, \
-    QMenu, QAction
+    QMenu, QAction, QTreeWidget, QTreeWidgetItem, QApplication
 
 from dataHandling import parsers
+from dataHandling.parsers import parse_song_data
 from gui.widgets.formattableTextEdit import FormattableTextEdit
 from gui.widgets.widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
 
@@ -618,7 +620,6 @@ class EditWidget(QDialog):
                 lyrics_html += f'{data[0]}<br />{data[1]}<br />'
             lyrics_html = lyrics_html[:-6]
             self.data['text'] = lyrics_html
-            self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
             self.update_song_data()
             self.populate_song_data()
             self.lyrics_list_widget.hide()
@@ -631,7 +632,6 @@ class EditWidget(QDialog):
             self.tool_bar.show()
         else:
             self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
-            self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
             self.update_song_data()
             self.populate_song_data()
             self.lyrics_text_edit.hide()
@@ -1822,8 +1822,8 @@ class EditWidget(QDialog):
             )
             return
 
-        self.update_song_data()
         if self.new_song:
+            # make sure this title doesn't already exist; prompt for new title if it does
             if self.title_line_edit.text() in self.gui.main.get_song_titles():
                 dialog = QDialog(self.gui.main_window)
                 dialog.setLayout(QVBoxLayout())
@@ -1865,33 +1865,42 @@ class EditWidget(QDialog):
         save_widget = SimpleSplash(self.gui, 'Saving...', parent=self)
 
         self.gui.main.save_song(self.data, self.old_title)
-        self.gui.media_widget.populate_song_list()
 
-        if self.from_oos:
-            for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                oos_title = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title']
-                if oos_title == self.data['title']:
-                    item = self.gui.media_widget.song_list.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)[0]
-                    item_data = item.data(Qt.ItemDataRole.UserRole).copy()
-                    item_data['parsed_text'] = parsers.parse_song_data(self.gui, item_data)
-                    self.gui.oos_widget.oos_list_widget.item(i).setData(Qt.ItemDataRole.UserRole, item_data)
-                    self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
-                    self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.item(i))
-                    break
-        else:
-            items = self.gui.media_widget.song_list.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
-            if len(items) > 0:
+        # set the data in the media widget's song list item for this song
+        items = self.gui.media_widget.song_list.findItems(self.old_title.lower(), Qt.MatchFlag.MatchExactly, 0)
+        if len(items) > 0:
+            items[0].setData(0, Qt.ItemDataRole.UserRole, self.data)
+            items[0].setData(0, Qt.ItemDataRole.DisplayRole, self.data['title'])
+
+            if not self.from_oos:
                 self.gui.media_widget.song_list.setCurrentItem(items[0])
+                self.gui.send_to_preview(items[0])
 
-        self.deleteLater()
+        # check if this song is in the oos list and set its data accordingly
+        items = self.gui.oos_widget.oos_list_widget.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
+        if len(items) > 0:
+            items[0].setData(Qt.ItemDataRole.UserRole, self.data)
+            items[0].setData(Qt.ItemDataRole.DisplayRole, self.data['title'])
+
+            if self.from_oos:
+                self.gui.oos_widget.oos_list_widget.setCurrentItem(items[0])
+                self.gui.send_to_preview(items[0])
+
+        self.done(0)
         save_widget.widget.deleteLater()
+
+        thread = Thread(target=self.gui.media_widget.build_song_search_index())
+        thread.start()
 
     def save_custom(self):
         """
         Method to save user's changes for the custom slide type editor.
         """
 
+        self.update_custom_data()
+
         if self.new_custom:
+            # make sure this title doesn't already exist; prompt for new title if it does
             if self.title_line_edit.text() in self.gui.main.get_custom_titles():
                 dialog = QDialog(self.gui.main_window)
                 dialog.setLayout(QVBoxLayout())
@@ -1931,24 +1940,29 @@ class EditWidget(QDialog):
                     return
 
         self.save_widget = SimpleSplash(self.gui, 'Saving...')
-
-        self.update_custom_data()
         self.gui.main.save_custom(self.data, self.old_title)
-        self.gui.media_widget.populate_custom_list()
 
-        if self.from_oos:
-            for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                if self.gui.oos_widget.oos_list_widget.item(i).data(
-                        Qt.ItemDataRole.UserRole)['title'] == self.data['title']:
-                    item = self.gui.media_widget.custom_list.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)[0]
-                    item_data = item.data(Qt.ItemDataRole.UserRole).copy()
-                    self.gui.oos_widget.oos_list_widget.item(i).setData(Qt.ItemDataRole.UserRole, item_data)
-                    self.gui.oos_widget.oos_list_widget.setCurrentRow(i)
-                    self.gui.send_to_preview(self.gui.oos_widget.oos_list_widget.item(i))
-                    break
-        else:
-            items = self.gui.media_widget.custom_list.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
-            self.gui.media_widget.custom_list.setCurrentItem(items[0])
+        # set the data in the media widget's custom list item for this song
+        items = self.gui.media_widget.custom_list.findItems(self.old_title.lower(), Qt.MatchFlag.MatchExactly, 0)
+        print(f'len custom list items: {len(items)}')
+        if len(items) > 0:
+            items[0].setData(0, Qt.ItemDataRole.UserRole, self.data)
+            items[0].setData(0, Qt.ItemDataRole.DisplayRole, self.data['title'])
+
+            if not self.from_oos:
+                self.gui.media_widget.custom_list.setCurrentItem(items[0])
+                self.gui.send_to_preview(items[0])
+
+        # check if this custom slide is in the oos list and set its data accordingly
+        items = self.gui.oos_widget.oos_list_widget.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
+        print(f'len oos list items: {len(items)}')
+        if len(items) > 0:
+            items[0].setData(Qt.ItemDataRole.UserRole, self.data)
+            items[0].setData(Qt.ItemDataRole.DisplayRole, self.data['title'])
+
+            if self.from_oos:
+                self.gui.oos_widget.oos_list_widget.setCurrentItem(items[0])
+                self.gui.send_to_preview(items[0])
 
         self.done(0)
         self.save_widget.widget.deleteLater()

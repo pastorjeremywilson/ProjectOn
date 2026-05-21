@@ -1,21 +1,24 @@
 import os
+import re
 import shutil
 import sqlite3
 import threading
 from os.path import exists
+from threading import Thread
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QCursor, QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QMenu, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, QAction, \
-    QApplication
+    QApplication, QTreeWidgetItem
 
 from dataHandling import parsers, declarations
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
+from dataHandling.parsers import parse_song_data
 from gui.widgets.editWidget import EditWidget
 from dataHandling.getScripture import GetScripture
-from gui.widgets.widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash
+from gui.widgets.widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash, CustomTreeWidget
 
 
 class MediaWidget(QTabWidget):
@@ -106,6 +109,14 @@ class MediaWidget(QTabWidget):
         button_widget.setLayout(QHBoxLayout())
         song_layout.addWidget(button_widget)
 
+        add_folder_button = QPushButton()
+        add_folder_button.setIcon(QIcon('resources/gui_icons/new_folder.svg'))
+        add_folder_button.setIconSize(QSize(20, 20))
+        add_folder_button.setFixedSize(30, 30)
+        add_folder_button.setToolTip('Add a new folder')
+        button_widget.layout().addWidget(add_folder_button)
+        button_widget.layout().addStretch()
+
         add_to_service_button = QPushButton()
         add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Song to Service')
@@ -123,11 +134,16 @@ class MediaWidget(QTabWidget):
         send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
-        self.song_list = CustomListWidget(self.gui, 'song')
-        self.song_list.setDragEnabled(True)
+        self.song_list = CustomTreeWidget(self.gui)
         self.song_list.setFont(self.gui.standard_font)
-        self.populate_song_list()
+        self.song_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.song_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.song_list.verticalScrollBar().setSingleStep(10)
+        self.song_list.setDragEnabled(True)
         song_layout.addWidget(self.song_list)
+
+        add_folder_button.clicked.connect(self.song_list.add_folder)
+        self.populate_song_list()
 
         return song_widget
 
@@ -268,6 +284,14 @@ class MediaWidget(QTabWidget):
         button_widget.setLayout(QHBoxLayout())
         custom_layout.addWidget(button_widget)
 
+        add_folder_button = QPushButton()
+        add_folder_button.setIcon(QIcon('resources/gui_icons/new_folder.svg'))
+        add_folder_button.setIconSize(QSize(20, 20))
+        add_folder_button.setFixedSize(30, 30)
+        add_folder_button.setToolTip('Add a new folder')
+        button_widget.layout().addWidget(add_folder_button)
+        button_widget.layout().addStretch()
+
         add_to_service_button = QPushButton()
         add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Custom Slide to Service')
@@ -285,12 +309,16 @@ class MediaWidget(QTabWidget):
         send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
-        self.custom_list = CustomListWidget(self.gui, 'custom')
-        self.custom_list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.custom_list.setDragEnabled(True)
+        self.custom_list = CustomTreeWidget(self.gui)
         self.custom_list.setFont(self.gui.standard_font)
-        self.populate_custom_list()
+        self.custom_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.custom_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.custom_list.verticalScrollBar().setSingleStep(10)
+        self.custom_list.setDragEnabled(True)
         custom_layout.addWidget(self.custom_list)
+
+        add_folder_button.clicked.connect(self.custom_list.add_folder)
+        self.populate_custom_list()
 
         return custom_widget
 
@@ -317,6 +345,14 @@ class MediaWidget(QTabWidget):
         button_widget.setLayout(QHBoxLayout())
         image_layout.addWidget(button_widget)
 
+        add_folder_button = QPushButton()
+        add_folder_button.setIcon(QIcon('resources/gui_icons/new_folder.svg'))
+        add_folder_button.setIconSize(QSize(20, 20))
+        add_folder_button.setFixedSize(30, 30)
+        add_folder_button.setToolTip('Add a new folder')
+        button_widget.layout().addWidget(add_folder_button)
+        button_widget.layout().addStretch()
+
         add_to_service_button = QPushButton()
         add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Image to Service')
@@ -334,14 +370,15 @@ class MediaWidget(QTabWidget):
         send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
-        self.image_list = CustomListWidget(self.gui, 'image')
+        self.image_list = CustomTreeWidget(self.gui)
         self.image_list.setFont(self.gui.standard_font)
-        self.image_list.setDragEnabled(True)
-        self.image_list.doubleClicked.connect(self.add_image_to_service)
+        self.image_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.image_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.image_list.verticalScrollBar().setSingleStep(10)
+        self.image_list.setDragEnabled(True)
         image_layout.addWidget(self.image_list)
 
+        add_folder_button.clicked.connect(self.image_list.add_folder)
         self.populate_image_list()
 
         return image_widget
@@ -369,6 +406,14 @@ class MediaWidget(QTabWidget):
         button_widget.setLayout(QHBoxLayout())
         video_layout.addWidget(button_widget)
 
+        add_folder_button = QPushButton()
+        add_folder_button.setIcon(QIcon('resources/gui_icons/new_folder.svg'))
+        add_folder_button.setIconSize(QSize(20, 20))
+        add_folder_button.setFixedSize(30, 30)
+        add_folder_button.setToolTip('Add a new folder')
+        button_widget.layout().addWidget(add_folder_button)
+        button_widget.layout().addStretch()
+
         add_to_service_button = QPushButton()
         add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Video to Service')
@@ -386,14 +431,16 @@ class MediaWidget(QTabWidget):
         send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
-        self.video_list = CustomListWidget(self.gui, 'video')
-        self.video_list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.video_list.setDragEnabled(True)
+        self.video_list = CustomTreeWidget(self.gui)
         self.video_list.setFont(self.gui.standard_font)
+        self.video_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.video_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.video_list.verticalScrollBar().setSingleStep(10)
-        self.populate_video_list()
+        self.video_list.setDragEnabled(True)
         video_layout.addWidget(self.video_list)
+
+        add_folder_button.clicked.connect(self.video_list.add_folder)
+        self.populate_video_list()
 
         return video_widget
 
@@ -420,6 +467,14 @@ class MediaWidget(QTabWidget):
         button_widget.setLayout(QHBoxLayout())
         web_layout.addWidget(button_widget)
 
+        add_folder_button = QPushButton()
+        add_folder_button.setIcon(QIcon('resources/gui_icons/new_folder.svg'))
+        add_folder_button.setIconSize(QSize(20, 20))
+        add_folder_button.setFixedSize(30, 30)
+        add_folder_button.setToolTip('Add a new folder')
+        button_widget.layout().addWidget(add_folder_button)
+        button_widget.layout().addStretch()
+
         add_to_service_button = QPushButton()
         add_to_service_button.setIcon(QIcon('resources/gui_icons/add_to_service_icon.svg'))
         add_to_service_button.setToolTip('Add Web Page to Service')
@@ -437,185 +492,315 @@ class MediaWidget(QTabWidget):
         send_to_live_button.clicked.connect(self.send_to_live)
         button_widget.layout().addWidget(send_to_live_button)
 
-        self.web_list = CustomListWidget(self.gui, 'web')
-        self.web_list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.web_list.setDragEnabled(True)
-        self.web_list.setFont(self.gui.standard_font)
-        self.populate_web_list()
+        self.web_list = CustomTreeWidget(self.gui)
+        self.video_list.setFont(self.gui.standard_font)
+        self.video_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.video_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.video_list.verticalScrollBar().setSingleStep(10)
+        self.video_list.setDragEnabled(True)
         web_layout.addWidget(self.web_list)
+
+        add_folder_button.clicked.connect(self.web_list.add_folder)
+        self.populate_web_list()
 
         return web_widget
 
     def song_search(self):
         """
         Method that retrieves the current text in the song widget's search_line_edit and shows/hides songs that do or
-        don't contain the text.
+        don't contain the text. Results are weighted according to whether the full text is found first in the song
+        title, then if the full text is found in the lyrics, then if any of the search words are found in the title or
+        lyrics. Sorting within the QTreeWidget is enabled by adding the weight plus '|' in front of the hidden text
+        of the QTreeWidgetItem.
         """
-        self.song_list.clear()
         search_string = self.search_line_edit.text().strip().lower()
         if len(search_string) == 0:
-            for item in self.song_list_items:
-                self.song_list.addItem(item.clone())
+            for i in range(self.song_list.topLevelItemCount()):
+                item = self.song_list.topLevelItem(i)
+                item.setHidden(False)
+
+                if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder':
+                    item.setExpanded(False)
+                    if '|' in item.text(0):
+                        item.setText(0, item.text(0).split('|')[1])
+                    for j in range(item.childCount()):
+                        item.child(j).setHidden(False)
+                        if '|' in item.child(j).text(0):
+                            item.child(j).setText(0, item.child(j).text(0).split('|')[0])
             return
 
-        show_list_items = []
-        show_list_indices = []
+        show_list_rankings = {}
+        # first, search for the full search term in titles
         for i in range(len(self.song_list_items)):
-            if search_string in self.song_list_items[i].data(Qt.ItemDataRole.UserRole)['title'].strip().lower():
-                show_list_items.append(self.song_list_items[i].clone())
-                show_list_indices.append(i)
+            data = self.song_list_items[i]
+            if search_string in data['stripped_title'].lower() and data['title'] not in show_list_rankings.keys():
+                show_list_rankings[data['title']] = int(f'{100}{i}')
 
+        # then, search for the full search term in texts
         for i in range(len(self.song_list_items)):
-            if search_string in self.song_list_items[i].data(Qt.ItemDataRole.UserRole)['text'].strip().lower() and i not in show_list_indices:
-                show_list_items.append(self.song_list_items[i].clone())
-                show_list_indices.append(i)
+            data = self.song_list_items[i]
+            if search_string in data['text'].lower() and data['title'] not in show_list_rankings.keys():
+                show_list_rankings[data['title']] = int(f'{110}{i}')
 
-        for item in show_list_items:
-            self.song_list.addItem(item)
+        # now, search for each search term in the titles
+        search_term_split = search_string.split()
+        for word in search_term_split:
+            for i in range(len(self.song_list_items)):
+                data = self.song_list_items[i]
+                if word in data['stripped_title'].lower() and data['title'] not in show_list_rankings.keys():
+                    show_list_rankings[data['title']] = int(f'{120}{i}')
+
+        # finally, search for each search term in the texts
+        for word in search_term_split:
+            for i in range(len(self.song_list_items)):
+                data = self.song_list_items[i]
+                if word in data['text'].lower() and data['title'] not in show_list_rankings.keys():
+                    show_list_rankings[data['title']] = int(f'{130}{i}')
+
+        # hide whichever items aren't in the list of titles
+        all_titles = show_list_rankings.keys()
+        folder_counter = 0
+        for i in range(self.song_list.topLevelItemCount()):
+            item = self.song_list.topLevelItem(i)
+            if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder':
+                item.setHidden(False)
+                found_in_folder = False
+                for j in range(item.childCount()):
+                    title = item.child(j).data(0, Qt.ItemDataRole.UserRole)['title']
+                    if title in all_titles:
+                        found_in_folder = True
+                        item.setExpanded(True)
+                        if '|' in item.text(0):
+                            item.setText(0, item.text(0).split('|')[1])
+                        item.setText(0, f'{folder_counter}|{item.text(0)}')
+                        folder_counter += 1
+
+                        item.child(j).setHidden(False)
+                        if '|' in title:
+                            title = title.split('|')[1]
+                        item.child(j).setText(0, f'{show_list_rankings[title]}|{title.lower()}')
+                    else:
+                        item.child(j).setHidden(True)
+                        if '|' in item.text(0):
+                            item.setText(0, item.text(0).split('|')[1])
+                        if '|' in title:
+                            item.child(j).setData(0, Qt.ItemDataRole.DisplayRole, title.split('|')[1])
+                if not found_in_folder:
+                    item.setHidden(True)
+                    if '|' in item.text(0):
+                        item.setText(0, item.text(0).split('|')[1])
+            else:
+                title = item.data(0, Qt.ItemDataRole.UserRole)['title']
+                if title in all_titles:
+                    item.setHidden(False)
+                    if '|' in title:
+                        title = title.split('|')[1]
+                    item.setText(0, f'{show_list_rankings[title]}|{title.lower()}')
+                else:
+                    item.setHidden(True)
+                    if '|' in title:
+                        item.setText(0, title)
+        self.song_list.custom_sort()
 
     def populate_song_list(self):
         """
-        Method that uses the data contained in the song table of the database to fill the song widget's QListWidget
+        Method that uses the data contained in the song table of the database to fill the song widget's QTreeWidget
         with all of the songs.
         """
         self.song_list.clear()
-        self.song_list_items = []
         all_songs = self.gui.main.get_all_songs()
-        if len(all_songs) > 0:
-            for song_data in all_songs:
-                if self.gui.main.initial_startup:
-                    self.gui.main.update_status_signal.emit(f'Loading Songs - {song_data['title']}', 'info')
+        all_folders = self.gui.main.get_folders('song')
 
-                list_item = QListWidgetItem(song_data['title'])
-                list_item.setData(Qt.ItemDataRole.UserRole, song_data)
-                list_item.setSizeHint(QSize(0, 28))
+        pixmap = QPixmap('resources/gui_icons/song_icon.svg')
+        pixmap = pixmap.scaled(
+            20,
+            20,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
 
-                self.song_list_items.append(list_item)
-                self.song_list.addItem(list_item.clone())
+        # first, create the folders the custom slides belong to
+        folder_items = {}
+        for folder in all_folders:
+            folder_items[folder] = self.song_list.add_folder(name=folder, from_populate=True)
+
+        # then, add the custom slides, putting them under their folder, if applicable
+        for song_data in all_songs:
+            if self.gui.main.initial_startup:
+                self.gui.main.update_status_signal.emit(f'Loading Songs - {song_data['title']}', 'info')
+
+            if not 'folder' in song_data.keys() or song_data['folder'].strip() == '':
+                self.song_list.add_item(song_data['title'], song_data, item_pixmap=pixmap)
+            else:
+                self.song_list.add_item(
+                    song_data['title'],
+                    song_data,
+                    item_pixmap=pixmap,
+                    item_parent=folder_items[song_data['folder']]
+                )
+        thread = Thread(target=self.build_song_search_index())
+        thread.start()
+
+    def build_song_search_index(self):
+        punctuation = ['"', '\'', '`', '(', ')', ':', ';', '?', '!', '.', ',', '-', '*', '#']
+        self.song_list_items = []
+        for i in range(self.song_list.topLevelItemCount()):
+            item = self.song_list.topLevelItem(i)
+            if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder':
+                for j in range(item.childCount()):
+                    title = item.child(j).data(0, Qt.ItemDataRole.UserRole)['title']
+                    text = item.child(j).data(0, Qt.ItemDataRole.UserRole)['text']
+                    stripped_title = title
+                    for punct in punctuation:
+                        stripped_title = title.replace(punct, '')
+                        text = text.replace(punct, '')
+                        text = re.sub(r'\[.*?]', '', text)
+                        text = re.sub(f'<.*?>', ' ', text)
+                        text = re.sub(r'\s+', ' ', text)
+                    self.song_list_items.append({'title': title, 'stripped_title': stripped_title, 'text': text})
+            else:
+                title = item.data(0, Qt.ItemDataRole.UserRole)['title']
+                text = item.data(0, Qt.ItemDataRole.UserRole)['text']
+                stripped_title = title
+                for punct in punctuation:
+                    stripped_title = title.replace(punct, '')
+                    text = text.replace(punct, '')
+                    text = re.sub(r'\[.*?]', '', text)
+                    text = re.sub(f'<.*?>', ' ', text)
+                    text = re.sub(r'\s+', ' ', text)
+                self.song_list_items.append({'title': title, 'stripped_title': stripped_title, 'text': text})
 
     def populate_custom_list(self):
         """
-        Method that uses the data contained in the custom slide table of the database to create QListWidgetItems in the
-        custom slide widget's QListWidget.
+        Method that uses the data contained in the custom slide table of the database to create QTreeWidgetItems in the
+        custom slide widget's QTreeWidget.
         """
         self.custom_list.clear()
         slides = self.gui.main.get_all_custom_slides()
-        if len(slides) > 0:
-            for data in slides:
-                data['use_footer'] = False
+        all_folders = self.gui.main.get_folders('custom')
 
-                list_item = QListWidgetItem(data['title'])
-                list_item.setData(Qt.ItemDataRole.UserRole, data)
-                list_item.setSizeHint(QSize(200, 28))
+        pixmap = QPixmap('resources/gui_icons/custom_slide_icon.svg')
+        pixmap = pixmap.scaled(
+            20,
+            20,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
 
-                self.custom_list.addItem(list_item)
+        # first, create the folders the custom slides belong to
+        folder_items = {}
+        for folder in all_folders:
+            folder_items[folder] = self.custom_list.add_folder(name=folder, from_populate=True)
+
+        # then, add the custom slides, putting them under their folder, if applicable
+        for data in slides:
+            data['use_footer'] = False
+
+            if not 'folder' in data.keys() or data['folder'].strip() == '':
+                self.custom_list.add_item(data['title'], data, item_pixmap=pixmap)
+            else:
+                self.custom_list.add_item(
+                    data['title'],
+                    data,
+                    item_pixmap=pixmap,
+                    item_parent=folder_items[data['folder']]
+                )
 
     def populate_image_list(self):
         """
-        Method that uses the data contained in the image table of the database to create QListWidgetItems in the
-        image widget's QListWidget.
+        Method that uses the data contained in the image table of the database to create QTreeWidgetItems in the
+        image widget's QTreeWidget.
         """
-        connection = None
-        try:
-            self.image_list.clear()
-            connection = sqlite3.connect(self.gui.main.database)
-            cursor = connection.cursor()
-            thumbnails = cursor.execute('SELECT * FROM imageThumbnails ORDER BY fileName COLLATE NOCASE ASC').fetchall()
+        self.image_list.clear()
+        all_images = self.gui.main.get_all_images()
+        all_folders = self.gui.main.get_folders('images')
 
-            for record in thumbnails:
-                file_name = record[0]
-                thumbnail_data = record[1]
-                pixmap = QPixmap()
-                pixmap.loadFromData(thumbnail_data)
+        # first, create the folders the image slides belong to
+        folder_items = {}
+        for folder in all_folders:
+            folder_items[folder] = self.image_list.add_folder(name=folder, from_populate=True)
 
-                widget = StandardItemWidget(self.gui, file_name, '', pixmap)
-                slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
-                slide_data['type'] = 'image'
-                slide_data['title'] = file_name
-                slide_data['file_name'] = file_name
-                slide_data['thumbnail'] = pixmap
-                slide_data['use_footer'] = False
+        # then, add the image slides, putting them under their folder, if applicable
+        for data in all_images:
+            if self.gui.main.initial_startup:
+                self.gui.main.update_status_signal.emit(f'Loading Images - {data['title']}', 'info')
 
-                item = QListWidgetItem()
-                item.setData(Qt.ItemDataRole.UserRole, slide_data)
-                item.setSizeHint(widget.sizeHint())
-                self.image_list.addItem(item)
-                self.image_list.setItemWidget(item, widget)
-        except Exception:
-            self.gui.main.error_log()
-            if connection:
-                connection.close()
+            data['use_footer'] = False
+            pixmap = data['background'].scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+
+            if not 'folder' in data.keys() or data['folder'].strip() == '':
+                self.image_list.add_item(data['title'], data, item_pixmap=pixmap)
+            else:
+                self.image_list.add_item(
+                    data['title'],
+                    data,
+                    item_pixmap=pixmap,
+                    item_parent=folder_items[data['folder']]
+                )
 
     def populate_video_list(self):
         """
         Method that polls the files contained in the video subdirectory of the data directory to create QListWidgetItems
         in the video widget's QListWidget.
         """
-        try:
-            self.video_list.clear()
-            files = os.listdir(self.gui.main.video_dir)
-            for file in files:
-                video_file = None
-                if file.endswith('.jpg'):
-                    name_only = file.split('.')[0]
-                    for other_file in files:
-                        if other_file.startswith(name_only) and not other_file.endswith('.jpg'):
-                            video_file = other_file
+        self.video_list.clear()
+        all_videos = self.gui.main.get_all_videos()
+        all_folders = self.gui.main.get_folders('videos')
 
-                    if video_file:
-                        pixmap = QPixmap(self.gui.main.video_dir + '/' + file)
-                        pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        # first, create the folders the image slides belong to
+        folder_items = {}
+        for folder in all_folders:
+            folder_items[folder] = self.video_list.add_folder(name=folder, from_populate=True)
 
-                        widget = StandardItemWidget(self.gui, video_file.split('.')[0], '', pixmap)
-                        slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
-                        slide_data['type'] = 'video'
-                        slide_data['title'] = video_file
-                        slide_data['file_name'] = video_file
-                        slide_data['use_footer'] = False
+        # then, add the image slides, putting them under their folder, if applicable
+        for data in all_videos:
+            if self.gui.main.initial_startup:
+                self.gui.main.update_status_signal.emit(f'Loading Videos - {data['title']}', 'info')
 
-                        item = QListWidgetItem()
-                        item.setData(Qt.ItemDataRole.UserRole, slide_data)
-                        item.setSizeHint(widget.sizeHint())
+            pixmap = data['background'].scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
 
-                        self.video_list.addItem(item)
-                        self.video_list.setItemWidget(item, widget)
-        except Exception:
-            self.gui.main.error_log()
+            if not 'folder' in data.keys() or data['folder'].strip() == '':
+                self.video_list.add_item(data['title'], data, item_pixmap=pixmap)
+            else:
+                self.video_list.add_item(
+                    data['title'],
+                    data,
+                    item_pixmap=pixmap,
+                    item_parent=folder_items[data['folder']]
+                )
 
     def populate_web_list(self):
         """
         Method that uses the data contained in the web table of the database to create QListWidgetItems in the
         web widget's QListWidget.
         """
-        connection = None
-        try:
-            self.web_list.clear()
-            connection = sqlite3.connect(self.gui.main.database)
-            cursor = connection.cursor()
-            results = cursor.execute('SELECT * FROM web').fetchall()
-            connection.close()
+        self.web_list.clear()
+        all_web = self.gui.main.get_all_web()
+        all_folders = self.gui.main.get_folders('web')
 
-            if len(results) > 0:
-                for record in results:
-                    title = record[0]
-                    url = record[1]
-                    item = QListWidgetItem()
-                    slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
-                    slide_data['type'] = 'web'
-                    slide_data['title'] = title
-                    slide_data['url'] = url
-                    slide_data['use_footer'] = False
-                    item.setData(Qt.ItemDataRole.UserRole, slide_data)
+        # first, create the folders the image slides belong to
+        folder_items = {}
+        for folder in all_folders:
+            folder_items[folder] = self.web_list.add_folder(name=folder, from_populate=True)
+        print(folder_items)
 
-                    widget = StandardItemWidget(self.gui, title, url)
+        # then, add the image slides, putting them under their folder, if applicable
+        for data in all_web:
+            if self.gui.main.initial_startup:
+                self.gui.main.update_status_signal.emit(f'Loading Websites - {data['title']}', 'info')
 
-                    self.web_list.addItem(item)
-                    item.setSizeHint(widget.sizeHint())
-                    self.web_list.setItemWidget(item, widget)
-        except Exception:
-            self.gui.main.error_log()
-            if connection:
-                connection.close()
+            pixmap = QPixmap('resources/gui_icons/web_icon.svg')
+            pixmap = pixmap.scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+
+            if not 'folder' in data.keys() or data['folder'].strip() == '':
+                self.web_list.add_item(data['title'], data, item_pixmap=pixmap)
+            else:
+                self.web_list.add_item(
+                    data['title'],
+                    data,
+                    item_pixmap=pixmap,
+                    item_parent=folder_items[data['folder']]
+                )
 
     def get_bibles(self):
         """
@@ -759,19 +944,34 @@ class MediaWidget(QTabWidget):
         )
         if len(result[0]) > 0:
             try:
+                # first, copy the user's file to the ProjectOn data/images folder
                 simple_splash = SimpleSplash(self.gui, 'Importing image, please wait...')
 
                 file_name_split = result[0].split('/')
                 file_name = file_name_split[len(file_name_split) - 1]
                 shutil.copy(result[0], self.gui.main.image_dir + '/' + file_name)
 
-                from core.runnables import IndexImages
-                ii = IndexImages(self.gui.main, 'images')
-                ii.add_image_index(self.gui.main.image_dir + '/' + file_name, 'image')
-                self.image_list.blockSignals(True)
-                self.populate_image_list()
-                self.image_list.update()
-                self.image_list.blockSignals(False)
+                # create the thumbnail and data for saving to the database
+                pixmap = QPixmap(self.gui.main.image_dir + '/' + file_name)
+                pixmap = pixmap.scaled(
+                    96,
+                    54,
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+
+                data = SLIDE_DATA_DEFAULTS.copy()
+                data['type'] = 'image'
+                data['title'] = file_name
+                data['background'] = pixmap
+                data['folder'] = ''
+                self.gui.main.save_image(data)
+
+                # create the new image item in the image_list
+                pixmap = data['background'].scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+                item = self.image_list.add_item(data['title'], data, item_pixmap=pixmap)
+                self.image_list.setCurrentItem(item)
+                self.image_list.scrollToItem(item)
 
                 simple_splash.widget.deleteLater()
             except Exception:
@@ -866,19 +1066,33 @@ class MediaWidget(QTabWidget):
 
         result = web_dialog.exec()
         if result == 0:
-            item = QListWidgetItem()
-            item.setData(20, title_line_edit.text())
-            item.setData(21, url_line_edit.text())
-            item.setData(40, 'web')
+            title = title_line_edit.text().strip()
+            url = url_line_edit.text().strip()
+            self.save_web(title, url)
 
-            widget = StandardItemWidget(self.gui, title_line_edit.text(), url_line_edit.text())
+    def save_web(self, title, url, old_title=None):
+        message = None
+        if len(title) == 0:
+            message = 'Title is required to save a web item. Please try again.'
+        elif len(url) == 0:
+            message = 'URL is required to save a web item. Please try again.'
+        if message:
+            QMessageBox.information(
+                self.gui.main_window,
+                'Info Missing',
+                message
+            )
+            return
 
-            self.web_list.addItem(item)
-            item.setSizeHint(widget.sizeHint())
-            self.web_list.setItemWidget(item, widget)
-
-            self.gui.main.save_web_item(title_line_edit.text(), url_line_edit.text())
-            self.populate_web_list()
+        data = SLIDE_DATA_DEFAULTS.copy()
+        data['type'] = 'web'
+        data['title'] = title
+        data['url'] = url
+        if old_title:
+            self.gui.main.save_web_item(data, old_title)
+        else:
+            self.gui.main.save_web_item(data)
+        self.populate_web_list()
 
     def add_video(self):
         """
@@ -1007,26 +1221,25 @@ class MediaWidget(QTabWidget):
         :param bool from_load_service: Whether this call is occurring while loading a service file
         """
         if not item and self.song_list.currentItem():
-            item = QListWidgetItem()
-            item.setData(Qt.ItemDataRole.UserRole, self.song_list.currentItem().data(Qt.ItemDataRole.UserRole).copy())
+            data = self.song_list.currentItem().data(0, Qt.ItemDataRole.UserRole).copy()
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
 
         if item and not from_load_service:
-            item.setText(None)
-
             # Create a thumbnail of either the global song background or the custom background associated with this song
-            item_data = item.data(Qt.ItemDataRole.UserRole)
-            if (not item_data['background']
-                    or item_data['background'] == 'False'
-                    or item_data['background'] == 'global_song'):
+            data = item.data(Qt.ItemDataRole.UserRole)
+            if (not data['background']
+                    or data['background'] == 'False'
+                    or data['background'] == 'global_song'):
                 pixmap = self.gui.global_song_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif item_data['background'] == 'global_bible':
+            elif data['background'] == 'global_bible':
                 pixmap = self.gui.global_bible_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif 'rgb(' in item_data['background']:
+            elif 'rgb(' in data['background']:
                 pixmap = QPixmap(50, 27)
                 painter = QPainter(pixmap)
-                rgb = item_data['background'].replace('rgb(', '')
+                rgb = data['background'].replace('rgb(', '')
                 rgb = rgb.replace(')', '')
                 rgb_split = rgb.split(',')
                 brush = QBrush(QColor.fromRgb(
@@ -1035,10 +1248,10 @@ class MediaWidget(QTabWidget):
                 painter.fillRect(pixmap.rect(), brush)
                 painter.end()
             else:
-                pixmap = QPixmap(self.gui.main.background_dir + '/' + item_data['background'])
+                pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-            widget = StandardItemWidget(self.gui, item_data['title'], 'Song', pixmap)
+            widget = StandardItemWidget(self.gui, data['title'], 'Song', pixmap)
 
             item.setSizeHint(widget.sizeHint())
             if not row:
@@ -1052,35 +1265,34 @@ class MediaWidget(QTabWidget):
 
         if item and from_load_service:
             # handle this differently if it's being created while loading a service file
-            widget_item = QListWidgetItem()
-            slide_data = item.data(Qt.ItemDataRole.UserRole).copy()
-            slide_data['parsed_text'] = (parsers.parse_song_data(self.gui, slide_data))
-            widget_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+            data = item.data(Qt.ItemDataRole.UserRole).copy()
+            widget_item = QListWidgetItem(data['title'])
+            widget_item.setData(Qt.ItemDataRole.UserRole, data)
 
-            if (slide_data['override_global'] == 'False'
-                or not slide_data['background']
-                or slide_data['background'] == 'False'
-                or slide_data['background'] == 'global_song'):
+            if (data['override_global'] == 'False'
+                or not data['background']
+                or data['background'] == 'False'
+                or data['background'] == 'global_song'):
                 pixmap = self.gui.global_song_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                        Qt.TransformationMode.SmoothTransformation)
-            elif slide_data['background'] == 'global_bible':
+            elif data['background'] == 'global_bible':
                 pixmap = self.gui.global_bible_background_pixmap
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                        Qt.TransformationMode.SmoothTransformation)
-            elif 'rgb(' in slide_data['background']:
+            elif 'rgb(' in data['background']:
                 pixmap = QPixmap(50, 27)
                 painter = QPainter(pixmap)
-                brush = QBrush(QColor(slide_data['background']))
+                brush = QBrush(QColor(data['background']))
                 painter.setBrush(brush)
                 painter.fillRect(pixmap.rect(), brush)
                 painter.end()
             else:
-                pixmap = QPixmap(self.gui.main.background_dir + '/' + slide_data['background'])
+                pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
                 pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                        Qt.TransformationMode.SmoothTransformation)
 
-            widget = StandardItemWidget(self.gui, slide_data['title'], 'Song', pixmap)
+            widget = StandardItemWidget(self.gui, data['title'], 'Song', pixmap)
 
             widget_item.setSizeHint(widget.sizeHint())
             self.gui.oos_widget.oos_list_widget.addItem(widget_item)
@@ -1094,28 +1306,30 @@ class MediaWidget(QTabWidget):
         service's QListWidget
         :return: None
         """
-        if self.formatted_reference:
-            passages = []
-            text_split = self.scripture_text_edit.toPlainText().split()
-            add_verse = False
-            verse_number = False
-            verse_words = []
-            for item in text_split:
-                item = item.strip()
-                if add_verse and not item.isdigit():
-                    verse_words.append(item)
-                else:
-                    if verse_number:
-                        passages.append([verse_number, ' '.join(verse_words).strip()])
-                        verse_words = []
-                    verse_number = item
-                    add_verse = True
-            passages.append([verse_number, ' '.join(verse_words).strip()])
+        if not self.formatted_reference:
+            return
 
-            reference = self.formatted_reference
-            version = self.bible_selector_combobox.currentText()
-            self.gui.add_scripture_item(reference, passages, version, self.scripture_text_edited)
-            self.gui.changes = True
+        passages = []
+        text_split = self.scripture_text_edit.toPlainText().split()
+        add_verse = False
+        verse_number = False
+        verse_words = []
+        for item in text_split:
+            item = item.strip()
+            if add_verse and not item.isdigit():
+                verse_words.append(item)
+            else:
+                if verse_number:
+                    passages.append([verse_number, ' '.join(verse_words).strip()])
+                    verse_words = []
+                verse_number = item
+                add_verse = True
+        passages.append([verse_number, ' '.join(verse_words).strip()])
+
+        reference = self.formatted_reference
+        version = self.bible_selector_combobox.currentText()
+        self.gui.add_scripture_item(reference, passages, version, self.scripture_text_edited)
+        self.gui.changes = True
 
     def add_custom_to_service(self, item=None, row=None):
         """
@@ -1124,35 +1338,35 @@ class MediaWidget(QTabWidget):
         :param int row: Optional: a specific row of the custom slide widget's QListWidget
         """
         if not item and self.custom_list.currentItem():
-            item = QListWidgetItem()
-            item.setData(Qt.ItemDataRole.UserRole, self.custom_list.currentItem().data(Qt.ItemDataRole.UserRole))
-            for i in range(20, 50):
-                item.setData(i, self.custom_list.currentItem().data(i))
+            data = self.custom_list.currentItem().data(0, Qt.ItemDataRole.UserRole)
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
         elif not item and not self.custom_list.currentItem():
             return
+        else:
+            data = item.data(0, Qt.ItemDataRole.UserRole)
+            item.setData(Qt.ItemDataRole.DisplayRole, data['title'])
 
-        item_data = item.data(Qt.ItemDataRole.UserRole)
-        if item_data['override_global'] == 'False' or not item_data['background']:
+        if data['override_global'] == 'False' or not data['background']:
             pixmap = self.gui.global_bible_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        elif item_data['background'] == 'global_song':
+        elif data['background'] == 'global_song':
             pixmap = self.gui.global_song_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        elif item_data['background'] == 'global_bible':
+        elif data['background'] == 'global_bible':
             pixmap = self.gui.global_bible_background_pixmap
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        elif 'rgb(' in item_data['background']:
+        elif 'rgb(' in data['background']:
             pixmap = QPixmap(50, 27)
             painter = QPainter(pixmap)
-            brush = QBrush(QColor(item_data['background']))
+            brush = QBrush(QColor(data['background']))
             painter.fillRect(pixmap.rect(), brush)
             painter.end()
         else:
-            pixmap = QPixmap(self.gui.main.background_dir + '/' + item_data['background'])
+            pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-        widget = StandardItemWidget(self.gui, item_data['title'], 'Custom Slide', pixmap)
-        item.setText(None)
+        widget = StandardItemWidget(self.gui, data['title'], 'Custom Slide', pixmap)
         item.setSizeHint(widget.sizeHint())
         if not row:
             self.gui.oos_widget.oos_list_widget.addItem(item)
@@ -1170,66 +1384,30 @@ class MediaWidget(QTabWidget):
         :param int row: Optional: a specific row of the image widget's QListWidget
         """
         add_item = False
-        if self.image_list.currentItem():
-            if not item:
-                item = QListWidgetItem()
-                add_item = True
+        if not self.image_list.currentItem():
+            return
 
-            slide_data = self.image_list.currentItem().data(Qt.ItemDataRole.UserRole).copy()
-            item.setData(Qt.ItemDataRole.UserRole, slide_data)
+        data = self.image_list.currentItem().data(0, Qt.ItemDataRole.UserRole).copy()
+        if not item:
+            item = QListWidgetItem(data['title'])
+            add_item = True
 
-            pixmap = slide_data['thumbnail']
-            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                   Qt.TransformationMode.SmoothTransformation)
-            widget = StandardItemWidget(self.gui, slide_data['title'], 'Image', pixmap)
+        item.setData(Qt.ItemDataRole.UserRole, data)
 
-            item.setSizeHint(widget.sizeHint())
-            if add_item:
-                self.gui.oos_widget.oos_list_widget.addItem(item)
-            else:
-                self.gui.oos_widget.oos_list_widget.insertItem(row, item)
-            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
-            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
-            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
-            self.gui.changes = True
+        pixmap = data['background']
+        pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                               Qt.TransformationMode.SmoothTransformation)
+        widget = StandardItemWidget(self.gui, data['title'], 'Image', pixmap)
 
-    def add_web_to_service(self, item=None, row=None):
-        """
-        Method to add a web QListWidgetItem to the order of service's QListWidget
-        :param QListWidgetItem item: Optional: a specific web item
-        :param int row: Optional: a specific row of the web widget's QListWidget
-        """
-        add_item = False
-        if self.web_list.currentItem():
-            if not item:
-                item = QListWidgetItem()
-                add_item = True
-            item.setData(Qt.ItemDataRole.UserRole, self.web_list.currentItem().data(Qt.ItemDataRole.UserRole).copy())
-
-            pixmap = QPixmap(50, 27)
-            painter = QPainter(pixmap)
-            brush = QBrush(Qt.GlobalColor.black)
-            pen = QPen(Qt.GlobalColor.white)
-            painter.setPen(pen)
-            painter.setBrush(brush)
-            painter.fillRect(pixmap.rect(), brush)
-            painter.setFont(self.gui.bold_font)
-            painter.drawText(QPoint(2, 20), 'WWW')
-            painter.end()
-
-            widget = StandardItemWidget(
-                self.gui, item.data(
-                    Qt.ItemDataRole.UserRole)['title'], item.data(Qt.ItemDataRole.UserRole)['url'], pixmap)
-
-            item.setSizeHint(widget.sizeHint())
-            if add_item:
-                self.gui.oos_widget.oos_list_widget.addItem(item)
-            else:
-                self.gui.oos_widget.oos_list_widget.insertItem(row, item)
-            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
-            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
-            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
-            self.gui.changes = True
+        item.setSizeHint(widget.sizeHint())
+        if add_item:
+            self.gui.oos_widget.oos_list_widget.addItem(item)
+        else:
+            self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+        self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+        self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
+        self.gui.changes = True
 
     def add_video_to_service(self, item=None, row=None):
         """
@@ -1238,30 +1416,72 @@ class MediaWidget(QTabWidget):
         :param int row: Optional: a specific row of the video widget's QListWidget
         """
         add_item = False
-        if self.video_list.currentItem():
-            if not item:
-                item = QListWidgetItem()
-                add_item = True
-            slide_data = self.video_list.currentItem().data(Qt.ItemDataRole.UserRole).copy()
-            item.setData(Qt.ItemDataRole.UserRole, slide_data)
+        if not self.video_list.currentItem():
+            return
 
-            pixmap = QPixmap(
-                self.gui.main.video_dir + '/' + slide_data['file_name'].split('.')[0] + '.jpg')
-            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                   Qt.TransformationMode.SmoothTransformation)
+        if not item:
+            item = QListWidgetItem()
+            add_item = True
+        slide_data = self.video_list.currentItem().data(0, Qt.ItemDataRole.UserRole).copy()
+        item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-            widget = StandardItemWidget(
-                self.gui, slide_data['title'].split('.')[0], 'Video', pixmap)
+        pixmap = QPixmap(
+            self.gui.main.video_dir + '/' + slide_data['file_name'].split('.')[0] + '.jpg')
+        pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                               Qt.TransformationMode.SmoothTransformation)
 
-            item.setSizeHint(widget.sizeHint())
-            if add_item:
-                self.gui.oos_widget.oos_list_widget.addItem(item)
-            else:
-                self.gui.oos_widget.oos_list_widget.insertItem(row, item)
-            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
-            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
-            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
-            self.gui.changes = True
+        widget = StandardItemWidget(
+            self.gui, slide_data['title'].split('.')[0], 'Video', pixmap)
+
+        item.setSizeHint(widget.sizeHint())
+        if add_item:
+            self.gui.oos_widget.oos_list_widget.addItem(item)
+        else:
+            self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+        self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+        self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
+        self.gui.changes = True
+
+    def add_web_to_service(self, item=None, row=None):
+        """
+        Method to add a web QListWidgetItem to the order of service's QListWidget
+        :param QListWidgetItem item: Optional: a specific web item
+        :param int row: Optional: a specific row of the web widget's QListWidget
+        """
+        add_item = False
+        if not self.web_list.currentItem():
+            return
+
+        if not item:
+            item = QListWidgetItem()
+            add_item = True
+        item.setData(Qt.ItemDataRole.UserRole, self.web_list.currentItem().data(0, Qt.ItemDataRole.UserRole).copy())
+
+        pixmap = QPixmap(50, 27)
+        painter = QPainter(pixmap)
+        brush = QBrush(Qt.GlobalColor.black)
+        pen = QPen(Qt.GlobalColor.white)
+        painter.setPen(pen)
+        painter.setBrush(brush)
+        painter.fillRect(pixmap.rect(), brush)
+        painter.setFont(self.gui.bold_font)
+        painter.drawText(QPoint(2, 20), 'WWW')
+        painter.end()
+
+        widget = StandardItemWidget(
+            self.gui, item.data(
+                Qt.ItemDataRole.UserRole)['title'], item.data(Qt.ItemDataRole.UserRole)['url'], pixmap)
+
+        item.setSizeHint(widget.sizeHint())
+        if add_item:
+            self.gui.oos_widget.oos_list_widget.addItem(item)
+        else:
+            self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+        self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+        self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
+        self.gui.changes = True
 
 
 class CustomListWidget(QListWidget):
@@ -1290,46 +1510,6 @@ class CustomListWidget(QListWidget):
         """
         self.item_pos = self.mapFromGlobal(self.cursor().pos())
         menu = QMenu()
-        if self.gui.main.settings['theme'] == 'dark':
-            menu.setStyleSheet(
-                'QMenu {'
-                    'background: #000000;'
-                    'color: #e0e0e0;'
-                '}'
-                'QMenu::item {'
-                    'background: #000000;'
-                    'color: #e0e0e0;'
-                '}'
-                'QMenu::item:hover {'
-                    'background: #555588;'
-                '}'
-                'QMenu::item:selected {'
-                    'background: #444466;'
-                '}'
-                'QMenu::item:pressed {'
-                    'background: #444466;'
-                '}'
-            )
-        else:
-            menu.setStyleSheet(
-                'QMenu {'
-                    'background: #f0f0f0;'
-                    'color: #000000;'
-                '}'
-                'QMenu::item {'
-                    'background: #f0f0f0;'
-                    'color: #000000;'
-                '}'
-                'QMenuBar::item:hover {'
-                    'background: #aaaaff;'
-                '}'
-                'QMenu::item:selected {'
-                    'background: #aaaaff;'
-                '}'
-                'QMenu::item:pressed {'
-                    'background: #aaaaff;'
-                '}'
-            )
 
         add_to_service_action = QAction('Add to Order of Service')
         if self.type == 'song':
@@ -1405,10 +1585,6 @@ class CustomListWidget(QListWidget):
         Method to send the current item to the preview widget upon the current item being changed.
         """
         if self.currentItem():
-            if self.currentItem().data(Qt.ItemDataRole.UserRole)['type'] == 'song':
-                item_data = self.currentItem().data(Qt.ItemDataRole.UserRole)
-                item_data['parsed_text'] = parsers.parse_song_data(self.gui, item_data)
-                self.currentItem().setData(Qt.ItemDataRole.UserRole, item_data)
             self.gui.send_to_preview(self.currentItem())
 
     def edit_song(self):

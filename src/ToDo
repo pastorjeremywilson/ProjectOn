@@ -2,10 +2,12 @@ Done:
     Auto-scroll OOS list when adding an item
     Except no server check timer on shutdown (for quick shutdowns)
     Add wait splash after importing image (maybe video too?)
+    Do all slide parsing when populating widget or finishing editing; remove calls to do so from everywhere else
+    Fix folder expand arrow color on dark theme
+    Allow sorting media into folders
 
 To Do:
 
 Future Releases:
     Video backgrounds
-    Allow sorting media into folders
     When running under Linux, removing an image results in a hard crash with no feedback

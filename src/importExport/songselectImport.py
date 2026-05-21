@@ -401,7 +401,6 @@ class SongselectImport(QDialog):
         song_data['copyright'] = copyright
         song_data['ccli_song_number'] = song_number
         song_data['verse_order'] = order
-        song_data['parsed_text'] = parse_song_data(self.gui, song_data)
 
         save_widget = SimpleSplash(self.gui, 'Saving...')
 

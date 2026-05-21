@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.001
+ProjectOn v.1.10.0.002
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -30,11 +30,12 @@ import time
 import traceback
 import zipfile
 from datetime import datetime
+from email.mime import image
 from os.path import exists
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
-    qInstallMessageHandler, QThread
+    qInstallMessageHandler, QThread, QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
@@ -196,7 +197,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.0.001')
+        version_label = QLabel('v.1.10.0.002')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -243,6 +244,125 @@ class ProjectOn(QObject):
         self.splash_widget.raise_()
         self.splash_widget.setFocus()
 
+    def check_database_update(self):
+        connection = sqlite3.connect(self.database)
+        cursor = connection.cursor()
+        db_version = cursor.execute('PRAGMA user_version').fetchone()[0]
+
+        if db_version == 2:
+            # this is the most recent version
+            connection.close()
+            return True
+        elif db_version > 2:
+            QMessageBox.critical(
+                None,
+                'Database Mismatch',
+                'Your database was created/updated by a newer verison of ProjectOn. Please install the newest '
+                'version of ProjectOn and try again.'
+            )
+            sys.exit(-2)
+
+        date = datetime.now().strftime('%Y-%m-%d_%H.%M.%S')
+        db_backup_loc = f'{self.data_dir}/backups/projecton.{date}.db'
+        QMessageBox.information(
+            None,
+            'Updating Database',
+            f'Your database will be upgraded to the newest version. A backup of your old database will be created'
+            f'at {db_backup_loc}'
+        )
+
+        if not exists(f'{self.data_dir}/backups'):
+            os.mkdir(f'{self.data_dir}/backups')
+        shutil.copy(self.database, db_backup_loc)
+
+        # first, check for the second-most-recently added columns in the songs table
+        result = cursor.execute('PRAGMA table_info(songs)').fetchall()
+        columns = []
+        for record in result:
+            columns.append(record[1])
+
+        if not 'shade_opacity' in columns:
+            column_names = [
+                ['use_shade', 'False'],
+                ['shade_color', '0'],
+                ['shade_opacity', '75']
+            ]
+            for name in column_names:
+                cursor.execute(f'ALTER TABLE songs ADD {name[0]} TEXT;')
+                cursor.execute(f'UPDATE songs SET {name[0]}={str(name[1])}')
+            connection.commit()
+
+        # check for the 'folder' column in the songs table
+        if not 'folder' in columns:
+            cursor.execute('ALTER TABLE songs ADD folder TEXT default "";')
+            connection.commit()
+
+        # check for the 'folder' column in the customSlides table
+        result = cursor.execute('PRAGMA table_info(customSlides)').fetchall()
+        columns = []
+        for record in result:
+            columns.append(record[1])
+
+        if not 'folder' in columns:
+            cursor.execute('ALTER TABLE customSlides ADD folder TEXT default "";')
+            cursor.execute('UPDATE customSlides SET folder="";')
+            connection.commit()
+
+        # check for the 'folder' column in the imageThumbnails table
+        result = cursor.execute('PRAGMA table_info(imageThumbnails)').fetchall()
+        columns = []
+        for record in result:
+            columns.append(record[1])
+
+        if not 'folder' in columns:
+            cursor.execute('ALTER TABLE imageThumbnails ADD folder TEXT default "";')
+            connection.commit()
+
+        # check that the videos table exists
+        result = cursor.execute(f'SELECT name FROM sqlite_schema WHERE type="table" AND name="videos";').fetchall()
+        if len(result) == 0:
+            cursor.execute('CREATE TABLE videos (filename TEXT DEFAULT "", thumbnail BLOB, folder TEXT DEFAULT "");')
+
+        files = os.listdir(self.video_dir)
+        for file in files:
+            video_file = None
+            if file.endswith('.jpg'):
+                name_only = file.split('.')[0]
+                for other_file in files:
+                    if other_file.startswith(name_only) and not other_file.endswith('.jpg'):
+                        video_file = other_file
+
+                if video_file:
+                    pixmap = QPixmap(self.video_dir + '/' + file)
+                    pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                           Qt.TransformationMode.SmoothTransformation)
+
+                    array = QByteArray()
+                    buffer = QBuffer(array)
+                    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                    pixmap.save(buffer, 'JPG')
+                    blob = bytes(array.data())
+
+                    sql = 'INSERT INTO videos (filename, thumbnail, folder) VALUES (?, ?, ?)'
+                    cursor.execute(sql, (video_file, blob, ''))
+                    connection.commit()
+
+        # check for the 'folder' column in the web table
+        result = cursor.execute('PRAGMA table_info(web)').fetchall()
+        columns = []
+        for record in result:
+            columns.append(record[1])
+
+        if not 'folder' in columns:
+            cursor.execute('ALTER TABLE web ADD folder TEXT default "";')
+            connection.commit()
+
+        cursor.execute('PRAGMA user_version = 2')
+        connection.commit()
+        connection.close()
+
+        return True
+
     def get_all_songs(self):
         """
         Retrieves all song data from the ProjectOn database's 'songs' table
@@ -253,17 +373,6 @@ class ProjectOn(QObject):
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
 
-            # check that the database has the newest columns
-            result = cursor.execute('PRAGMA table_info(songs)').fetchall()
-            updated_table = False
-            columns = []
-            for record in result:
-                columns.append(record[1])
-                if record[1] == 'shade_opacity':
-                    updated_table = True
-            if not updated_table:
-                self.update_table(connection, cursor, 'songs')
-
             result = cursor.execute('SELECT * FROM songs ORDER BY title').fetchall()
 
             # there's been enough variation in how data is stored across versions that we're going to
@@ -273,7 +382,7 @@ class ProjectOn(QObject):
             for song in result:
                 data = SLIDE_DATA_DEFAULTS.copy()
                 data['type'] = 'song'
-                for i in range(len(columns)):
+                for i in range(len(song)):
                     if 'global' in str(song[i]):
                         data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = song[i]
                     elif song[i] is not None and type(song[i]) is not int and song[i].lower() == 'true':
@@ -291,17 +400,6 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def update_table(self, connection, cursor, table):
-        column_names = [
-            ['use_shade', 'False'],
-            ['shade_color', '0'],
-            ['shade_opacity', '75']
-        ]
-        for name in column_names:
-            cursor.execute(f'ALTER TABLE {table} ADD {name[0]} TEXT;')
-            cursor.execute(f'UPDATE {table} SET {name[0]}={str(name[1])}')
-        connection.commit()
-
     def get_all_custom_slides(self):
         """
         Retrieves all custom slide data from the ProjectOn database's 'customSlides' table
@@ -312,17 +410,6 @@ class ProjectOn(QObject):
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
 
-            # check that the database has the newest columns
-            result = cursor.execute('PRAGMA table_info(customSlides)').fetchall()
-            updated_table = False
-            columns = []
-            for record in result:
-                columns.append(record[1])
-                if record[1] == 'shade_opacity':
-                    updated_table = True
-            if not updated_table:
-                self.update_table(connection, cursor, 'customSlides')
-
             result = cursor.execute('SELECT * FROM customSlides ORDER BY title').fetchall()
 
             # there's been enough variation in how data is stored across versions that we're going to
@@ -332,7 +419,7 @@ class ProjectOn(QObject):
             for custom in result:
                 data = SLIDE_DATA_DEFAULTS.copy()
                 data['type'] = 'custom'
-                for i in range(len(columns)):
+                for i in range(len(custom)):
                     if 'global' in str(custom[i]):
                         data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = custom[i]
                     elif custom[i] is not None and type(custom[i]) is not int and custom[i].lower() == 'true':
@@ -344,6 +431,83 @@ class ProjectOn(QObject):
                 all_custom.append(data)
             connection.close()
             return all_custom
+        except Exception:
+            self.error_log()
+            if connection:
+                connection.close()
+            return -1
+
+    def get_all_images(self):
+        connection = None
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            result = cursor.execute('SELECT * FROM imageThumbnails ORDER BY fileName COLLATE NOCASE ASC').fetchall()
+
+            all_images = []
+            for image in result:
+                data = SLIDE_DATA_DEFAULTS.copy()
+                data['type'] = 'image'
+                data['title'] = image[0]
+                pixmap = QPixmap()
+                pixmap.loadFromData(image[1], 'jpg')
+                data['background'] = pixmap
+                data['folder'] = image[2]
+                all_images.append(data)
+            connection.close()
+            return all_images
+        except Exception:
+            self.error_log()
+            if connection:
+                connection.close()
+            return -1
+
+    def get_all_videos(self):
+        connection = None
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            result = cursor.execute('SELECT * FROM videos').fetchall()
+            all_videos = []
+            for video in result:
+                data = SLIDE_DATA_DEFAULTS.copy()
+                data['type'] = 'video'
+                data['title'] = video[0]
+                data['file_name'] = video[0]
+                data['folder'] = video[2]
+                data['use_footer'] = False
+
+                pixmap = QPixmap()
+                pixmap.loadFromData(video[1], 'jpg')
+                data['background'] = pixmap
+
+                all_videos.append(data)
+            return all_videos
+        except Exception:
+            self.error_log()
+            if connection:
+                connection.close()
+            return -1
+
+    def get_all_web(self):
+        connection = None
+        all_web = []
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            results = cursor.execute('SELECT * FROM web').fetchall()
+            connection.close()
+
+            for record in results:
+                data = SLIDE_DATA_DEFAULTS.copy()
+                data['type'] = 'web'
+                data['title'] = record[0]
+                data['url'] = record[1]
+                data['folder'] = record[2]
+                data['use_footer'] = False
+                all_web.append(data)
+
+            return all_web
         except Exception:
             self.error_log()
             if connection:
@@ -387,6 +551,32 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
             return -1
+
+    def get_folders(self, type):
+        connection = sqlite3.connect(self.database)
+        cursor = connection.cursor()
+        result = ''
+        if type == 'song':
+            result = cursor.execute('SELECT folder FROM songs').fetchall()
+        elif type == 'custom':
+            result = cursor.execute('SELECT folder FROM customSlides').fetchall()
+        elif type == 'images':
+            result = cursor.execute('SELECT folder FROM imageThumbnails').fetchall()
+        elif type == 'videos':
+            result = cursor.execute('SELECT folder FROM videos').fetchall()
+        elif type == 'web':
+            result = cursor.execute('SELECT folder FROM web').fetchall()
+        else:
+            connection.close()
+            return -1
+        connection.close()
+
+        folders = []
+        for item in result:
+            if len(item[0].strip()) > 0 and item[0].strip() not in folders:
+                folders.append(item[0].strip())
+
+        return folders
 
     def get_audio_clip_names(self):
         connection = None
@@ -563,7 +753,115 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
 
-    def save_web_item(self, title, url):
+    def save_image(self, data, old_title=None):
+        connection = None
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            for key in data.keys():
+                if type(data[key]) == str:
+                    data[key] = data[key].replace('"', '""')
+
+            # if old_title has been provided, this image already exists in the database and we need to use UPDATE
+            if old_title:
+                pixmap = data['background'].scaled(
+                    96,
+                    54,
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+
+                array = QByteArray()
+                buffer = QBuffer(array)
+                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                pixmap.save(buffer, 'JPG')
+                blob = bytes(array.data())
+                sql = (f'UPDATE imageThumbnails SET '
+                       f'filename="{data["title"]}",'
+                       f'image=?,'
+                       f'folder="{data["folder"]}" '
+                       f'WHERE filename="{old_title}";')
+
+                cursor.execute(sql, (blob,))
+                connection.commit()
+                connection.close()
+            else:  # use INSERT INTO instead
+                pixmap = data['background'].scaled(
+                    96,
+                    54,
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+
+                array = QByteArray()
+                buffer = QBuffer(array)
+                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                pixmap.save(buffer, 'JPG')
+                blob = bytes(array.data())
+
+                sql = (f'INSERT INTO imageThumbnails (filename, image, folder) VALUES ('
+                       f'"{data["title"]}",'
+                       f'?,'
+                       f'"{data["folder"]}");')
+                cursor.execute(sql, (blob,))
+                connection.commit()
+                connection.close()
+
+        except Exception:
+            self.error_log()
+            if connection:
+                connection.close()
+
+    def save_video(self, data, old_title=None):
+        connection = None
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+
+            array = QByteArray()
+            buffer = QBuffer(array)
+            buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+            data['background'].save(buffer, 'JPG')
+            blob = bytes(array.data())
+
+            # if old_title has been provided, this image already exists in the database and we need to use UPDATE
+            if old_title:
+                sql = (f'UPDATE videos SET '
+                       f'filename="{data["title"]}",'
+                       f'thumbnail=?,'
+                       f'folder="{data["folder"]}" '
+                       f'WHERE filename="{old_title}";')
+
+                cursor.execute(sql, (blob,))
+                connection.commit()
+                connection.close()
+            else:  # use INSERT INTO instead
+                pixmap = data['background'].scaled(
+                    96,
+                    54,
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+
+                array = QByteArray()
+                buffer = QBuffer(array)
+                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                pixmap.save(buffer, 'JPG')
+                blob = bytes(array.data())
+
+                sql = (f'INSERT INTO imageThumbnails (filename, image, folder) VALUES ('
+                       f'"{data["title"]}",'
+                       f'?,'
+                       f'"{data["folder"]}");')
+                cursor.execute(sql, (blob,))
+                connection.commit()
+                connection.close()
+            return 0
+        except Exception:
+            self.error_log()
+            return -1
+
+    def save_web_item(self, data, old_title=None):
         """
         Stores the title and url of a web slide to the program's database. Checks the database first to see if the
         given title already exists.
@@ -574,22 +872,33 @@ class ProjectOn(QObject):
         try:
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
-            result = cursor.execute('SELECT * FROM web WHERE title="' + title + '"').fetchone()
 
-            if result:
-                sql = ('UPDATE web SET url="' + url + '" WHERE title="' + title + '"')
+            # if old_title has been provided, this web item already exists in the database and we need to use UPDATE
+            if old_title:
+                sql = (f'UPDATE web SET '
+                       f'title="{data["title"]}",'
+                       f'url="{data["url"]}",'
+                       f'folder="{data["folder"]}" '
+                       f'WHERE title="{old_title}";')
+
                 cursor.execute(sql)
                 connection.commit()
                 connection.close()
-            else:
-                sql = ('INSERT INTO web (title, url) VALUES ("' + title + '", "' + url + '")')
+            else:  # use INSERT INTO instead
+                sql = (f'INSERT INTO web (title, url, folder) VALUES ('
+                       f'"{data["title"]}",'
+                       f'"{data["url"]}",'
+                       f'"{data["folder"]}");')
                 cursor.execute(sql)
                 connection.commit()
                 connection.close()
+            return 0
+
         except Exception:
             self.error_log()
             if connection:
                 connection.close()
+            return -1
 
     def delete_item(self, item):
         """
@@ -598,12 +907,19 @@ class ProjectOn(QObject):
         """
         connection = None
         try:
-            if item.data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+            if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'song':
                 table = 'songs'
-                description = 'Song'
-            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                title = item.data(0, Qt.ItemDataRole.UserRole)['title']
+                column = 'title'
+            elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 table = 'customSlides'
-                description = 'Custom Slide'
+                title = item.data(0, Qt.ItemDataRole.UserRole)['title']
+                column = 'title'
+            elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'image':
+                table = 'imageThumbnails'
+                title = item.data(0, Qt.ItemDataRole.UserRole)['title']
+                column = 'filename'
+                os.remove(self.image_dir + '/' + title)
             elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
                 file_name = item.data(Qt.ItemDataRole.UserRole)['file_name']
                 os.remove(self.video_dir + '/' + file_name)
@@ -613,13 +929,13 @@ class ProjectOn(QObject):
                 return
             elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
                 table = 'web'
-                description = 'Web Page'
+                title = item.data(Qt.ItemDataRole.UserRole)['title']
             else:
                 return
 
             connection = sqlite3.connect(self.database)
             cursor = connection.cursor()
-            cursor.execute('DELETE FROM ' + table + ' WHERE title="' + item.data(Qt.ItemDataRole.UserRole)['title'] + '"')
+            cursor.execute(f'DELETE FROM {table} WHERE {column}="{title}"')
             connection.commit()
             connection.close()
 

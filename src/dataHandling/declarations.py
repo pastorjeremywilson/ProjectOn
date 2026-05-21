@@ -165,7 +165,8 @@ SLIDE_DATA_DEFAULTS = {
     'auto_play': False,
     'slide_delay': 6,
     'file_name': '',
-    'url': ''
+    'url': '',
+    'folder': ''
 }
 
 SLIDE_DATA_DATA_TYPES = {
@@ -198,7 +199,8 @@ SLIDE_DATA_DATA_TYPES = {
     'auto_play': bool,
     'slide_delay': int,
     'file_name': str,
-    'url': str
+    'url': str,
+    'folder': str
 }
 
 SQL_COLUMN_TO_DICTIONARY_SONG = {
@@ -222,7 +224,8 @@ SQL_COLUMN_TO_DICTIONARY_SONG = {
     17: 'override_global',
     18: 'use_shade',
     19: 'shade_color',
-    20: 'shade_opacity'
+    20: 'shade_opacity',
+    21: 'folder'
 }
 
 SQL_COLUMN_TO_DICTIONARY_CUSTOM = {
@@ -246,7 +249,8 @@ SQL_COLUMN_TO_DICTIONARY_CUSTOM = {
     17: 'loop_audio',
     18: 'auto_play',
     19: 'slide_delay',
-    20: 'split_slides'
+    20: 'split_slides',
+    21: 'folder'
 }
 
 SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN = {
@@ -270,7 +274,8 @@ SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN = {
     'override_global': 'override_global',
     'use_shade': 'use_shade',
     'shade_color': 'shade_color',
-    'shade_opacity': 'shade_opacity'
+    'shade_opacity': 'shade_opacity',
+    'folder': 'folder'
 }
 
 SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN = {
@@ -295,4 +300,5 @@ SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN = {
     'split_slides': 'split_slides',
     'auto_play': 'auto_play',
     'slide_delay': 'slide_delay',
+    'folder': 'folder'
 }

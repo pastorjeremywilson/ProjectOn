@@ -128,7 +128,6 @@ class OpenLPImport:
                 data['ccli_song_number'] = song[7]
                 data['verse_order'] = verse_order
                 data['text'] = self.convert_lyrics(song[3])
-                data['parsed_text'] = parse_song_data(self.gui, data)
 
                 self.gui.main.save_song(data)
 

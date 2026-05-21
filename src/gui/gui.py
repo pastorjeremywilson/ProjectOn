@@ -3,6 +3,7 @@ import json
 import os
 import re
 import shutil
+import sqlite3
 import sys
 import tempfile
 from datetime import datetime
@@ -17,13 +18,12 @@ from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile, QWebEngineSettings
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
-    QGraphicsView, QGraphicsScene, QTextEdit, QApplication
-from numpy.f2py.auxfuncs import throw_error
+    QGraphicsView, QGraphicsScene, QTextEdit, QApplication, QTreeWidgetItem
 
 from dataHandling import parsers, declarations
 from dataHandling.declarations import DEFAULT_SETTINGS
-from dataHandling.getGithubEvents import get_release_notes, show_notes
-from dataHandling.parsers import parse_scripture_by_verse
+from dataHandling.getGithubEvents import show_notes
+from dataHandling.parsers import parse_song_data
 from gui.widgets.help import Help
 from importExport.importers import Importers
 from gui.widgets.liveWidget import LiveWidget
@@ -289,11 +289,12 @@ class GUI(QObject):
                     data_dir_string = '~/AppData/Roaming/ProjectOn'
 
                 self.main.data_dir = os.path.expanduser(data_dir_string)
+                device_specific_settings['data_dir'] = self.main.data_dir
+
                 if not exists(self.main.data_dir):
                     os.mkdir(self.main.data_dir)
 
-                device_specific_settings['data_dir'] = self.main.data_dir
-                shutil.copytree('resources/defaults/data', self.main.data_dir)
+                shutil.copytree('resources/defaults/data', self.main.data_dir, dirs_exist_ok=True)
 
         self.main.config_file = self.main.data_dir + '/settings.json'
         self.main.database = self.main.data_dir + '/projecton.db'
@@ -373,6 +374,16 @@ class GUI(QObject):
         self.main.settings['data_dir'] = self.main.data_dir
         if 'show_songselect_warning' in device_specific_settings.keys():
             self.main.settings['show_songselect_warning'] = device_specific_settings['show_songselect_warning']
+
+        # check that the database has the newest columns
+        result = self.main.check_database_update()
+        if not result:
+            QMessageBox.critical(
+                None,
+                'Database Update Error',
+                'An unknown error occurred while updating your database. Please try running ProjectOn again or '
+                f'copy the backup database from {self.main.data_dir}/backups to {self.main.database}.'
+            )
 
         # check for the rest of the necessary files/directories
         if not exists(self.main.database):
@@ -618,7 +629,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0.001'
+        current_version = 'v.1.10.0.002'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -834,7 +845,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0.001')
+        title_label = QLabel('ProjectOn v.1.10.0.002')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1368,12 +1379,20 @@ class GUI(QObject):
         Provides a method for sending an item, selected in the order of service list widget, to the preview list widget.
         :param QListWidgetItem item: The item selected
         """
-        if not item or not item.data(Qt.ItemDataRole.UserRole): # don't continue if there is no item or data dictionary
+        if not item: # don't continue if there is no item or data dictionary
             return
-        slide_data = item.data(Qt.ItemDataRole.UserRole).copy()
+        if type(item) == QTreeWidgetItem:
+            if not item.data(0, Qt.ItemDataRole.UserRole):
+                return
+            slide_data = item.data(0, Qt.ItemDataRole.UserRole)
+        else:
+            if not item.data(Qt.ItemDataRole.UserRole):
+                return
+            slide_data = item.data(Qt.ItemDataRole.UserRole).copy()
         self.preview_widget.slide_list.clear()
 
         if slide_data['type'] == 'song':
+            slide_data['parsed_text'] = parse_song_data(self, slide_data)
             if len(slide_data['parsed_text']) > 0:
                 for segment in slide_data['parsed_text']:
                     # reduce parsed text for this item to only this item's title and text
@@ -1398,8 +1417,11 @@ class GUI(QObject):
                 slide_data['parsed_text'] = re.split('<split>', slide_text)
             else:
                 slide_data['parsed_text'] = [slide_text]
-            item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
+            if type(item) == QTreeWidgetItem:
+                item.setData(0, Qt.ItemDataRole.UserRole, slide_data)
+            else:
+                item.setData(Qt.ItemDataRole.UserRole, slide_data)
             for text in slide_data['parsed_text']:
                 if len(text.strip()) > 0:
                     lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
@@ -1481,7 +1503,7 @@ class GUI(QObject):
                 self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
         elif slide_data['type'] == 'image':
-            lyric_widget = StandardItemWidget(self, slide_data['file_name'])
+            lyric_widget = StandardItemWidget(self, slide_data['title'])
             list_item = QListWidgetItem()
             list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
             list_item.setSizeHint(lyric_widget.sizeHint())
@@ -1558,7 +1580,7 @@ class GUI(QObject):
                     )
                 elif item_data['type'] == 'image':
                     lyric_widget = StandardItemWidget(
-                        self, item_data['file_name'], '')
+                        self, item_data['title'], '')
                 elif item_data['type'] == 'video':
                     lyric_widget = StandardItemWidget(self, item_data['file_name'], '')
                 else:
@@ -1737,8 +1759,8 @@ class GUI(QObject):
             elif item_data['type'] == 'bible':
                 display_widget.background_label.setPixmap(self.global_bible_background_pixmap)
             elif item_data['type'] == 'image':
-                if exists(self.main.image_dir + '/' + item_data['file_name']):
-                    display_widget.background_pixmap = QPixmap(self.main.image_dir + '/' + item_data['file_name'])
+                if exists(self.main.image_dir + '/' + item_data['title']):
+                    display_widget.background_pixmap = QPixmap(self.main.image_dir + '/' + item_data['title'])
             elif item_data['type'] == 'video':
                 display_widget.background_label.setStyleSheet('background: black;')
                 display_widget.background_label.clear()

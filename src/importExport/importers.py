@@ -250,7 +250,6 @@ class Importers:
                 data['author'] = author.strip()
                 data['verse_order'] = order.strip()
                 data['text'] = lyrics.strip()
-                data['parsed_text'] = parse_song_data(self.gui, data)
 
                 self.save_song(data)
 
@@ -327,7 +326,6 @@ class Importers:
                             lyric_block = re.sub(r'\s+', ' ', lyric_block)
                             lyrics += lyric_block.strip() + '\n'
                 data['text'] = lyrics
-                data['parsed_text'] = parse_song_data(self.gui, data)
 
                 self.save_song(data)
 
