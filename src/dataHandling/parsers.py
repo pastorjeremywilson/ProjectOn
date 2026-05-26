@@ -162,7 +162,7 @@ def parse_song_data(gui, song_data: dict):
         lyric_widget = gui.sample_lyric_widget
 
         lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
-        lyric_widget.footer_label.setFont(QFont(font_face, gui.global_footer_font_size))
+        lyric_widget.footer_label.setFont(QFont(font_face, gui.main.settings['footer_font_size']))
         lyric_widget.use_shadow = use_shadow
         lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
         lyric_widget.shadow_offset = shadow_offset
@@ -240,68 +240,6 @@ def parse_song_data(gui, song_data: dict):
             segments.append({'title': segment_title, 'text': segment_text})
 
     return segments
-
-def parse_scripture_item(gui, text: str):
-    """
-    Method to take a scripture passage and divide it up according to what will fit on the screen given the current
-    font and size.
-    :param GUI gui: The current instance of GUI
-    :param str text: The scripture text to be parsed
-    """
-    gui.sample_lyric_widget.lyric_label.setFont(
-        QFont(gui.global_font_face, gui.global_font_size, QFont.Weight.Bold))
-    gui.sample_lyric_widget.lyric_label.setText(
-        '<p style="text-align: center; line-height: 120%;">' + text + '<p>')
-    gui.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
-    gui.sample_lyric_widget.lyric_label.adjustSize()
-
-    slide_texts = []
-    if gui.sample_lyric_widget.lyric_label.sizeHint().height() > 920:
-        words = text.split(' ')
-
-        gui.sample_lyric_widget.lyric_label.setText('<p style="text-align: center; line-height: 120%;">')
-        gui.sample_lyric_widget.lyric_label.adjustSize()
-        count = 0
-        word_index = 0
-        segment_indices = []
-        current_segment_index = 0
-        while word_index < len(words) - 1:
-            segment_indices.append([])
-            while (gui.sample_lyric_widget.lyric_label.sizeHint().height() <= 920 and word_index < len(words) - 1):
-                if count > 0:
-                    gui.sample_lyric_widget.lyric_label.setText(
-                        gui.sample_lyric_widget.lyric_label.text().replace(
-                            '</p>', '') + ' ' + words[word_index].strip() + ' </p>')
-                else:
-                    gui.sample_lyric_widget.lyric_label.setText(
-                        '<p style="text-align: center; line-height: 120%;">' + words[
-                            word_index].strip() + ' </p>')
-                gui.sample_lyric_widget.lyric_label.adjustSize()
-                segment_indices[current_segment_index].append(word_index)
-                word_index += 1
-                count += 1
-
-            if len(segment_indices[current_segment_index]) > 1 and word_index < len(words) - 1:
-                segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
-                word_index -= 1
-                current_segment_index += 1
-            elif word_index == len(words) - 1:
-                segment_indices[current_segment_index].append(word_index)
-
-            gui.sample_lyric_widget.lyric_label.setText('<p style="text-align: center; line-height: 120%;">')
-            gui.sample_lyric_widget.lyric_label.adjustSize()
-            count = 0
-
-        for indices in segment_indices:
-            if len(indices) > 0:
-                current_segment = ''
-                for index in indices:
-                    current_segment += words[index] + ' '
-                slide_texts.append(current_segment)
-    else:
-        slide_texts.append(f'<p style="text-align: center; line-height: 120%;">{text}</p>')
-
-    return slide_texts
 
 def parse_scripture_by_verse(gui, text: str | list[str]):
     """

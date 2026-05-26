@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.003
+ProjectOn v.1.10.0.004
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -34,7 +34,7 @@ from os.path import exists
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
-    QByteArray, QBuffer, QIODevice
+    QByteArray, QBuffer, QIODevice, qInstallMessageHandler
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QTreeWidgetItem
@@ -201,7 +201,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.0.003')
+        version_label = QLabel('v.1.10.0.004')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1159,9 +1159,9 @@ class ProjectOn(QObject):
         else:
             result = [filename]
 
-        # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
-        # provide a splash
         if len(result[0]) > 0:
+            # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
+            # provide a splash
             wait_widget = SimpleSplash(self.gui, 'Loading service...')
             service_dict = None
 
@@ -1221,13 +1221,13 @@ class ProjectOn(QObject):
             for key in service_dict:
                 if key.isnumeric():
                     if service_dict[key]['type'] == 'song':
-                        try:
-                            song_item = self.gui.media_widget.song_list.findItems(
-                                service_dict[key]['title'], Qt.MatchFlag.MatchExactly)[0].clone()
-                        except IndexError:
-                            song_item = None
+                        song_items = self.gui.media_widget.song_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not song_item:
+                        if len(song_items) == 0:
                             title = service_dict[key]['title']
                             QMessageBox.information(
                                 None,
@@ -1239,7 +1239,7 @@ class ProjectOn(QObject):
                             item = QListWidgetItem('Missing song: ' + service_dict[key]['title'])
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
-                            self.gui.media_widget.add_song_to_service(song_item, from_load_service=True)
+                            self.gui.media_widget.add_song_to_service(song_items[0].clone())
 
                     elif service_dict[key]['type'] == 'bible':
                         if not self.gui.main.get_scripture:
@@ -1258,6 +1258,7 @@ class ProjectOn(QObject):
                             reference = service_dict[key]['title']
                             version = self.gui.media_widget.bible_selector_combobox.currentText()
                             self.gui.add_scripture_item(reference, passages[1], version, scripture_edited=False)
+
                     elif service_dict[key]['type'] == 'custom_bible':
                         try:
                             reference = service_dict[key]['title']
@@ -1272,13 +1273,13 @@ class ProjectOn(QObject):
                             pass
 
                     elif service_dict[key]['type'] == 'custom':
-                        try:
-                            custom_item = self.gui.media_widget.custom_list.findItems(
-                                service_dict[key]['title'], Qt.MatchFlag.MatchExactly)[0]
-                        except IndexError:
-                            custom_item = None
+                        custom_items = self.gui.media_widget.custom_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not custom_item:
+                        if len(custom_items) == 0:
                             title = service_dict[key]['title']
                             QMessageBox.information(
                                 None,
@@ -1290,50 +1291,16 @@ class ProjectOn(QObject):
                             item = QListWidgetItem('Missing custom slide: ' + service_dict[key]['title'])
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
-                            widget_item = QListWidgetItem()
-                            item_data = custom_item.data(Qt.ItemDataRole.UserRole).copy()
-                            widget_item.setData(Qt.ItemDataRole.UserRole, item_data)
-
-                            if item_data['override_global'] == 'False' or not item_data['background']:
-                                pixmap = self.gui.global_bible_background_pixmap
-                                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                                       Qt.TransformationMode.SmoothTransformation)
-                            elif item_data['background'] == 'global_song':
-                                pixmap = self.gui.global_song_background_pixmap
-                                pixmap = pixmap.scaled(
-                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            elif item_data['background'] == 'global_bible':
-                                pixmap = self.gui.global_bible_background_pixmap
-                                pixmap = pixmap.scaled(
-                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            elif 'rgb(' in item_data['background']:
-                                pixmap = QPixmap(50, 27)
-                                painter = QPainter(pixmap)
-                                brush = QBrush(QColor(item_data['background']))
-                                painter.fillRect(pixmap.rect(), brush)
-                                painter.end()
-                            else:
-                                pixmap = QPixmap(
-                                    self.gui.main.background_dir + '/' + item_data['background'])
-                                pixmap = pixmap.scaled(
-                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-
-                            widget = StandardItemWidget(
-                                self.gui, item_data['title'], 'Custom', pixmap)
-
-                            widget_item.setSizeHint(widget.sizeHint())
-                            self.gui.oos_widget.oos_list_widget.addItem(widget_item)
-                            self.gui.oos_widget.oos_list_widget.setItemWidget(widget_item, widget)
+                            self.gui.media_widget.add_custom_to_service(custom_items[0].clone())
 
                     elif service_dict[key]['type'] == 'image':
-                        image_item = None
-                        for i in range(self.gui.media_widget.image_list.count()):
-                            if (self.gui.media_widget.image_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
-                                    == service_dict[key]['title']):
-                                image_item = self.gui.media_widget.image_list.item(i).clone()
-                                break
+                        image_items = self.gui.media_widget.image_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not image_item:
+                        if len(image_items) == 0:
                             title = service_dict[key]['title']
                             QMessageBox.information(
                                 self.gui.main_window,
@@ -1345,25 +1312,16 @@ class ProjectOn(QObject):
                             item = QListWidgetItem('Missing image slide: ' + service_dict[key]['title'])
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
-                            pixmap = QPixmap(image_item.data(Qt.ItemDataRole.UserRole)['thumbnail'])
-                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                                   Qt.TransformationMode.SmoothTransformation)
-
-                            widget = StandardItemWidget(
-                                self.gui, image_item.data(Qt.ItemDataRole.UserRole)['title'], 'Image', pixmap)
-
-                            image_item.setSizeHint(widget.sizeHint())
-                            self.gui.oos_widget.oos_list_widget.addItem(image_item)
-                            self.gui.oos_widget.oos_list_widget.setItemWidget(image_item, widget)
+                            self.gui.media_widget.add_image_to_service(image_items[0].clone())
 
                     elif service_dict[key]['type'] == 'video':
-                        video_item = None
-                        for i in range(self.gui.media_widget.video_list.count()):
-                            if (self.gui.media_widget.video_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
-                                    == service_dict[key]['title']):
-                                video_item = self.gui.media_widget.video_list.item(i).clone()
+                        video_items = self.gui.media_widget.video_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not video_item:
+                        if len(video_items) == 0:
                             title = service_dict[key]['title']
                             QMessageBox.information(
                                 self.gui.main_window,
@@ -1375,27 +1333,16 @@ class ProjectOn(QObject):
                             item = QListWidgetItem('Missing video: ' + service_dict[key]['title'])
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
-                            pixmap = QPixmap(
-                                self.gui.main.video_dir + '/' + video_item.data(Qt.ItemDataRole.UserRole)['file_name'].split('.')[
-                                    0] + '.jpg')
-                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                                   Qt.TransformationMode.SmoothTransformation)
-
-                            widget = StandardItemWidget(
-                                self.gui, video_item.data(Qt.ItemDataRole.UserRole)['title'], 'Video', pixmap)
-
-                            video_item.setSizeHint(widget.sizeHint())
-                            self.gui.oos_widget.oos_list_widget.addItem(video_item)
-                            self.gui.oos_widget.oos_list_widget.setItemWidget(video_item, widget)
+                            self.gui.media_widget.add_video_to_service(video_items[0].clone())
 
                     elif service_dict[key]['type'] == 'web':
-                        web_item = None
-                        for i in range(self.gui.media_widget.web_list.count()):
-                            if (self.gui.media_widget.web_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
-                                    == service_dict[key]['title']):
-                                web_item = self.gui.media_widget.web_list.item(i)
+                        web_items = self.gui.media_widget.web_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not web_item:
+                        if len(web_items) == 0:
                             title = service_dict[key]['title']
                             QMessageBox.information(
                                 self.gui.main_window,
@@ -1407,26 +1354,7 @@ class ProjectOn(QObject):
                             item = QListWidgetItem('Missing web slide: ' + service_dict[key]['title'])
                             self.gui.oos_widget.oos_list_widget.addItem(item)
                         else:
-                            item = QListWidgetItem()
-                            item.setData(Qt.ItemDataRole.UserRole, web_item.data(Qt.ItemDataRole.UserRole).copy())
-
-                            pixmap = QPixmap(50, 27)
-                            painter = QPainter(pixmap)
-                            brush = QBrush(Qt.GlobalColor.black)
-                            pen = QPen(Qt.GlobalColor.white)
-                            painter.setPen(pen)
-                            painter.setBrush(brush)
-                            painter.fillRect(pixmap.rect(), brush)
-                            painter.setFont(self.gui.bold_font)
-                            painter.drawText(QPoint(2, 20), 'WWW')
-                            painter.end()
-
-                            widget = StandardItemWidget(
-                                self.gui, web_item.data(Qt.ItemDataRole.UserRole)['title'], 'Web', pixmap)
-
-                            item.setSizeHint(widget.sizeHint())
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
-                            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+                            self.gui.media_widget.add_web_to_service(web_items[0].clone())
 
             self.gui.current_file = result[0]
 
@@ -1704,7 +1632,7 @@ class ProjectOn(QObject):
             log_text = (f'\n{date_time}:\n' + log_text)
 
         if 'linux' in sys.platform:
-            log_location = os.path.expanduser('~/.ProjectOn/error.log')
+            log_location = os.path.expanduser('~/.config/ProjectOn/error.log')
         else:
             log_location = os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log')
 

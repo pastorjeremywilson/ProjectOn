@@ -1209,95 +1209,58 @@ class MediaWidget(QTabWidget):
 
         self.populate_video_list()
 
-    def add_song_to_service(self,
-                            item: QTreeWidgetItem | None = None,
-                            row: int | None = None,
-                            from_load_service: bool | None = False):
+    def add_song_to_service(self, item: QTreeWidgetItem | None = None, row: int | None = None):
         """
         Method to add a song QListWidgetItem to the order of service's QListWidget
         :param QListWidgetItem item: Optional: a specific song item
         :param int row: Optional: a specific row of the song widget's QListWidget
-        :param bool from_load_service: Whether this call is occurring while loading a service file
         """
         if not item and self.song_list.currentItem():
             data = self.song_list.currentItem().data(0, Qt.ItemDataRole.UserRole).copy()
             item = QListWidgetItem(data['title'])
             item.setData(Qt.ItemDataRole.UserRole, data)
+        elif not item:
+            return
+        else:
+            data = item.data(0, Qt.ItemDataRole.UserRole)
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
 
-        if item and not from_load_service:
-            # Create a thumbnail of either the global song background or the custom background associated with this song
-            data = item.data(Qt.ItemDataRole.UserRole)
-            if (not data['background']
-                    or data['background'] == 'False'
-                    or data['background'] == 'global_song'):
-                pixmap = self.gui.global_song_background_pixmap
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif data['background'] == 'global_bible':
-                pixmap = self.gui.global_bible_background_pixmap
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            elif 'rgb(' in data['background']:
-                pixmap = QPixmap(50, 27)
-                painter = QPainter(pixmap)
-                rgb = data['background'].replace('rgb(', '')
-                rgb = rgb.replace(')', '')
-                rgb_split = rgb.split(',')
-                brush = QBrush(QColor.fromRgb(
-                    int(rgb_split[0].strip()), int(rgb_split[1].strip()), int(rgb_split[2].strip())))
-                painter.setBrush(brush)
-                painter.fillRect(pixmap.rect(), brush)
-                painter.end()
-            else:
-                pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-
-            widget = StandardItemWidget(self.gui, data['title'], 'Song', pixmap)
-
-            item.setSizeHint(widget.sizeHint())
-            if not row:
-                self.gui.oos_widget.oos_list_widget.addItem(item)
-            else:
-                self.gui.oos_widget.oos_list_widget.insertItem(row, item)
-            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
-            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
-            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
-            self.gui.changes = True
-
-        if item and from_load_service:
-            # handle this differently if it's being created while loading a service file
-            data = item.data(Qt.ItemDataRole.UserRole).copy()
-            widget_item = QListWidgetItem(data['title'])
-            widget_item.setData(Qt.ItemDataRole.UserRole, data)
-
-            if (data['override_global'] == 'False'
-                or not data['background']
-                or data['background'] == 'False'
+        # Create a thumbnail of either the global song background or the custom background associated with this song
+        if (not data['background']
+                or data['background'] is False
                 or data['background'] == 'global_song'):
-                pixmap = self.gui.global_song_background_pixmap
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                       Qt.TransformationMode.SmoothTransformation)
-            elif data['background'] == 'global_bible':
-                pixmap = self.gui.global_bible_background_pixmap
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                       Qt.TransformationMode.SmoothTransformation)
-            elif 'rgb(' in data['background']:
-                pixmap = QPixmap(50, 27)
-                painter = QPainter(pixmap)
-                brush = QBrush(QColor(data['background']))
-                painter.setBrush(brush)
-                painter.fillRect(pixmap.rect(), brush)
-                painter.end()
-            else:
-                pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
-                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                       Qt.TransformationMode.SmoothTransformation)
+            pixmap = self.gui.global_song_background_pixmap
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        elif data['background'] == 'global_bible':
+            pixmap = self.gui.global_bible_background_pixmap
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        elif 'rgb(' in data['background']:
+            pixmap = QPixmap(50, 27)
+            painter = QPainter(pixmap)
+            rgb = data['background'].replace('rgb(', '')
+            rgb = rgb.replace(')', '')
+            rgb_split = rgb.split(',')
+            brush = QBrush(QColor.fromRgb(
+                int(rgb_split[0].strip()), int(rgb_split[1].strip()), int(rgb_split[2].strip())))
+            painter.setBrush(brush)
+            painter.fillRect(pixmap.rect(), brush)
+            painter.end()
+        else:
+            pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
+            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-            widget = StandardItemWidget(self.gui, data['title'], 'Song', pixmap)
+        widget = StandardItemWidget(self.gui, data['title'], 'Song', pixmap)
 
-            widget_item.setSizeHint(widget.sizeHint())
-            self.gui.oos_widget.oos_list_widget.addItem(widget_item)
-            self.gui.oos_widget.oos_list_widget.setItemWidget(widget_item, widget)
-            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
-            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
+        item.setSizeHint(widget.sizeHint())
+        if not row:
+            self.gui.oos_widget.oos_list_widget.addItem(item)
+        else:
+            self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+        self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+        self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
+        self.gui.changes = True
 
     def add_scripture_to_service(self):
         """
@@ -1340,11 +1303,12 @@ class MediaWidget(QTabWidget):
             data = self.custom_list.currentItem().data(0, Qt.ItemDataRole.UserRole)
             item = QListWidgetItem(data['title'])
             item.setData(Qt.ItemDataRole.UserRole, data)
-        elif not item and not self.custom_list.currentItem():
+        elif not item:
             return
         else:
             data = item.data(0, Qt.ItemDataRole.UserRole)
-            item.setData(0, Qt.ItemDataRole.DisplayRole, data['title'])
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
 
         if data['override_global'] == 'False' or not data['background']:
             pixmap = self.gui.global_bible_background_pixmap
@@ -1366,6 +1330,7 @@ class MediaWidget(QTabWidget):
             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
         widget = StandardItemWidget(self.gui, data['title'], 'Custom Slide', pixmap)
+
         item.setSizeHint(widget.sizeHint())
         if not row:
             self.gui.oos_widget.oos_list_widget.addItem(item)
@@ -1382,16 +1347,16 @@ class MediaWidget(QTabWidget):
         :param QListWidgetItem item: Optional: a specific image item
         :param int row: Optional: a specific row of the image widget's QListWidget
         """
-        add_item = False
-        if not self.image_list.currentItem():
-            return
-
-        data = self.image_list.currentItem().data(0, Qt.ItemDataRole.UserRole).copy()
-        if not item:
+        if not item and self.custom_list.currentItem():
+            data = self.image_list.currentItem().data(0, Qt.ItemDataRole.UserRole)
             item = QListWidgetItem(data['title'])
-            add_item = True
-
-        item.setData(Qt.ItemDataRole.UserRole, data)
+            item.setData(Qt.ItemDataRole.UserRole, data)
+        elif not item:
+            return
+        else:
+            data = item.data(0, Qt.ItemDataRole.UserRole)
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.DisplayRole, data['title'])
 
         pixmap = data['background']
         pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
@@ -1399,7 +1364,7 @@ class MediaWidget(QTabWidget):
         widget = StandardItemWidget(self.gui, data['title'], 'Image', pixmap)
 
         item.setSizeHint(widget.sizeHint())
-        if add_item:
+        if not row:
             self.gui.oos_widget.oos_list_widget.addItem(item)
         else:
             self.gui.oos_widget.oos_list_widget.insertItem(row, item)
@@ -1414,29 +1379,31 @@ class MediaWidget(QTabWidget):
         :param QListWidgetItem item: Optional: a specific video item
         :param int row: Optional: a specific row of the video widget's QListWidget
         """
-        add_item = False
-        if not self.video_list.currentItem():
+        if not item and self.custom_list.currentItem():
+            data = self.video_list.currentItem().data(0, Qt.ItemDataRole.UserRole)
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
+        elif not item:
             return
-
-        if not item:
-            item = QListWidgetItem()
-            add_item = True
-        slide_data = self.video_list.currentItem().data(0, Qt.ItemDataRole.UserRole).copy()
-        item.setData(Qt.ItemDataRole.UserRole, slide_data)
+        else:
+            data = item.data(0, Qt.ItemDataRole.UserRole)
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.DisplayRole, data['title'])
 
         pixmap = QPixmap(
-            self.gui.main.video_dir + '/' + slide_data['file_name'].split('.')[0] + '.jpg')
+            self.gui.main.video_dir + '/' + data['file_name'].split('.')[0] + '.jpg')
         pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                Qt.TransformationMode.SmoothTransformation)
 
         widget = StandardItemWidget(
-            self.gui, slide_data['title'].split('.')[0], 'Video', pixmap)
+            self.gui, data['title'].split('.')[0], 'Video', pixmap)
 
         item.setSizeHint(widget.sizeHint())
-        if add_item:
+        if not row:
             self.gui.oos_widget.oos_list_widget.addItem(item)
         else:
             self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
         self.gui.oos_widget.oos_list_widget.scrollToItem(item)
         self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
@@ -1448,14 +1415,16 @@ class MediaWidget(QTabWidget):
         :param QListWidgetItem item: Optional: a specific web item
         :param int row: Optional: a specific row of the web widget's QListWidget
         """
-        add_item = False
-        if not self.web_list.currentItem():
+        if not item and self.custom_list.currentItem():
+            data = self.web_list.currentItem().data(0, Qt.ItemDataRole.UserRole)
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
+        elif not item:
             return
-
-        if not item:
-            item = QListWidgetItem()
-            add_item = True
-        item.setData(Qt.ItemDataRole.UserRole, self.web_list.currentItem().data(0, Qt.ItemDataRole.UserRole).copy())
+        else:
+            data = item.data(0, Qt.ItemDataRole.UserRole)
+            item = QListWidgetItem(data['title'])
+            item.setData(Qt.ItemDataRole.DisplayRole, data['title'])
 
         pixmap = QPixmap(50, 27)
         painter = QPainter(pixmap)
@@ -1469,14 +1438,14 @@ class MediaWidget(QTabWidget):
         painter.end()
 
         widget = StandardItemWidget(
-            self.gui, item.data(
-                Qt.ItemDataRole.UserRole)['title'], item.data(Qt.ItemDataRole.UserRole)['url'], pixmap)
+            self.gui, data['title'], data['url'], pixmap)
 
         item.setSizeHint(widget.sizeHint())
-        if add_item:
+        if not row:
             self.gui.oos_widget.oos_list_widget.addItem(item)
         else:
             self.gui.oos_widget.oos_list_widget.insertItem(row, item)
+
         self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
         self.gui.oos_widget.oos_list_widget.scrollToItem(item)
         self.gui.oos_widget.oos_list_widget.setCurrentItem(item)

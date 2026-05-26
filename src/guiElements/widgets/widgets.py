@@ -800,7 +800,7 @@ class FontWidget(QWidget):
 
     def change_font(self, value: int | None = None):
         """
-        applies the currently chosen font settings to guiElements's global_font_face, global_footer_font_face, and settings
+        updates ProjectOn.settings to the user's selected font settings
         """
 
         shadow_color = None
@@ -819,8 +819,6 @@ class FontWidget(QWidget):
                     outline_width = value
 
             new_font_face = self.font_face_combobox.currentText()
-            self.gui.global_font_face = new_font_face
-            self.gui.global_footer_font_face = new_font_face
 
             self.gui.main.settings[f'{self.slide_type}_font_face'] = self.font_face_combobox.currentText()
             self.gui.main.settings[f'{self.slide_type}_font_size'] = self.font_size_spinbox.value()
@@ -1510,7 +1508,8 @@ class NewFontWidget(QWidget):
         self.blockSignals(True)
 
         font_face = self.gui.main.settings[f'{self.slide_type}_font_face']
-        self.font_face_combobox.setCurrentIndex(self.font_face_combobox.findText(font_face))
+        self.font_face_combobox.setCurrentIndex(
+            self.font_face_combobox.findText(font_face, Qt.MatchFlag.MatchFixedString))
 
         self.font_size_spinbox.setValue(self.gui.main.settings[f'{self.slide_type}_font_size'])
 
@@ -1557,7 +1556,7 @@ class NewFontWidget(QWidget):
 
     def change_font(self, value: int | None = None):
         """
-        applies the currently chosen font settings to guiElements's global_font_face, global_footer_font_face, and settings
+        updates ProjectOn.settings to the user's selected font settings
         """
 
         shadow_color = None
@@ -1575,10 +1574,7 @@ class NewFontWidget(QWidget):
                 elif self.sender().objectName() == 'outline_width_slider':
                     outline_width = value
 
-            #new_font_face = self.font_list_widget.currentItem().data(20)
             new_font_face = self.font_face_combobox.currentText()
-            self.gui.global_font_face = new_font_face
-            self.gui.global_footer_font_face = new_font_face
 
             self.gui.main.settings[f'{self.slide_type}_font_face'] = self.font_face_combobox.currentText()
             self.gui.main.settings[f'{self.slide_type}_font_size'] = self.font_size_spinbox.value()
@@ -3385,6 +3381,26 @@ class IndexedSettingsWidget(QWidget):
         stage_font_layout.addWidget(self.stage_font_spinbox)
         stage_font_layout.addStretch()
 
+        footer_font_group_box = QGroupBox()
+        footer_font_group_box.setTitle('Footer Font Settings')
+        footer_font_group_box.setFont(self.gui.standard_font)
+        footer_font_layout = QHBoxLayout(footer_font_group_box)
+        layout.addWidget(footer_font_group_box)
+        layout.addSpacing(20)
+
+        footer_font_label = QLabel('Footer Font Size:')
+        footer_font_label.setFont(self.gui.bold_font)
+        footer_font_layout.addWidget(footer_font_label)
+
+        self.footer_font_spinbox = QSpinBox()
+        self.footer_font_spinbox.setRange(8, 60)
+        self.footer_font_spinbox.setMinimumSize(60, 30)
+        self.footer_font_spinbox.setFont(self.gui.standard_font)
+        self.footer_font_spinbox.installEventFilter(self)
+        self.footer_font_spinbox.setValue(24)
+        footer_font_layout.addWidget(self.footer_font_spinbox)
+        footer_font_layout.addStretch()
+
         self.song_font_settings_widget = NewFontWidget(self.gui, 'song', draw_border=False)
         song_font_group_box = QGroupBox()
         song_font_group_box.setTitle('Song Font Settings')
@@ -3967,6 +3983,9 @@ class IndexedSettingsWidget(QWidget):
                 if 'stage_font_size' in self.gui.main.settings.keys():
                     self.stage_font_spinbox.setValue(int(self.gui.main.settings['stage_font_size']))
 
+                if 'footer_font_size' in self.gui.main.settings.keys():
+                    self.footer_font_spinbox.setValue(int(self.gui.main.settings['footer_font_size']))
+
                 self.song_background_combobox.blockSignals(True)
                 self.bible_background_combobox.blockSignals(True)
                 self.logo_background_combobox.blockSignals(True)
@@ -4047,6 +4066,7 @@ class IndexedSettingsWidget(QWidget):
         )
         self.gui.main.settings['ccli_num'] = self.ccli_line_edit.text()
         self.gui.main.settings['stage_font_size'] = self.stage_font_spinbox.value()
+        self.gui.main.settings['footer_font_size'] = self.footer_font_spinbox.value()
         self.gui.main.settings['update_fps'] = self.fps_button_group.id(self.fps_button_group.checkedButton())
 
         if self.stage_display_button_group.checkedId() == 0:
