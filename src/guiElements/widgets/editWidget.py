@@ -766,7 +766,7 @@ class EditWidget(QDialog):
                 shade_opacity = self.gui.main.settings['song_shade_opacity']
 
         lyric_widget.setFont(QFont(font_face, font_size))
-        lyric_widget.footer_label.setFont(QFont(font_face, self.gui.global_footer_font_size))
+        lyric_widget.footer_label.setFont(QFont(font_face, self.gui.main.settings['footer_font_size']))
         lyric_widget.use_shadow = use_shadow
         lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
         lyric_widget.shadow_offset = shadow_offset

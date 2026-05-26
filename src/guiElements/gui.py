@@ -82,12 +82,6 @@ class GUI(QObject):
     list_title_font = QFont('Helvetica', 10, QFont.Weight.Bold)
     list_font = QFont('Helvetica', 10)
     toolbar_icon_size = QSize(36, 36)
-    global_font_face = 'Helvetica'
-    global_font_size = 48
-    global_font_color = 'rgb(255, 255, 255)'
-    global_footer_font_face = 'Helvetica'
-    global_footer_font_size = 24
-    stage_font_size = 60
     block_remote_input = False
     black_display = False
     current_display_background_color = None
@@ -352,6 +346,10 @@ class GUI(QObject):
                 self.main.settings.pop('outline_width')
 
                 self.main.save_settings()
+
+            # make sure the new footer font size key exists; set it if not
+            if 'footer_font_size' not in self.main.settings.keys():
+                self.main.settings['footer_font_size'] = 24
 
         else:
             self.main.settings = default_settings
@@ -634,7 +632,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0.003'
+        current_version = 'v.1.10.0.004'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -850,7 +848,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_layout.addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0.003')
+        title_label = QLabel('ProjectOn v.1.10.0.004')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_layout.addWidget(title_label)
         title_layout.addStretch()
@@ -1129,7 +1127,6 @@ class GUI(QObject):
                     if (self.main.settings['global_bible_background']
                             in self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole)):
                         index = i
-
             # set the bible background combobox to the saved bible background
             if index and not index == -1:
                 self.tool_bar.bible_background_combobox.setCurrentIndex(index)
@@ -1137,6 +1134,7 @@ class GUI(QObject):
                 pixmap = QPixmap(self.main.background_dir + '/' + self.main.settings['global_bible_background'])
                 pixmap = self.size_background_to_screen(pixmap)
                 self.global_bible_background_pixmap = pixmap
+
             # show a message and set to default if the song background wasn't found
             else:
                 if not self.main.settings["global_song_background"] == 'choose_global':
@@ -1317,6 +1315,8 @@ class GUI(QObject):
         """
         Provides a message box if the server check has failed.
         """
+        self.main.server_check_timer.keep_checking = False
+        self.main.server_check_timer.stop()
         QMessageBox.critical(
             self.main_window,
             'Server Error',
@@ -1431,7 +1431,7 @@ class GUI(QObject):
             if type(item) == QTreeWidgetItem:
                 item.setData(0, Qt.ItemDataRole.UserRole, slide_data)
             else:
-                item.setData(0, Qt.ItemDataRole.UserRole, slide_data)
+                item.setData(Qt.ItemDataRole.UserRole, slide_data)
             for text in slide_data['parsed_text']:
                 if len(text.strip()) > 0:
                     lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
@@ -1804,9 +1804,9 @@ class GUI(QObject):
             # set the font
             if 'override_global' in item_data.keys() and item_data['override_global']:
                 lyric_widget.setFont(QFont(item_data['font_family'], item_data['font_size']))
-                font_color = self.get_font_color(item_data['font_color'], item_data['type'])
+                font_color = self.get_qcolor_from_str(item_data['font_color'], item_data['type'])
                 lyric_widget.fill_color = font_color
-                lyric_widget.footer_label.setFont(QFont(item_data['font_family'], self.global_footer_font_size))
+                lyric_widget.footer_label.setFont(QFont(item_data['font_family'], self.main.settings['footer_font_size']))
                 lyric_widget.use_shadow = item_data['use_shadow']
                 lyric_widget.shadow_color = QColor(
                     item_data['shadow_color'], item_data['shadow_color'], item_data['shadow_color'])
@@ -1822,11 +1822,16 @@ class GUI(QObject):
                 slide_type = item_data['type']
                 if not slide_type == 'song':
                     slide_type = 'bible'
+
+                # Set the main font, the footer font, and the font color
                 lyric_widget.setFont(
-                    QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings['bible_font_size']))
-                lyric_widget.footer_label.setFont(QFont(self.global_footer_font_face, self.global_footer_font_size))
-                font_color = self.get_font_color(self.main.settings[f'{slide_type}_font_color'], item_data['type'])
+                    QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings[f'{slide_type}_font_size']))
+                lyric_widget.footer_label.setFont(
+                    QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings['footer_font_size']))
+                font_color = self.get_qcolor_from_str(self.main.settings[f'{slide_type}_font_color'], item_data['type'])
                 lyric_widget.fill_color = font_color
+
+                # Set the font shadow
                 lyric_widget.use_shadow = self.main.settings[f'{slide_type}_use_shadow']
                 lyric_widget.shadow_color = QColor(
                     self.main.settings[f'{slide_type}_shadow_color'],
@@ -1834,6 +1839,8 @@ class GUI(QObject):
                     self.main.settings[f'{slide_type}_shadow_color']
                 )
                 lyric_widget.shadow_offset = self.main.settings[f'{slide_type}_shadow_offset']
+
+                # Set the font outline
                 lyric_widget.use_outline = self.main.settings[f'{slide_type}_use_outline']
                 lyric_widget.outline_color = QColor(
                     self.main.settings[f'{slide_type}_outline_color'],
@@ -1841,6 +1848,8 @@ class GUI(QObject):
                     self.main.settings[f'{slide_type}_outline_color']
                 )
                 lyric_widget.outline_width = self.main.settings[f'{slide_type}_outline_width']
+
+                # Set the shading behind the text
                 lyric_widget.use_shade = self.main.settings[f'{slide_type}_use_shade']
                 lyric_widget.shade_color = self.main.settings[f'{slide_type}_shade_color']  # needs to be sent as an integer so opacity can be set by the lyric widget
                 lyric_widget.shade_opacity = self.main.settings[f'{slide_type}_shade_opacity']
@@ -1875,7 +1884,8 @@ class GUI(QObject):
                 lyric_widget.footer_label.setText('')
                 lyric_widget.footer_label.clear()
 
-            if lyric_widget.footer_label.text() == '':
+            # Hide the footer label if the string is empty
+            if lyric_widget.footer_label.text().strip() == '':
                 lyric_widget.footer_label.hide()
 
             # hide or show the appropriate widgets
@@ -2061,7 +2071,7 @@ class GUI(QObject):
 
                 self.preview_widget.preview_label.setPixmap(pixmap)
 
-    def get_font_color(self, font_color: str, slide_type: str):
+    def get_qcolor_from_str(self, font_color: str, slide_type: str):
         """
         Method to convert a string font color to a QColor object
         :param font_color: String font color (white, rgb(255, 255, 255), #ffffff, etc.)

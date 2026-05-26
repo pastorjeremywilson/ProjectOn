@@ -190,20 +190,21 @@ class RemoteServer:
         remote_oos_buttons = ''
         current_row = self.gui.oos_widget.oos_list_widget.currentRow()
         for i in range(self.gui.oos_widget.oos_list_widget.count()):
-            title = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title']
+            if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole):
+                title = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title']
 
-            if i == current_row:
-                class_tag = 'class="current" '
-            else:
-                class_tag = ''
+                if i == current_row:
+                    class_tag = 'class="current" '
+                else:
+                    class_tag = ''
 
-            remote_oos_buttons += f"""
-                <button id="oos{str(i)}" {class_tag}type="button" name="oos_button" value="{str(i)}" onclick="oosClick(event)">
-                    <span class="title">
-                        {title}
-                    </span>
-                </button>
-                <br />"""
+                remote_oos_buttons += f"""
+                    <button id="oos{str(i)}" {class_tag}type="button" name="oos_button" value="{str(i)}" onclick="oosClick(event)">
+                        <span class="title">
+                            {title}
+                        </span>
+                    </button>
+                    <br />"""
 
         slide_buttons = ''
         current_row = self.gui.live_widget.slide_list.currentRow()
