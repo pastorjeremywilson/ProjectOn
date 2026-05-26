@@ -9,7 +9,7 @@ from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSigna
     QModelIndex, QObject
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics, QFocusEvent, QMouseEvent, QResizeEvent, \
-    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument
+    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
@@ -4581,11 +4581,11 @@ class Toolbar(QWidget):
 
 
 class CustomTreeWidget(QTreeWidget):
-    def __init__(self, gui, parent=None):
+    def __init__(self, gui, parent: QWidget = None):
         super().__init__(parent)
         self.gui = gui
-        self.copied_items = None
         self.sorting = False
+        self.available_folders = []
 
         self.header().hide()
 
@@ -4598,7 +4598,7 @@ class CustomTreeWidget(QTreeWidget):
         self.currentItemChanged.connect(self.current_item_changed)
         self.setSelectionMode(self.SelectionMode.ExtendedSelection)
 
-    def add_item(self, item_text: str, item_data: dict, item_pixmap: QPixmap=None, item_parent: QTreeWidgetItem=None):
+    def add_item(self, item_text: str, item_data: dict, item_pixmap: QPixmap = None, item_parent: QTreeWidgetItem = None):
         widget = QWidget()
         layout = QHBoxLayout(widget)
 
@@ -4624,7 +4624,7 @@ class CustomTreeWidget(QTreeWidget):
 
         return item
 
-    def add_folder(self, name=None, from_populate=False):
+    def add_folder(self, name: str = None, from_populate: bool = False):
         if not name:
             result = self.get_folder_name()
             if result == -1:
@@ -4670,6 +4670,9 @@ class CustomTreeWidget(QTreeWidget):
             self.custom_sort()
             self.scrollToItem(item)
 
+        self.available_folders.append(name)
+        self.available_folders.sort()
+
         return item
 
     def show_context_menu(self):
@@ -4677,14 +4680,19 @@ class CustomTreeWidget(QTreeWidget):
         item = self.currentItem()
         item_data = item.data(0, Qt.ItemDataRole.UserRole)
         menu = QMenu()
+        menu.setToolTipsVisible(True)
 
         if not item_data['type'] == 'folder':
-            copy_action = menu.addAction('Copy')
-            copy_action.triggered.connect(lambda: self.copy_item(click_pos))
+            move_menu = menu.addMenu('Move to folder...')
+            for folder in self.available_folders:
+                action = move_menu.addAction(folder)
+                action.setObjectName(folder)
+                action.triggered.connect(self.move_items)
 
-        if self.copied_items:
-            paste_action = menu.addAction('Paste')
-            paste_action.triggered.connect(lambda: self.paste_item(click_pos))
+        if type(item.parent()) == QTreeWidgetItem:
+            action = menu.addAction('Move out of folder')
+            action.setToolTip('Removes this item from its folder and moves it back into the main list')
+            action.triggered.connect(lambda: self.complete_move(self.selectedItems()))
 
         menu.addSeparator()
 
@@ -4717,9 +4725,12 @@ class CustomTreeWidget(QTreeWidget):
                     edit_action.triggered.connect(self.edit_song)
             menu.addAction(edit_action)
         else:
-            rename_action = QAction('Rename Folder')
+            rename_action = menu.addAction('Rename Folder')
             rename_action.triggered.connect(self.rename_folder)
-            menu.addAction(rename_action)
+
+            empty_action = menu.addAction('Empty Folder')
+            empty_action.setToolTip('Move all items in this folder to the main list')
+            empty_action.triggered.connect(self.empty_folder)
 
         delete_action = None
         if item_data['type'] == 'image':
@@ -4753,28 +4764,18 @@ class CustomTreeWidget(QTreeWidget):
         if self.currentItem():
             self.gui.send_to_preview(self.currentItem())
 
-    def copy_item(self, click_pos):
-        self.copied_items = self.selectedItems()
-
-    def paste_item(self, click_pos):
-        if not self.copied_items:
+    def move_items(self):
+        if len(self.selectedItems()) == 0:
             return
+        folder_name = self.sender().objectName()
 
-        target_item = self.itemAt(self.mapFromGlobal(click_pos))
-        target_item_data = None
-        if target_item:
-            target_item_data = target_item.data(0, Qt.ItemDataRole.UserRole)
-
-        if ((not target_item_data or not target_item_data['type'] == 'folder')
-                and self.rect().contains(self.mapFromGlobal(click_pos))):
-            self.complete_move(self.copied_items)
-        elif target_item_data and target_item_data['type'] == 'folder':
-            self.complete_move(self.copied_items, target_item)
-
-        self.copied_items = None
+        target_items = self.findItems(folder_name, Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive, 0)
+        if len(target_items) == 0:
+            return
+        self.complete_move(self.selectedItems(), target_items[0])
         self.custom_sort()
 
-    def complete_move(self, items, target_item=None):
+    def complete_move(self, items: list[QTreeWidgetItem], target_item: QTreeWidgetItem = None):
         if not items:
             return
 
@@ -4974,11 +4975,24 @@ class CustomTreeWidget(QTreeWidget):
             return
 
         item = self.currentItem()
-        item.setData(0, Qt.ItemDataRole.DisplayRole, result)
+        data = item.data(0, Qt.ItemDataRole.UserRole)
+        old_name = data['title']
+        data['title'] = result
+        item.setData(0, Qt.ItemDataRole.DisplayRole, data)
         widget = self.itemWidget(item, 0)
         widget.findChild(QLabel, 'title_label').setText(result)
 
+        self.available_folders.remove(old_name)
+        self.available_folders.append(result)
+        self.available_folders.sort()
+
         self.custom_sort()
+
+    def empty_folder(self):
+        children = []
+        for i in range(self.currentItem().childCount()):
+            children.append(self.currentItem().child(i))
+        self.complete_move(children)
 
     def get_folder_name(self):
         dialog = QDialog(self.gui.main_window)
@@ -5020,15 +5034,41 @@ class CustomTreeWidget(QTreeWidget):
         """
         Method to remove an item from this widget. Creates a QMessageBox to confirm removal.
         """
-        if not self.currentItem():
+        if len(self.selectedItems()) == 0:
             return
 
-        data = self.currentItem().data(0, Qt.ItemDataRole.UserRole)
-        title = data['title']
-        if data['type'] == 'folder':
-            message = f'Really delete the {data['title']} folder? All items in the folder will be kept.'
+        items = self.selectedItems()
+
+        titles = []
+        has_folder = False
+        for item in items:
+            titles.append(item.data(0, Qt.ItemDataRole.UserRole)['title'])
+            if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder':
+                has_folder = True
+        title_count = len(titles)
+
+        if title_count == 0:
+            return
+        elif title_count == 1:
+            titles = titles[0]
+        elif title_count == 2:
+            titles = ' and '.join(titles)
         else:
-            message = f'Really delete {data['title']}? This action cannot be undone.'
+            if title_count > 3:
+                truncated_titles = titles[:3]
+                remaining_count = title_count - 3
+                if remaining_count == 1:
+                    titles = f'{", ".join(truncated_titles)}, and {remaining_count} more item'
+                else:
+                    titles = f'{", ".join(truncated_titles)}, and {remaining_count} more items'
+            else:
+                titles = f'{", ".join(titles[:-1])}, and {titles[-1]}'
+
+        if has_folder:
+            message = (f'Really delete {titles}? All items contained in selected folders will also be deleted. '
+                       f'This action cannot be undone')
+        else:
+            message = f'Really delete {titles}? This action cannot be undone.'
 
         response = QMessageBox.question(
             self.gui.main_window,
@@ -5037,37 +5077,49 @@ class CustomTreeWidget(QTreeWidget):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
         )
 
-        if response == QMessageBox.StandardButton.Yes:
-            if data['type'] == 'folder':
-                # first, move all of the items out of this folder and into the top level
-                children = []
-                for i in range(self.currentItem().childCount()):
-                    children.append(self.currentItem().child(i))
-                self.complete_move(children)
+        if not response == QMessageBox.StandardButton.Yes:
+            return
 
-                # remove the folder from its parent or the top level
-                if self.currentItem().parent():
-                    self.currentItem().parent().removeChild(self.currentItem())
-                else:
-                    self.takeTopLevelItem(self.indexOfTopLevelItem(self.currentItem()))
+        # remove the selected items from the database
+        items_to_delete_from_db = set()
+        for item in items:
+            if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder':
+                for i in range(item.childCount()):
+                    items_to_delete_from_db.add(item.child(i))
             else:
-                thread = threading.Thread(target=self.gui.main.delete_item, args=(self.currentItem(),))
-                thread.start()
-                thread.join()
+                items_to_delete_from_db.add(item)
+        self.gui.main.delete_items_from_db(list(items_to_delete_from_db))
 
-                self.model().removeRows(self.currentIndex().row(), 1)
+        # remove each selected item from the tree
+        for item in items:
+            if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder':
+                children = item.takeChildren()
+                children.clear()
 
-                QMessageBox.information(
-                    self.gui.main_window,
-                    'Removed',
-                    f'{title} has been removed.',
-                    QMessageBox.StandardButton.Ok
-                )
+            parent = item.parent()
+            if parent:
+                parent.removeChild(item)
+            else:
+                index = self.indexOfTopLevelItem(item)
+                if index != -1:
+                    detached = self.takeTopLevelItem(index)
+                    del detached
 
-            self.gui.preview_widget.slide_list.clear()
+        if len(titles) == 1:
+            message = f'{titles} has been removed.'
+        else:
+            message = f'{titles} have been removed.'
+        QMessageBox.information(
+            self.gui.main_window,
+            'Removed',
+            message,
+            QMessageBox.StandardButton.Ok
+        )
+
+        self.gui.preview_widget.slide_list.clear()
         self.custom_sort()
 
-    def dropEvent(self, evt):
+    def dropEvent(self, evt: QDropEvent):
         target_item = self.itemAt(evt.pos())
         target_item_data = None
         if target_item:
@@ -5078,7 +5130,7 @@ class CustomTreeWidget(QTreeWidget):
         elif target_item_data and target_item_data['type'] == 'folder':
             self.complete_move(self.selectedItems(), target_item)
 
-    def mouseDoubleClickEvent(self, evt):
+    def mouseDoubleClickEvent(self, evt: QMouseEvent):
         """
         Overrides mouseDoubleClickEvent to provide the ability to add an item to the order of service upon double-click.
         :param QMouseEvent evt: mouseEvent
