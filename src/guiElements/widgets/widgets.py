@@ -1748,7 +1748,7 @@ class OffsetSlider(QWidget):
         self.offset_slider = CustomSlider()
         self.offset_slider.setOrientation(Qt.Orientation.Horizontal)
         self.offset_slider.setFont(self.gui.list_font)
-        self.offset_slider.setRange(0, 15)
+        self.offset_slider.setRange(1, 15)
         self.offset_slider.setValue(self.gui.shadow_offset)
         self.offset_slider.installEventFilter(self)
         slider_layout.addWidget(self.offset_slider, 0, 0, 1, 3)

@@ -1356,7 +1356,7 @@ class MediaWidget(QTabWidget):
         else:
             data = item.data(0, Qt.ItemDataRole.UserRole)
             item = QListWidgetItem(data['title'])
-            item.setData(Qt.ItemDataRole.DisplayRole, data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
 
         pixmap = data['background']
         pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
@@ -1388,7 +1388,7 @@ class MediaWidget(QTabWidget):
         else:
             data = item.data(0, Qt.ItemDataRole.UserRole)
             item = QListWidgetItem(data['title'])
-            item.setData(Qt.ItemDataRole.DisplayRole, data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
 
         pixmap = QPixmap(
             self.gui.main.video_dir + '/' + data['file_name'].split('.')[0] + '.jpg')
@@ -1424,17 +1424,18 @@ class MediaWidget(QTabWidget):
         else:
             data = item.data(0, Qt.ItemDataRole.UserRole)
             item = QListWidgetItem(data['title'])
-            item.setData(Qt.ItemDataRole.DisplayRole, data['title'])
+            item.setData(Qt.ItemDataRole.UserRole, data)
 
         pixmap = QPixmap(50, 27)
+        pixmap.fill(QColor(255, 255, 255, 50))
+        icon = QPixmap('resources/gui_icons/web_icon.svg')
+        icon = icon.scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
         painter = QPainter(pixmap)
-        brush = QBrush(Qt.GlobalColor.black)
-        pen = QPen(Qt.GlobalColor.white)
-        painter.setPen(pen)
-        painter.setBrush(brush)
-        painter.fillRect(pixmap.rect(), brush)
-        painter.setFont(self.gui.bold_font)
-        painter.drawText(QPoint(2, 20), 'WWW')
+        icon_loc = QPoint(
+            int(pixmap.width() / 2 - icon.width() / 2),
+            int(pixmap.height() / 2 - icon.height() / 2)
+        )
+        painter.drawPixmap(icon_loc, icon)
         painter.end()
 
         widget = StandardItemWidget(

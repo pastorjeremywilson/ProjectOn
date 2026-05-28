@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.005
+ProjectOn v.1.10.0.006
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import base64
 import threading
 import json
 import logging
@@ -201,7 +202,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.0.005')
+        version_label = QLabel('v.1.10.0.006')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -1024,102 +1025,172 @@ class ProjectOn(QObject):
             )
             return 0
 
-        try:
-            service_items = {
-                'global_song_background': self.settings['global_song_background'],
-                'global_bible_background': self.settings['global_bible_background'],
-                'song_font_face': self.settings['song_font_face'],
-                'song_font_size': self.settings['song_font_size'],
-                'song_font_color': self.settings['song_font_color'],
-                'song_use_shadow': self.settings['song_use_shadow'],
-                'song_shadow_color': self.settings['song_shadow_color'],
-                'song_shadow_offset': self.settings['song_shadow_offset'],
-                'song_use_outline': self.settings['song_use_outline'],
-                'song_outline_color': self.settings['song_outline_color'],
-                'song_outline_width': self.settings['song_outline_width'],
-                'song_use_shade': self.settings['song_use_shade'],
-                'song_shade_color': self.settings['song_shade_color'],
-                'song_shade_opacity': self.settings['song_shade_opacity'],
-                'bible_font_face': self.settings['bible_font_face'],
-                'bible_font_size': self.settings['bible_font_size'],
-                'bible_font_color': self.settings['bible_font_color'],
-                'bible_use_shadow': self.settings['bible_use_shadow'],
-                'bible_shadow_color': self.settings['bible_shadow_color'],
-                'bible_shadow_offset': self.settings['bible_shadow_offset'],
-                'bible_use_outline': self.settings['bible_use_outline'],
-                'bible_outline_color': self.settings['bible_outline_color'],
-                'bible_outline_width': self.settings['bible_outline_width'],
-                'bible_use_shade': self.settings['bible_use_shade'],
-                'bible_shade_color': self.settings['bible_shade_color'],
-                'bible_shade_opacity': self.settings['bible_shade_opacity']
+        service_items = {
+            'global_song_background': self.settings['global_song_background'],
+            'global_bible_background': self.settings['global_bible_background'],
+            'song_font_face': self.settings['song_font_face'],
+            'song_font_size': self.settings['song_font_size'],
+            'song_font_color': self.settings['song_font_color'],
+            'song_use_shadow': self.settings['song_use_shadow'],
+            'song_shadow_color': self.settings['song_shadow_color'],
+            'song_shadow_offset': self.settings['song_shadow_offset'],
+            'song_use_outline': self.settings['song_use_outline'],
+            'song_outline_color': self.settings['song_outline_color'],
+            'song_outline_width': self.settings['song_outline_width'],
+            'song_use_shade': self.settings['song_use_shade'],
+            'song_shade_color': self.settings['song_shade_color'],
+            'song_shade_opacity': self.settings['song_shade_opacity'],
+            'bible_font_face': self.settings['bible_font_face'],
+            'bible_font_size': self.settings['bible_font_size'],
+            'bible_font_color': self.settings['bible_font_color'],
+            'bible_use_shadow': self.settings['bible_use_shadow'],
+            'bible_shadow_color': self.settings['bible_shadow_color'],
+            'bible_shadow_offset': self.settings['bible_shadow_offset'],
+            'bible_use_outline': self.settings['bible_use_outline'],
+            'bible_outline_color': self.settings['bible_outline_color'],
+            'bible_outline_width': self.settings['bible_outline_width'],
+            'bible_use_shade': self.settings['bible_use_shade'],
+            'bible_shade_color': self.settings['bible_shade_color'],
+            'bible_shade_opacity': self.settings['bible_shade_opacity']
+        }
+
+        for i in range(self.gui.oos_widget.oos_list_widget.count()):
+            item_data = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+            service_items[i] = {
+                'title': item_data['title'],
+                'type': item_data['type']
             }
+            if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_bible':
+                service_items[i]['text'] = item_data['parsed_text']
+            elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                service_items[i]['text'] = item_data['parsed_text']
 
-            for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                item_data = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
-                service_items[i] = {
-                    'title': item_data['title'],
-                    'type': item_data['type']
-                }
-                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_bible':
-                    service_items[i]['text'] = item_data['parsed_text']
-                elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
-                    service_items[i]['text'] = item_data['parsed_text']
+        result = self.complete_save(service_items, 'pro')
+        return result
 
+    def save_frozen_service(self):
+        """
+        Saves the user's current order of service as well as each item's full dataset so that it preserves the slides
+        exactly as they are, ignoring any changes made in the program apart from the service.
+        """
+
+        if self.gui.oos_widget.oos_list_widget.count() == 0:
+            QMessageBox.information(
+                self.gui.main_window,
+                'Nothing to do',
+                'There are no Order of Service items to save.',
+                QMessageBox.StandardButton.Ok
+            )
+            return 0
+
+        service_items = {
+            'global_song_background': self.settings['global_song_background'],
+            'global_bible_background': self.settings['global_bible_background'],
+            'song_font_face': self.settings['song_font_face'],
+            'song_font_size': self.settings['song_font_size'],
+            'song_font_color': self.settings['song_font_color'],
+            'song_use_shadow': self.settings['song_use_shadow'],
+            'song_shadow_color': self.settings['song_shadow_color'],
+            'song_shadow_offset': self.settings['song_shadow_offset'],
+            'song_use_outline': self.settings['song_use_outline'],
+            'song_outline_color': self.settings['song_outline_color'],
+            'song_outline_width': self.settings['song_outline_width'],
+            'song_use_shade': self.settings['song_use_shade'],
+            'song_shade_color': self.settings['song_shade_color'],
+            'song_shade_opacity': self.settings['song_shade_opacity'],
+            'bible_font_face': self.settings['bible_font_face'],
+            'bible_font_size': self.settings['bible_font_size'],
+            'bible_font_color': self.settings['bible_font_color'],
+            'bible_use_shadow': self.settings['bible_use_shadow'],
+            'bible_shadow_color': self.settings['bible_shadow_color'],
+            'bible_shadow_offset': self.settings['bible_shadow_offset'],
+            'bible_use_outline': self.settings['bible_use_outline'],
+            'bible_outline_color': self.settings['bible_outline_color'],
+            'bible_outline_width': self.settings['bible_outline_width'],
+            'bible_use_shade': self.settings['bible_use_shade'],
+            'bible_shade_color': self.settings['bible_shade_color'],
+            'bible_shade_opacity': self.settings['bible_shade_opacity']
+        }
+
+        for i in range(self.gui.oos_widget.oos_list_widget.count()):
+            service_items[i] = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+            for key in service_items[i].keys():
+                if type(service_items[i][key]) == QPixmap:
+                    byte_array = QByteArray()
+                    buffer = QBuffer(byte_array)
+                    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                    service_items[i][key].save(buffer, "PNG")
+                    raw_bytes = byte_array.data()
+                    base64_bytes = base64.b64encode(raw_bytes)
+                    base64_string = base64_bytes.decode('utf-8')
+                    service_items[i][key] = base64_string
+
+        result = self.complete_save(service_items, 'proj')
+        return result
+
+    def complete_save(self, service_items, file_type):
+        if len(self.settings['last_save_dir']) > 0:
+            save_dir = os.path.expanduser(self.settings['last_save_dir'])
+        else:
             save_dir = os.path.expanduser('~' + '/Documents')
-            dialog_needed = True
-            if self.gui.current_file:
-                dialog_needed = False
-            elif len(self.settings['last_save_dir']) > 0:
-                save_dir = self.settings['last_save_dir']
 
-            result = 'saved'
-            if dialog_needed:
-                result = QFileDialog.getSaveFileName(
+        if self.gui.current_file and self.gui.current_file.endswith(file_type):
+            file_loc = self.gui.current_file
+        else:
+            if file_type == 'proj':
+                QMessageBox.information(
                     self.gui.main_window,
-                    'Save Service File',
-                    save_dir,
-                    'ProjectOn Service File (*.pro)')
-
-            if len(result[0]) > 0:
-                file_loc = result[0]
-                if result == 'saved':
-                    file_loc = self.gui.current_file
-                try:
-                    with open(file_loc, 'w') as file:
-                        json.dump(service_items, file, indent=4)
-
-                    directory = os.path.dirname(file_loc)
-                    filename = file_loc.replace(directory, '').replace('/', '')
-                    self.settings['last_save_dir'] = directory
-                    self.save_settings()
-
-                    QMessageBox.information(
-                        self.gui.main_window,
-                        'File Saved',
-                        'Service saved as\n' + file_loc.replace('/', '\\'),
-                        QMessageBox.StandardButton.Ok
-                    )
-
-                    # add this file to the recently used services menu
-                    self.add_to_recently_used(directory, filename)
-
-                    self.gui.current_file = file_loc
-                    self.gui.changes = False
-                    self.gui.main_window.setWindowTitle(f'ProjectOn - {filename}')
-                    return 0
-                except Exception as ex:
-                    QMessageBox.information(
-                        self.gui.main_window,
-                        'Save Error',
-                        'There was a problem saving the service: '
-                        + file_loc.replace('/', '\\') + '\n\n' + str(ex),
-                        QMessageBox.StandardButton.Ok
-                    )
-                    return -1
-            else:
+                    'Save Fixed Service',
+                    'This will lock the current slide content directly into the file. '
+                    'Any future changes you make to these items in your library will not affect this specific service. '
+                    'Fixed services are saved with a ".proj" extension.',
+                    QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel
+                )
+            type_text = 'Service'
+            if file_type == 'proj':
+                type_text = 'Fixed Service'
+            result = QFileDialog.getSaveFileName(
+                self.gui.main_window,
+                'Save Service File',
+                save_dir,
+                f'ProjectOn {type_text} File (*.{file_type})')
+            if len(result[0]) == 0:
                 return -1
-        except Exception:
-            self.error_log()
+            file_loc = result[0]
+            if not file_loc.endswith(file_type):
+                file_loc += f'.{file_type}'
+
+        try:
+            with open(file_loc, 'w') as file:
+                json.dump(service_items, file, indent=4)
+
+            directory = os.path.dirname(file_loc)
+            filename = file_loc.replace(directory, '').replace('/', '')
+            self.settings['last_save_dir'] = directory
+            self.save_settings()
+
+            QMessageBox.information(
+                self.gui.main_window,
+                'File Saved',
+                'Service saved as\n' + file_loc.replace('/', '\\'),
+                QMessageBox.StandardButton.Ok
+            )
+
+            # add this file to the recently used services menu
+            self.add_to_recently_used(directory, filename)
+
+            self.gui.current_file = file_loc
+            self.gui.changes = False
+            self.gui.main_window.setWindowTitle(f'ProjectOn - {filename}')
+            return 0
+        except Exception as ex:
+            QMessageBox.information(
+                self.gui.main_window,
+                'Save Error',
+                'There was a problem saving the service: '
+                + file_loc.replace('/', '\\') + '\n\n' + str(ex),
+                QMessageBox.StandardButton.Ok
+            )
             return -1
 
     def load_service(self, filename: str | None = None):
@@ -1158,25 +1229,24 @@ class ProjectOn(QObject):
                 self.gui.main_window,
                 'Load Service File',
                 open_dir,
-                'ProjectOn Service Files (*.pro)'
+                'ProjectOn Service Files (*.pro *.proj)'
             )
         else:
             result = [filename]
 
         if len(result[0]) > 0:
-            # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
-            # provide a splash
-            wait_widget = SimpleSplash(self.gui, 'Loading service...')
-            service_dict = None
+            self.finish_load(result[0])
 
-            try:
-                with open(result[0], 'r') as file:
-                    service_dict = json.load(file)
-
-                json.dumps(service_dict, indent=4)
-            except Exception:
-                logging.exception('')
-
+    def finish_load(self, filename):
+        self.gui.oos_widget.oos_list_widget.clear()
+        
+        # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
+        # provide a splash
+        wait_widget = SimpleSplash(self.gui, 'Loading service...')
+        service_dict = None
+        try:
+            with open(filename, 'r') as file:
+                service_dict = json.load(file)
             if not service_dict:
                 QMessageBox.information(
                     self.gui.main_window,
@@ -1185,43 +1255,82 @@ class ProjectOn(QObject):
                     QMessageBox.StandardButton.Ok
                 )
                 return
+        except Exception:
+            self.error_log()
+            return
 
-            if 'global_song_background' in service_dict.keys():
-                self.settings['global_song_background'] = service_dict['global_song_background']
-            if 'global_bible_background' in service_dict.keys():
-                self.settings['global_bible_background'] = service_dict['global_bible_background']
+        # change the background and font options in the current settings
+        if 'global_song_background' in service_dict.keys():
+            self.settings['global_song_background'] = service_dict['global_song_background']
+            self.gui.global_song_background_pixmap = QPixmap(
+                self.background_dir + '/' + self.settings['global_song_background'])
+        if 'global_bible_background' in service_dict.keys():
+            self.settings['global_bible_background'] = service_dict['global_bible_background']
+            self.gui.global_bible_background_pixmap = QPixmap(
+                self.background_dir + '/' + self.settings['global_bible_background'])
 
-            slide_types = ['song', 'bible']
-            for slide_type in slide_types:
-                if f'{slide_type}_font_face' in service_dict.keys():
-                    self.settings[f'{slide_type}_font_face'] = service_dict[f'{slide_type}_font_face']
-                if f'{slide_type}_font_size' in service_dict.keys():
-                    self.settings[f'{slide_type}_font_size'] = service_dict[f'{slide_type}_font_size']
-                if f'{slide_type}_font_color' in service_dict.keys():
-                    self.settings[f'{slide_type}_font_color'] = service_dict[f'{slide_type}_font_color']
-                if f'{slide_type}_use_shadow' in service_dict.keys():
-                    self.settings[f'{slide_type}_use_shadow'] = service_dict[f'{slide_type}_use_shadow']
-                if f'{slide_type}_shadow_color' in service_dict.keys():
-                    self.settings[f'{slide_type}_shadow_color'] = service_dict[f'{slide_type}_shadow_color']
-                if f'{slide_type}_shadow_offset' in service_dict.keys():
-                    self.settings[f'{slide_type}_shadow_offset'] = service_dict[f'{slide_type}_shadow_offset']
-                if f'{slide_type}_use_outline' in service_dict.keys():
-                    self.settings[f'{slide_type}_use_outline'] = service_dict[f'{slide_type}_use_outline']
-                if f'{slide_type}_outline_color' in service_dict.keys():
-                    self.settings[f'{slide_type}_outline_color'] = service_dict[f'{slide_type}_outline_color']
-                if f'{slide_type}_outline_width' in service_dict.keys():
-                    self.settings[f'{slide_type}_outline_width'] = service_dict[f'{slide_type}_outline_width']
-                if f'{slide_type}_use_shade' in service_dict.keys():
-                    self.settings[f'{slide_type}_use_shade'] = service_dict[f'{slide_type}_use_shade']
-                if f'{slide_type}_shade_color' in service_dict.keys():
-                    self.settings[f'{slide_type}_shade_color'] = service_dict[f'{slide_type}_shade_color']
-                if f'{slide_type}_shade_opacity' in service_dict.keys():
-                    self.settings[f'{slide_type}_shade_opacity'] = service_dict[f'{slide_type}_shade_opacity']
+        slide_types = ['song', 'bible']
+        for slide_type in slide_types:
+            if f'{slide_type}_font_face' in service_dict.keys():
+                self.settings[f'{slide_type}_font_face'] = service_dict[f'{slide_type}_font_face']
+            if f'{slide_type}_font_size' in service_dict.keys():
+                self.settings[f'{slide_type}_font_size'] = service_dict[f'{slide_type}_font_size']
+            if f'{slide_type}_font_color' in service_dict.keys():
+                self.settings[f'{slide_type}_font_color'] = service_dict[f'{slide_type}_font_color']
+            if f'{slide_type}_use_shadow' in service_dict.keys():
+                self.settings[f'{slide_type}_use_shadow'] = service_dict[f'{slide_type}_use_shadow']
+            if f'{slide_type}_shadow_color' in service_dict.keys():
+                self.settings[f'{slide_type}_shadow_color'] = service_dict[f'{slide_type}_shadow_color']
+            if f'{slide_type}_shadow_offset' in service_dict.keys():
+                self.settings[f'{slide_type}_shadow_offset'] = service_dict[f'{slide_type}_shadow_offset']
+            if f'{slide_type}_use_outline' in service_dict.keys():
+                self.settings[f'{slide_type}_use_outline'] = service_dict[f'{slide_type}_use_outline']
+            if f'{slide_type}_outline_color' in service_dict.keys():
+                self.settings[f'{slide_type}_outline_color'] = service_dict[f'{slide_type}_outline_color']
+            if f'{slide_type}_outline_width' in service_dict.keys():
+                self.settings[f'{slide_type}_outline_width'] = service_dict[f'{slide_type}_outline_width']
+            if f'{slide_type}_use_shade' in service_dict.keys():
+                self.settings[f'{slide_type}_use_shade'] = service_dict[f'{slide_type}_use_shade']
+            if f'{slide_type}_shade_color' in service_dict.keys():
+                self.settings[f'{slide_type}_shade_color'] = service_dict[f'{slide_type}_shade_color']
+            if f'{slide_type}_shade_opacity' in service_dict.keys():
+                self.settings[f'{slide_type}_shade_opacity'] = service_dict[f'{slide_type}_shade_opacity']
 
-            self.gui.apply_settings()
+        # handle the loading differently depending on whether this is a standard service file or a frozen service file
+        if filename.endswith('.pro'):
+            def make_missing_item(slide_type: str, title: str):
+                # Creates a placeholder list widget item when a saved item is not found
+                QMessageBox.information(
+                    None,
+                    'Song Missing',
+                    f'Saved {slide_type} "{title}" not found in current database. '
+                    f'Inserting placeholder.',
+                    QMessageBox.StandardButton.Ok
+                )
+
+                pixmap = QPixmap(50, 27)
+                pixmap.fill(QColor(255, 255, 255, 50))
+                icon = QPixmap('resources/gui_icons/x_icon.svg')
+                icon = icon.scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+                painter = QPainter(pixmap)
+                icon_loc = QPoint(
+                    int(pixmap.width() / 2 - icon.width() / 2),
+                    int(pixmap.height() / 2 - icon.height() / 2)
+                )
+                painter.drawPixmap(icon_loc, icon)
+                painter.end()
+
+                placeholder_item = QListWidgetItem()
+                placeholder_widget = StandardItemWidget(
+                    self.gui,
+                    'Missing custom slide: ' + service_dict[key]['title'],
+                    icon=pixmap
+                )
+                placeholder_item.setSizeHint(placeholder_widget.sizeHint())
+                self.gui.oos_widget.oos_list_widget.addItem(placeholder_item)
+                self.gui.oos_widget.oos_list_widget.setItemWidget(placeholder_item, placeholder_widget)
 
             # walk through the items saved in the file and load their QListWidgetItems into the order of service widget
-            self.gui.oos_widget.oos_list_widget.clear()
             for key in service_dict:
                 if key.isnumeric():
                     if service_dict[key]['type'] == 'song':
@@ -1232,16 +1341,7 @@ class ProjectOn(QObject):
                         )
 
                         if len(song_items) == 0:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                None,
-                                'Song Missing',
-                                f'Saved song "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing song: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                            make_missing_item('song', service_dict[key]['title'])
                         else:
                             self.gui.media_widget.add_song_to_service(song_items[0].clone())
 
@@ -1284,16 +1384,7 @@ class ProjectOn(QObject):
                         )
 
                         if len(custom_items) == 0:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                None,
-                                'Custom Slide Missing',
-                                f'Saved custom slide "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing custom slide: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                            make_missing_item('custom slide', service_dict[key]['title'])
                         else:
                             self.gui.media_widget.add_custom_to_service(custom_items[0].clone())
 
@@ -1305,16 +1396,7 @@ class ProjectOn(QObject):
                         )
 
                         if len(image_items) == 0:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Custom Slide Missing',
-                                f'Saved image slide "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing image slide: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                            make_missing_item('image', service_dict[key]['title'])
                         else:
                             self.gui.media_widget.add_image_to_service(image_items[0].clone())
 
@@ -1326,16 +1408,7 @@ class ProjectOn(QObject):
                         )
 
                         if len(video_items) == 0:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Custom Slide Missing',
-                                f'Saved video "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing video: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                            make_missing_item('video', service_dict[key]['title'])
                         else:
                             self.gui.media_widget.add_video_to_service(video_items[0].clone())
 
@@ -1347,39 +1420,134 @@ class ProjectOn(QObject):
                         )
 
                         if len(web_items) == 0:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Web Slide Missing',
-                                f'Saved web slide "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing web slide: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                            make_missing_item('web', service_dict[key]['title'])
                         else:
                             self.gui.media_widget.add_web_to_service(web_items[0].clone())
+        elif filename.endswith('.proj'):
+            # walk through the items saved in the file and load their QListWidgetItems into the order of service widget
+            self.gui.oos_widget.oos_list_widget.clear()
+            for key in service_dict:
+                if key.isnumeric():
+                    # first, look for values that might be PNG bytes
+                    data = service_dict[key]
+                    for data_key in data:
+                        # test to see if this key's value contains the bytes for a PNG image
+                        # convert to a pixmap if so
+                        if type(data[data_key]) is str and len(data[data_key]) > 90:
+                            try:
+                                decoded_bytes = base64.b64decode(
+                                    service_dict[key][data_key].encode('utf-8'), validate=True)
+                                if decoded_bytes.startswith(b'\x89PNG\r\n\x1a\n'):
+                                    # these are the bytes of a PNG image
+                                    pixmap = QPixmap()
+                                    pixmap.loadFromData(decoded_bytes)
+                                    service_dict[key][data_key] = pixmap
+                            except Exception:
+                                pass
 
-            self.gui.current_file = result[0]
+                    # create a QListWidgetItem and its itemWidget for each service item based on the stored data
+                    item = QListWidgetItem()
+                    item.setData(Qt.ItemDataRole.UserRole, service_dict[key])
 
-            self.gui.preview_widget.slide_list.clear()
-            self.gui.live_widget.slide_list.clear()
+                    # create the proper icon for this slide type
+                    if data['type'] == 'song':
+                        print(f'data[\'override_global\']: {data['override_global']}')
+                        if not data['override_global'] or data['background'] == 'global_song':
+                            print('setting icon to global song pixmap')
+                            pixmap = self.gui.global_song_background_pixmap
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                        elif data['background'] == 'global_bible':
+                            pixmap = self.gui.global_bible_background_pixmap
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                        elif 'rgb(' in data['background']:
+                            pixmap = QPixmap(50, 27)
+                            painter = QPainter(pixmap)
+                            rgb = data['background'].replace('rgb(', '')
+                            rgb = rgb.replace(')', '')
+                            rgb_split = rgb.split(',')
+                            brush = QBrush(QColor.fromRgb(
+                                int(rgb_split[0].strip()), int(rgb_split[1].strip()), int(rgb_split[2].strip())))
+                            painter.setBrush(brush)
+                            painter.fillRect(pixmap.rect(), brush)
+                            painter.end()
+                        else:
+                            pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                    elif data['type'] == 'bible' or data['type'] == 'custom_bible':
+                        pixmap = self.gui.global_bible_background_pixmap.scaled(
+                            50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                    elif data['type'] == 'custom':
+                        if not data['override_global'] or data['background'] == 'global_bible':
+                            pixmap = self.gui.global_bible_background_pixmap
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                        elif data['background'] == 'global_song':
+                            pixmap = self.gui.global_song_background_pixmap
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                        elif 'rgb(' in data['background']:
+                            pixmap = QPixmap(50, 27)
+                            painter = QPainter(pixmap)
+                            brush = QBrush(QColor(data['background']))
+                            painter.fillRect(pixmap.rect(), brush)
+                            painter.end()
+                        else:
+                            pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                    elif service_dict[key]['type'] == 'image':
+                        pixmap = data['background']
+                        pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                               Qt.TransformationMode.SmoothTransformation)
+                    elif service_dict[key]['type'] == 'video':
+                        pixmap = QPixmap(
+                            self.gui.main.video_dir + '/' + data['file_name'].split('.')[0] + '.jpg')
+                        pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                               Qt.TransformationMode.SmoothTransformation)
+                    elif service_dict[key]['type'] == 'web':
+                        pixmap = QPixmap(50, 27)
+                        pixmap.fill(QColor(255, 255, 255, 50))
+                        icon = QPixmap('resources/gui_icons/web_icon.svg')
+                        icon = icon.scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+                        painter = QPainter(pixmap)
+                        icon_loc = QPoint(
+                            int(pixmap.width() / 2 - icon.width() / 2),
+                            int(pixmap.height() / 2 - icon.height() / 2)
+                        )
+                        painter.drawPixmap(icon_loc, icon)
+                        painter.end()
+                    else:
+                        pixmap = QPixmap()
 
-            # set the last used directory in settings
-            file_dir = os.path.dirname(result[0])
-            file_name = result[0].replace(file_dir, '').replace('/', '').replace('\\', '')
-            self.settings['last_save_dir'] = file_dir
+                    widget = StandardItemWidget(self.gui, data['title'], icon=pixmap)
+                    item.setSizeHint(widget.sizeHint())
+                    self.gui.oos_widget.oos_list_widget.addItem(item)
+                    self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
 
-            # add this file to the recently used services menu
-            self.add_to_recently_used(file_dir, file_name)
+        # update the gui to reflect the changes loaded from the service file
+        self.gui.current_file = filename[0]
 
-            # apply any settings changes
-            self.gui.apply_settings()
+        self.gui.preview_widget.slide_list.clear()
+        self.gui.live_widget.slide_list.clear()
 
-            self.gui.changes = False
-            wait_widget.widget.deleteLater()
+        # set the last used directory in settings
+        file_dir = os.path.dirname(filename[0])
+        file_name = filename[0].replace(file_dir, '').replace('/', '').replace('\\', '')
+        self.settings['last_save_dir'] = file_dir
 
-            self.gui.main_window.setWindowTitle(f'ProjectOn - {file_name}')
+        # add this file to the recently used services menu
+        self.add_to_recently_used(file_dir, file_name)
+
+        # apply any settings changes
+        self.gui.apply_settings()
+
+        self.gui.changes = False
+        wait_widget.widget.deleteLater()
+
+        self.gui.main_window.setWindowTitle(f'ProjectOn - {file_name}')
 
     def add_to_recently_used(self, directory: str, file_name: str):
         """

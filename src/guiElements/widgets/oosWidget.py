@@ -159,20 +159,19 @@ class CustomListWidget(QListWidget):
             return
 
         item = evt.source().currentItem().clone()
-        item.setText('')
         row = self.row(self.itemAt(QPoint(int(evt.pos().x()), int(evt.pos().y()))))
         if row == -1:
             row = self.count()
 
-        if item.data(Qt.ItemDataRole.UserRole)['type'] == 'song':
+        if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'song':
             self.gui.media_widget.add_song_to_service(item, row)
-        elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+        elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'custom':
             self.gui.media_widget.add_custom_to_service(item, row)
-        elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'image':
+        elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'image':
             self.gui.media_widget.add_image_to_service(item, row)
-        elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
+        elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'video':
             self.gui.media_widget.add_video_to_service(item, row)
-        elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
+        elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'web':
             self.gui.media_widget.add_web_to_service(item, row)
 
         remote_oos_buttons = ''
@@ -188,6 +187,8 @@ class CustomListWidget(QListWidget):
                     <br />"""
         if self.gui.main.remote_server:
             self.gui.main.remote_server.socketio.emit('update_oos', remote_oos_buttons)
+
+        evt.ignore()
 
         self.gui.changes = True
 

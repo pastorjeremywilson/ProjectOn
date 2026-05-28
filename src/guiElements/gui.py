@@ -517,6 +517,11 @@ class GUI(QObject):
         save_action.setShortcut(QKeySequence('Ctrl+S'))
         save_action.triggered.connect(self.main.save_service)
 
+        save_frozen_action = file_menu.addAction('Save Fixed Service')
+        save_frozen_action.setToolTip(
+            'Locks the current slide content so future canges to the media library won\'t alter this service file.')
+        save_frozen_action.triggered.connect(self.main.save_frozen_service)
+
         print_action = file_menu.addAction('Print Order of Service')
         print_action.setShortcut(QKeySequence('Ctrl+P'))
         print_action.triggered.connect(self.print_oos)
@@ -632,7 +637,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0.005'
+        current_version = 'v.1.10.0.006'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -848,7 +853,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_layout.addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0.005')
+        title_label = QLabel('ProjectOn v.1.10.0.006')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_layout.addWidget(title_label)
         title_layout.addStretch()
