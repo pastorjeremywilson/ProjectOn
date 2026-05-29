@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.006
+ProjectOn v.1.10.0.007
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -202,7 +202,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.0.006')
+        version_label = QLabel('v.1.10.0.007')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -905,10 +905,10 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def delete_items_from_db(self, items: list[QTreeWidgetItem]):
+    def delete_items_from_db(self, items: set):
         """
         Provides a method of deleting a given item from the program's database.
-        :param QListWidgetItem item: The item to be removed
+        :param set items: Set of two-value sets(type, title) to be removed
         """
         connection = None
         try:
@@ -916,33 +916,30 @@ class ProjectOn(QObject):
             cursor = connection.cursor()
             for item in items:
                 no_command = False
-                table, column, title = '', '', ''
-                if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'song':
+                type, title = item
+                table, column = '', ''
+                if type == 'song':
                     table = 'songs'
-                    title = item.data(0, Qt.ItemDataRole.UserRole)['title']
                     column = 'title'
-                elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                elif type == 'custom':
                     table = 'customSlides'
-                    title = item.data(0, Qt.ItemDataRole.UserRole)['title']
                     column = 'title'
-                elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'image':
+                elif type == 'image':
                     table = 'imageThumbnails'
-                    title = item.data(0, Qt.ItemDataRole.UserRole)['title']
                     column = 'filename'
                     os.remove(self.image_dir + '/' + title)
-                elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'video':
-                    file_name = item.data(0, Qt.ItemDataRole.UserRole)['file_name']
+                elif type == 'video':
+                    # remove the video from the video directory as well as its snapshot image
+                    file_name = title
                     os.remove(self.video_dir + '/' + file_name)
                     filename_split = file_name.split('.')
                     thumbnail_filename = '.'.join(filename_split[:len(filename_split) - 1]) + '.jpg'
                     os.remove(self.video_dir + '/' + thumbnail_filename)
 
                     table = 'videos'
-                    title = item.data(0, Qt.ItemDataRole.UserRole)['title']
                     column = 'filename'
-                elif item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'web':
+                elif type == 'web':
                     table = 'web'
-                    title = item.data(0, Qt.ItemDataRole.UserRole)['title']
                     column = 'title'
                 else:
                     no_command = True

@@ -9,7 +9,7 @@ from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSigna
     QModelIndex, QObject
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics, QFocusEvent, QMouseEvent, QResizeEvent, \
-    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent
+    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
@@ -5083,12 +5083,19 @@ class CustomTreeWidget(QTreeWidget):
         # remove the selected items from the database
         items_to_delete_from_db = set()
         for item in items:
-            if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder':
+            data = item.data(0, Qt.ItemDataRole.UserRole)
+            if data['type'] == 'folder':
                 for i in range(item.childCount()):
-                    items_to_delete_from_db.add(item.child(i))
+                    child_data = item.child(i).data(0, Qt.ItemDataRole.UserRole)
+                    if child_data['type'] == 'video':
+                        items_to_delete_from_db.add((child_data['type'], child_data['file_name']))
+                    else:
+                        items_to_delete_from_db.add((child_data['type'], child_data['title']))
+            elif data['type'] == 'video':
+                items_to_delete_from_db.add((data['type'], data['file_name']))
             else:
-                items_to_delete_from_db.add(item)
-        self.gui.main.delete_items_from_db(list(items_to_delete_from_db))
+                items_to_delete_from_db.add((data['type'], data['title']))
+        self.gui.main.delete_items_from_db(items_to_delete_from_db)
 
         # remove each selected item from the tree
         for item in items:
@@ -5160,3 +5167,10 @@ class CustomTreeWidget(QTreeWidget):
 
         self.gui.oos_widget.oos_list_widget.setCurrentRow(self.gui.oos_widget.oos_list_widget.count() - 1)
         self.gui.oos_widget.oos_list_widget.setFocus()
+
+    def keyPressEvent(self, evt: QKeyEvent):
+        if evt.key() == Qt.Key.Key_Delete:
+            print('delete pressed')
+            self.delete_item()
+        else:
+            super().keyPressEvent(evt)

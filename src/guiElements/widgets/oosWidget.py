@@ -131,6 +131,10 @@ class CustomListWidget(QListWidget):
         """
         if evt.key() == Qt.Key.Key_Space:
             self.gui.send_to_live()
+        elif evt.key() == Qt.Key.Key_Delete:
+            self.delete_song()
+        else:
+            super().keyPressEvent(evt)
 
     def mouseDoubleClickEvent(self, evt: QMouseEvent):
         """
@@ -139,14 +143,6 @@ class CustomListWidget(QListWidget):
         :return:
         """
         self.gui.send_to_live()
-
-    def dragEnterEvent(self, evt: QDragEnterEvent):
-        """
-        Overrides dragEnterEvent to globalize the event's source widget.
-        :param QDragEnterEvent evt: dragEnterEvent
-        """
-        super().dragEnterEvent(evt)
-        self.source_list_widget = evt.source()
 
     def dropEvent(self, evt: QDropEvent):
         """
@@ -157,6 +153,8 @@ class CustomListWidget(QListWidget):
         if evt.source() == self:
             super().dropEvent(evt)
             return
+
+        evt.setDropAction(Qt.DropAction.CopyAction)
 
         item = evt.source().currentItem().clone()
         row = self.row(self.itemAt(QPoint(int(evt.pos().x()), int(evt.pos().y()))))
@@ -188,7 +186,7 @@ class CustomListWidget(QListWidget):
         if self.gui.main.remote_server:
             self.gui.main.remote_server.socketio.emit('update_oos', remote_oos_buttons)
 
-        evt.ignore()
+        evt.accept()
 
         self.gui.changes = True
 

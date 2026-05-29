@@ -7,10 +7,11 @@ Done:
     Allow sorting media into folders
     Added types to method/function arguments
     Make sure delete is only removing the tree item, not running populate
-
-To Do:
     Fix placeholders in oos not showing correctly
     Allow delete key to remove items from media and oos
+    
+To Do:
+    Try to break things
 
 Future Releases:
     Video backgrounds
