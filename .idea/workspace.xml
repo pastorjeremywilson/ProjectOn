@@ -7,17 +7,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added the ability to save a service as a &quot;Fixed Service&quot;, meaning that all data for each slide in the order of service is preserved in the save file. The data is loaded for each slide from the file as opposed to loading data from the items in the media widget. Fixed missing slide placeholders not showing correctly.">
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added the ability to press the delete key in the media trees and the oos list widget to perform the same function as right-click:Delete. Fixed ghost drag-drop image remaining stuck to the cursor when dragging into the oos. Improved the deleting of items from trees and modified delete_item_from_db to accommodate.">
+      <change afterPath="$PROJECT_DIR$/src/resources/help/new_folder.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" beforeDir="false" afterPath="$PROJECT_DIR$/compile_config_and_installers/projecton.iss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/README.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/guiElements/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/oosWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/oosWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/help.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/previewWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/previewWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/file_menu.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/file_menu.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/intro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/main_screen.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/main_screen.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/media.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/media.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/media_box.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/media_box.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/menu_bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/menu_bar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/help/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/settings.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +66,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/pastorjeremywilson/ProjectOn&quot;,
-    &quot;accountId&quot;: &quot;f7ca7050-bc92-45de-b2f2-1756e26a64e9&quot;
+    &quot;accountId&quot;: &quot;8f828663-ea93-4da9-9d98-44a3bd3daf8b&quot;
   }
 }</component>
   <component name="MarkdownSettingsMigration">
@@ -107,7 +111,7 @@
     &quot;git-widget-placeholder&quot;: &quot;development&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/pasto/Documents/Python Workspace/project_on/src/resources&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/jeremy/Documents/Python Workspace/project_on/src/resources/help&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -124,6 +128,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/resources/help" />
       <recent name="C:\Users\pasto\Documents\Python Workspace\project_on\src\resources" />
       <recent name="$PROJECT_DIR$" />
     </key>
@@ -202,7 +207,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173" />
+        <option value="bundled-python-sdk-83fa46d5d5d4-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.33514.19" />
       </set>
     </attachedChunks>
   </component>
@@ -238,14 +243,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00157" summary="Tested, ready for release.">
-      <option name="closed" value="true" />
-      <created>1764955829415</created>
-      <option name="number" value="00157" />
-      <option name="presentableId" value="LOCAL-00157" />
-      <option name="project" value="LOCAL" />
-      <updated>1764955829415</updated>
     </task>
     <task id="LOCAL-00158" summary="Added code to send grab of display window to the stage webpage as jpg bytes.">
       <option name="closed" value="true" />
@@ -631,7 +628,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780009216496</updated>
     </task>
-    <option name="localTasksCounter" value="206" />
+    <task id="LOCAL-00206" summary="Added the ability to press the delete key in the media trees and the oos list widget to perform the same function as right-click:Delete. Fixed ghost drag-drop image remaining stuck to the cursor when dragging into the oos. Improved the deleting of items from trees and modified delete_item_from_db to accommodate.">
+      <option name="closed" value="true" />
+      <created>1780093173088</created>
+      <option name="number" value="00206" />
+      <option name="presentableId" value="LOCAL-00206" />
+      <option name="project" value="LOCAL" />
+      <updated>1780093173090</updated>
+    </task>
+    <option name="localTasksCounter" value="207" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -652,7 +657,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Forgot to import monkey from gevent and run patch_all" />
     <MESSAGE value="More bug squashing, made tags uneditable in edit widget's lyric_text_edit, added context menu to remove such tags, fixed updating data on lyric editor save" />
     <MESSAGE value="Changed the lyrics editor textEdit to FormattableTextEdit" />
     <MESSAGE value="Reorganized project files into a source directory and sub-directories; fixed relative paths in the code" />
@@ -677,7 +681,8 @@
     <MESSAGE value="Added the ability to change the size of the footer font. Removed calls to global_font_face, global_font_size, global_footer_font_face, and global_footer_font_size (obsolete). Fixed song font size not changing when setting the global song font size." />
     <MESSAGE value="Changed the process for moving media items into a folder from copy/paste to listing the folders; changed CustomTreeWidget.delete_item to handle multiple selected items; added an &quot;Empty Folder&quot; option to QTreeWidgetItem's context menu." />
     <MESSAGE value="Added the ability to save a service as a &quot;Fixed Service&quot;, meaning that all data for each slide in the order of service is preserved in the save file. The data is loaded for each slide from the file as opposed to loading data from the items in the media widget. Fixed missing slide placeholders not showing correctly." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added the ability to save a service as a &quot;Fixed Service&quot;, meaning that all data for each slide in the order of service is preserved in the save file. The data is loaded for each slide from the file as opposed to loading data from the items in the media widget. Fixed missing slide placeholders not showing correctly." />
+    <MESSAGE value="Added the ability to press the delete key in the media trees and the oos list widget to perform the same function as right-click:Delete. Fixed ghost drag-drop image remaining stuck to the cursor when dragging into the oos. Improved the deleting of items from trees and modified delete_item_from_db to accommodate." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added the ability to press the delete key in the media trees and the oos list widget to perform the same function as right-click:Delete. Fixed ghost drag-drop image remaining stuck to the cursor when dragging into the oos. Improved the deleting of items from trees and modified delete_item_from_db to accommodate." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

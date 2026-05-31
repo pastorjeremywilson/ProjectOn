@@ -637,7 +637,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0.007'
+        current_version = 'v.1.10.0.008'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -853,7 +853,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_layout.addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0.007')
+        title_label = QLabel('ProjectOn v.1.10.0.008')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_layout.addWidget(title_label)
         title_layout.addStretch()
@@ -1243,7 +1243,9 @@ class GUI(QObject):
 
         self.oos_widget.oos_list_widget.clear()
         self.preview_widget.slide_list.clear()
+        self.preview_widget.preview_label.clear()
         self.live_widget.slide_list.clear()
+        self.live_widget.preview_label.clear()
         self.current_file = None
 
         self.oos_widget.oos_list_widget.blockSignals(False)
@@ -1405,6 +1407,7 @@ class GUI(QObject):
             slide_data = item.data(Qt.ItemDataRole.UserRole)
 
         self.preview_widget.slide_list.clear()
+        self.preview_widget.preview_label.clear()
 
         if slide_data['type'] == 'song':
             slide_data['parsed_text'] = parse_song_data(self, slide_data)
@@ -1526,6 +1529,7 @@ class GUI(QObject):
 
         elif slide_data['type'] == 'video':
             self.preview_widget.slide_list.clear()
+            self.preview_widget.preview_label.clear()
 
             pixmap = QPixmap(
                 self.main.video_dir + '/' + slide_data['file_name'].split('.')[0] + '.jpg')
@@ -1562,6 +1566,7 @@ class GUI(QObject):
             self.oos_widget.oos_list_widget.blockSignals(True)
             self.live_widget.blockSignals(True)
             self.live_widget.slide_list.clear()
+            self.live_widget.preview_label.clear()
 
             item_index = self.preview_widget.slide_list.currentRow()
             item_data = declarations.SLIDE_DATA_DEFAULTS.copy()

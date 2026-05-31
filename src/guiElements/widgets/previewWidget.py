@@ -43,8 +43,6 @@ class PreviewWidget(QWidget):
         title_label.setObjectName('title_label')
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setFont(self.gui.bold_font)
-        #title_label.setStyleSheet(
-        #    'background: lightGrey; color: black; padding-top: 5px; padding-bottom: 5px; border-bottom: 2px solid black;')
         container_layout.addWidget(title_label, 0, 0)
 
         self.slide_list = CustomListWidget(self.gui)
@@ -57,7 +55,6 @@ class PreviewWidget(QWidget):
         container_layout.addWidget(self.slide_list, 1, 0)
 
         self.preview_label = QLabel()
-        #self.preview_label.setStyleSheet('margin-top: 20px;')
         layout.addWidget(self.preview_label, 1, 0, Qt.AlignmentFlag.AlignCenter)
 
     def show_preview(self):

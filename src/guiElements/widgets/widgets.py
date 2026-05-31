@@ -5124,6 +5124,8 @@ class CustomTreeWidget(QTreeWidget):
         )
 
         self.gui.preview_widget.slide_list.clear()
+        self.gui.preview_widget.preview_label.clear()
+
         self.custom_sort()
 
     def dropEvent(self, evt: QDropEvent):

@@ -38,7 +38,7 @@ class Help(QMainWindow):
         tab_widget.addTab(self.intro_widget(), 'Introduction')
         tab_widget.addTab(self.main_screen_widget(), 'Main Screen')
         tab_widget.addTab(self.menu_widget(), 'Menu Bar')
-        tab_widget.addTab(self.media_widget(), 'Media Box')
+        tab_widget.addTab(self.media_widget(), 'Media Library')
         tab_widget.addTab(self.edit_widget(), 'Edit Window')
         tab_widget.addTab(self.settings_widget(), 'Settings Window')
         tab_widget.addTab(self.remote_widget(), 'Remote Server')
