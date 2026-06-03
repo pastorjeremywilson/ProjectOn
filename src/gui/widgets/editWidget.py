@@ -1761,6 +1761,8 @@ class EditWidget(QDialog):
         else:
             self.data['font_color'] = 'white'
 
+        self.data['title'] = self.title_line_edit.text().strip()
+
         self.data['font_size'] = self.font_widget.font_size_spinbox.value()
 
         self.data['use_shadow'] = self.font_widget.shadow_checkbox.isChecked()

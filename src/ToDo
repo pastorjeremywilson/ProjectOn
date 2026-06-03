@@ -48,6 +48,8 @@ Done:
     Fix remote item press sometimes loading the next slide
 
 To Do:
+    Add copying/thumbnail feedback when importing a video
+    Add video playing progress bar or slider
 
 Future Releases:
     Video backgrounds

@@ -618,7 +618,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.1'
+        current_version = 'v.1.10.2'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -834,7 +834,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.1')
+        title_label = QLabel('ProjectOn v.1.10.2')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -1798,7 +1798,7 @@ class GUI(QObject):
                 if not slide_type == 'song':
                     slide_type = 'bible'
                 lyric_widget.setFont(
-                    QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings['bible_font_size']))
+                    QFont(self.main.settings[f'{slide_type}_font_face'], self.main.settings[f'{slide_type}_font_size']))
                 lyric_widget.footer_label.setFont(QFont(self.global_footer_font_face, self.global_footer_font_size))
                 font_color = self.get_font_color(self.main.settings[f'{slide_type}_font_color'], item_data['type'])
                 lyric_widget.fill_color = font_color
@@ -2263,7 +2263,7 @@ class GUI(QObject):
             # ensure that the logo widget is not being shown
             if self.tool_bar.logo_screen_button.isChecked():
                 self.tool_bar.logo_screen_button.setChecked(False)
-                self.display_logo_screen()
+                self.display_logo_screen(False)
 
             self.blackout_widget.show()
 
@@ -2313,7 +2313,7 @@ class GUI(QObject):
             # ensure the black widget is not being shown
             if self.tool_bar.black_screen_button.isChecked():
                 self.tool_bar.black_screen_button.setChecked(False)
-                self.display_black_screen()
+                self.display_black_screen(False)
 
             self.logo_widget.show()
             self.logo_label.show()
