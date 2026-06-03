@@ -47,6 +47,7 @@ class RemoteServer:
             oos = ''
             slides = ''
             if request.method == "POST":
+                print(request.data)
                 if 'oos_title' in request.form:
                     try:
                         num = request.form.get('oos_title')
@@ -71,7 +72,6 @@ class RemoteServer:
 
                 elif b'logo_screen' in request.data:
                     self.gui.display_logo_screen_signal.emit()
-
                     
                 elif b'item_back' in request.data:
                     self.slide_button('item_back')

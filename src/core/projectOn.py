@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.008
+ProjectOn v.1.10.0.009
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -155,11 +155,11 @@ class ProjectOn(QObject):
 
         self.app.exec()
 
-    def update_status_label(self, text: str, type: str):
+    def update_status_label(self, text: str, update_type: str):
         """
         Updates the splash widget with the given text.
         :param str text: The text to be displayed
-        :param str type: Use 'status' if this will be an update to the status text under the main text
+        :param str update_type: Use 'status' if this will be an update to the status text under the main text
         """
         # just in case
         if not self.initial_startup:
@@ -167,7 +167,7 @@ class ProjectOn(QObject):
 
         if self.splash_widget and not self.updating_label: # prevent access violation by ensuring processEvents has finished
             self.updating_label = True
-            if type == 'status':
+            if update_type == 'status':
                 self.status_label.setText(text)
             else:
                 self.info_label.setText(text)
@@ -180,6 +180,8 @@ class ProjectOn(QObject):
     def make_splash_screen(self, last_status_count: int):
         """
         Create the splash screen that will show progress as the program is loading
+        :param int last_status_count: The total number of update calls last time the program was run; used for setting
+        the upper range of the QProgressBar
         """
         self.splash_widget = QWidget()
         self.splash_widget.setObjectName('splash_widget')
@@ -202,7 +204,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.0.008')
+        version_label = QLabel('v.1.10.0.009')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -249,7 +251,11 @@ class ProjectOn(QObject):
         self.splash_widget.raise_()
         self.splash_widget.setFocus()
 
-    def check_database_update(self):
+    def check_database_update(self) -> bool:
+        """
+        Method to check the current database version, updating the database if it's not current
+        :return: True if up to date or update successful
+        """
         connection = sqlite3.connect(self.database)
         cursor = connection.cursor()
         db_version = cursor.execute('PRAGMA user_version').fetchone()[0]
@@ -368,10 +374,10 @@ class ProjectOn(QObject):
 
         return True
 
-    def get_all_songs(self):
+    def get_all_songs(self) -> list[str]:
         """
         Retrieves all song data from the ProjectOn database's 'songs' table
-        :return: list of str result
+        :return: list[str]: all songs and their data
         """
         connection = None
         try:
@@ -405,10 +411,10 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_all_custom_slides(self):
+    def get_all_custom_slides(self) -> list[str]:
         """
         Retrieves all custom slide data from the ProjectOn database's 'customSlides' table
-        :return: list of str result
+        :return: list[str] all custom slides and their data
         """
         connection = None
         try:
@@ -442,7 +448,11 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_all_images(self):
+    def get_all_images(self) -> list | int:
+        """
+        Retrieves all image data from the ProjectOn database's 'images' table
+        :return: list: all images and their data or -1 on exception
+        """
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -467,7 +477,11 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_all_videos(self):
+    def get_all_videos(self) -> list | int:
+        """
+        Retrieves all video data from the ProjectOn database's 'videos' table
+        :return: list of all videos and their data or -1 on exception
+        """
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -494,7 +508,11 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_all_web(self):
+    def get_all_web(self) -> list | int:
+        """
+        Retrieves all web page data from the ProjectOn database's 'web' table
+        :return: list of all web pages and their data or -1 on exception
+        """
         connection = None
         all_web = []
         try:
@@ -519,11 +537,11 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_song_data(self, title: str):
+    def get_song_data(self, title: str) -> list[str] | int:
         """
         Gets the song data for a particular song where the 'title' column matches 'title'
         :param str title: the song title
-        :return: list of str result
+        :return: list[str]: all columns for this song
         """
         connection = None
         try:
@@ -538,11 +556,11 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_custom_data(self, title: str):
+    def get_custom_data(self, title: str) -> list[str] | int:
         """
         Gets the song data for a particular custom slide where the 'title' column matches 'title'
         :param str title: the title (name) of the custom slide
-        :return: list of str result
+        :return: list[str]: all columns for this custom slide
         """
         connection = None
         try:
@@ -557,33 +575,46 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_folders(self, type: str):
-        connection = sqlite3.connect(self.database)
-        cursor = connection.cursor()
-        result = ''
-        if type == 'song':
-            result = cursor.execute('SELECT folder FROM songs').fetchall()
-        elif type == 'custom':
-            result = cursor.execute('SELECT folder FROM customSlides').fetchall()
-        elif type == 'images':
-            result = cursor.execute('SELECT folder FROM imageThumbnails').fetchall()
-        elif type == 'videos':
-            result = cursor.execute('SELECT folder FROM videos').fetchall()
-        elif type == 'web':
-            result = cursor.execute('SELECT folder FROM web').fetchall()
-        else:
+    def get_folders(self, slide_type: str) -> list[str] | int:
+        """
+        Retrieves all the folders associated with items for this slide type
+        :param slide_type: The type of slide
+        :return: list[str] of all folders or -1 on exception, 0 if wrong slide_type
+        """
+        connection = None
+        try:
+            connection = sqlite3.connect(self.database)
+            cursor = connection.cursor()
+            if slide_type == 'song':
+                result = cursor.execute('SELECT folder FROM songs').fetchall()
+            elif slide_type == 'custom':
+                result = cursor.execute('SELECT folder FROM customSlides').fetchall()
+            elif slide_type == 'images':
+                result = cursor.execute('SELECT folder FROM imageThumbnails').fetchall()
+            elif slide_type == 'videos':
+                result = cursor.execute('SELECT folder FROM videos').fetchall()
+            elif slide_type == 'web':
+                result = cursor.execute('SELECT folder FROM web').fetchall()
+            else:
+                connection.close()
+                return 0
             connection.close()
-            return -1
-        connection.close()
+        except Exception:
+            if connection:
+                connection.close()
+            self.error_log()
 
-        folders = []
+        folders = set()
         for item in result:
-            if len(item[0].strip()) > 0 and item[0].strip() not in folders:
-                folders.append(item[0].strip())
+            folders.add(item[0].strip())
 
-        return folders
+        return list(folders)
 
-    def get_audio_clip_names(self):
+    def get_audio_clip_names(self) -> list[str] | int:
+        """
+        Retrievers all info from the "name" column of the audio table
+        :return: list[str]: all audio clip names or 0 on exception
+        """
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -597,7 +628,12 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def get_audio_data(self, name: str):
+    def get_audio_data(self, name: str) -> list[str] | int:
+        """
+        Retrieves all the audio data for the given audio clip
+        :param name: The name of the qudio clip
+        :return: list[str]: all audio data or -1 on exception
+        """
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -613,7 +649,14 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def save_audio(self, name: str, audio_format: str, audio_data: bytes):
+    def save_audio(self, name: str, audio_format: str, audio_data: bytes) -> int:
+        """
+        Saves an audio clip to the database
+        :param str name: The name of the qudio clip
+        :param str audio_format: The format the audio clip is rendered as
+        :param bytes audio_data: The audio clip's data
+        :return: int: 0 on success, -2 on failed execute, -1 on exception
+        """
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -648,9 +691,9 @@ class ProjectOn(QObject):
 
     def save_song(self, data: dict, old_title: str=None):
         """
-        Takes song data as a string list, ordered by the column order of the 'songs' table of the program's database,
+        Takes song data as a dictionary, converts the dictionary keys to the database's columns,
         and inserts or updates that data in the database.
-        :param dict data: The song's data in columnar order
+        :param dict data: The song's data
         :param str old_title: Optional, the song's original title so that it can be updated instead of inserted
         """
         connection = None
@@ -688,10 +731,10 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
 
-    def get_song_titles(self):
+    def get_song_titles(self) -> list[str]:
         """
         Retrieves just the titles of all songs in the database.
-        :return list of str song_titles: Song titles
+        :return list[str]: list of song titles
         """
         connection = sqlite3.connect(self.database)
         cursor = connection.cursor()
@@ -702,10 +745,10 @@ class ProjectOn(QObject):
 
         return song_titles
 
-    def get_custom_titles(self):
+    def get_custom_titles(self) -> list[str]:
         """
         Retrieves just the titles of all custom slides in the database.
-        :return list of str custom_titles: Custom slide titles
+        :return list[str]: Custom slide titles
         """
         connection = sqlite3.connect(self.database)
         cursor = connection.cursor()
@@ -718,8 +761,8 @@ class ProjectOn(QObject):
 
     def save_custom(self, data: dict, old_title: str | None = None):
         """
-        Takes custom slide data as a string list, ordered by the column order of the 'customSlides' table of the
-        program's database, and inserts or updates that data in the database.
+        Takes custom slide data as a dict, converts the dictionary keys to the database's columns,
+        and inserts or updates that data in the database.
         :param dict data: The custom slide's data in columnar order
         :param str old_title: Optional, the custom slide's original title so that it can be updated instead of inserted
         """
@@ -759,6 +802,13 @@ class ProjectOn(QObject):
                 connection.close()
 
     def save_image(self, data: dict, old_title: str | None = None):
+        """
+        Saves an image to the database by first scaling the image to a standardized thumbnail, then inserts or updates
+        the database with the info in its dictionary
+        :param dict data: The dictionary associated with the image
+        :param old_title: optional: The title of an image already existant in the database
+        :return: None
+        """
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -767,20 +817,21 @@ class ProjectOn(QObject):
                 if type(data[key]) == str:
                     data[key] = data[key].replace('"', '""')
 
+            pixmap = data['background'].scaled(
+                96,
+                54,
+                Qt.AspectRatioMode.IgnoreAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+
+            array = QByteArray()
+            buffer = QBuffer(array)
+            buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+            pixmap.save(buffer, 'JPG')
+            blob = bytes(array.data())
+
             # if old_title has been provided, this image already exists in the database and we need to use UPDATE
             if old_title:
-                pixmap = data['background'].scaled(
-                    96,
-                    54,
-                    Qt.AspectRatioMode.IgnoreAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation
-                )
-
-                array = QByteArray()
-                buffer = QBuffer(array)
-                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-                pixmap.save(buffer, 'JPG')
-                blob = bytes(array.data())
                 sql = (f'UPDATE imageThumbnails SET '
                        f'filename="{data["title"]}",'
                        f'image=?,'
@@ -791,18 +842,6 @@ class ProjectOn(QObject):
                 connection.commit()
                 connection.close()
             else:  # use INSERT INTO instead
-                pixmap = data['background'].scaled(
-                    96,
-                    54,
-                    Qt.AspectRatioMode.IgnoreAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation
-                )
-
-                array = QByteArray()
-                buffer = QBuffer(array)
-                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-                pixmap.save(buffer, 'JPG')
-                blob = bytes(array.data())
 
                 sql = (f'INSERT INTO imageThumbnails (filename, image, folder) VALUES ('
                        f'"{data["title"]}",'
@@ -817,7 +856,14 @@ class ProjectOn(QObject):
             if connection:
                 connection.close()
 
-    def save_video(self, data: dict, old_title: str | None = None):
+    def save_video(self, data: dict, old_title: str | None = None) -> int:
+        """
+        Saves a video to the database by first scaling the video to a standardized thumbnail, then inserts or updates
+        the database with the info in its dictionary
+        :param dict data: Dictionary associated with the video
+        :param old_title: optional: The title of a video already existant in the database
+        :return: int: 0 on success, -1 on exception
+        """
         connection = None
         try:
             connection = sqlite3.connect(self.database)
@@ -840,6 +886,7 @@ class ProjectOn(QObject):
                 cursor.execute(sql, (blob,))
                 connection.commit()
                 connection.close()
+                return 0
             else:  # use INSERT INTO instead
                 pixmap = data['background'].scaled(
                     96,
@@ -866,12 +913,13 @@ class ProjectOn(QObject):
             self.error_log()
             return -1
 
-    def save_web_item(self, data: dict, old_title: str | None = None):
+    def save_web_item(self, data: dict, old_title: str | None = None) -> int:
         """
         Stores the title and url of a web slide to the program's database. Checks the database first to see if the
         given title already exists.
         :param dict data: The title of the web slide
         :param str old_title: The url the web slide is to fetch
+        :param int: 0 on success, -1 on exception
         """
         connection = None
         try:
@@ -905,10 +953,11 @@ class ProjectOn(QObject):
                 connection.close()
             return -1
 
-    def delete_items_from_db(self, items: set):
+    def delete_items_from_db(self, items: set) -> int:
         """
         Provides a method of deleting a given item from the program's database.
-        :param set items: Set of two-value sets(type, title) to be removed
+        :param set items: Set of two-value tuples(type, title) to be removed
+        :return: int: 0 on success, -1 on exception
         """
         connection = None
         try:
@@ -960,7 +1009,7 @@ class ProjectOn(QObject):
     def delete_all_songs(self):
         """
         Provides a method for removing all of the songs from the database's 'songs' table. Checks and double-checks
-        with the user that they really want to do this.
+        with the user that they really want to do this. Not currently accessible by the user.
         """
         result = QMessageBox.question(
             self.gui.main_window,
@@ -1003,8 +1052,8 @@ class ProjectOn(QObject):
 
     def save_settings(self):
         """
-        Saves all of the settings currently stored in the self.settings variable to the settings.json file in the
-        program's data directory.
+        Saves all the settings currently stored in the self.settings dict to the settings.json file in the
+        program's data directory by threading the SaveSettings class.
         """
         save_settings = SaveSettings(self)
         self.thread_pool.start(save_settings)

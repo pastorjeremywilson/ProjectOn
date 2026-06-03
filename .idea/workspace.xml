@@ -7,21 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Added the ability to press the delete key in the media trees and the oos list widget to perform the same function as right-click:Delete. Fixed ghost drag-drop image remaining stuck to the cursor when dragging into the oos. Improved the deleting of items from trees and modified delete_item_from_db to accommodate.">
-      <change afterPath="$PROJECT_DIR$/src/resources/help/new_folder.svg" afterDir="false" />
+    <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Updated the help htmls to reflect recent changes.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/webRemote.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/webRemote.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/guiElements/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/help.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/help.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/previewWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/previewWidget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/widgets.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/file_menu.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/file_menu.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/intro.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/intro.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/main_screen.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/main_screen.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/media.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/media.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/media_box.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/media_box.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/menu_bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/menu_bar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/help/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/help/settings.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -243,14 +233,6 @@
       <workItem from="1773353381997" duration="4340000" />
       <workItem from="1773440353057" duration="2305000" />
       <workItem from="1773763513455" duration="19000" />
-    </task>
-    <task id="LOCAL-00158" summary="Added code to send grab of display window to the stage webpage as jpg bytes.">
-      <option name="closed" value="true" />
-      <created>1768532103332</created>
-      <option name="number" value="00158" />
-      <option name="presentableId" value="LOCAL-00158" />
-      <option name="project" value="LOCAL" />
-      <updated>1768532103332</updated>
     </task>
     <task id="LOCAL-00159" summary="Added selection between text and mirror for the stage view to the display settings. Added slightly different background to the button widgets in settings and edit windows. Moved the edit buttons outside of the QScrollArea to keep visible. Minor tweaks to the GUI colors in light mode.">
       <option name="closed" value="true" />
@@ -636,7 +618,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780093173090</updated>
     </task>
-    <option name="localTasksCounter" value="207" />
+    <task id="LOCAL-00207" summary="Updated the help htmls to reflect recent changes.">
+      <option name="closed" value="true" />
+      <created>1780194563461</created>
+      <option name="number" value="00207" />
+      <option name="presentableId" value="LOCAL-00207" />
+      <option name="project" value="LOCAL" />
+      <updated>1780194563462</updated>
+    </task>
+    <option name="localTasksCounter" value="208" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -657,7 +647,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="More bug squashing, made tags uneditable in edit widget's lyric_text_edit, added context menu to remove such tags, fixed updating data on lyric editor save" />
     <MESSAGE value="Changed the lyrics editor textEdit to FormattableTextEdit" />
     <MESSAGE value="Reorganized project files into a source directory and sub-directories; fixed relative paths in the code" />
     <MESSAGE value="Fixed the rest of the deprecated regedit strings; improved the light theme QSS; fixed the operation of the checkable screen buttons; began rewriting the help contents" />
@@ -682,7 +671,8 @@
     <MESSAGE value="Changed the process for moving media items into a folder from copy/paste to listing the folders; changed CustomTreeWidget.delete_item to handle multiple selected items; added an &quot;Empty Folder&quot; option to QTreeWidgetItem's context menu." />
     <MESSAGE value="Added the ability to save a service as a &quot;Fixed Service&quot;, meaning that all data for each slide in the order of service is preserved in the save file. The data is loaded for each slide from the file as opposed to loading data from the items in the media widget. Fixed missing slide placeholders not showing correctly." />
     <MESSAGE value="Added the ability to press the delete key in the media trees and the oos list widget to perform the same function as right-click:Delete. Fixed ghost drag-drop image remaining stuck to the cursor when dragging into the oos. Improved the deleting of items from trees and modified delete_item_from_db to accommodate." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added the ability to press the delete key in the media trees and the oos list widget to perform the same function as right-click:Delete. Fixed ghost drag-drop image remaining stuck to the cursor when dragging into the oos. Improved the deleting of items from trees and modified delete_item_from_db to accommodate." />
+    <MESSAGE value="Updated the help htmls to reflect recent changes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the help htmls to reflect recent changes." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

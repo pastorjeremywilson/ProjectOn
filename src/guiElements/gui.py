@@ -637,7 +637,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0.008'
+        current_version = 'v.1.10.0.009'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -853,7 +853,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_layout.addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0.008')
+        title_label = QLabel('ProjectOn v.1.10.0.009')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_layout.addWidget(title_label)
         title_layout.addStretch()
@@ -2292,6 +2292,11 @@ class GUI(QObject):
         """
         Method to toggle a black screen on and off
         """
+        # if this method was called from GUI.display_black_screen_signal, programmatically toggle the checked state
+        # of the button
+        if type(self.sender()) == GUI:
+            self.tool_bar.black_screen_button.setChecked(not self.tool_bar.black_screen_button.isChecked())
+
         if self.tool_bar.black_screen_button.isChecked():
             # ensure the display widget is not being hidden
             if self.tool_bar.hide_display_button.isChecked():
@@ -2335,6 +2340,11 @@ class GUI(QObject):
         # make sure a logo image is set, use default if not
         if len(self.main.settings['logo_image'].strip()) == 0 or 'choose' in self.main.settings['logo_image'].lower():
             self.main.settings['logo_image'] = 'background.png'
+
+        # if this method was called from GUI.display_logo_screen_signal, programmatically toggle the checked state
+        # of the button
+        if type(self.sender()) == GUI:
+            self.tool_bar.logo_screen_button.setChecked(not self.tool_bar.logo_screen_button.isChecked())
 
         if self.tool_bar.logo_screen_button.isChecked():
             #ensure the display widget is not being hidden
