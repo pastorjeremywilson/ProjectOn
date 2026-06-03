@@ -618,7 +618,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0'
+        current_version = 'v.1.10.1'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -834,7 +834,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0')
+        title_label = QLabel('ProjectOn v.1.10.1')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()
@@ -2244,10 +2244,16 @@ class GUI(QObject):
             self.display_widget.show()
         self.live_widget.slide_list.setFocus()
 
-    def display_black_screen(self):
+    def display_black_screen(self, checked=None):
         """
         Method to toggle a black screen on and off
         """
+        # if checked argument wasn't supplied, this was called from the display_black_screen_signal, so programmatically
+        # toggle the checked state of the button
+        if checked is None:
+            checked = not self.tool_bar.black_screen_button.isChecked()
+            self.tool_bar.black_screen_button.setChecked(checked)
+
         if self.tool_bar.black_screen_button.isChecked():
             # ensure the display widget is not being hidden
             if self.tool_bar.hide_display_button.isChecked():
@@ -2284,10 +2290,16 @@ class GUI(QObject):
                 else:
                     self.lyric_widget.show()
 
-    def display_logo_screen(self):
+    def display_logo_screen(self, checked=None):
         """
         Method to toggle the logo widget on and off
         """
+        # if checked argument wasn't supplied, this was called from the display_logo_screen_signal, so programmatically
+        # toggle the checked state of the button
+        if checked is None:
+            checked = not self.tool_bar.logo_screen_button.isChecked()
+            self.tool_bar.logo_screen_button.setChecked(checked)
+
         # make sure a logo image is set, use default if not
         if len(self.main.settings['logo_image'].strip()) == 0 or 'choose' in self.main.settings['logo_image'].lower():
             self.main.settings['logo_image'] = 'background.png'
