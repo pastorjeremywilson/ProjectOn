@@ -4477,7 +4477,8 @@ class Toolbar(QWidget):
         self.black_screen_button.setToolTip('Show a Black Screen')
         self.black_screen_button.setIconSize(self.gui.toolbar_icon_size)
         self.black_screen_button.setCheckable(True)
-        self.black_screen_button.released.connect(self.gui.display_black_screen)
+        self.black_screen_button.released.connect(
+            lambda: self.gui.display_black_screen(self.black_screen_button.isChecked()))
         self.layout.addWidget(self.black_screen_button)
 
         self.logo_screen_button = QPushButton()
@@ -4485,7 +4486,8 @@ class Toolbar(QWidget):
         self.logo_screen_button.setToolTip('Show the Logo Screen')
         self.logo_screen_button.setIconSize(self.gui.toolbar_icon_size)
         self.logo_screen_button.setCheckable(True)
-        self.logo_screen_button.released.connect(self.gui.display_logo_screen)
+        self.logo_screen_button.released.connect(
+            lambda: self.gui.display_logo_screen(self.logo_screen_button.isChecked()))
         self.layout.addWidget(self.logo_screen_button)
 
     def show_font_widget(self, slide_type: str):

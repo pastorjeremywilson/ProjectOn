@@ -1285,7 +1285,7 @@ class ProjectOn(QObject):
 
     def finish_load(self, filename):
         self.gui.oos_widget.oos_list_widget.clear()
-        
+
         # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
         # provide a splash
         wait_widget = SimpleSplash(self.gui, 'Loading service...')

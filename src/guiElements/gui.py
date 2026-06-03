@@ -676,7 +676,7 @@ class GUI(QObject):
             if 'skip_update' in self.main.settings.keys():
                 if self.main.settings['skip_update'] == newest_version['tag_name']:
                     return
-                
+
             if ask_update:
                 release_notes = newest_version['body'].split('[!')[0].strip()
 
@@ -690,9 +690,10 @@ class GUI(QObject):
                 label.setFont(self.standard_font)
                 layout.addWidget(label)
 
-                notes_label = QLabel(release_notes)
+                notes_text_edit = QTextEdit()
+                notes_text_edit.setMarkdown(release_notes)
                 label.setFont(self.standard_font)
-                layout.addWidget(notes_label)
+                layout.addWidget(notes_text_edit)
 
                 checkbox = QCheckBox('Don\'t remind me again for this version')
                 layout.addWidget(checkbox, Qt.AlignmentFlag.AlignCenter)
@@ -2288,14 +2289,15 @@ class GUI(QObject):
             self.display_widget.show()
         self.live_widget.slide_list.setFocus()
 
-    def display_black_screen(self):
+    def display_black_screen(self, checked=None):
         """
         Method to toggle a black screen on and off
         """
-        # if this method was called from GUI.display_black_screen_signal, programmatically toggle the checked state
-        # of the button
-        if type(self.sender()) == GUI:
-            self.tool_bar.black_screen_button.setChecked(not self.tool_bar.black_screen_button.isChecked())
+        # if checked argument wasn't supplied, this was called from the display_black_screen_signal, so programmatically
+        # toggle the checked state of the button
+        if checked is None:
+            checked = not self.tool_bar.black_screen_button.isChecked()
+            self.tool_bar.black_screen_button.setChecked(checked)
 
         if self.tool_bar.black_screen_button.isChecked():
             # ensure the display widget is not being hidden
@@ -2306,7 +2308,7 @@ class GUI(QObject):
             # ensure that the logo widget is not being shown
             if self.tool_bar.logo_screen_button.isChecked():
                 self.tool_bar.logo_screen_button.setChecked(False)
-                self.display_logo_screen()
+                self.display_logo_screen(False)
 
             self.blackout_widget.show()
 
@@ -2333,10 +2335,16 @@ class GUI(QObject):
                 else:
                     self.lyric_widget.show()
 
-    def display_logo_screen(self):
+    def display_logo_screen(self, checked=None):
         """
         Method to toggle the logo widget on and off
         """
+        # if checked argument wasn't supplied, this was called from the display_logo_screen_signal, so programmatically
+        # toggle the checked state of the button
+        if checked is None:
+            checked = not self.tool_bar.logo_screen_button.isChecked()
+            self.tool_bar.logo_screen_button.setChecked(checked)
+
         # make sure a logo image is set, use default if not
         if len(self.main.settings['logo_image'].strip()) == 0 or 'choose' in self.main.settings['logo_image'].lower():
             self.main.settings['logo_image'] = 'background.png'
@@ -2355,7 +2363,7 @@ class GUI(QObject):
             # ensure the black widget is not being shown
             if self.tool_bar.black_screen_button.isChecked():
                 self.tool_bar.black_screen_button.setChecked(False)
-                self.display_black_screen()
+                self.display_black_screen(False)
 
             self.logo_widget.show()
             self.logo_label.show()
