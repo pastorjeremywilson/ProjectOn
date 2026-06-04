@@ -120,7 +120,7 @@ class OpenLPImport:
                             verse_order_split[i] = 't1'
                 verse_order = ' '.join(verse_order_split)
 
-                data = SLIDE_DATA_DEFAULTS
+                data = SLIDE_DATA_DEFAULTS.copy()
                 data['type'] = 'song'
                 data['title'] = title
                 data['author'] = author

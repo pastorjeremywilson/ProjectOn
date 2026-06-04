@@ -618,7 +618,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.2'
+        current_version = 'v.1.10.3'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -657,7 +657,7 @@ class GUI(QObject):
             if 'skip_update' in self.main.settings.keys():
                 if self.main.settings['skip_update'] == newest_version['tag_name']:
                     return
-                
+
             if ask_update:
                 release_notes = newest_version['body'].split('[!')[0].strip()
 
@@ -671,9 +671,10 @@ class GUI(QObject):
                 label.setFont(self.standard_font)
                 layout.addWidget(label)
 
-                notes_label = QLabel(release_notes)
+                notes_text_edit = QTextEdit()
+                notes_text_edit.setMarkdown(release_notes)
                 label.setFont(self.standard_font)
-                layout.addWidget(notes_label)
+                layout.addWidget(notes_text_edit)
 
                 checkbox = QCheckBox('Don\'t remind me again for this version')
                 layout.addWidget(checkbox, Qt.AlignmentFlag.AlignCenter)
@@ -834,7 +835,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_widget.layout().addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.2')
+        title_label = QLabel('ProjectOn v.1.10.3')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_widget.layout().addWidget(title_label)
         title_widget.layout().addStretch()

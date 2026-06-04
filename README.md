@@ -16,9 +16,10 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.10.2?
-***Two bugs crept into version 1.10.0 where the black/logo screen buttons stopped working and new Custom Slide titles
-    weren't saving. This version fixes those.***
+# What's New in Version 1.10.3?
+***Three bugs crept into version 1.10.0 where the black/logo screen buttons stopped working, slide editor was retaining
+    slide info when creating a second new song/custom slide, and new Custom Slide titles weren't saving. 
+    This version fixes those.***
 
 This is a pretty major update, addressing a variety of fixes I've been wanting to make to the program's usability
 and reliability.
@@ -34,7 +35,7 @@ and reliability.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.10.2) and run
+system only. Download the current ProjectOn installer (v.1.10.3) and run
 it on your computer.
 
 # Using ProjectOn

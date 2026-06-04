@@ -176,7 +176,7 @@ class Importers:
                 lyrics = ''
                 tag = ''
 
-                data = SLIDE_DATA_DEFAULTS
+                data = SLIDE_DATA_DEFAULTS.copy()
                 data['type'] = 'song'
                 
                 content_tags = re.findall(r'\{.*?}', file_contents)
@@ -279,7 +279,7 @@ class Importers:
                     ElementTree.register_namespace('', namespace)
                     ns = {'': namespace}
 
-                data = SLIDE_DATA_DEFAULTS
+                data = SLIDE_DATA_DEFAULTS.copy()
 
                 song_title = ''
                 song_titles = root.findall('.//properties/titles/title', ns)

@@ -37,17 +37,16 @@ class EditWidget(QDialog):
         self.gui = gui
         self.lyrics_edit = None
         self.old_title = None
-        self.new_custom = False
+        self.new_item = False
         self.from_oos = from_oos
-        self.new_song = False
         self.data = data
         self.type = data['type']
 
         self.setObjectName('edit_widget')
         self.setWindowFlag(Qt.WindowType.Window)
 
-        if self.data['title'] == '':
-            self.new_song = True
+        if self.data is None or self.data['title'] == '':
+            self.new_item = True
         else:
             self.old_title = self.data['title']
 
@@ -229,7 +228,7 @@ class EditWidget(QDialog):
         model = QStandardItemModel()
         self.lyrics_list_widget.setModel(model)
         self.lyrics_list_widget.selectionModel().currentChanged.connect(self.update_preview_widget)
-        self.lyrics_list_widget.setItemDelegate(LyricDelegate(self.lyrics_list_widget, self.gui))
+        self.lyrics_list_widget.setItemDelegate(LyricDelegate(self.lyrics_list_widget, self.gui, self))
         self.lyrics_list_widget.setDragEnabled(True)
         self.lyrics_list_widget.setAcceptDrops(True)
         self.lyrics_list_widget.setDragDropOverwriteMode(False)
@@ -1825,7 +1824,7 @@ class EditWidget(QDialog):
             return
 
         self.update_song_data()
-        if self.new_song:
+        if self.new_item:
             if self.title_line_edit.text() in self.gui.main.get_song_titles():
                 dialog = QDialog(self.gui.main_window)
                 dialog.setLayout(QVBoxLayout())
@@ -1885,7 +1884,7 @@ class EditWidget(QDialog):
             if len(items) > 0:
                 self.gui.media_widget.song_list.setCurrentItem(items[0])
 
-        self.deleteLater()
+        self.done(0)
         save_widget.widget.deleteLater()
 
     def save_custom(self):
@@ -1893,7 +1892,7 @@ class EditWidget(QDialog):
         Method to save user's changes for the custom slide type editor.
         """
 
-        if self.new_custom:
+        if self.new_item:
             if self.title_line_edit.text() in self.gui.main.get_custom_titles():
                 dialog = QDialog(self.gui.main_window)
                 dialog.setLayout(QVBoxLayout())
@@ -2228,9 +2227,10 @@ class LyricListWidget(QListView):
 
 
 class LyricDelegate(QStyledItemDelegate):
-    def __init__(self, parent, gui):
+    def __init__(self, parent, gui, edit_widget):
         super().__init__(parent)
         self.gui = gui
+        self.edit_widget = edit_widget
         self.type_combobox = QComboBox()
         self.number_spinbox = QSpinBox()
         self.lyrics_text_edit = FormattableTextEdit(self.gui)
@@ -2262,7 +2262,7 @@ class LyricDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         # Take the text from widgets and save it back to the model
         type = f'[{self.type_combobox.currentText()} {self.number_spinbox.value()}]'
-        lyrics = self.gui.edit_widget.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
+        lyrics = self.edit_widget.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
         data = [
             type,
             lyrics
@@ -2290,10 +2290,10 @@ class LyricDelegate(QStyledItemDelegate):
             data = index.data(Qt.ItemDataRole.UserRole)
             lyrics_html += f'{data[0]}<br />{data[1]}<br />'
         lyrics_html = lyrics_html[:-6]
-        self.gui.edit_widget.data['text'] = lyrics_html
-        self.gui.edit_widget.data['parsed_text'] = parsers.parse_song_data(self.gui, self.gui.edit_widget.data)
-        self.gui.edit_widget.lyrics_text_edit.text_edit.setHtml(
-            self.gui.edit_widget.get_simplified_text(lyrics_html))
+        self.edit_widget.data['text'] = lyrics_html
+        self.edit_widget.data['parsed_text'] = parsers.parse_song_data(self.gui, self.edit_widget.data)
+        self.edit_widget.lyrics_text_edit.text_edit.setHtml(
+            self.edit_widget.get_simplified_text(lyrics_html))
 
     def destroyEditor(self, editor, index):
         # Reset the editing index when done

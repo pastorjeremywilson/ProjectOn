@@ -76,7 +76,7 @@ class MediaWidget(QTabWidget):
         add_button.setToolTip('Add a New Song')
         add_button.setIconSize(QSize(20, 20))
         add_button.setFixedSize(30, 30)
-        add_button.clicked.connect(lambda: self.add_song('song'))
+        add_button.clicked.connect(lambda: self.add_item('song'))
         song_layout.addWidget(add_button)
 
         search_widget = QWidget()
@@ -260,7 +260,7 @@ class MediaWidget(QTabWidget):
         add_custom_button.setToolTip('Create a New Custom Slide')
         add_custom_button.setIconSize(QSize(20, 20))
         add_custom_button.setFixedSize(30, 30)
-        add_custom_button.clicked.connect(lambda: self.add_song('custom'))
+        add_custom_button.clicked.connect(lambda: self.add_item('custom'))
         custom_layout.addWidget(add_custom_button)
 
         button_widget = QWidget()
@@ -731,14 +731,14 @@ class MediaWidget(QTabWidget):
 
             self.formatted_reference = None
 
-    def add_song(self, type):
+    def add_item(self, slide_type):
         """
         Method to create an instance of EditWidget.
-        :param str type: Whether the type to be added is a 'song' or a 'custom' slide
+        :param str slide_type: Whether the type to be added is a 'song' or a 'custom' slide
         """
-        song_data = SLIDE_DATA_DEFAULTS
-        song_data['type'] = type
-        self.gui.edit_widget = EditWidget(self.gui, song_data, type)
+        song_data = SLIDE_DATA_DEFAULTS.copy()
+        song_data['type'] = slide_type
+        EditWidget(self.gui, song_data, slide_type)
 
     def send_to_live(self):
         self.gui.preview_widget.slide_list.setCurrentRow(0)
@@ -1391,9 +1391,9 @@ class CustomListWidget(QListWidget):
         if self.itemAt(self.item_pos):
             data = self.itemAt(self.item_pos).data(Qt.ItemDataRole.UserRole)
             if data['type'] == 'song':
-                self.gui.edit_widget = EditWidget(self.gui, data, 'song')
+                EditWidget(self.gui, data, 'song')
             elif data['type'] == 'custom':
-                self.gui.edit_widget = EditWidget(self.gui, data, 'custom')
+                EditWidget(self.gui, data, 'custom')
 
     def edit_web(self):
         if self.itemAt(self.item_pos):
