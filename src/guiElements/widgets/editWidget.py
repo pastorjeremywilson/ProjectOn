@@ -1861,25 +1861,35 @@ class EditWidget(QDialog):
 
         self.gui.main.save_song(self.data, self.old_title)
 
-        # set the data in the media widget's song list item for this song
-        items = self.gui.media_widget.song_list.findItems(self.old_title.lower(), Qt.MatchFlag.MatchExactly, 0)
-        if len(items) > 0:
-            items[0].setData(0, Qt.ItemDataRole.UserRole, self.data)
-            items[0].setData(0, Qt.ItemDataRole.DisplayRole, self.data['title'])
+        # create an item or change the data of an existing item in the media widget's song list item for this song
+        if self.new_item:
+            pixmap = QPixmap('resources/gui_icons/song_icon.svg')
+            pixmap = pixmap.scaled(
+                20,
+                20,
+                Qt.AspectRatioMode.IgnoreAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+            self.gui.media_widget.song_list.add_item(self.data['title'], self.data, pixmap)
+        else:
+            items = self.gui.media_widget.song_list.findItems(self.old_title.lower(), Qt.MatchFlag.MatchExactly, 0)
+            if len(items) > 0:
+                items[0].setData(0, Qt.ItemDataRole.UserRole, self.data)
+                items[0].setData(0, Qt.ItemDataRole.DisplayRole, self.data['title'])
 
-            if not self.from_oos:
-                self.gui.media_widget.song_list.setCurrentItem(items[0])
-                self.gui.send_to_preview(items[0])
+                if not self.from_oos:
+                    self.gui.media_widget.song_list.setCurrentItem(items[0])
+                    self.gui.send_to_preview(items[0])
 
-        # check if this song is in the oos list and set its data accordingly
-        items = self.gui.oos_widget.oos_list_widget.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
-        if len(items) > 0:
-            items[0].setData(Qt.ItemDataRole.UserRole, self.data)
-            items[0].setData(Qt.ItemDataRole.DisplayRole, self.data['title'])
+            # check if this song is in the oos list and set its data accordingly
+            items = self.gui.oos_widget.oos_list_widget.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
+            if len(items) > 0:
+                items[0].setData(Qt.ItemDataRole.UserRole, self.data)
+                items[0].setData(Qt.ItemDataRole.DisplayRole, self.data['title'])
 
-            if self.from_oos:
-                self.gui.oos_widget.oos_list_widget.setCurrentItem(items[0])
-                self.gui.send_to_preview(items[0])
+                if self.from_oos:
+                    self.gui.oos_widget.oos_list_widget.setCurrentItem(items[0])
+                    self.gui.send_to_preview(items[0])
 
         self.done(0)
         save_widget.widget.deleteLater()
@@ -1937,27 +1947,35 @@ class EditWidget(QDialog):
         self.save_widget = SimpleSplash(self.gui, 'Saving...')
         self.gui.main.save_custom(self.data, self.old_title)
 
-        # set the data in the media widget's custom list item for this song
-        items = self.gui.media_widget.custom_list.findItems(self.old_title.lower(), Qt.MatchFlag.MatchExactly, 0)
-        print(f'len custom list items: {len(items)}')
-        if len(items) > 0:
-            items[0].setData(0, Qt.ItemDataRole.UserRole, self.data)
-            items[0].setData(0, Qt.ItemDataRole.DisplayRole, self.data['title'])
+        # create an item or change the data of an existing item in the media widget's custom list item for this custom slide
+        if self.new_item:
+            pixmap = QPixmap('resources/gui_icons/custom_slide_icon.svg')
+            pixmap = pixmap.scaled(
+                20,
+                20,
+                Qt.AspectRatioMode.IgnoreAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+            self.gui.media_widget.custom_list.add_item(self.data['title'], self.data, pixmap)
+        else:
+            items = self.gui.media_widget.custom_list.findItems(self.old_title.lower(), Qt.MatchFlag.MatchExactly, 0)
+            if len(items) > 0:
+                items[0].setData(0, Qt.ItemDataRole.UserRole, self.data)
+                items[0].setData(0, Qt.ItemDataRole.DisplayRole, self.data['title'])
 
-            if not self.from_oos:
-                self.gui.media_widget.custom_list.setCurrentItem(items[0])
-                self.gui.send_to_preview(items[0])
+                if not self.from_oos:
+                    self.gui.media_widget.custom_list.setCurrentItem(items[0])
+                    self.gui.send_to_preview(items[0])
 
-        # check if this custom slide is in the oos list and set its data accordingly
-        items = self.gui.oos_widget.oos_list_widget.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
-        print(f'len oos list items: {len(items)}')
-        if len(items) > 0:
-            items[0].setData(Qt.ItemDataRole.UserRole, self.data)
-            items[0].setData(Qt.ItemDataRole.DisplayRole, self.data['title'])
+            # check if this custom slide is in the oos list and set its data accordingly
+            items = self.gui.oos_widget.oos_list_widget.findItems(self.data['title'], Qt.MatchFlag.MatchExactly)
+            if len(items) > 0:
+                items[0].setData(Qt.ItemDataRole.UserRole, self.data)
+                items[0].setData(Qt.ItemDataRole.DisplayRole, self.data['title'])
 
-            if self.from_oos:
-                self.gui.oos_widget.oos_list_widget.setCurrentItem(items[0])
-                self.gui.send_to_preview(items[0])
+                if self.from_oos:
+                    self.gui.oos_widget.oos_list_widget.setCurrentItem(items[0])
+                    self.gui.send_to_preview(items[0])
 
         self.done(0)
         self.save_widget.widget.deleteLater()

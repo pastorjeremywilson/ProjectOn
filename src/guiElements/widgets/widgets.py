@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QLi
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
     QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog, QStyledItemDelegate, QTreeWidget, \
-    QTreeWidgetItem, QMenu, QAction, QStyleOptionViewItem
+    QTreeWidgetItem, QMenu, QAction, QStyleOptionViewItem, QProgressBar
 
 from importExport.openlpImport import OpenLPImport
 
@@ -1913,12 +1913,13 @@ class SimpleSplash:
     Provides a simple and standardized popup for showing messages
     """
 
-    def __init__(self, gui, text: str | None = '', subtitle: bool | None = False, parent: QWidget | None = None):
+    def __init__(self, gui, text: str | None = '', subtitle: bool | None = False, progress: bool = False, parent: QWidget | None = None):
         """
         Provides a simple and standardized popup for showing messages
         :param guiElements.GUI gui: the current instance of GUI
         :param str text: the text to be displayed
-        :param str subtitle: optional: subtitle to be displayed under the text
+        :param bool subtitle: optional: Whether a subtitle will be used
+        :param bool progress: optional: Whether a progress bar will be used
         :param obj parent: optional: parent widget for SimpleSplash's main widget
         """
         self.gui = gui
@@ -1946,6 +1947,12 @@ class SimpleSplash:
             self.subtitle_label.setObjectName('simple_splash_subtitle_label')
             self.subtitle_label.setFont(self.gui.list_font)
             layout.addWidget(self.subtitle_label, 1, 0, Qt.AlignmentFlag.AlignHCenter)
+
+        if progress:
+            self.progress_bar = QProgressBar()
+            self.progress_bar.setRange(0, 100)
+            self.progress_bar.setFont(self.gui.standard_font)
+            layout.addWidget(self.progress_bar)
 
         container.adjustSize()
         self.widget.adjustSize()

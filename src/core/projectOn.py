@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.009
+ProjectOn v.1.10.0.010
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -204,7 +204,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.0.009')
+        version_label = QLabel('v.1.10.0.010')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -606,7 +606,9 @@ class ProjectOn(QObject):
 
         folders = set()
         for item in result:
-            folders.add(item[0].strip())
+            folder_name = item[0].strip()
+            if len(folder_name) > 0:
+                folders.add(folder_name)
 
         return list(folders)
 
@@ -875,7 +877,7 @@ class ProjectOn(QObject):
             data['background'].save(buffer, 'JPG')
             blob = bytes(array.data())
 
-            # if old_title has been provided, this image already exists in the database and we need to use UPDATE
+            # if old_title has been provided, this video already exists in the database so we need to use UPDATE
             if old_title:
                 sql = (f'UPDATE videos SET '
                        f'filename="{data["title"]}",'
@@ -888,25 +890,20 @@ class ProjectOn(QObject):
                 connection.close()
                 return 0
             else:  # use INSERT INTO instead
-                pixmap = data['background'].scaled(
-                    96,
-                    54,
-                    Qt.AspectRatioMode.IgnoreAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation
-                )
-
+                pixmap = data['background']
                 array = QByteArray()
                 buffer = QBuffer(array)
                 buffer.open(QIODevice.OpenModeFlag.WriteOnly)
                 pixmap.save(buffer, 'JPG')
                 blob = bytes(array.data())
 
-                sql = (f'INSERT INTO imageThumbnails (filename, image, folder) VALUES ('
+                sql = (f'INSERT INTO videos (filename, thumbnail, folder) VALUES ('
                        f'"{data["title"]}",'
                        f'?,'
                        f'"{data["folder"]}");')
                 cursor.execute(sql, (blob,))
                 connection.commit()
+                buffer.close()
                 connection.close()
             return 0
         except Exception:
@@ -2076,6 +2073,32 @@ class ProjectOn(QObject):
             f'You are now working with the data folder located at\n{target_directory}.',
             QMessageBox.StandardButton.Ok
         )
+
+    def copy_file_with_progress(self, src, dst, callback=None, chunk_size=1024 * 1024):
+        """
+        Copies a file from src to dst and reports progress via a callback function.
+        chunk_size defaults to 1MB.
+        :param str src: source file
+        :param str dst: destination file
+        :param callable callback: callback function to report progress
+        :param int chunk_size: chunk size in bytes
+        """
+        total_size = os.path.getsize(src)
+        bytes_copied = 0
+
+        with open(src, 'rb') as fsrc:
+            with open(dst, 'wb') as fdst:
+                while True:
+                    chunk = fsrc.read(chunk_size)
+                    if not chunk:
+                        break
+                    fdst.write(chunk)
+                    bytes_copied += len(chunk)
+
+                    # Calculate percentage and send it to the callback
+                    if callback:
+                        percentage = int((bytes_copied / total_size) * 100)
+                        callback(percentage)
 
 
 def log_unhandled_exception(exc_type, exc_value, exc_traceback):

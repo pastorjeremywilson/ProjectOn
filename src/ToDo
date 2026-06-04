@@ -46,10 +46,18 @@ Done:
     Finish select data folder
     Test bible on new installation
     Fix remote item press sometimes loading the next slide
+    Fixed black/logo screen buttons on web remote not working
+    Fixed Title not saving in new custom slide
+    Fixed custom slide data being retained after saving new slide
+    Add copying/thumbnail feedback when importing a video
+    Figure out why new videos aren't saving to database
+    See about changing thumbnails for video import to bytes instead of files
 
 To Do:
-    Add copying/thumbnail feedback when importing a video
+    Style QProgressBar
+    Unload video if loaded during remove
     Add video playing progress bar or slider
+    Fix Ignore update not working
 
 Future Releases:
     Video backgrounds

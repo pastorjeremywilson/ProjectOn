@@ -47,7 +47,6 @@ class RemoteServer:
             oos = ''
             slides = ''
             if request.method == "POST":
-                print(request.data)
                 if 'oos_title' in request.form:
                     try:
                         num = request.form.get('oos_title')

@@ -637,7 +637,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0.009'
+        current_version = 'v.1.10.0.010'
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -854,7 +854,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_layout.addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0.009')
+        title_label = QLabel('ProjectOn v.1.10.0.010')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_layout.addWidget(title_label)
         title_layout.addStretch()
@@ -2300,17 +2300,18 @@ class GUI(QObject):
             self.tool_bar.black_screen_button.setChecked(checked)
 
         if self.tool_bar.black_screen_button.isChecked():
-            # ensure the display widget is not being hidden
-            if self.tool_bar.hide_display_button.isChecked():
-                self.tool_bar.hide_display_button.setChecked(False)
-                self.show_hide_display_screen()
+            self.blackout_widget.show()
 
             # ensure that the logo widget is not being shown
             if self.tool_bar.logo_screen_button.isChecked():
                 self.tool_bar.logo_screen_button.setChecked(False)
-                self.display_logo_screen(False)
+                self.logo_widget.hide()
+                self.logo_label.hide()
 
-            self.blackout_widget.show()
+            # ensure the display widget is not being hidden
+            if self.tool_bar.hide_display_button.isChecked():
+                self.tool_bar.hide_display_button.setChecked(False)
+                self.show_hide_display_screen()
 
             # hide all the other widgets in the display widget
             if not self.lyric_widget.isHidden():
@@ -2341,33 +2342,31 @@ class GUI(QObject):
         """
         # if checked argument wasn't supplied, this was called from the display_logo_screen_signal, so programmatically
         # toggle the checked state of the button
-        if checked is None:
-            checked = not self.tool_bar.logo_screen_button.isChecked()
-            self.tool_bar.logo_screen_button.setChecked(checked)
 
         # make sure a logo image is set, use default if not
         if len(self.main.settings['logo_image'].strip()) == 0 or 'choose' in self.main.settings['logo_image'].lower():
             self.main.settings['logo_image'] = 'background.png'
 
-        # if this method was called from GUI.display_logo_screen_signal, programmatically toggle the checked state
-        # of the button
-        if type(self.sender()) == GUI:
-            self.tool_bar.logo_screen_button.setChecked(not self.tool_bar.logo_screen_button.isChecked())
+        if checked is None:
+            checked = not self.tool_bar.logo_screen_button.isChecked()
+            self.tool_bar.logo_screen_button.setChecked(checked)
+            self.main.app.processEvents()
 
         if self.tool_bar.logo_screen_button.isChecked():
+            self.logo_widget.show()
+            self.logo_label.show()
+
+            # ensure the black widget is not being shown
+            if self.tool_bar.black_screen_button.isChecked():
+                self.tool_bar.black_screen_button.setChecked(False)
+                self.blackout_widget.hide()
+
             #ensure the display widget is not being hidden
             if self.tool_bar.hide_display_button.isChecked():
                 self.tool_bar.hide_display_button.setChecked(False)
                 self.show_hide_display_screen()
 
-            # ensure the black widget is not being shown
-            if self.tool_bar.black_screen_button.isChecked():
-                self.tool_bar.black_screen_button.setChecked(False)
-                self.display_black_screen(False)
-
-            self.logo_widget.show()
-            self.logo_label.show()
-
+            # hide all the other widgets in the display widget
             if not self.lyric_widget.isHidden():
                 self.lyric_widget.hide()
             if self.video_widget and not self.video_widget.isHidden():
@@ -2376,7 +2375,9 @@ class GUI(QObject):
                 self.web_view.hide()
         else:
             self.logo_widget.hide()
+            self.logo_label.hide()
 
+            # if there is a currently-selected live item, show that
             if self.live_widget.slide_list.currentItem():
                 if self.tool_bar.black_screen_button.isChecked():
                     self.tool_bar.black_screen_button.setChecked(False)

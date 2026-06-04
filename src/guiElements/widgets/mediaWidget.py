@@ -6,7 +6,7 @@ from threading import Thread
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QSize, QPoint
-from PyQt5.QtGui import QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen
+from PyQt5.QtGui import QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen, QImage
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, \
     QApplication, QTreeWidgetItem
@@ -1104,24 +1104,49 @@ class MediaWidget(QTabWidget):
         )
 
         if len(result[0]) > 0:
-            wait_widget = SimpleSplash(self.gui, 'Importing video, please wait...')
+            wait_widget = SimpleSplash(self.gui, 'Importing video, please wait...', subtitle=True, progress=True)
+
+            def show_progress(percent_done):
+                wait_widget.progress_bar.setValue(percent_done)
+                self.gui.main.app.processEvents()
 
             file_name_split = result[0].split('/')
             file_name = file_name_split[len(file_name_split) - 1]
-            shutil.copy(result[0], self.gui.main.video_dir + '/' + file_name)
+            wait_widget.subtitle_label.setText(f'Importing {file_name}')
+            self.gui.main.copy_file_with_progress(
+                result[0], self.gui.main.video_dir + '/' + file_name, callback=show_progress)
 
             try:
-                wait_widget.label.setText('Getting thumbnails, please wait...')
+                wait_widget.subtitle_label.setText('Processing video')
+                wait_widget.progress_bar.setValue(0)
+                wait_widget.progress_bar.setRange(0, 500)
                 wait_widget.widget.adjustSize()
                 QApplication.processEvents()
                 import cv2
                 cap = cv2.VideoCapture(self.gui.main.video_dir + '/' + file_name)
                 iteration = 0
+                wait_widget.subtitle_label.setText('Getting thumbnails')
+                QApplication.processEvents()
+
+                thumbnail_pixmaps = []
                 while True:
+                    wait_widget.progress_bar.setValue(iteration)
+                    QApplication.processEvents()
                     result, frame = cap.read()
                     if iteration % 100 == 0:
                         if result:
-                            cv2.imwrite(f'{os.path.expanduser("~/AppData/Roaming/ProjectOn")}/thumbnail{str(iteration)}.jpg', frame)
+                            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                            height, width, channels = rgb_frame.shape
+                            bytes_per_line = channels * width
+                            q_image = QImage(
+                                rgb_frame.data,
+                                width,
+                                height,
+                                bytes_per_line,
+                                QImage.Format.Format_RGB888
+                            )
+                            pixmap = QPixmap.fromImage(q_image).copy()
+                            thumbnail_pixmaps.append(pixmap)
                         else:
                             break
                     iteration += 1
@@ -1142,32 +1167,33 @@ class MediaWidget(QTabWidget):
                 thumbnail_list.setObjectName('thumbnail_list')
                 thumbnail_list.currentItem()
                 thumbnail_list.itemClicked.connect(
-                    lambda: self.copy_video(
-                        file_name, thumbnail_list.currentItem().data(20),
+                    lambda: self.complete_video_import(
+                        file_name,
+                        thumbnail_list.currentItem().data(Qt.ItemDataRole.UserRole),
                         thumbnail_widget
                     )
                 )
                 thumbnail_layout.addWidget(thumbnail_list)
 
-                file_list = os.listdir(os.path.expanduser("~/AppData/Roaming/ProjectOn"))
-                for file in file_list:
-                    if file.startswith('thumbnail'):
-                        pixmap = QPixmap(os.path.expanduser("~/AppData/Roaming/ProjectOn") + '/' + file)
-                        pixmap = pixmap.scaled(
-                            96,
-                            54,
-                            Qt.AspectRatioMode.IgnoreAspectRatio,
-                            Qt.TransformationMode.SmoothTransformation
-                        )
+                counter = 0
+                for pixmap in thumbnail_pixmaps:
+                    scaled_pixmap = pixmap.scaled(
+                        96,
+                        54,
+                        Qt.AspectRatioMode.IgnoreAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation
+                    )
 
-                        widget = StandardItemWidget(
-                            self.gui, 'Frame ' + file.split('.')[0].replace('thumbnail', ''), '', pixmap)
+                    widget = StandardItemWidget(
+                        self.gui, f'Frame {counter * 100}', '', scaled_pixmap)
 
-                        item = QListWidgetItem()
-                        item.setData(20, file)
-                        item.setSizeHint(widget.sizeHint())
-                        thumbnail_list.addItem(item)
-                        thumbnail_list.setItemWidget(item, widget)
+                    item = QListWidgetItem()
+                    item.setData(Qt.ItemDataRole.UserRole, pixmap)
+                    item.setSizeHint(widget.sizeHint())
+                    thumbnail_list.addItem(item)
+                    thumbnail_list.setItemWidget(item, widget)
+
+                    counter += 1
 
                 wait_widget.widget.deleteLater()
                 thumbnail_widget.exec()
@@ -1179,7 +1205,7 @@ class MediaWidget(QTabWidget):
             except Exception:
                 self.gui.main.error_log()
 
-    def copy_video(self, video_file: str, image_file: str, dialog: QFileDialog):
+    def complete_video_import(self, title: str, pixmap: QPixmap, dialog: QFileDialog):
         """
         Method to copy the user's video file and its thumbnail image file to the video subdirectory of the data
         directory, then repopulate the video widget's QListWidget. Provides a QMessageBox to confirm that the
@@ -1189,15 +1215,16 @@ class MediaWidget(QTabWidget):
         :param dialog: The currently showing thumbnail dialog
         :return:
         """
-        try:
-            new_image_file_name = video_file.split('.')[0] + '.jpg'
-            shutil.copy(
-                os.path.expanduser('~/AppData/Roaming/ProjectOn') + '/' + image_file,
-                self.gui.main.video_dir + '/' + new_image_file_name
-            )
-        except Exception:
-            self.gui.main.error_log()
-            return
+
+        data = SLIDE_DATA_DEFAULTS.copy()
+        data['type'] = 'video'
+        data['title'] = title
+        data['background'] = pixmap
+        data['file_name'] = title
+        pixmap = data['background'].scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+
+        self.video_list.add_item(title, data, item_pixmap=pixmap)
+        self.gui.main.save_video(data)
 
         QMessageBox.information(
             self.gui.main_window,
@@ -1206,8 +1233,6 @@ class MediaWidget(QTabWidget):
             QMessageBox.StandardButton.Ok
         )
         dialog.done(0)
-
-        self.populate_video_list()
 
     def add_song_to_service(self, item: QTreeWidgetItem | None = None, row: int | None = None):
         """

@@ -9,9 +9,13 @@
   <component name="ChangeListManager">
     <list default="true" id="952c8f52-4fbc-4a9a-a04b-64cd54717eb6" name="Changes" comment="Updated the help htmls to reflect recent changes.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ToDo" beforeDir="false" afterPath="$PROJECT_DIR$/src/ToDo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/projectOn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/projectOn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/webRemote.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/webRemote.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/guiElements/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/editWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/editWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/mediaWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/mediaWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/guiElements/widgets/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/guiElements/widgets/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,12 +57,12 @@
     &quot;assignee&quot;: &quot;pastorjeremywilson&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/pastorjeremywilson/ProjectOn&quot;,
-    &quot;accountId&quot;: &quot;8f828663-ea93-4da9-9d98-44a3bd3daf8b&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/pastorjeremywilson/ProjectOn",
+    "accountId": "79296b6e-54c2-48a3-bb48-7e0ce6c05fc7"
   }
-}</component>
+}]]></component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -149,7 +153,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/__main__.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -173,7 +176,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/linecount.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -197,7 +199,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-83fa46d5d5d4-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.33514.19" />
+        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
       </set>
     </attachedChunks>
   </component>
