@@ -187,7 +187,8 @@ class CustomMainWindow(QMainWindow):
                 self.gui.audio_output = None
                 self.gui.video_probe = None
 
-            self.gui.main.server_check_timer.stop()
+            if self.gui.main.server_check_timer:
+                self.gui.main.server_check_timer.stop()
             if self.gui.countdown_timer:
                 self.gui.countdown_timer.stop()
             if self.gui.countdown_widget:
