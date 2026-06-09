@@ -460,6 +460,7 @@ class EditWidget(QDialog):
         self.override_global_button.setIconSize(button_size)
         self.override_global_button.setChecked(False)
         self.override_global_button.released.connect(self.override_global_changed)
+        self.override_global_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         override_button_layout.addWidget(self.override_global_button)
 
         override_global_label = QLabel('Custom Slide Settings')
@@ -650,7 +651,7 @@ class EditWidget(QDialog):
         """
         Method to change what is being displayed in the preview widget.
         """
-        display_widget = self.gui.sample_widget
+        display_widget = self.gui.display_widget
         lyric_widget = self.gui.sample_lyric_widget
 
         # set the background
@@ -1735,7 +1736,7 @@ class EditWidget(QDialog):
         self.data['verse_order'] = verse_order.strip()
 
         self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
-        self.data['parsed_text'] = parsers.parse_song_data(self.gui, self.data)
+        self.data['parsed_text'] = parsers.parse_song_data(self.gui.display_widget, self.gui.main.settings, self.data)
         self.populate_song_data()
 
     def update_custom_data(self):
@@ -2317,7 +2318,8 @@ class LyricDelegate(QStyledItemDelegate):
             lyrics_html += f'{data[0]}<br />{data[1]}<br />'
         lyrics_html = lyrics_html[:-6]
         self.edit_widget.data['text'] = lyrics_html
-        self.edit_widget.data['parsed_text'] = parsers.parse_song_data(self.gui, self.edit_widget.data)
+        self.edit_widget.data['parsed_text'] = parsers.parse_song_data(
+            self.gui.display_widget, self.gui.main.settings, self.edit_widget.data)
         self.edit_widget.lyrics_text_edit.text_edit.setHtml(
             self.edit_widget.get_simplified_text(lyrics_html))
 

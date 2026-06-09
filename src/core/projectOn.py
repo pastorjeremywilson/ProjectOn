@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.010
+ProjectOn v.1.10.0.011
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -37,6 +37,7 @@ from xml.etree import ElementTree
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
     QByteArray, QBuffer, QIODevice, qInstallMessageHandler
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
+from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QTreeWidgetItem
 
@@ -76,6 +77,7 @@ class ProjectOn(QObject):
     thread_pool = None
     status_update_count = 0
     updating_label = False
+    server_check_timer = None
 
     def __init__(self):
         super().__init__()
@@ -148,7 +150,7 @@ class ProjectOn(QObject):
             if '.pro' in arg:
                 self.load_service(arg)
 
-        self.app.processEvents()
+        #self.app.processEvents()
 
         self.server_check_timer = ServerCheckTimer(self.remote_server, self.gui)
         self.server_check_timer.start()
@@ -204,7 +206,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.0.010')
+        version_label = QLabel('v.1.10.0.011')
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -975,12 +977,33 @@ class ProjectOn(QObject):
                     column = 'filename'
                     os.remove(self.image_dir + '/' + title)
                 elif type == 'video':
-                    # remove the video from the video directory as well as its snapshot image
+                    # first, check to see if this video is currently queued up; get rid of the media player if so
+                    if (self.gui.live_widget.slide_list.item(0)
+                            and self.gui.live_widget.slide_list.item(0).data(Qt.ItemDataRole.UserRole)['title'] == title):
+                        # handle stopping the media player carefully to avoid an Access Violation
+                        if self.gui.media_player:
+                            if self.gui.media_player.state() == QMediaPlayer.PlayingState:
+                                self.gui.media_player.stop()
+                                if self.gui.timed_update:
+                                    self.gui.timed_update.stop = True
+                            self.gui.media_player.deleteLater()
+                            self.gui.media_player = None
+                            if self.gui.video_widget:
+                                self.gui.video_widget.deleteLater()
+                                self.gui.graphics_view.deleteLater()
+                                self.gui.video_widget = None
+                                self.gui.graphics_view = None
+                        self.gui.live_widget.slide_list.clear()
+                        self.gui.live_widget.preview_label.clear()
+                        self.gui.live_widget.player_controls.hide()
+
+                    # remove the video from the video directory as well as its snapshot image, if it exists
                     file_name = title
                     os.remove(self.video_dir + '/' + file_name)
                     filename_split = file_name.split('.')
                     thumbnail_filename = '.'.join(filename_split[:len(filename_split) - 1]) + '.jpg'
-                    os.remove(self.video_dir + '/' + thumbnail_filename)
+                    if exists(self.video_dir + '/' + thumbnail_filename):
+                        os.remove(self.video_dir + '/' + thumbnail_filename)
 
                     table = 'videos'
                     column = 'filename'
@@ -1494,7 +1517,6 @@ class ProjectOn(QObject):
 
                     # create the proper icon for this slide type
                     if data['type'] == 'song':
-                        print(f'data[\'override_global\']: {data['override_global']}')
                         if not data['override_global'] or data['background'] == 'global_song':
                             print('setting icon to global song pixmap')
                             pixmap = self.gui.global_song_background_pixmap
@@ -1836,7 +1858,7 @@ class ProjectOn(QObject):
                 date_time = time.ctime(time.time())
                 log_text = (f'\n{date_time}:\n'
                             f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
-            print(log_text)
+            print(f'ProjectOn.error_log log text: {log_text}')
 
             message_box = QMessageBox()
             message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
@@ -2134,7 +2156,7 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
                 f'    {exc_type}\n'
                 f'    {exc_value}\n'
                 f'    {full_traceback}')
-    print(log_text)
+    print(f'log_unhandled_exception log text: {log_text}')
 
     if 'linux' in sys.platform:
         user_dir = os.path.expanduser('~/.config/ProjectOn')

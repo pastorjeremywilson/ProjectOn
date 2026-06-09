@@ -1,10 +1,11 @@
 import re
 
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtCore import QRect, Qt
+from PyQt5.QtGui import QFont, QColor, QImage, QPainter
 from PyQt5.QtWidgets import QMessageBox
 
 
-def parse_song_data(gui, song_data: dict):
+def parse_song_data(display_widget, settings: dict, song_data: dict):
     """
     Method to take the stored lyrics of a song and parse them out according to their segment markers (i.e. [V1])
     :param GUI gui: The current instance of GUI
@@ -12,6 +13,7 @@ def parse_song_data(gui, song_data: dict):
     """
     if 'text' not in song_data.keys() or len(song_data['text'].strip()) == 0:
         return
+
     # start by building a dictionary of segment text keyed to their corresponding tags
     lyric_dictionary = {}
     lyrics = song_data['text']
@@ -60,6 +62,62 @@ def parse_song_data(gui, song_data: dict):
     else:
         iterable = lyric_dictionary
 
+    # set the font, using the song's font data if override_global is True
+    if song_data['override_global']:
+        font_face = song_data['font_family']
+        font_size = int(song_data['font_size'])
+
+        if 'global' in str(song_data['use_shadow']):
+            use_shadow = settings['song_use_global']
+        else:
+            use_shadow = song_data['use_shadow']
+
+        if 'global' in str(song_data['shadow_color']):
+            shadow_color = settings['song_shadow_color']
+        else:
+            shadow_color = song_data['shadow_color']
+
+        if 'global' in str(song_data['shadow_offset']):
+            shadow_offset = settings['song_shadow_offset']
+        else:
+            shadow_offset = song_data['shadow_offset']
+
+        if 'global' in str(song_data['use_outline']):
+            use_outline = settings['song_use_outline']
+        else:
+            use_outline = song_data['use_outline']
+
+        if 'global' in str(song_data['outline_color']):
+            outline_color = settings['song_outline_color']
+        else:
+            outline_color = song_data['outline_color']
+
+        if 'global' in str(song_data['outline_width']):
+            outline_width = settings['song_outline_width']
+        else:
+            outline_width = song_data['outline_width']
+    else:
+        font_face = settings['song_font_face']
+        font_size = settings['song_font_size']
+        font_color = settings['song_font_color']
+        use_shadow = settings['song_use_shadow']
+        shadow_color = settings['song_shadow_color']
+        shadow_offset = settings['song_shadow_offset']
+        use_outline = settings['song_use_outline']
+        outline_color = settings['song_outline_color']
+        outline_width = settings['song_outline_width']
+
+    display_widget.lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
+    display_widget.lyric_widget.use_shadow = use_shadow
+    display_widget.lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
+    display_widget.lyric_widget.shadow_offset = shadow_offset
+    display_widget.lyric_widget.use_outline = use_outline
+    display_widget.lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
+    display_widget.lyric_widget.outline_width = outline_width
+
+    # create a QImage to use as a canvas for the text size calculations
+    image = QImage(display_widget.width(), display_widget.height(), QImage.Format.Format_ARGB32_Premultiplied)
+    painter = QPainter()
     for segment in iterable:
         item_num = [i for i in segment if i.isdigit()]
 
@@ -113,73 +171,15 @@ def parse_song_data(gui, song_data: dict):
                 new_text = re.sub('</span>', '</u>', new_text)
                 segment_text = segment_text.replace(text, new_text)
 
-        # set the font, using the song's font data if override_global is True
-        if song_data['override_global']:
-            font_face = song_data['font_family']
-            font_size = int(song_data['font_size'])
-            font_color = song_data['font_color']
-
-            if 'global' in str(song_data['use_shadow']):
-                use_shadow = gui.main.settings['song_use_global']
-            else:
-                use_shadow = song_data['use_shadow']
-
-            if 'global' in str(song_data['shadow_color']):
-                shadow_color = gui.main.settings['song_shadow_color']
-            else:
-                shadow_color = song_data['shadow_color']
-
-            if 'global' in str(song_data['shadow_offset']):
-                shadow_offset = gui.main.settings['song_shadow_offset']
-            else:
-                shadow_offset = song_data['shadow_offset']
-
-            if 'global' in str(song_data['use_outline']):
-                use_outline = gui.min.settings['song_use_outline']
-            else:
-                use_outline = song_data['use_outline']
-
-            if 'global' in str(song_data['outline_color']):
-                outline_color = gui.main.settings['song_outline_color']
-            else:
-                outline_color = song_data['outline_color']
-
-            if 'global' in str(song_data['outline_width']):
-                outline_width = gui.main.settings['song_outline_width']
-            else:
-                outline_width = song_data['outline_width']
-        else:
-            font_face = gui.main.settings['song_font_face']
-            font_size = gui.main.settings['song_font_size']
-            font_color = gui.main.settings['song_font_color']
-            use_shadow = gui.main.settings['song_use_shadow']
-            shadow_color = gui.main.settings['song_shadow_color']
-            shadow_offset = gui.main.settings['song_shadow_offset']
-            use_outline = gui.main.settings['song_use_outline']
-            outline_color = gui.main.settings['song_outline_color']
-            outline_width = gui.main.settings['song_outline_width']
-
-        lyric_widget = gui.sample_lyric_widget
-
-        lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
-        lyric_widget.footer_label.setFont(QFont(font_face, gui.main.settings['footer_font_size']))
-        lyric_widget.use_shadow = use_shadow
-        lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
-        lyric_widget.shadow_offset = shadow_offset
-        lyric_widget.use_outline = use_outline
-        lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
-        lyric_widget.outline_width = outline_width
-
         segment_text = '<p style="text-align: center; line-height: 120%;">' + segment_text + '</p>'
 
         segment_text = re.sub('<span.*?>', '', segment_text)
         segment_text = re.sub('</span>', '', segment_text)
-        gui.sample_lyric_widget.setText(segment_text)
+        display_widget.lyric_widget.setText(segment_text)
 
         segment_count = 1
 
         footer_text = ''
-        footer_height = 0
         if song_data['use_footer'] or song_data['use_footer'] == 'True':
             if len(song_data['author']) > 0:
                 footer_text += song_data['author']
@@ -187,14 +187,20 @@ def parse_song_data(gui, song_data: dict):
                 footer_text += '\n\u00A9' + song_data['copyright'].replace('\n', ' ')
             if len(song_data['ccli_song_number']) > 0:
                 footer_text += '\nCCLI Song #: ' + song_data['ccli_song_number']
-            if len(gui.main.settings['ccli_num']) > 0:
-                footer_text += '\nCCLI License #: ' + gui.main.settings['ccli_num']
-            gui.sample_lyric_widget.footer_label.setText(footer_text)
-            footer_height = gui.sample_lyric_widget.footer_label.height()
+            if len(settings['ccli_num']) > 0:
+                footer_text += '\nCCLI License #: ' + settings['ccli_num']
 
-        lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
-        lyric_widget_height = lyrics_rect.height()
-        target_height = gui.display_widget.height() - footer_height - 40
+        lyric_widget_height = 0
+        target_height = 0
+        if painter.begin(image):
+            try:
+                lyrics_rect, footer_height = display_widget.lyric_widget.calculate_painted_text(painter)
+                lyric_widget_height = lyrics_rect.height()
+                target_height = display_widget.height() - footer_height - 40
+            finally:
+                painter.end()
+        else:
+            print('Unable to initialize painter')
 
         # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
         if lyric_widget_height > target_height:
@@ -248,12 +254,9 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
     :param GUI gui: The current instance of GUI
     :param str | list of str text: The bible passage to be split
     """
-    # configure the hidden sample widget according to the current font
-    gui.sample_lyric_widget.setFont(QFont(gui.main.settings['bible_font_face'], gui.main.settings['bible_font_size']))
-    gui.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
-
-    # get the size values for the lyric widget, footer label, and font metrics
-    slide_texts: list[str] = []
+    # configure the lyric display widget according to the current font
+    gui.display_widget.lyric_widget.setFont(QFont(gui.main.settings['bible_font_face'], gui.main.settings['bible_font_size']))
+    gui.display_widget.footer_text = 'bogus reference' # just a placeholder
 
     # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
     # that needs to be parsed into verses and their corresponding verse numbers
@@ -285,34 +288,83 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
                 text_split.append([verse_numbers[i], text[verse_index + number_length:]])
         text: list[str] = text_split
 
+
+
+    # clear the text of the lyric widget and instantiate a painter that will allow calculating the text height
+    gui.display_widget.lyric_widget.text = ''
+    lyrics_rect = QRect(0, 0, 0, 0)
+    footer_height = 0
+    image = QImage(gui.display_widget.width(), gui.display_widget.height(), QImage.Format_ARGB32_Premultiplied)
+    painter = QPainter()
+    if painter.begin(image):
+        try:
+            lyrics_rect, footer_height = gui.display_widget.lyric_widget.calculate_painted_text(painter)
+        finally:
+            painter.end()
+    target_height = gui.display_widget.height() - footer_height - 40
+
+    slide_texts = []
+    verses_added = 0
+    parse_failed = False
     verse_index = 0
+    while verse_index < len(text):
+        # add the current verse number and verse text to the lyric widget's text
+        this_verse = ' '.join(text[verse_index])
+        gui.display_widget.lyric_widget.text = f'{gui.display_widget.lyric_widget.text} {this_verse}'.strip()
+        verses_added += 1
+
+        # repaint to the image from the lyric widget to get its current height
+        if painter.begin(image):
+            try:
+                lyrics_rect, footer_height = gui.display_widget.lyric_widget.calculate_painted_text(painter)
+            finally:
+                painter.end()
+
+        if lyrics_rect.height() > target_height:
+            if verses_added == 1:
+                # just this one verse overflowed the widget, so set parse_failed and add this verse to slide_texts
+                parse_failed = True
+                slide_texts.append(this_verse)
+            else:
+                # adding this verse overflowed the widget so remove this verse from the current lyric widget text,
+                # add the altered text to slide_texts, and reduce verse_index by one so that it gets added to the
+                # next set
+                slide_texts.append(gui.display_widget.lyric_widget.text.replace(this_verse, '').strip())
+                verse_index -= 1
+            gui.display_widget.lyric_widget.text = ''
+            verses_added = 0
+        verse_index += 1
+    slide_texts.append(gui.display_widget.lyric_widget.text)
+
+    """verse_index = 0
     segment_indices = []
     current_segment_index = 0
     recursion_count = 0
-    parse_failed = False
     while verse_index < len(text):
-        if recursion_count > len(text):
-            parse_failed = True
-            break
-        recursion_count += 1
-
         # keep adding verses until the text overflows its widget, remove the last verse, and add to the slide texts
         segment_indices.append([])
         count = 0
-        gui.sample_lyric_widget.setText('')
-        lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
-        target_height = gui.display_widget.height() - footer_height - 40
-        while lyrics_rect.height() < target_height:
+        gui.display_widget.lyric_widget.text = ''
+        while lyrics_rect.height() < target_height and verse_index < len(text):
+            print(lyrics_rect.height(), target_height)
             if count > 0:
                 if verse_index < len(text):
-                    gui.sample_lyric_widget.setText(
-                        gui.sample_lyric_widget.text + ' ' + text[verse_index][0] + ' ' + text[verse_index][1])
-                    lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
+                    gui.display_widget.lyric_widget.text = (f'{gui.display_widget.lyric_widget.text} '
+                                                            f'{text[verse_index][0]} {text[verse_index][1]}')
+                    if painter.begin(image):
+                        try:
+                            lyrics_rect, footer_height = gui.display_widget.lyric_widget.calculate_painted_text(painter)
+                        finally:
+                            painter.end()
                 else:
                     break
             else:
-                gui.sample_lyric_widget.setText(text[verse_index][0] + ' ' + text[verse_index][1])
-                lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
+                gui.display_widget.lyric_widget.text = f'{text[verse_index][0]} {text[verse_index][1]}'
+                if painter.begin(image):
+                    try:
+                        lyrics_rect, footer_height = gui.display_widget.lyric_widget.calculate_painted_text(painter)
+                    finally:
+                        painter.end()
 
             segment_indices[current_segment_index].append(verse_index)
             count += 1
@@ -325,10 +377,9 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
             elif verse_index == len(text) and lyrics_rect.height() > target_height:
                 segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
                 verse_index -= 1
-
         elif not verse_index == len(text):
             verse_index -= 1
-        current_segment_index += 1
+        current_segment_index += 1"""
 
     # show an error message should parsing fail
     if parse_failed:
@@ -342,15 +393,50 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
         for verse in text:
             if len(verse[1].strip()) > 0:
                 slide_texts.append(verse[0] + ' ' + verse[1])
-    else:
-        for indices in segment_indices:
-            if len(indices) > 0:
-                current_segment: str = ''
-                for index in indices:
-                    current_segment += text[index][0] + ' ' + text[index][1] + ' '
-                slide_texts.append(current_segment.strip())
 
     return slide_texts
+
+def get_qcolor_from_str(main, font_color: str, slide_type: str):
+    """
+    Method to convert a string font color to a QColor object
+    :param font_color: String font color (white, rgb(255, 255, 255), #ffffff, etc.)
+    :param slide_type: The type of slide this color will be applied to
+    :return QColor: QColor object
+    """
+    if font_color == 'white':
+        font_color = QColor(Qt.GlobalColor.white)
+    elif font_color == 'black':
+        font_color = QColor(Qt.GlobalColor.black)
+    elif '#' in font_color:
+        color = font_color.replace('#', '')
+        rgb_color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
+        font_color = QColor(rgb_color)
+    elif 'rgb' in font_color or ',' in font_color:
+        color = font_color.replace('rgb(', '').replace(')', '')
+        font_color_split = color.split(', ')
+        font_color = QColor(
+            int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+    else:
+        if slide_type == 'song':
+            if main.settings['song_font_color'] == 'black':
+                font_color = QColor(0, 0, 0)
+            elif main.settings['song_font_color'] == 'white':
+                font_color = QColor(255, 255, 255)
+            else:
+                font_color_split = main.settings['font_color'].split(', ')
+                font_color = QColor(
+                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+        else:
+            if main.settings['bible_font_color'] == 'black':
+                font_color = QColor(0, 0, 0)
+            elif main.settings['bible_font_color'] == 'white':
+                font_color = QColor(255, 255, 255)
+            else:
+                font_color_split = main.settings['bible_font_color'].split(', ')
+                font_color = QColor(
+                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+
+    return font_color
 
 
 class ParseScriptureReference:

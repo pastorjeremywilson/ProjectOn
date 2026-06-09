@@ -1,7 +1,8 @@
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtGui import QIcon, QKeyEvent
 from PyQt5.QtMultimedia import QMediaPlayer
-from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout, QAbstractItemView
+from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QHBoxLayout, QPushButton, QGridLayout, QAbstractItemView, \
+    QVBoxLayout, QSlider
 
 
 class LiveWidget(QWidget):
@@ -18,6 +19,15 @@ class LiveWidget(QWidget):
         super().__init__()
         self.gui = gui
         self.web_button_signal.connect(self.web_buttons)
+
+        self.slide_list = CustomListWidget(self.gui)
+        self.player_controls = QWidget()
+        self.seek_slider = QSlider()
+        self.video_current_label = QLabel('0:00:00')
+        self.video_end_label = QLabel('0:00:00')
+        self.web_controls = QWidget()
+        self.preview_label = QLabel()
+
         self.init_components()
 
     def init_components(self):
@@ -48,19 +58,54 @@ class LiveWidget(QWidget):
         title_label.setFont(self.gui.bold_font)
         container_layout.addWidget(title_label, 0, 0)
 
-        self.slide_list = CustomListWidget(self.gui)
         self.slide_list.setObjectName('slide_list')
         self.slide_list.setFont(self.gui.standard_font)
         self.slide_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.slide_list.verticalScrollBar().setSingleStep(15)
         container_layout.addWidget(self.slide_list, 1, 0)
 
-        self.preview_label = QLabel()
-        layout.addWidget(self.preview_label, 1, 0, Qt.AlignmentFlag.AlignCenter)
+        preview_container = QWidget()
+        layout.addWidget(preview_container, 1, 0)
+        preview_container_layout = QVBoxLayout(preview_container)
+        preview_container_layout.setContentsMargins(0, 0, 0, 0)
+        preview_container_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.player_controls = QWidget()
-        player_layout = QHBoxLayout()
-        self.player_controls.setLayout(player_layout)
+        preview_container_layout.addWidget(self.player_controls)
+        player_layout = QVBoxLayout(self.player_controls)
+
+        self.seek_slider.setFont(self.gui.standard_font)
+        self.seek_slider.setOrientation(Qt.Orientation.Horizontal)
+        def slider_moved():
+            if self.gui.display_widget.media_player:
+                if self.gui.display_widget.media_player.state() == QMediaPlayer.StoppedState:
+                    self.gui.display_widget.media_player.pause()
+                    self.gui.display_widget.media_player.play()
+                else:
+                    self.gui.display_widget.media_player.pause()
+                self.gui.display_widget.media_player.setPosition(self.seek_slider.value())
+        self.seek_slider.sliderMoved.connect(slider_moved)
+        player_layout.addWidget(self.seek_slider)
+
+        slider_label_widget = QWidget()
+        player_layout.addWidget(slider_label_widget)
+        slider_label_layout = QHBoxLayout(slider_label_widget)
+
+        video_start_label = QLabel('0:00:00')
+        video_start_label.setFont(self.gui.standard_font)
+        slider_label_layout.addWidget(video_start_label)
+        slider_label_layout.addStretch()
+
+        self.video_current_label.setFont(self.gui.bold_font)
+        slider_label_layout.addWidget(self.video_current_label)
+        slider_label_layout.addStretch()
+
+        self.video_end_label.setFont(self.gui.standard_font)
+        slider_label_layout.addWidget(self.video_end_label)
+
+        player_button_widget = QWidget()
+        player_layout.addWidget(player_button_widget)
+        player_button_layout = QHBoxLayout(player_button_widget)
+        player_button_layout.setContentsMargins(0, 0, 0, 0)
 
         to_beginning_button = QPushButton()
         to_beginning_button.setIcon(QIcon('resources/gui_icons/to_beginning.svg'))
@@ -68,9 +113,10 @@ class LiveWidget(QWidget):
         to_beginning_button.setFixedSize(50, 50)
         to_beginning_button.setObjectName('to_beginning')
         to_beginning_button.setToolTip('Start Video from Beginning')
-        to_beginning_button.clicked.connect(self.video_control)
-        player_layout.addStretch()
-        player_layout.addWidget(to_beginning_button)
+        to_beginning_button.released.connect(self.video_control)
+        player_button_layout.addStretch()
+        player_button_layout.addWidget(to_beginning_button)
+        player_button_layout.addSpacing(25)
 
         play_button = QPushButton()
         play_button.setIcon(QIcon('resources/gui_icons/play_pause.svg'))
@@ -78,8 +124,9 @@ class LiveWidget(QWidget):
         play_button.setFixedSize(50, 50)
         play_button.setObjectName('play')
         play_button.setToolTip('Play/Pause the Video')
-        play_button.clicked.connect(self.video_control)
-        player_layout.addWidget(play_button)
+        play_button.released.connect(self.video_control)
+        player_button_layout.addWidget(play_button)
+        player_button_layout.addSpacing(25)
 
         stop_button = QPushButton()
         stop_button.setIcon(QIcon('resources/gui_icons/stop.svg'))
@@ -87,14 +134,13 @@ class LiveWidget(QWidget):
         stop_button.setFixedSize(50, 50)
         stop_button.setObjectName('stop')
         stop_button.setToolTip('Stop the Video')
-        stop_button.clicked.connect(self.video_control)
-        player_layout.addWidget(stop_button)
-        player_layout.addStretch()
+        stop_button.released.connect(self.video_control)
+        player_button_layout.addWidget(stop_button)
+        player_button_layout.addStretch()
 
-        layout.addWidget(self.player_controls, 2, 0, Qt.AlignmentFlag.AlignCenter)
         self.player_controls.hide()
 
-        self.web_controls = QWidget()
+        preview_container_layout.addWidget(self.web_controls)
         web_layout = QHBoxLayout(self.web_controls)
 
         reload_button = QPushButton()
@@ -108,8 +154,16 @@ class LiveWidget(QWidget):
         web_layout.addWidget(reload_button)
         web_layout.addStretch()
 
-        layout.addWidget(self.web_controls, 2, 0, Qt.AlignmentFlag.AlignCenter)
         self.web_controls.hide()
+
+        preview_label_container = QWidget()
+        preview_container_layout.addWidget(preview_label_container)
+        preview_label_container_layout = QHBoxLayout(preview_label_container)
+        preview_label_container_layout.setContentsMargins(0, 0, 0, 0)
+
+        preview_label_container_layout.addStretch()
+        preview_label_container_layout.addWidget(self.preview_label)
+        preview_label_container_layout.addStretch()
 
     def video_control(self):
         """
@@ -117,22 +171,23 @@ class LiveWidget(QWidget):
         """
         sender = self.gui.main_window.sender()
         if sender.objectName() == 'to_beginning':
-            self.gui.media_player.setPosition(0)
+            self.gui.display_widget.media_player.setPosition(0)
         elif sender.objectName() == 'play':
             # pause or play depending on the current mediaStatus
-            if self.gui.media_player.state() == QMediaPlayer.PlayingState:
+            if self.gui.display_widget.media_player.state() == QMediaPlayer.PlayingState:
                 self.gui.media_player.pause()
             else:
-                self.gui.media_player.play()
+                self.gui.display_widget.media_player.play()
         elif sender.objectName() == 'stop':
-            self.gui.media_player.stop()
+            self.gui.display_widget.media_player.pause()
+            self.gui.display_widget.media_player.setPosition(0)
 
     def web_reload(self):
         """
         Tell the web view widget to reload the current web page
         :return: None
         """
-        self.gui.web_view.reload()
+        self.gui.display_widget.web_view.reload()
 
     def web_buttons(self, button: str):
         """
@@ -192,9 +247,9 @@ class CustomListWidget(QListWidget):
         """
         Call GUI's change_display function and sync the web remote with the user's input.
         """
-        self.gui.change_display('live')
 
         if self.currentItem():
+            self.gui.display_widget.change_display()
             self.gui.main.remote_server.socketio.emit('change_current_slide', str(self.currentRow()))
 
     def keyPressEvent(self, evt: QKeyEvent):
@@ -253,7 +308,7 @@ class CustomListWidget(QListWidget):
                 else:
                     self.setCurrentRow(self.currentRow() - 1)
             elif evt.key() == 46:  # PPT remote 'blank' button
-                self.gui.display_black_screen()
+                self.gui.display_widget.show_black_screen()
 
             elif evt.key() == 16777268:  # PPT remote 'play' button
                 if self.gui.video_widget.isVisible():

@@ -415,8 +415,6 @@ class SongselectImport(QDialog):
         self.gui.main.save_song(song_data)
         self.gui.media_widget.song_list.add_item(song_data['title'], song_data, pixmap)
 
-        print(f'title: {song_data["title"]}')
-        print(f'findItems: "{self.gui.media_widget.song_list.findItems(song_data['title'].lower(), Qt.MatchFlag.MatchExactly, 0)}"')
         self.gui.media_widget.song_list.setCurrentItem(
             self.gui.media_widget.song_list.findItems(song_data['title'].lower(), Qt.MatchFlag.MatchExactly, 0)[0])
 

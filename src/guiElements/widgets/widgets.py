@@ -3,21 +3,28 @@ import re
 import shutil
 import sqlite3
 import sys
-import threading
+from os.path import exists
 
+import requests
+from PyQt5 import sip
 from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF, QTime, \
-    QModelIndex, QObject
+    QModelIndex, QObject, QByteArray, QBuffer, QIODevice, QUrl
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics, QFocusEvent, QMouseEvent, QResizeEvent, \
-    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent
-from PyQt5.QtMultimedia import QMediaPlayer
+    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent, QMoveEvent, QShowEvent
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem, QVideoWidget
 from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
     QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog, QStyledItemDelegate, QTreeWidget, \
-    QTreeWidgetItem, QMenu, QAction, QStyleOptionViewItem, QProgressBar
+    QTreeWidgetItem, QMenu, QAction, QStyleOptionViewItem, QProgressBar, QGraphicsView, \
+    QGraphicsScene, QStackedWidget, QSizePolicy
 
+from core.runnables import SlideAutoPlay, TimedPreviewUpdate
+from dataHandling.parsers import get_qcolor_from_str
 from importExport.openlpImport import OpenLPImport
 
 
@@ -131,7 +138,6 @@ class CountdownWidget(QWidget):
 
     def show_self(self):
         self.show()
-        #self.raise_()
         self.gui.main.app.processEvents()
 
     def hide_self(self):
@@ -182,7 +188,7 @@ class CustomMainWindow(QMainWindow):
 
         if continue_close:
             # shutdown the media player
-            if self.gui.media_player:
+            if self.gui.media_player and not sip.isdeleted(self.gui.media_player):
                 if self.gui.media_player.state() == QMediaPlayer.PlayingState:
                     self.gui.media_player.stop()
                 self.gui.media_player.deleteLater()
@@ -242,11 +248,11 @@ class CustomSlider(QSlider):
         super().mouseReleaseEvent(evt)
 
 
-class DisplayWidget(QWidget):
+class DisplayWidget(QStackedWidget):
     """
     Provides a custom QWidget to be used as the display widget
     """
-    def __init__(self, gui, sample: bool | None = False):
+    def __init__(self, gui):
         """
         Provides a custom QWidget to be used as the display widget
         :param guiElements.GUI gui: The current instance of GUI
@@ -254,67 +260,364 @@ class DisplayWidget(QWidget):
         """
         super().__init__()
         self.gui = gui
-        self.sample = sample
-        margins = QMargins(0, 0, 0, 0)
 
+        self.background_label = QLabel()
+        self.lyric_widget = LyricDisplayWidget(self.gui)
+        self.blackout_widget = QWidget()
+        self.logo_label = QLabel()
+        self.web_view = QWebEngineView()
+        from guiElements.gui import CustomWebEnginePage
+        self.web_engine_page = CustomWebEnginePage()
+        self.video_widget, self.media_player = self.make_video_widget()
+        self.slide_auto_play = None
+        self.last_current_widget = None
+
+        self.init_components()
+
+    def init_components(self):
         self.setObjectName('display_widget')
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
-        self.setStyleSheet('#display_widget { background: blue; }')
-        self.setContentsMargins(margins)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setStyleSheet('#display_widget { background: black; }')
 
-        # provide a QLabel for drawing the background image
-        self.background_label = QLabel()
+        self.addWidget(self.lyric_widget)
+
+        self.blackout_widget.setStyleSheet('background-color: #000000;')
+        self.blackout_widget.setParent(self)
+        self.addWidget(self.blackout_widget)
+
+        self.addWidget(self.logo_label)
+
+        self.web_view.page().setBackgroundColor(Qt.GlobalColor.transparent)
+        self.web_view.setStyleSheet("background: transparent;")
+        self.web_view.setParent(self)
+        settings = self.web_view.settings()
+        settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)
+        settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)  # rarely needed for video
+        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+        self.web_engine_page.setParent(self.web_view)
+        self.web_view.setPage(self.web_engine_page)
+        self.addWidget(self.web_view)
+
+        self.addWidget(self.video_widget)
+
+    def make_lyric_widget(self):
+        widget = QWidget()
+        widget.setParent(self)
+
         self.background_label.setObjectName('background_label')
-        self.background_label.setParent(self)
-        self.background_label.setGeometry(self.geometry())
-        self.background_label.move(self.x(), self.y())
+        self.background_label.setParent(widget)
 
-        self.background_pixmap = None
+        self.lyric_widget.setObjectName('lyric_widget')
+        self.lyric_widget.setParent(widget)
+        self.lyric_widget.setStyleSheet('border: 3px solid darkGreen;')
 
-    def toggle_show_hide(self):
-        """
-        Convenience method to show/hide this display widget
-        """
-        if self.isHidden():
-            self.showFullScreen()
-        else:
+        return widget
+
+    def make_video_widget(self) -> tuple[QGraphicsView, QMediaPlayer]:
+        video_widget = QVideoWidget()
+
+        media_player = QMediaPlayer()
+        media_player.setVideoOutput(video_widget)
+
+        def media_error(err):
+            QMessageBox.information(self.gui.main_window, f'Media Error', 'Unable to play video:\n{err}',
+                                    QMessageBox.StandardButton.Ok)
+        media_player.error.connect(media_error)
+
+        def duration_changed(duration):
+            self.gui.live_widget.seek_slider.setMaximum(duration)
+            self.gui.live_widget.seek_slider.setEnabled(True)
+            total_seconds = duration // 1000
+            hours = total_seconds // 3600
+            minutes = (total_seconds // 60) % 60
+            seconds = total_seconds % 60
+            self.gui.live_widget.video_end_label.setText(f'{hours:01d}:{minutes:02d}:{seconds:02d}')
+        media_player.durationChanged.connect(duration_changed)
+
+        def position_changed(position):
+            if media_player.state() == QMediaPlayer.StoppedState and position > 0:
+                position = 0
+            self.gui.live_widget.seek_slider.setValue(position)
+            total_seconds = position // 1000
+            hours = total_seconds // 3600
+            minutes = (total_seconds // 60) % 60
+            seconds = total_seconds % 60
+            self.gui.live_widget.video_current_label.setText(f'{hours:01d}:{minutes:02d}:{seconds:02d}')
+        media_player.positionChanged.connect(position_changed)
+
+        def media_status_changed(status):
+            if status == QMediaPlayer.EndOfMedia:
+                media_player.pause()
+                media_player.setPosition(0)
+        media_player.mediaStatusChanged.connect(media_status_changed)
+
+        return video_widget, media_player
+
+    def show_hide(self):
+        if self.gui.tool_bar.hide_display_button.isChecked():
             self.hide()
+        else:
+            self.show()
 
-    def paintEvent(self, evt: QPaintEvent):
-        # in the case of a background pixmap, either center it if the pixmap is smaller than the display widget,
-        # or scale it down if it is bigger
-        super().paintEvent(evt)
-        if self.background_pixmap:
-            p_width = self.background_pixmap.width()
-            p_height = self.background_pixmap.height()
+    def show_logo(self, checked: bool | None = None):
+        if checked is not None:
+            if checked:
+                self.setCurrentWidget(self.logo_label)
+                self.gui.tool_bar.black_screen_button.setChecked(False)
+            elif self.last_current_widget is not None:
+                self.setCurrentWidget(self.last_current_widget)
+        else:
+            self.setCurrentWidget(self.logo_label)
 
-            width_diff = self.width() - p_width
-            height_diff = self.height() - p_height
+    def show_black_screen(self, checked: bool | None = None):
+        if checked is not None:
+            if checked:
+                self.setCurrentWidget(self.blackout_widget)
+                self.gui.tool_bar.logo_screen_button.setChecked(False)
+            elif self.last_current_widget is not None:
+                self.setCurrentWidget(self.last_current_widget)
+        else:
+            self.setCurrentWidget(self.blackout_widget)
 
-            if width_diff > 0 and height_diff > 0:
-                if width_diff > height_diff:
-                    ratio = self.width() / p_width
-                elif height_diff > width_diff:
-                    ratio = self.height() / p_height
-            elif width_diff > 0 and height_diff > 0:
-                if width_diff > height_diff:
-                    ratio = self.height() / p_height
-                else:
-                    ratio = self.width() / p_width
-            else:
-                if width_diff > 0:
-                    ratio = self.width() / p_width
-                else:
-                    ratio = self.height() / p_height
+    def show_lyric_widget(self):
+        self.setCurrentWidget(self.lyric_widget)
 
-            background_pixmap = self.background_pixmap.scaled(
-                self.width(),
-                self.height(),
-                Qt.AspectRatioMode.IgnoreAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            )
-            self.background_label.setPixmap(background_pixmap)
+    def show_web_view(self):
+        self.setCurrentWidget(self.web_view)
+
+    def show_video_widget(self):
+        self.setCurrentWidget(self.graphics_view)
+
+    def change_display(self):
+        """
+        Method to change what it being displayed in the display widget or the hidden sample widget.
+        :param str widget: 'live' or 'sample' widget that is being changed
+        """
+        # we don't need things being futzed with while the program is still starting up
+        if self.gui.main.initial_startup:
             return
+
+        auto_play_text = ''
+
+        # stop timed update if it's running
+        if self.gui.timed_update:
+            self.gui.timed_update.keep_running = False
+            self.gui.timed_update = None
+
+        # stop slide auto-play if it's running
+        if self.slide_auto_play:
+            self.slide_auto_play.keep_running = False
+            self.slide_auto_play = None
+
+        # handle stopping the media player carefully to avoid an Access Violation
+        if self.media_player:
+            if self.media_player.state == QMediaPlayer.PlayingState:
+                self.media_player.pause()
+                self.media_player.setPosition(0)
+
+            # return statusChanged to its default function in case loop audio has been used
+            def media_status_changed(status):
+                if status == QMediaPlayer.EndOfMedia:
+                    self.media_player.pause()
+                    self.media_player.setPosition(0)
+            self.media_player.mediaStatusChanged.connect(media_status_changed)
+
+        item_data = self.gui.live_widget.slide_list.currentItem().data(Qt.ItemDataRole.UserRole).copy()
+
+        if item_data['type'] == 'song' or item_data['type'] == 'custom':
+            self.lyric_widget.set_for_song_custom(item_data)
+        elif item_data['type'] == 'bible':
+            self.lyric_widget.set_for_bible(item_data)
+        elif item_data['type'] == 'image':
+            self.lyric_widget.set_for_image(item_data)
+        elif item_data['type'] == 'video':
+            self.lyric_widget.set_for_video(item_data)
+        elif item_data['type'] == 'web':
+            self.lyric_widget.set_for_web(item_data)
+        else:
+            return
+
+        # show the appropriate widget and start any media, but not if this isn't being done live
+        if (item_data['type'] == 'song'
+                or item_data['type'] == 'bible'
+                or item_data['type'] == 'custom'
+                or item_data['type'] == 'image'):
+            self.setCurrentWidget(self.lyric_widget)
+
+            # start playing audio if this is a custom slide with audio, but only if audio isn't already playing
+            if (item_data['type'] == 'custom'
+                    and item_data['audio_file']
+                    and len(item_data['audio_file']) > 0
+                    and not self.media_player):
+                audio_data = self.gui.main.get_audio_data(item_data['audio_file'])
+                if audio_data == -2:
+                    QMessageBox.critical(
+                        self.gui.main_window,
+                        'Missing Audio File',
+                        f'The audio named {item_data["audio_file"]} is missing. Unable to play sound.',
+                        QMessageBox.StandardButton.Ok
+                    )
+                    return
+                elif audio_data == -1:
+                    QMessageBox.critical(
+                        self.gui.main_window,
+                        'Audio Data Error',
+                        'Error loading the audio. Unable to play sound.',
+                        QMessageBox.StandardButton.Ok
+                    )
+                else:
+                    byte_array = QByteArray(audio_data[0])
+                    audio_buffer = QBuffer()
+                    audio_buffer.setData(byte_array)
+                    audio_buffer.open(QIODevice.ReadOnly)
+                    self.media_player.setMedia(QMediaContent(), self.audio_buffer)
+
+                    if item_data['loop_audio'] is True:
+                        def repeat_media():
+                            if self.media_player.mediaStatus() == QMediaPlayer.EndOfMedia:
+                                self.media_player.play()
+
+                        self.media_player.mediaStatusChanged.connect(repeat_media)
+                    else:
+                        self.media_player.stateChanged.connect(self.media_playing_change)
+
+                    self.media_player.play()
+
+            # cycle through text paragraphs if auto-play is enabled for this custom slide
+            if item_data['auto_play'] == 'True' and not self.slide_auto_play:
+                slide_auto_play = SlideAutoPlay(self, auto_play_text, item_data['slide_delay'])
+                self.gui.main.thread_pool.start(slide_auto_play)
+        elif item_data['type'] == 'video':
+            self.setCurrentWidget(self.video_widget)
+            media = QMediaContent(QUrl.fromLocalFile(self.gui.main.video_dir + '/' + item_data['file_name']))
+            self.media_player.setMedia(media)
+            self.media_player.play()
+            # start the timed update so that the live preview and stage view is updated at regular intervals
+            self.gui.timed_update = TimedPreviewUpdate(self.gui)
+            self.gui.main.thread_pool.start(self.gui.timed_update)
+        elif item_data['type'] == 'web':
+            self.setCurrentWidget(self.web_view)
+            self.web_engine_page.load(QUrl(item_data['url']))
+            # start the timed update so that the live preview and stage view is updated at regular intervals
+            self.gui.timed_update = TimedPreviewUpdate(self.gui)
+            self.gui.main.thread_pool.start(self.gui.timed_update)
+
+        # change the preview image
+        full_size_pixmap = self.grab(self.rect())
+        pixmap = full_size_pixmap.scaled(
+            int(self.width() / 5),
+            int(self.height() / 5),
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        stage_html = re.sub('<p.*?>', '', self.lyric_widget.text)
+        stage_html = stage_html.replace('</p>', '')
+        stage_html = f'<p style="align-text: center;">{stage_html}</p>'
+
+        slide_number = self.gui.live_widget.slide_list.currentRow() + 1
+        num_slides = self.gui.live_widget.slide_list.count()
+        slide_info = f'Slide {slide_number} of {num_slides}'
+
+        if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
+            self.gui.live_widget.preview_label.setPixmap(pixmap)
+
+            if 'mirror_stage_display' in self.gui.main.settings.keys() and self.gui.main.settings['mirror_stage_display']:
+                buffer = QBuffer()
+                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                success = full_size_pixmap.save(buffer, 'JPEG', 70)
+
+                if success:
+                    jpg_bytes = buffer.data().data()
+                    self.gui.main.remote_server.socketio.emit('update_display', [jpg_bytes, slide_info])
+                else:
+                    print("Failed to save pixmap as JPEG!")
+
+                buffer.close()
+            else:
+                self.gui.main.remote_server.update_stage_text(
+                    stage_html, self.gui.main.settings['stage_font_size'], slide_info)
+        elif auto_play_text:
+            self.gui.live_widget.preview_label.setPixmap(pixmap)
+            if 'mirror_stage_display' in self.gui.main.settings.keys() and self.gui.main.settings['mirror_stage_display']:
+                buffer = QBuffer()
+                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                success = full_size_pixmap.save(buffer, 'JPEG', 70)
+
+                if success:
+                    jpg_bytes = buffer.data().data()
+                    self.gui.main.remote_server.socketio.emit('update_display', [jpg_bytes, slide_info])
+                else:
+                    print("Failed to save pixmap as JPEG!")
+
+                buffer.close()
+            else:
+                self.gui.main.remote_server.update_stage_text(
+                    stage_html, self.gui.main.settings['stage_font_size'], slide_info)
+        else:
+            if 'mirror_stage_display' in self.gui.main.settings.keys() and self.gui.main.settings[
+                    'mirror_stage_display']:
+                buffer = QBuffer()
+                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+
+                success = full_size_pixmap.save(buffer, 'JPEG', 70)
+
+                if success:
+                    jpg_bytes = buffer.data().data()
+                    self.gui.main.remote_server.socketio.emit('update_display', [jpg_bytes, ''])
+                else:
+                    print("Failed to save pixmap as JPEG!")
+
+                buffer.close()
+            else:
+                self.gui.main.remote_server.update_stage_text(
+                    stage_html, self.gui.main.settings['stage_font_size'], '')
+
+
+    def resize_widgets(self):
+        return
+        background_pixmap = self.background_label.pixmap()
+        width = self.width()
+        height = self.height()
+
+        self.background_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.lyric_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.blackout_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.logo_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.web_view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.graphics_view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        if (background_pixmap and
+                (background_pixmap.width() is not width or background_pixmap.height() is not height)):
+            self.background_label.setPixmap(
+                background_pixmap.scaled(
+                    width,
+                    height,
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+            )
+        self.repaint()
+
+    def resizeEvent(self, evt: QResizeEvent):
+        super().resizeEvent(evt)
+        self.resize_widgets()
+
+    def moveEvent(self, evt: QMoveEvent):
+        super().moveEvent(evt)
+        self.resize_widgets()
+
+    def showEvent(self, evt: QShowEvent):
+        super().showEvent(evt)
+        self.resize_widgets()
+
+    def setCurrentWidget(self, widget):
+        self.last_current_widget = widget
+        super().setCurrentWidget(widget)
 
 
 class FontFaceListWidget(QListWidget):
@@ -450,7 +753,8 @@ class FontSample(QLabel):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         background_image = self.make_sample_background(image_rect)
-        painter.drawImage(QPoint(0, 0), background_image)
+        if background_image:
+            painter.drawImage(QPoint(0, 0), background_image)
 
         opacity = self.shade_opacity
         if not self.use_shade:
@@ -501,6 +805,8 @@ class FontSample(QLabel):
                     + self.edit_widget.gui.main.settings['global_bible_background'])
             elif 'solid color' in background_button_text.lower():
                 background = self.edit_widget.background_button_group.button(2).objectName()
+                if not 'rgb' in background:
+                    return
                 background = background.replace('rgb(', '')
                 background = background.replace(')', '')
                 background_split = background.split(', ')
@@ -1072,20 +1378,9 @@ class LyricDisplayWidget(QWidget):
     """
     Provide a standardized QWidget to be used for showing lyrics on the display and sample widgets.py
     """
-    def __init__(
-            self,
-            gui,
-            for_sample: bool | None = False,
-            use_outline: bool | None = True,
-            outline_color: QColor | None = QColor(0, 0, 0),
-            outline_width: int | None = 8,
-            fill_color: QColor | None = QColor(255, 255, 255),
-            use_shadow: bool | None = True,
-            shadow_color: QColor | None = QColor(0, 0, 0),
-            shadow_offset: int | None = 5,
-            use_shade: bool | None = False,
-            shade_color: int | None = 0,
-            shade_opacity: int | None = 75):
+
+    footer_label = None
+    def __init__(self, gui):
         """
         Provide a standardized QWidget to be used for showing lyrics on the display and sample widgets.py
         :param guiElements.GUI gui: The current instance of GUI
@@ -1100,37 +1395,206 @@ class LyricDisplayWidget(QWidget):
         """
         super().__init__()
         self.gui = gui
-        self.for_sample = for_sample
-        self.use_outline = use_outline
-        self.outline_color = outline_color
-        self.outline_width = outline_width
-        self.fill_color = fill_color
-        self.use_shadow = use_shadow
-        self.shadow_color = shadow_color
-        self.shadow_offset = shadow_offset
-        self.use_shade = use_shade
-        self.shade_color = shade_color
-        self.shade_opacity = shade_opacity
 
-        self.text = ''
-        self.total_height = 0
-
-        margins = QMargins(0, 0, 0, 0)
-        self.setContentsMargins(margins)
-
-        layout = QGridLayout()
-        layout.setRowStretch(0, 20)
-        layout.setRowStretch(1, 1)
-        layout.setContentsMargins(margins)
-        self.setLayout(layout)
         self.setObjectName('lyric_display_widget')
-        self.setAutoFillBackground(False)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent, True)
 
-        self.footer_label = QLabel()
-        self.footer_label.setContentsMargins(margins)
-        self.footer_label.setWordWrap(True)
-        self.footer_label.setObjectName('footer_label')
-        layout.addWidget(self.footer_label, 1, 0)
+        self.use_outline = True
+        self.outline_color = QColor(0, 0, 0)
+        self.outline_width = 8
+        self.fill_color = QColor(255, 255, 255)
+        self.use_shadow = True
+        self.shadow_color = QColor(0, 0, 0)
+        self.shadow_offset = 5
+        self.use_shade = False
+        self.shade_color = 0
+        self.shade_opacity = 75
+        self.background_pixmap = None
+        self.text = ''
+        self.footer_text = ''
+
+    def set_for_song_custom(self, slide_data):
+        # set the background
+        if slide_data['override_global']:
+            if slide_data['background'] == 'global_song':
+                self.background_pixmap = self.gui.global_song_background_pixmap
+            elif slide_data['background'] == 'global_bible':
+                self.background_pixmap = self.gui.global_bible_background_pixmap
+            elif 'rgb(' in slide_data['background']:
+                self.background_pixmap = QPixmap(self.gui.display_widget.width(), self.gui.display_widget.height())
+                background_color = get_qcolor_from_str(
+                    self.gui.main, slide_data['background'], slide_data['type'])
+                self.background_pixmap.fill(background_color)
+            elif exists(self.gui.main.background_dir + '/' + slide_data['background']):
+                self.gui.display_widget.lyric_widget.background_pixmap = QPixmap(
+                    self.gui.main.background_dir + '/' + slide_data['background'])
+            else:
+                self.background_pixmap = self.gui.global_song_background_pixmap
+        elif slide_data['type'] == 'song':
+            self.background_pixmap = self.gui.global_song_background_pixmap
+        else:
+            self.background_pixmap = self.gui.global_bible_background_pixmap
+
+        # set the lyric text
+        if slide_data['type'] == 'song':
+            self.text = slide_data['parsed_text']['text']
+        else:
+            self.text = slide_data['parsed_text']
+
+        # set the footer text
+        footer_text = []
+        if slide_data['type'] == 'song':
+            if len(slide_data['author'].strip()) > 0:
+                footer_text.append(slide_data['author'])
+            if len(slide_data['copyright'].strip()) > 0:
+                footer_text.append('\n\u00A9' + slide_data['copyright'].replace('\n', ' '))
+            if len(slide_data['ccli_song_number'].strip()) > 0:
+                footer_text.append('\nCCLI Song #: ' + slide_data['ccli_song_number'])
+            if len(self.gui.main.settings['ccli_num'].strip()) > 0:
+                footer_text.append('\nCCLI License #: ' + self.gui.main.settings['ccli_num'])
+        self.footer_text = footer_text
+
+        self.set_font(slide_data)
+
+    def set_for_bible(self, slide_data):
+        # set the background
+        self.background_pixmap = self.gui.global_bible_background_pixmap
+
+        # set the lyrics
+        self.text = slide_data['parsed_text']
+
+        # set the footer text
+        self.footer_text = [f'{slide_data['title']}({slide_data['author']})']
+        self.set_font(slide_data)
+
+    def set_for_image(self, slide_data):
+        # set the background
+        if exists(self.gui.main.image_dir + '/' + slide_data['title']):
+            self.background_pixmap = QPixmap(self.gui.main.image_dir + '/' + slide_data['title'])
+        self.text = ''
+        self.footer_text = []
+
+    def set_for_video(self, slide_data):
+        pixmap = QPixmap(self.gui.display_widget.width(), self.gui.display_widget.height())
+        pixmap.fill(Qt.GlobalColor.black)
+        self.background_pixmap = pixmap
+        self.text = ''
+        self.footer_text = []
+
+    def set_for_web(self, slide_data):
+        self.text = ''
+        url_ok, url = self.test_url(slide_data['url'])
+        if not url_ok:
+            self.text = '<p style="align-text: center;">Unable to load webpage: invalid URL</p>'
+
+        self.footer_text = []
+
+    def set_font(self, slide_data):
+        if 'override_global' in slide_data.keys() and slide_data['override_global']:
+            # use all of the relevent font data stored in slide_data
+            self.setFont(QFont(slide_data['font_family'], slide_data['font_size']))
+            self.fill_color = get_qcolor_from_str(self.gui.main, slide_data['font_color'], slide_data['type'])
+            self.use_shadow = slide_data['use_shadow']
+            self.shadow_color = QColor(
+                slide_data['shadow_color'], slide_data['shadow_color'], slide_data['shadow_color'])
+            self.shadow_offset = slide_data['shadow_offset']
+            self.use_outline = slide_data['use_outline']
+            self.outline_color = QColor(
+                slide_data['outline_color'], slide_data['outline_color'], slide_data['outline_color'])
+            self.outline_width = slide_data['outline_width']
+            self.use_shade = slide_data['use_shade']
+            # needs to be sent as an integer so opacity can be set by the lyric widget
+            self.shade_color = slide_data['shade_color']
+            self.shade_opacity = slide_data['shade_opacity']
+        else:
+            # use the relevent font settings stored in ProjectOn.settings
+            slide_type = slide_data['type']
+            if not slide_type == 'song':
+                slide_type = 'bible'
+
+            # Set the main font face, size, and color
+            self.setFont(
+                QFont(
+                    self.gui.main.settings[f'{slide_type}_font_face'],
+                    self.gui.main.settings[f'{slide_type}_font_size']
+                )
+            )
+            font_color = get_qcolor_from_str(self.gui.main, self.gui.main.settings[f'{slide_type}_font_color'], slide_type)
+            self.fill_color = font_color
+
+            # Set the font shadow
+            self.use_shadow = self.gui.main.settings[f'{slide_type}_use_shadow']
+            self.shadow_color = QColor(
+                self.gui.main.settings[f'{slide_type}_shadow_color'],
+                self.gui.main.settings[f'{slide_type}_shadow_color'],
+                self.gui.main.settings[f'{slide_type}_shadow_color']
+            )
+            self.shadow_offset = self.gui.main.settings[
+                f'{slide_type}_shadow_offset']
+
+            # Set the font outline
+            self.use_outline = self.gui.main.settings[f'{slide_type}_use_outline']
+            self.outline_color = QColor(
+                self.gui.main.settings[f'{slide_type}_outline_color'],
+                self.gui.main.settings[f'{slide_type}_outline_color'],
+                self.gui.main.settings[f'{slide_type}_outline_color']
+            )
+            self.outline_width = self.gui.main.settings[
+                f'{slide_type}_outline_width']
+
+            # Set the shading behind the text
+            self.use_shade = self.gui.main.settings[f'{slide_type}_use_shade']
+            self.shade_color = self.gui.main.settings[
+                f'{slide_type}_shade_color']  # needs to be sent as an integer so opacity can be set by the lyric widget
+            self.shade_opacity = self.gui.main.settings[
+                f'{slide_type}_shade_opacity']
+
+    def test_url(self, url: str):
+        response = None
+        try:
+            response = requests.get(url)
+        except requests.exceptions.MissingSchema:
+            pass
+        except requests.exceptions.ConnectionError:
+            pass
+        except requests.exceptions.InvalidSchema:
+            new_url = 'http://' + url.split('//')[1]
+            try:
+                response = requests.get(new_url)
+            except requests.exceptions.ConnectionError:
+                pass
+            if response and response.ok:
+                return True, new_url
+        if response and response.ok:
+            return True, url
+        else:
+            if not '//' in url:
+                new_url = 'http://' + url
+                try:
+                    response = requests.get(new_url)
+                except requests.exceptions.ConnectionError:
+                    pass
+                if response and response.ok:
+                    return True, new_url
+                else:
+                    new_url = 'https://' + url
+                    try:
+                        response = requests.get(new_url)
+                    except requests.exceptions.ConnectionError:
+                        pass
+                    if response and response.ok:
+                        return True, new_url
+            else:
+                new_url = '//www.'.join(url.split('//'))
+                try:
+                    response = requests.get(new_url)
+                except requests.exceptions.ConnectionError:
+                    pass
+                if response and response.ok:
+                    return True, new_url
+
+        return False, url
 
     def setText(self, text: str):
         """
@@ -1139,141 +1603,168 @@ class LyricDisplayWidget(QWidget):
         """
         self.text = text
 
-    def set_geometry(self):
-        """
-        Sets the geometry to match its parent widget
-        """
-        if self.for_sample:
-            self.setParent(self.gui.sample_widget)
-            self.setGeometry(self.gui.sample_widget.geometry())
-            self.move(self.gui.sample_widget.x(), self.gui.sample_widget.y())
-
     def paintEvent(self, evt: QPaintEvent):
         """
         Overrides paintEvent to custom paint the text onto the widget
         :param QPaintEvent evt: paintEvent
         """
+        super().paintEvent(evt)
+        painter = QPainter()
+        if painter.begin(self):
+            try:
+                self.calculate_painted_text(painter)
+            finally:
+                painter.end()
 
-        painter = QPainter(self)
-        self.calculate_painted_text(painter)
-
-    def calculate_painted_text(self, painter: QPainter | None = None):
+    def calculate_painted_text(self, painter: QPainter):
         """
         Provides a method for performing all the drawing operations for the text that will be shown on the slide,
         but it does so outside of the paintEvent. If the text is actually to be drawn, the widget's painter can be
-        passed to this method and the text will be painted on to it. If not, it will create its own painter and will
-        return the size of the text background rect in order to give feedback on the final size of the text + background
+        passed to this method and the text will be painted on to it. If not, a painter from a like-sized QImage can be
+        used and will return the size of the text background rect in order to give feedback on the final size of the
+        text + background.
         :param painter: QPainter
-        :return: QRectF
+        :return: QRectF"""
+        # paint the background pixmap if it is set
+        if self.background_pixmap:
+            # check to see if the pixmap is wider or taller than the display widget; shrink if so
+            mode = 'fill'
+            screen_size = self.gui.display_widget.size()  # Your widget's current dimensions
 
-        palette = self.footer_label.palette()
-        palette.setColor(QPalette.ColorRole.WindowText, self.fill_color)
-        self.footer_label.setPalette(palette)"""
+            if mode == 'stretch':
+                # Force it to fit the rect exactly (Option 1)
+                scaled_pixmap = self.background_pixmap.scaled(
+                    screen_size,
+                    Qt.AspectRatioMode.IgnoreAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                x = 0
+                y = 0
 
-        self.total_height = 0
+            elif mode == 'fit':
+                # Scale to bounds, leaving black bars (Option 2)
+                scaled_pixmap = self.background_pixmap.scaled(
+                    screen_size,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                # Center the image on the screen
+                x = (screen_size.width() - scaled_pixmap.width()) // 2
+                y = (screen_size.height() - scaled_pixmap.height()) // 2
+
+            else:
+                # Scale to completely fill the screen, cropping edges (Option 3)
+                scaled_pixmap = self.background_pixmap.scaled(
+                    screen_size,
+                    Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                # Center the image so the cropping happens equally on both sides/top/bottom
+                x = (screen_size.width() - scaled_pixmap.width()) // 2
+                y = (screen_size.height() - scaled_pixmap.height()) // 2
+
+            painter.drawPixmap(x, y, scaled_pixmap)
+
         self.text = re.sub('<p.*?>', '', self.text)
         self.text = re.sub('</p>', '', self.text)
         self.text = re.sub('\n', '<br />', self.text)
         self.text = re.sub('<br/>', '<br />', self.text)
 
-        BOLD = 0
-        ITALIC = 1
-        UNDERLINE = 2
+        brush = QBrush()
+        painter.setBrush(brush)
+        pen = QPen(self.fill_color)
+        painter.setPen(pen)
+        painter.setFont(QFont(self.font().family(), self.gui.main.settings['footer_font_size']))
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
+        # draw the footer first so it's height can be used to determine the usable space for the text
+        font_metrics = painter.fontMetrics()
+        line_height = font_metrics.height()
+        footer_height = line_height * len(self.footer_text)
+        y = self.gui.display_widget.height() - footer_height
+        for line in self.footer_text:
+            painter.drawText(
+                QPoint(20, y),
+                line
+            )
+            y += line_height
+
+        # build painter paths according to how many words will fit within the width of the screen, creating a new
+        # path whenever the line becomes too long
+        painter.setFont(self.font())
         font = self.font()
-        font_size = font.pointSize() + 2
-        painter_paths = []
-        longest_line = 0
-        self.footer_label.adjustSize()
-
-        # build paths for each line, creating a new path whenever the line becomes too long
-        footer_height = self.footer_label.height()
-        if self.footer_label.isHidden() or len(self.footer_label.text().strip()) == 0:
+        font_metrics = painter.fontMetrics()
+        space_width = font_metrics.horizontalAdvance(' ')
+        line_height = font_metrics.boundingRect('Wy').height()
+        if len(self.footer_text) == 0:
             footer_height = 0
         usable_rect = QRect(0, 0, self.gui.display_widget.width(),
                             self.gui.display_widget.height() - footer_height - 40)
-        self.total_height = -1
-        line_height = 0
-        while self.total_height == -1 or self.total_height > usable_rect.height():
-            longest_line = 0
-            painter_paths = []
-            word_path = QPainterPath()
-            path_index = -1
 
-            font_size -= 2
-            font = QFont(font.family(), font_size)
-            self.setFont(font)
-            line_height = self.fontMetrics().boundingRect('Way').height()
-            space_width = self.fontMetrics().horizontalAdvance(' ')
+        max_line_width = usable_rect.width() - 40
+        longest_line = 0
+        painter_paths = []
+        word_path = QPainterPath()
+        path_index = -1
 
-            lines = self.text.split('<br />')
-            for i in range(len(lines)):
-                # if len(re.sub('<.*?>', '', lines[i]).strip()) > 0:
-                x = 0
-                y = 0
-                line_words = lines[i].split(' ')
-                if len(line_words) == 0:
-                    line_words = [' ']
-                painter_paths.append(QPainterPath())
-                path_index += 1
-                for word in line_words:
-                    # if len(re.sub('<.*?>', '', word).strip()) > 0:
-                    word_path.clear()
-                    if '<b>' in word:
-                        font.setWeight(1000)
-                    if '<i>' in word:
-                        font.setItalic(True)
-                    if '<u>' in word:
-                        font.setUnderline(True)
+        lines = self.text.split('<br />')
+        for i in range(len(lines)):
+            x = 0
+            y = 0
+            line_words = lines[i].split(' ')
+            if len(line_words) == 0:
+                line_words = [' ']
+            painter_paths.append(QPainterPath())
+            path_index += 1
+            for word in line_words:
+                word_path.clear()
+                if '<b>' in word:
+                    font.setWeight(1000)
+                if '<i>' in word:
+                    font.setItalic(True)
+                if '<u>' in word:
+                    font.setUnderline(True)
 
-                    word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
-                    if (painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width()
-                            > self.gui.display_widget.width() - 40):
-                        painter_paths.append(QPainterPath())
-                        x = 0
-                        y = 0
-                        path_index += 1
-                    painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
-                    x = painter_paths[path_index].boundingRect().width() + space_width
+                word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
 
-                    if '</b>' in word:
-                        font.setWeight(QFont.Weight.Normal)
-                    if '</i>' in word:
-                        font.setItalic(False)
-                    if '</u>' in word:
-                        font.setUnderline(False)
+                # begin a new painter path if the current path's width plus the word path is greater than the max
+                # line width; reset x to 0
+                if painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width() > max_line_width:
+                    painter_paths.append(QPainterPath())
+                    x = 0
+                    path_index += 1
 
-            # get the total size of the paths that will be drawn for creating the shading rectangle
-            self.total_height = 0
-            for path in painter_paths:
-                # if path.boundingRect().width() > 0:
-                self.total_height += line_height
-                if path.boundingRect().width() > longest_line:
-                    longest_line = path.boundingRect().width()
+                painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                x = painter_paths[path_index].boundingRect().width() + space_width
 
-            if self.for_sample:
-                break
+                if '</b>' in word:
+                    font.setWeight(QFont.Weight.Normal)
+                if '</i>' in word:
+                    font.setItalic(False)
+                if '</u>' in word:
+                    font.setUnderline(False)
+
+        # get the total size of the paths that will be drawn for creating the shading rectangle
+        total_height = 0
+        for path in painter_paths:
+            total_height += line_height
+            if path.boundingRect().width() > longest_line:
+                longest_line = path.boundingRect().width()
 
         # start the first path at the midpoint of the usable rect, minus half the total height of the paths, plus
         # the font's ascent (to account for the path's y being the baseline of the text) plus a 20px margin at the top
-        path_y = (usable_rect.height() / 2) - (self.total_height / 2) + self.fontMetrics().ascent() + 20
+        path_y = (usable_rect.height() / 2) - (total_height / 2) + self.fontMetrics().ascent() + 20
         starting_y = path_y
-        if not painter:
-            painter = QPainter()
-        brush = QBrush()
-        painter.setBrush(brush)
-        pen = QPen()
-        painter.setPen(pen)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         opacity = self.shade_opacity
-        if not self.use_shade:
+        # set opacity to 0 if use_shade is false or if there is no text to display
+        if not self.use_shade or len(self.text.strip()) == 0:
             opacity = 0
         shade_rect = QRectF(
             int((self.gui.display_widget.width() / 2) - (longest_line / 2)) - 20,
             starting_y - self.fontMetrics().ascent() - 20,
             longest_line + 40,
-            self.total_height + 40
+            total_height + 40
         )
         painter.fillRect(shade_rect, QColor(self.shade_color, self.shade_color, self.shade_color, opacity))
 
@@ -1951,7 +2442,8 @@ class SimpleSplash:
         if progress:
             self.progress_bar = QProgressBar()
             self.progress_bar.setRange(0, 100)
-            self.progress_bar.setFont(self.gui.standard_font)
+            self.progress_bar.setFont(self.gui.bold_font)
+            self.progress_bar.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.addWidget(self.progress_bar)
 
         container.adjustSize()
@@ -4476,7 +4968,7 @@ class Toolbar(QWidget):
         self.hide_display_button.setToolTip('Show/Hide the Display Screen')
         self.hide_display_button.setIconSize(self.gui.toolbar_icon_size)
         self.hide_display_button.setCheckable(True)
-        self.hide_display_button.released.connect(self.gui.show_hide_display_screen)
+        self.hide_display_button.released.connect(self.gui.display_widget.show_hide)
         self.layout.addWidget(self.hide_display_button)
 
         self.black_screen_button = QPushButton()
@@ -4485,7 +4977,7 @@ class Toolbar(QWidget):
         self.black_screen_button.setIconSize(self.gui.toolbar_icon_size)
         self.black_screen_button.setCheckable(True)
         self.black_screen_button.released.connect(
-            lambda: self.gui.display_black_screen(self.black_screen_button.isChecked()))
+            lambda: self.gui.display_widget.show_black_screen(self.black_screen_button.isChecked()))
         self.layout.addWidget(self.black_screen_button)
 
         self.logo_screen_button = QPushButton()
@@ -4494,7 +4986,7 @@ class Toolbar(QWidget):
         self.logo_screen_button.setIconSize(self.gui.toolbar_icon_size)
         self.logo_screen_button.setCheckable(True)
         self.logo_screen_button.released.connect(
-            lambda: self.gui.display_logo_screen(self.logo_screen_button.isChecked()))
+            lambda: self.gui.display_widget.show_logo(self.logo_screen_button.isChecked()))
         self.layout.addWidget(self.logo_screen_button)
 
     def show_font_widget(self, slide_type: str):
@@ -4566,10 +5058,6 @@ class Toolbar(QWidget):
                             self.gui.display_widget.setStyleSheet('#display_widget { background-color: none } ')
                             self.gui.display_widget.background_label.setPixmap(self.gui.global_song_background_pixmap)
 
-                            self.gui.sample_widget.background_label.clear()
-                            self.gui.sample_widget.setStyleSheet('#display_widget { background-color: none } ')
-                            self.gui.sample_widget.background_label.setPixmap(self.gui.global_song_background_pixmap)
-
                 elif 'bible' in sender.objectName():
                     self.gui.set_bible_background(self.gui.main.background_dir + '/' + data)
                     if self.gui.live_widget.slide_list.currentItem():
@@ -4578,15 +5066,11 @@ class Toolbar(QWidget):
                             self.gui.display_widget.setStyleSheet('#display_widget { background-color: none } ')
                             self.gui.display_widget.background_label.setPixmap(self.gui.global_bible_background_pixmap)
 
-                            self.gui.sample_widget.background_label.clear()
-                            self.gui.sample_widget.setStyleSheet('#display_widget { background-color: none } ')
-                            self.gui.sample_widget.background_label.setPixmap(self.gui.global_bible_background_pixmap)
-
                 elif 'logo' in sender.objectName():
                     self.gui.set_logo_image(self.gui.main.image_dir + '/' + data)
-                    if self.gui.logo_widget.isVisible():
-                        self.gui.logo_label.clear()
-                        self.gui.logo_label.setPixmap(self.gui.logo_pixmap)
+                    if self.gui.display_widget.currentWidget() == self.gui.display_widget.logo_widget:
+                        self.gui.display_widget.logo_label.clear()
+                        self.gui.display_widget.logo_label.setPixmap(self.gui.logo_pixmap)
 
 
 class CustomTreeWidget(QTreeWidget):
@@ -5185,3 +5669,10 @@ class CustomTreeWidget(QTreeWidget):
             self.delete_item()
         else:
             super().keyPressEvent(evt)
+
+    def mouseReleaseEvent(self, evt):
+        super().mouseReleaseEvent(evt)
+        # since send_to_preview is called on currentItemChanged, provide send to preview on mouse release as well
+        # in case this widget only has one item
+        if self.currentItem():
+            self.gui.send_to_preview(self.currentItem())

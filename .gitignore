@@ -41,6 +41,6 @@ __pycache__/web_remote.cpython-310.pyc
 __pycache__/web_remote.cpython-311.pyc
 __pycache__/widgets.cpython-310.pyc
 __pycache__/widgets.cpython-311.pyc
-.idea/.gitignore
-.idea/workspace.xml
-.unusedCode/powerpoint_viewer.py
+.idea/
+.unusedCode/
+.vs/

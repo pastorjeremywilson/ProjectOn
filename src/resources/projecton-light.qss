@@ -320,14 +320,14 @@ QMessageBox {
 
 /*-------------------- QProgressBar --------------------*/
 QProgressBar {
+    border: 3px solid #555588;
+    text-align: center;
     color: #000000;
     background-color: #ffffff;
-    border: 1px solid #000000;
-    text-align: right;
 }
 QProgressBar::chunk {
-    background-color: #5555aa;
-    color: #ffffff;
+    background-color: #aaaaff;
+    color: #aaaaff;
 }
 
 /*-------------------- QPushButton --------------------*/
@@ -424,6 +424,9 @@ QScrollBar::sub-page:vertical {
 /*-------------------- QSlider --------------------*/
 QSlider::handle {
     background-color: #aaaaff;
+    border: 1px solid #f0f0f2;
+    height: 16px;
+    border-radius: 3px;
 }
 QSlider::handle:hover {
     background-color: #5555aa;

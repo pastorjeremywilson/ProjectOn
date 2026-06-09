@@ -1221,9 +1221,9 @@ class MediaWidget(QTabWidget):
         data['title'] = title
         data['background'] = pixmap
         data['file_name'] = title
-        pixmap = data['background'].scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+        pixmap_icon = data['background'].scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
 
-        self.video_list.add_item(title, data, item_pixmap=pixmap)
+        self.video_list.add_item(title, data, item_pixmap=pixmap_icon)
         self.gui.main.save_video(data)
 
         QMessageBox.information(
