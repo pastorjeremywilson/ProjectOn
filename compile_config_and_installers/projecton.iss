@@ -2,8 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ProjectOn"
-#define MyAppVersion "1.10.0.011"
-#define MyAppVersion "1.10.3"
+#define MyAppVersion "1.10.0.012"
+#define MyAppVersion "1.10.0.012"
 #define MyAppPublisher "Wilson's Widgets"
 #define MyAppExeName "ProjectOn.exe"
 #define MyAppAssocName MyAppName + " File"

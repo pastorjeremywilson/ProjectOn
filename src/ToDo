@@ -14,10 +14,11 @@ Done:
     Figure out why video isn't going back to zero at end after scrubbing
     Set window positions and maximized states before showing
     Consolidated all display widgets into the DisplayWidget class, switched DisplayWidget to a QStackedWidget
+    Add stretch/fit/fill to settings and modify lyric widget to use settings
+    Test on dual-screen. Preview might be changing the live display.
+    Allow sorting media into folders
 
 To Do:
-    Add stretch/fit/fill to settings and modify lyric widget to use settings
 
 Future Releases:
     Video backgrounds
-    Allow sorting media into folders

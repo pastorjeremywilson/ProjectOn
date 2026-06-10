@@ -338,7 +338,7 @@ class TimedPreviewUpdate(QRunnable):
 
 
 class SlideAutoPlay(QRunnable):
-    def __init__(self, gui, text: str, interval: int):
+    def __init__(self, gui, interval: int):
         """
         Cycles through the text in a list of strings, changing the display widget's lyrics based on a given interval
         :param gui: the current instance of GUI
@@ -348,7 +348,6 @@ class SlideAutoPlay(QRunnable):
         super().__init__()
         self.gui = gui
         self.interval = interval
-        self.text = text
         self.keep_running = True
 
     def run(self):

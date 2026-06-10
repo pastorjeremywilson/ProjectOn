@@ -175,7 +175,7 @@ class LiveWidget(QWidget):
         elif sender.objectName() == 'play':
             # pause or play depending on the current mediaStatus
             if self.gui.display_widget.media_player.state() == QMediaPlayer.PlayingState:
-                self.gui.media_player.pause()
+                self.gui.display_widget.media_player.pause()
             else:
                 self.gui.display_widget.media_player.play()
         elif sender.objectName() == 'stop':
@@ -247,7 +247,6 @@ class CustomListWidget(QListWidget):
         """
         Call GUI's change_display function and sync the web remote with the user's input.
         """
-
         if self.currentItem():
             self.gui.display_widget.change_display()
             self.gui.main.remote_server.socketio.emit('change_current_slide', str(self.currentRow()))

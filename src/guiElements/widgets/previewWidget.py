@@ -1,10 +1,12 @@
 import json
+import re
 from os.path import exists
 
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QKeyEvent, QMouseEvent, QPixmap, QPainter, QFont, QColor, QImage, QPen, QBrush
 from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QGridLayout, QAbstractItemView
 
+from dataHandling.parsers import parse_song_data
 from guiElements import gui
 
 
@@ -54,7 +56,6 @@ class PreviewWidget(QWidget):
         self.slide_list.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.slide_list.verticalScrollBar().setSingleStep(15)
         self.slide_list.setFont(self.gui.standard_font)
-        #self.slide_list.itemClicked.connect(self.show_preview)
         self.slide_list.currentItemChanged.connect(self.show_preview)
         container_layout.addWidget(self.slide_list, 1, 0)
 
@@ -73,14 +74,12 @@ class PreviewWidget(QWidget):
         )
         image.fill(Qt.GlobalColor.black)
         painter = QPainter()
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         if slide_data['type'] == 'song' or slide_data['type'] == 'custom':
-            print(self.sender())
-            self.gui.display_widget.lyric_widget.set_for_song_custom(slide_data)
             if painter.begin(image):
                 try:
-                    self.gui.display_widget.lyric_widget.calculate_painted_text(painter)
+                    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+                    self.gui.display_widget.lyric_widget.draw_slide(painter, slide_data)
                 finally:
                     painter.end()
             self.preview_label.setPixmap(
@@ -92,10 +91,10 @@ class PreviewWidget(QWidget):
                 )
             )
         elif slide_data['type'] == 'bible' or slide_data['type'] == 'custom_bible':
-            self.gui.display_widget.lyric_widget.set_for_bible(slide_data)
             if painter.begin(image):
                 try:
-                    self.gui.display_widget.lyric_widget.calculate_painted_text(painter)
+                    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+                    self.gui.display_widget.lyric_widget.draw_slide(painter, slide_data)
                 finally:
                     painter.end()
             self.preview_label.setPixmap(
@@ -108,10 +107,10 @@ class PreviewWidget(QWidget):
             )
         elif slide_data['type'] == 'image':
             if exists(self.gui.main.image_dir + '/' + slide_data['title']):
-                self.gui.display_widget.lyric_widget.set_for_image(slide_data)
                 if painter.begin(image):
                     try:
-                        self.gui.display_widget.lyric_widget.calculate_painted_text(painter)
+                        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+                        self.gui.display_widget.lyric_widget.draw_slide(painter, slide_data)
                     finally:
                         painter.end()
                 self.preview_label.setPixmap(
@@ -123,19 +122,17 @@ class PreviewWidget(QWidget):
                     )
                 )
         elif slide_data['type'] == 'video':
-            print(self.sender())
             # having switched from storing video icon pixmaps as jpg files in the video directory to storing them
             # in the database, check first for an existing jpg file in case this is an old database entry
             video_jpg = self.gui.main.video_dir + '/' + '.'.join(slide_data['title'].split('.')[:-1]) + '.jpg'
             if exists(video_jpg):
-                print('using jpg file')
                 pixmap = QPixmap(video_jpg).scaled(self.gui.display_widget.width(), self.gui.display_widget.height())
             else:
-                print('using database image')
                 pixmap = slide_data['background'].scaled(self.gui.display_widget.width(), self.gui.display_widget.height())
 
             if painter.begin(image):
                 try:
+                    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
                     painter.drawPixmap(0, 0, pixmap)
 
                     if len(self.gui.main.settings['song_font_face'].strip()) > 0:

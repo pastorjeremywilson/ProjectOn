@@ -639,7 +639,7 @@ class GUI(QObject):
         QApplication.processEvents()
 
     def check_update(self):
-        current_version = 'v.1.10.0.011'
+        current_version = self.main.version
         current_version = current_version.replace('v.', '')
         current_version = current_version.replace('rc', '')
         current_version_split = current_version.split('.')
@@ -859,7 +859,7 @@ class GUI(QObject):
         title_pixmap_label.setPixmap(title_pixmap)
         title_layout.addWidget(title_pixmap_label)
 
-        title_label = QLabel('ProjectOn v.1.10.0.011')
+        title_label = QLabel(f'ProjectOn {self.main.version}')
         title_label.setFont(QFont('Helvetica', 24, QFont.Weight.Bold))
         title_layout.addWidget(title_label)
         title_layout.addStretch()
@@ -1405,9 +1405,7 @@ class GUI(QObject):
         self.preview_widget.preview_label.clear()
 
         if slide_data['type'] == 'song':
-            self.display_widget.blockSignals(True)
             slide_data['parsed_text'] = parse_song_data(self.display_widget, self.main.settings, slide_data)
-            self.display_widget.blockSignals(False)
             if len(slide_data['parsed_text']) > 0:
                 for segment in slide_data['parsed_text']:
                     # reduce parsed text for this item to only this item's title and text
@@ -1689,6 +1687,7 @@ class GUI(QObject):
             self.live_widget.slide_list.setCurrentRow(0)
         else:
             self.live_widget.slide_list.setCurrentRow(self.live_widget.slide_list.currentRow() + 1)
+        self.display_widget.lyric_widget.update()
 
     def display_black_screen(self, checked=None):
         """
