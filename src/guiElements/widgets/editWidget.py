@@ -6,7 +6,7 @@ from threading import Thread
 
 from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument, QDrag, \
-    QStandardItemModel, QStandardItem, QFontMetrics
+    QStandardItemModel, QStandardItem, QFontMetrics, QImage
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
     QMessageBox, QCheckBox, QRadioButton, QButtonGroup, QColorDialog, QFileDialog, QScrollArea, QListWidget, \
     QSpinBox, QComboBox, QListWidgetItem, QTextEdit, QGroupBox, QAbstractItemView, QStyledItemDelegate, QListView, \
@@ -41,7 +41,7 @@ class EditWidget(QDialog):
         self.old_title = None
         self.new_item = False
         self.from_oos = from_oos
-        self.data = data
+        self.data = data.copy()
         self.type = data['type']
 
         self.setObjectName('edit_widget')
@@ -651,238 +651,68 @@ class EditWidget(QDialog):
         """
         Method to change what is being displayed in the preview widget.
         """
-        display_widget = self.gui.display_widget
-        lyric_widget = self.gui.sample_lyric_widget
+        image = QImage(
+            self.gui.display_widget.width(),
+            self.gui.display_widget.height(),
+            QImage.Format_ARGB32_Premultiplied
+        )
+        image.fill(Qt.GlobalColor.black)
+        painter = QPainter()
 
-        # set the background
-        display_widget.background_label.clear()
-        display_widget.setStyleSheet('#display_widget { background-color: none } ')
+        self.data['parsed_text'] = {}
+        self.data['parsed_text']['text'] = self.lyrics_list_widget.currentIndex().data(Qt.ItemDataRole.UserRole)[1]
+        shade_rect = 0
+        footer_height = 0
+        pixmap = None
+        if painter.begin(image):
+            try:
+                painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+                shade_rect, footer_height = self.gui.display_widget.lyric_widget.draw_slide(painter, self.data)
+                pixmap = QPixmap.fromImage(image).scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
+            finally:
+                painter.end()
 
-        if not self.data['override_global'] or self.data['override_global'] == 'False':
-            if self.data['type'] == 'song':
-                display_widget.background_label.setPixmap(self.gui.global_song_background_pixmap)
-            else:
-                display_widget.background_label.setPixmap(self.gui.global_bible_background_pixmap)
-        elif self.data['background'] == 'global_song':
-            display_widget.background_label.setPixmap(self.gui.global_song_background_pixmap)
-        elif self.data['background'] == 'global_bible':
-            display_widget.background_label.setPixmap(self.gui.global_bible_background_pixmap)
-        elif 'rgb(' in self.data['background']:
-            display_widget.setStyleSheet(
-                '#display_widget { background-color: ' + self.data['background'] + '}')
-        elif exists(self.gui.main.background_dir + '/' + self.data['background']):
-            custom_pixmap = QPixmap(self.gui.main.background_dir + '/' + self.data['background'])
-            display_widget.background_label.setPixmap(custom_pixmap)
-        else:
-            display_widget.background_label.setPixmap(self.gui.global_song_background_pixmap)
-
-        # set the lyrics html
-        lyrics_html = None
-        self.lyrics_list_widget.currentIndex()
-        if self.lyrics_list_widget.currentIndex() is not None:
-            index = self.lyrics_list_widget.currentIndex()
-            data = index.data(Qt.ItemDataRole.UserRole)
-            lyrics_html = self.get_simplified_text(data[1])
-
-        if not lyrics_html:
+        if not pixmap:
             return
 
-        # set the font
-        if 'override_global' in self.data.keys() and self.data['override_global'] == 'True':
-            font_face = self.data['font_family']
-            font_size = int(self.data['font_size'])
-            font_color = self.data['font_color']
-
-            if 'global' in str(self.data['use_shadow']):
-                use_shadow = self.gui.main.settings['song_use_global']
-            else:
-                use_shadow = self.data['use_shadow']
-
-            if 'global' in str(self.data['shadow_color']):
-                shadow_color = self.gui.main.settings['song_shadow_color']
-            else:
-                shadow_color = self.data['shadow_color']
-
-            if 'global' in str(self.data['shadow_offset']):
-                shadow_offset = self.gui.main.settings['song_shadow_offset']
-            else:
-                shadow_offset = self.data['shadow_offset']
-
-            if 'global' in str(self.data['use_outline']):
-                use_outline = self.gui.min.settings['song_use_outline']
-            else:
-                use_outline = self.data['use_outline']
-
-            if 'global' in str(self.data['outline_color']):
-                outline_color = self.gui.main.settings['song_outline_color']
-            else:
-                outline_color = self.data['outline_color']
-
-            if 'global' in str(self.data['outline_width']):
-                outline_width = self.gui.main.settings['song_outline_width']
-            else:
-                outline_width = self.data['outline_width']
-
-            if 'global' in str(self.data['use_shade']):
-                use_shade = self.gui.main.settings['song_use_shade']
-            else:
-                use_shade = self.data['use_shade']
-
-            if 'global' in str(self.data['shade_color']):
-                shade_color = self.gui.main.settings['song_shade_color']
-            else:
-                shade_color = self.data['shade_color']
-
-            if 'global' in str(self.data['shade_opacity']):
-                shade_opacity = self.gui.main.settings['song_shade_opacity']
-            else:
-                shade_opacity = self.data['shade_opacity']
-        else:
-            if self.data['type'] == 'custom':
-                font_face = self.gui.main.settings['bible_font_face']
-                font_size = self.gui.main.settings['bible_font_size']
-                font_color = self.gui.main.settings['bible_font_color']
-                use_shadow = self.gui.main.settings['bible_use_shadow']
-                shadow_color = self.gui.main.settings['bible_shadow_color']
-                shadow_offset = self.gui.main.settings['bible_shadow_offset']
-                use_outline = self.gui.main.settings['bible_use_outline']
-                outline_color = self.gui.main.settings['bible_outline_color']
-                outline_width = self.gui.main.settings['bible_outline_width']
-                use_shade = self.gui.main.settings['bible_use_shade']
-                shade_color = self.gui.main.settings['bible_shade_color']
-                shade_opacity = self.gui.main.settings['bible_shade_opacity']
-            else:
-                font_face = self.gui.main.settings['song_font_face']
-                font_size = self.gui.main.settings['song_font_size']
-                font_color = self.gui.main.settings['song_font_color']
-                use_shadow = self.gui.main.settings['song_use_shadow']
-                shadow_color = self.gui.main.settings['song_shadow_color']
-                shadow_offset = self.gui.main.settings['song_shadow_offset']
-                use_outline = self.gui.main.settings['song_use_outline']
-                outline_color = self.gui.main.settings['song_outline_color']
-                outline_width = self.gui.main.settings['song_outline_width']
-                use_shade = self.gui.main.settings['song_use_shade']
-                shade_color = self.gui.main.settings['song_shade_color']
-                shade_opacity = self.gui.main.settings['song_shade_opacity']
-
-        lyric_widget.setFont(QFont(font_face, font_size))
-        lyric_widget.footer_label.setFont(QFont(font_face, self.gui.main.settings['footer_font_size']))
-        lyric_widget.use_shadow = use_shadow
-        lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
-        lyric_widget.shadow_offset = shadow_offset
-        lyric_widget.use_outline = use_outline
-        lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
-        lyric_widget.outline_width = outline_width
-        lyric_widget.use_shade = use_shade
-        if not use_shade:
-            shade_opacity = 0
-        lyric_widget.shade_color = shade_color
-        lyric_widget.shade_opacity = shade_opacity
-
-        # set the font color
-        if not font_color == 'global':
-            if font_color == 'white':
-                lyric_widget.fill_color = QColor(Qt.GlobalColor.white)
-            elif font_color == 'black':
-                lyric_widget.fill_color = QColor(Qt.GlobalColor.black)
-            elif '#' in font_color:
-                color = font_color.replace('#', '')
-                rgb_color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
-                lyric_widget.fill_color = QColor(rgb_color)
-            else:
-                color = font_color.replace('rgb(', '')
-                color = color.replace(')', '')
-                font_color_split = color.split(', ')
-                lyric_widget.fill_color = QColor(
-                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
-        else:
-            if self.gui.main.settings['font_color'] == 'black':
-                lyric_widget.fill_color = QColor(0, 0, 0)
-            elif self.gui.main.settings['font_color'] == 'white':
-                lyric_widget.fill_color = QColor(255, 255, 255)
-            else:
-                font_color_split = self.gui.main.settings['font_color'].split(', ')
-                lyric_widget.fill_color = QColor(
-                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
-
-        lyric_widget.text = lyrics_html
-
-        # set the footer text
-        lyric_widget.footer_label.show()
-        footer_text = ''
-        if 'use_footer' in self.data.keys() and self.data['use_footer']:
-            if len(self.data['author']) > 0:
-                footer_text += self.data['author']
-            if len(self.data['copyright']) > 0:
-                footer_text += '\n\u00A9' + self.data['copyright'].replace('\n', ' ')
-            if len(self.data['ccli_song_number']) > 0:
-                footer_text += '\nCCLI Song #: ' + self.data['ccli_song_number']
-            if len(self.gui.main.settings['ccli_num']) > 0:
-                footer_text += '\nCCLI License #: ' + self.gui.main.settings['ccli_num']
-            lyric_widget.footer_label.setText(footer_text)
-        elif self.data['type'] == 'bible':
-            lyric_widget.footer_label.setText(
-                self.data['title']
-                + ' ('
-                + self.data['author']
-                + ')'
-            )
-        else:
-            lyric_widget.footer_label.setText('')
-            lyric_widget.footer_label.clear()
-
-        qss_font_color = (f'rgb({lyric_widget.fill_color.red()}, '
-                          f'{lyric_widget.fill_color.green()}, '
-                          f'{lyric_widget.fill_color.blue()})')
-        if not font_color == 'global':
-            lyric_widget.footer_label.setStyleSheet(f'color: {qss_font_color}')
-        else:
-            if self.gui.main.settings['font_color'] == 'black':
-                lyric_widget.footer_label.setStyleSheet('color: black;')
-            elif self.gui.main.settings['font_color'] == 'white':
-                lyric_widget.footer_label.setStyleSheet('color: white;')
-            else:
-                lyric_widget.footer_label.setStyleSheet(f'color: rgb({self.gui.main.settings["font_color"]});')
-
-        if lyric_widget.footer_label.text() == '':
-            lyric_widget.footer_label.hide()
-
-        lyrics_rect, footer_height = lyric_widget.draw_slide()
-        lyrics_height = lyrics_rect.height()
-        target_height = display_widget.height() - footer_height - 40
-
-        # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
-        if lyrics_height > target_height:
-            segment_text_split = re.split('<br.*?/>', lyrics_html)
-            half_lines = int(len(segment_text_split) / 2)
-            if half_lines > 1:
-                first_lyrics = ''
-                for i in range(half_lines):
-                    first_lyrics += segment_text_split[i] + '<br />'
-                first_lyrics = first_lyrics[:-6]
-                lyric_widget.text = first_lyrics
-                preview_pixmap = display_widget.grab(display_widget.rect())
-                preview_pixmap = preview_pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
-                self.preview_label_one.setPixmap(preview_pixmap)
-
-                second_lyrics = ''
-                for i in range(half_lines, len(segment_text_split)):
-                    second_lyrics += segment_text_split[i] + '<br />'
-                second_lyrics = second_lyrics[:-6]
-                lyric_widget.text = second_lyrics
-                preview_pixmap = display_widget.grab(display_widget.rect())
-                preview_pixmap = preview_pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
-                self.preview_label_two.setPixmap(preview_pixmap)
-            else:
-                preview_pixmap = display_widget.grab(display_widget.rect())
-                preview_pixmap = preview_pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
-                self.preview_label_one.setPixmap(preview_pixmap)
-                self.preview_label_two.clear()
-        else:
-            preview_pixmap = display_widget.grab(display_widget.rect())
-            preview_pixmap = preview_pixmap.scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
-            self.preview_label_one.setPixmap(preview_pixmap)
+        # if the text overflows the usable area of the lyric widget, split the text in two and set both
+        # preview label pixmaps
+        max_height = self.gui.display_widget.height() - footer_height - 40
+        if shade_rect.height() < max_height:
+            self.preview_label_one.setPixmap(pixmap)
             self.preview_label_two.clear()
+        else:
+            segment_text_split = re.split('<br.*?/>', self.data['parsed_text']['text'])
+            half_lines = int(len(segment_text_split) / 2)
+            first_lyrics = ''
+            for i in range(half_lines):
+                first_lyrics += segment_text_split[i] + '<br />'
+            first_lyrics = first_lyrics[:-6]
+
+            second_lyrics = ''
+            for i in range(half_lines, len(segment_text_split)):
+                second_lyrics += segment_text_split[i] + '<br />'
+            second_lyrics = second_lyrics[:-6]
+
+            self.data['parsed_text']['text'] = first_lyrics
+            if painter.begin(image):
+                try:
+                    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+                    self.gui.display_widget.lyric_widget.draw_slide(painter, self.data)
+                finally:
+                    painter.end()
+                pixmap = QPixmap.fromImage(image).scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
+                self.preview_label_one.setPixmap(pixmap)
+
+            self.data['parsed_text']['text'] = second_lyrics
+            if painter.begin(image):
+                try:
+                    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+                    self.gui.display_widget.lyric_widget.draw_slide(painter, self.data)
+                finally:
+                    painter.end()
+                pixmap = QPixmap.fromImage(image).scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
+                self.preview_label_two.setPixmap(pixmap)
 
     def add_audio_changed(self):
         #self.audio_line_edit.setVisible(self.add_audio_button.isChecked())

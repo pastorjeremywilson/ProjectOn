@@ -1947,8 +1947,12 @@ class NewFontWidget(QWidget):
         self.blockSignals(True)
 
         font_face = self.gui.main.settings[f'{self.slide_type}_font_face']
-        self.font_face_combobox.setCurrentIndex(
-            self.font_face_combobox.findText(font_face, Qt.MatchFlag.MatchFixedString))
+        if len(font_face.strip()) > 0:
+            self.font_face_combobox.setCurrentIndex(
+                self.font_face_combobox.findText(font_face, Qt.MatchFlag.MatchFixedString))
+        else:
+            self.font_face_combobox.setCurrentIndex(0)
+            self.gui.main.settings[f'{self.slide_type}_font_face'] = self.font_face_combobox.currentText()
 
         self.font_size_spinbox.setValue(self.gui.main.settings[f'{self.slide_type}_font_size'])
 

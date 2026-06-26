@@ -866,16 +866,18 @@ class GUI(QObject):
 
         remote_widget = QWidget()
         remote_layout = QGridLayout()
+        remote_layout.setContentsMargins(0, 0, 0, 0)
         remote_widget.setLayout(remote_layout)
         layout.addWidget(remote_widget)
+        layout.addSpacing(20)
 
         remote_title_label = QLabel('Remote Web Pages:')
-        remote_title_label.setFont(self.standard_font)
+        remote_title_label.setFont(self.bold_font)
         remote_layout.addWidget(remote_title_label, 0, 0)
 
         remote_label = QLabel('Standard Remote-Control:')
         remote_label.setFont(self.bold_font)
-        remote_layout.addWidget(remote_label, 1, 0)
+        remote_layout.addWidget(remote_label, 1, 0, Qt.AlignmentFlag.AlignRight)
 
         remote_url_label = QLabel('http://' + self.main.ip + ':15171/remote')
         remote_url_label.setFont(self.standard_font)
@@ -883,7 +885,7 @@ class GUI(QObject):
 
         mremote_label = QLabel('Mobile-Friendly Remote-Control:')
         mremote_label.setFont(self.bold_font)
-        remote_layout.addWidget(mremote_label, 2, 0)
+        remote_layout.addWidget(mremote_label, 2, 0, Qt.AlignmentFlag.AlignRight)
 
         mremote_url_label = QLabel('http://' + self.main.ip + ':15171/mremote')
         mremote_url_label.setFont(self.standard_font)
@@ -891,13 +893,13 @@ class GUI(QObject):
 
         stage_label = QLabel('Stage View:')
         stage_label.setFont(self.bold_font)
-        remote_layout.addWidget(stage_label, 3, 0)
+        remote_layout.addWidget(stage_label, 3, 0, Qt.AlignmentFlag.AlignRight)
 
         stage_url_label = QLabel('http://' + self.main.ip + ':15171/stage')
         stage_url_label.setFont(self.standard_font)
         remote_layout.addWidget(stage_url_label, 3, 1)
 
-        database_label = QLabel(f'Database Location: {self.main.database}')
+        database_label = QLabel(f'<b>Database Location:</b> {self.main.database}')
         database_label.setFont(self.standard_font)
         layout.addWidget(database_label)
         layout.addSpacing(20)
@@ -1233,9 +1235,6 @@ class GUI(QObject):
                     self.main.app.processEvents()
                 if self.countdown_timer:
                     self.countdown_timer.stop()
-
-
-
         except Exception:
             self.main.error_log()
 
@@ -1276,6 +1275,8 @@ class GUI(QObject):
         self.oos_widget.oos_list_widget.blockSignals(False)
         self.preview_widget.slide_list.blockSignals(False)
         self.live_widget.slide_list.blockSignals(False)
+
+        self.main_window.setWindowTitle('ProjectOn - New Service')
 
         self.changes = False
 
