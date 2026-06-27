@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.013
+ProjectOn v.1.10.0.014
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -82,7 +82,7 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.10.0.013'
+        self.version = 'v.1.10.0.014'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
@@ -1299,12 +1299,13 @@ class ProjectOn(QObject):
                 'ProjectOn Service Files (*.pro *.proj)'
             )
         else:
-            result = [filename]
+            result = [filename, '']
 
         if len(result[0]) > 0:
             self.finish_load(result[0])
 
     def finish_load(self, filename):
+        print(filename)
         self.gui.oos_widget.oos_list_widget.clear()
 
         # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
@@ -1594,7 +1595,7 @@ class ProjectOn(QObject):
                     self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
 
         # update the gui to reflect the changes loaded from the service file
-        self.gui.current_file = filename[0]
+        self.gui.current_file = filename
 
         self.gui.preview_widget.slide_list.clear()
         self.gui.preview_widget.preview_label.clear()
@@ -1602,7 +1603,7 @@ class ProjectOn(QObject):
         self.gui.live_widget.preview_label.clear()
 
         # set the last used directory in settings
-        file_dir = os.path.dirname(filename[0])
+        file_dir = os.path.dirname(filename)
         file_name = filename[0].replace(file_dir, '').replace('/', '').replace('\\', '')
         self.settings['last_save_dir'] = file_dir
 

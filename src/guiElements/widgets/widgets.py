@@ -562,6 +562,9 @@ class DisplayWidget(QStackedWidget):
                 self.gui.main.remote_server.update_stage_text(
                     stage_html, self.gui.main.settings['stage_font_size'], '')
 
+        if not self.currentWidget == self.video_widget:
+            self.currentWidget().update()
+
     def setCurrentWidget(self, widget):
         self.last_current_widget = widget
         super().setCurrentWidget(widget)
@@ -1656,48 +1659,55 @@ class LyricDisplayWidget(QWidget):
         path_index = -1
 
         lines = text.split('<br />')
-        for i in range(len(lines)):
-            x = 0
-            y = 0
-            line_words = lines[i].split(' ')
-            if len(line_words) == 0:
-                line_words = [' ']
-            painter_paths.append(QPainterPath())
-            path_index += 1
-            for word in line_words:
-                word_path.clear()
-                if '<b>' in word:
-                    font.setWeight(1000)
-                if '<i>' in word:
-                    font.setItalic(True)
-                if '<u>' in word:
-                    font.setUnderline(True)
+        total_height = usable_rect.height() + 40
+        while True:
+            for i in range(len(lines)):
+                x = 0
+                y = 0
+                line_words = lines[i].split(' ')
+                if len(line_words) == 0:
+                    line_words = [' ']
+                painter_paths.append(QPainterPath())
+                path_index += 1
+                for word in line_words:
+                    word_path.clear()
+                    if '<b>' in word:
+                        font.setWeight(1000)
+                    if '<i>' in word:
+                        font.setItalic(True)
+                    if '<u>' in word:
+                        font.setUnderline(True)
 
-                word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                    word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
 
-                # begin a new painter path if the current path's width plus the word path is greater than the max
-                # line width; reset x to 0
-                if painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width() > max_line_width:
-                    painter_paths.append(QPainterPath())
-                    x = 0
-                    path_index += 1
+                    # begin a new painter path if the current path's width plus the word path is greater than the max
+                    # line width; reset x to 0
+                    if painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width() > max_line_width:
+                        painter_paths.append(QPainterPath())
+                        x = 0
+                        path_index += 1
 
-                painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
-                x = painter_paths[path_index].boundingRect().width() + space_width
+                    painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
+                    x = painter_paths[path_index].boundingRect().width() + space_width
 
-                if '</b>' in word:
-                    font.setWeight(QFont.Weight.Normal)
-                if '</i>' in word:
-                    font.setItalic(False)
-                if '</u>' in word:
-                    font.setUnderline(False)
+                    if '</b>' in word:
+                        font.setWeight(QFont.Weight.Normal)
+                    if '</i>' in word:
+                        font.setItalic(False)
+                    if '</u>' in word:
+                        font.setUnderline(False)
 
-        # get the total size of the paths that will be drawn for creating the shading rectangle
-        total_height = 0
-        for path in painter_paths:
-            total_height += line_height
-            if path.boundingRect().width() > longest_line:
-                longest_line = path.boundingRect().width()
+            # get the total size of the paths that will be drawn for creating the shading rectangle
+            total_height = 0
+            for path in painter_paths:
+                total_height += line_height
+                if path.boundingRect().width() > longest_line:
+                    longest_line = path.boundingRect().width()
+
+            if total_height > usable_rect.height() and font.pointSize() > 24:
+                font.setPointSize(font.pointSize() - 2)
+            else:
+                break
 
         # start the first path at the midpoint of the usable rect, minus half the total height of the paths, plus
         # the font's ascent (to account for the path's y being the baseline of the text) plus a 20px margin at the top

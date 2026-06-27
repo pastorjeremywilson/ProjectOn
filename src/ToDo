@@ -17,8 +17,11 @@ Done:
     Add stretch/fit/fill to settings and modify lyric widget to use settings
     Test on dual-screen. Preview might be changing the live display.
     Allow sorting media into folders
+    Last used directory not saving
+    Display not updating from live
 
 To Do:
+    keep working on final lyrics resize
 
 Future Releases:
     Video backgrounds
