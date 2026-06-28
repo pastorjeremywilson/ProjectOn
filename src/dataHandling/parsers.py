@@ -133,7 +133,7 @@ def parse_song_data(display_widget, settings: dict, song_data: dict):
         target_height = 0
         if painter.begin(image):
             try:
-                lyrics_rect, footer_height = display_widget.lyric_widget.draw_slide(painter, song_data)
+                lyrics_rect, footer_height = display_widget.lyric_widget.draw_slide(painter, song_data, auto_fit=False)
                 lyric_widget_height = lyrics_rect.height()
                 target_height = display_widget.height() - footer_height - 40
             finally:
@@ -265,7 +265,7 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
     painter = QPainter()
     if painter.begin(image):
         try:
-            lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(painter, slide_data)
+            lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(painter, slide_data, auto_fit=False)
         finally:
             painter.end()
     target_height = gui.display_widget.height() - footer_height - 40
@@ -283,7 +283,8 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
         # repaint to the image from the lyric widget to get its current height
         if painter.begin(image):
             try:
-                lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(painter, slide_data)
+                lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(
+                    painter, slide_data, auto_fit=False)
             finally:
                 painter.end()
 

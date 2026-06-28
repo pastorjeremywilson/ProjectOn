@@ -1477,19 +1477,25 @@ class LyricDisplayWidget(QWidget):
             try:
                 if self.gui.live_widget.slide_list.currentItem():
                     self.draw_slide(
-                        painter, self.gui.live_widget.slide_list.currentItem().data(Qt.ItemDataRole.UserRole))
+                        painter,
+                        self.gui.live_widget.slide_list.currentItem().data(Qt.ItemDataRole.UserRole).copy()
+                    )
             finally:
                 painter.end()
 
-    def draw_slide(self, painter: QPainter, slide_data: dict | None = None):
+    def draw_slide(self, painter: QPainter, slide_data: dict, auto_fit: bool | None = True):
         """
         Provides a method for performing all the drawing operations for the text that will be shown on the slide,
-        but it does so outside of the paintEvent. If the text is actually to be drawn, the widget's painter can be
+        but it does so outside of the paintEvent. If the text is actually to be drawn, the widget's painter is to be
         passed to this method and the text will be painted on to it. If not, a painter from a like-sized QImage can be
         used and will return the size of the text background rect in order to give feedback on the final size of the
-        text + background.
+        text + background. If auto_fit is true, it will reduce the font size in the case the height of the text is
+        larger than the usable area of the slide.
         :param painter: QPainter
-        :return: QRectF"""
+        :param slide_data: dict
+        :param auto_fit: bool
+        :return: QRectF
+        """
         background_pixmap = None
         if slide_data['type'] == 'song' or slide_data['type'] == 'custom':
             # set the background
@@ -1643,34 +1649,37 @@ class LyricDisplayWidget(QWidget):
 
         # build painter paths according to how many words will fit within the width of the screen, creating a new
         # path whenever the line becomes too long
-        painter.setFont(font)
-        font_metrics = painter.fontMetrics()
-        space_width = font_metrics.horizontalAdvance(' ')
-        line_height = font_metrics.boundingRect('Wy').height()
         if len(footer_text) == 0:
             footer_height = 0
-        usable_rect = QRect(0, 0, self.gui.display_widget.width(),
-                            self.gui.display_widget.height() - footer_height - 40)
+        usable_rect = QRect(
+            0,
+            0,
+            self.gui.display_widget.width(),
+            self.gui.display_widget.height() - footer_height - font_metrics.height()
+        )
 
-        max_line_width = usable_rect.width() - 40
         longest_line = 0
         painter_paths = []
-        word_path = QPainterPath()
-        path_index = -1
 
         lines = text.split('<br />')
-        total_height = usable_rect.height() + 40
         while True:
+            longest_line = 0
+            painter.setFont(font)
+            font_metrics = painter.fontMetrics()
+            space_width = font_metrics.horizontalAdvance(' ')
+            line_height = font_metrics.boundingRect('Wy').height()
+            painter_paths.clear()
+
             for i in range(len(lines)):
-                x = 0
-                y = 0
                 line_words = lines[i].split(' ')
                 if len(line_words) == 0:
                     line_words = [' ']
-                painter_paths.append(QPainterPath())
-                path_index += 1
+
+                # get the full length of this line to check if it is longer than the usable rect's width
+                full_line_path = QPainterPath()
+                full_line_x = 0
+                full_line_y = 0
                 for word in line_words:
-                    word_path.clear()
                     if '<b>' in word:
                         font.setWeight(1000)
                     if '<i>' in word:
@@ -1678,17 +1687,8 @@ class LyricDisplayWidget(QWidget):
                     if '<u>' in word:
                         font.setUnderline(True)
 
-                    word_path.addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
-
-                    # begin a new painter path if the current path's width plus the word path is greater than the max
-                    # line width; reset x to 0
-                    if painter_paths[path_index].boundingRect().width() + word_path.boundingRect().width() > max_line_width:
-                        painter_paths.append(QPainterPath())
-                        x = 0
-                        path_index += 1
-
-                    painter_paths[path_index].addText(QPointF(x, y), font, re.sub('<.*?>', '', word))
-                    x = painter_paths[path_index].boundingRect().width() + space_width
+                    full_line_path.addText(QPointF(full_line_x, full_line_y), font, re.sub('<.*?>', '', word))
+                    full_line_x = full_line_path.boundingRect().width() + space_width
 
                     if '</b>' in word:
                         font.setWeight(QFont.Weight.Normal)
@@ -1697,6 +1697,43 @@ class LyricDisplayWidget(QWidget):
                     if '</u>' in word:
                         font.setUnderline(False)
 
+                line_segments = [line_words]
+                # split the line in two if the line overflows usable_rect
+                if full_line_path.boundingRect().width() > usable_rect.width() - 40:
+                    half_index = int(len(line_words) / 2)
+                    line_segments = [line_words[:half_index], line_words[half_index:]]
+
+                # draw the path(s) for this line
+                painter_path_x = 0
+                painter_path_y = 0
+                for segment in line_segments:
+                    painter_path = QPainterPath()
+                    for word in segment:
+                        if '<b>' in word:
+                            font.setWeight(1000)
+                        if '<i>' in word:
+                            font.setItalic(True)
+                        if '<u>' in word:
+                            font.setUnderline(True)
+
+                        painter_path.addText(
+                            QPointF(painter_path_x, painter_path_y),
+                            font,
+                            re.sub('<.*?>', '', word)
+                        )
+
+                        if '</b>' in word:
+                            font.setWeight(QFont.Weight.Normal)
+                        if '</i>' in word:
+                            font.setItalic(False)
+                        if '</u>' in word:
+                            font.setUnderline(False)
+
+                        painter_path_x = painter_path.boundingRect().width() + space_width
+
+                    painter_paths.append(painter_path)
+                    painter_path_x = 0
+
             # get the total size of the paths that will be drawn for creating the shading rectangle
             total_height = 0
             for path in painter_paths:
@@ -1704,30 +1741,42 @@ class LyricDisplayWidget(QWidget):
                 if path.boundingRect().width() > longest_line:
                     longest_line = path.boundingRect().width()
 
-            if total_height > usable_rect.height() and font.pointSize() > 24:
+            # Calculate what the total size including the margins of the shadeing rectangle will be. If it
+            # overflows the usable rect, shrink the font by 2 points and allow loop.
+            if ((total_height + font_metrics.descent() + 40 > usable_rect.height()
+                    or longest_line + 80 > usable_rect.width())
+                    and font.pointSize() > 24 and auto_fit):
                 font.setPointSize(font.pointSize() - 2)
             else:
                 break
 
-        # start the first path at the midpoint of the usable rect, minus half the total height of the paths, plus
-        # the font's ascent (to account for the path's y being the baseline of the text) plus a 20px margin at the top
-        path_y = (usable_rect.height() / 2) - (total_height / 2) + font_metrics.ascent() + 20
-        starting_y = path_y
-
+        # Set the opacity of the shading rectangle behind the text. If use_shade is false or there is no text, set the
+        # opacity to zero.
         opacity = shade_opacity
-        # set opacity to 0 if use_shade is false or if there is no text to display
         if not use_shade or len(text.strip()) == 0:
             opacity = 0
-        shade_rect = QRectF(
-            int((self.gui.display_widget.width() / 2) - (longest_line / 2)) - 20,
-            starting_y - font_metrics.ascent() - 20,
-            longest_line + 40,
-            total_height + 40
-        )
-        painter.fillRect(shade_rect, QColor(shade_color, shade_color, shade_color, opacity))
 
+        # Calculate the size of the shade_rect based on the longest line and the height of the text. Account for
+        # margins.
+        shade_rect = QRectF(
+            0,
+            0,
+            longest_line + 80,
+            total_height + font_metrics.descent() + 40
+        )
+        # Center the shade rectangle within the usable rect
+        shade_rect.translate(
+            (usable_rect.width() / 2) - (shade_rect.width() / 2),
+            (usable_rect.height() / 2) - (shade_rect.height() / 2)
+        )
+        painter.fillRect(
+            shade_rect,
+            QColor(shade_color, shade_color, shade_color, opacity)
+        )
+
+        path_y = shade_rect.y() + line_height
         for path in painter_paths:
-            path_x = (self.gui.display_widget.width() / 2) - (path.boundingRect().width() / 2)
+            path_x = (usable_rect.width() / 2) - (path.boundingRect().width() / 2)
             path.translate(path_x, path_y)
 
             if use_shadow:
@@ -5661,7 +5710,6 @@ class CustomTreeWidget(QTreeWidget):
 
     def keyPressEvent(self, evt: QKeyEvent):
         if evt.key() == Qt.Key.Key_Delete:
-            print('delete pressed')
             self.delete_item()
         else:
             super().keyPressEvent(evt)

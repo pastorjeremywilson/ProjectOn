@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.014
+ProjectOn v.1.10.0.015
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -82,7 +82,7 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.10.0.014'
+        self.version = 'v.1.10.0.015'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
@@ -1305,7 +1305,6 @@ class ProjectOn(QObject):
             self.finish_load(result[0])
 
     def finish_load(self, filename):
-        print(filename)
         self.gui.oos_widget.oos_list_widget.clear()
 
         # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
@@ -1520,7 +1519,6 @@ class ProjectOn(QObject):
                     # create the proper icon for this slide type
                     if data['type'] == 'song':
                         if not data['override_global'] or data['background'] == 'global_song':
-                            print('setting icon to global song pixmap')
                             pixmap = self.gui.global_song_background_pixmap
                             pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
                                                    Qt.TransformationMode.SmoothTransformation)

@@ -667,7 +667,8 @@ class EditWidget(QDialog):
         if painter.begin(image):
             try:
                 painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-                shade_rect, footer_height = self.gui.display_widget.lyric_widget.draw_slide(painter, self.data)
+                shade_rect, footer_height = self.gui.display_widget.lyric_widget.draw_slide(
+                    painter, self.data, auto_fit=False)
                 pixmap = QPixmap.fromImage(image).scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
             finally:
                 painter.end()
@@ -698,7 +699,7 @@ class EditWidget(QDialog):
             if painter.begin(image):
                 try:
                     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-                    self.gui.display_widget.lyric_widget.draw_slide(painter, self.data)
+                    self.gui.display_widget.lyric_widget.draw_slide(painter, self.data, auto_fit=False)
                 finally:
                     painter.end()
                 pixmap = QPixmap.fromImage(image).scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
@@ -708,7 +709,7 @@ class EditWidget(QDialog):
             if painter.begin(image):
                 try:
                     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-                    self.gui.display_widget.lyric_widget.draw_slide(painter, self.data)
+                    self.gui.display_widget.lyric_widget.draw_slide(painter, self.data, auto_fit=False)
                 finally:
                     painter.end()
                 pixmap = QPixmap.fromImage(image).scaledToWidth(300, Qt.TransformationMode.SmoothTransformation)
