@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QLi
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
     QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog, QStyledItemDelegate, QTreeWidget, \
     QTreeWidgetItem, QMenu, QAction, QStyleOptionViewItem, QProgressBar, QGraphicsView, \
-    QGraphicsScene, QStackedWidget, QSizePolicy
+    QGraphicsScene, QStackedWidget, QSizePolicy, QGraphicsBlurEffect, QGraphicsPixmapItem
 
 from core.runnables import SlideAutoPlay, TimedPreviewUpdate
 from dataHandling.parsers import get_qcolor_from_str
@@ -1639,13 +1639,49 @@ class LyricDisplayWidget(QWidget):
         font_metrics = painter.fontMetrics()
         line_height = font_metrics.height()
         footer_height = line_height * len(footer_text)
-        y = self.gui.display_widget.height() - footer_height
+        footer_x = 20
+        footer_y = self.gui.display_widget.height() - footer_height
+
+        footer_shade_rect = QRectF(
+            0,
+            footer_y - line_height,
+            self.gui.display_widget.width(),
+            footer_height + 20
+        )
+        opacity = shade_opacity
+        if not use_shade or len(text.strip()) == 0:
+            opacity = 0
+        painter.fillRect(
+            footer_shade_rect,
+            QColor(shade_color, shade_color, shade_color, opacity)
+        )
+
+        painter.save()
         for line in footer_text:
-            painter.drawText(
-                QPoint(20, y),
+            # Create a path for this line of text
+            path = QPainterPath()
+            path.addText(
+                QPointF(footer_x, footer_y),
+                QFont(font.family(), self.gui.main.settings['footer_font_size']),
                 line
             )
-            y += line_height
+            if use_shadow:
+                # first, draw a shadow behind the footer text
+                path.translate(2, 2)
+                painter.fillPath(path, QBrush(shadow_color))
+                path.translate(-2, -2)
+
+            # then draw the footer text
+            painter.fillPath(path, QBrush(fill_color))
+
+            if use_outline:
+                pen = QPen(outline_color)
+                pen.setWidth(1)
+                painter.strokePath(path, pen)
+
+            footer_y += line_height
+
+        painter.restore()
 
         # build painter paths according to how many words will fit within the width of the screen, creating a new
         # path whenever the line becomes too long
@@ -1764,28 +1800,56 @@ class LyricDisplayWidget(QWidget):
             longest_line + 80,
             total_height + font_metrics.descent() + 40
         )
+
         # Center the shade rectangle within the usable rect
         shade_rect.translate(
             (usable_rect.width() / 2) - (shade_rect.width() / 2),
             (usable_rect.height() / 2) - (shade_rect.height() / 2)
         )
-        painter.fillRect(
+
+        # Create a separate pixmap for the shade rect and text shadow so it can be blurred
+        blur_pixmap = QPixmap(int(usable_rect.width()), int(usable_rect.height()))
+        blur_pixmap.fill(Qt.GlobalColor.transparent)
+        blur_painter = QPainter(blur_pixmap)
+        blur_painter.setPen(Qt.GlobalColor.transparent)
+        blur_painter.setRenderHint(QPainter.Antialiasing)
+        blur_painter.fillRect(
             shade_rect,
             QColor(shade_color, shade_color, shade_color, opacity)
         )
 
         path_y = shade_rect.y() + line_height
-        for path in painter_paths:
-            path_x = (usable_rect.width() / 2) - (path.boundingRect().width() / 2)
-            path.translate(path_x, path_y)
-
-            if use_shadow:
-                path.translate(shadow_offset, shadow_offset)
+        if use_shadow:
+            for path in painter_paths:
+                path_x = (usable_rect.width() / 2) - (path.boundingRect().width() / 2)
+                path.translate(path_x + shadow_offset, path_y + shadow_offset)
                 shadow_brush = QBrush()
                 shadow_brush.setColor(shadow_color)
                 shadow_brush.setStyle(Qt.BrushStyle.SolidPattern)
-                painter.fillPath(path, shadow_brush)
-                path.translate(-shadow_offset, -shadow_offset)
+                blur_painter.fillPath(path, shadow_brush)
+                path.translate(-path_x - shadow_offset, -path_y - shadow_offset)
+                path_y += line_height
+
+        blur_painter.end()
+
+        scene = QGraphicsScene()
+        scene.setSceneRect(0, 0, blur_pixmap.width(), blur_pixmap.height())
+
+        rect_item = QGraphicsRectItem(0, 0, blur_pixmap.width(), blur_pixmap.height())
+        rect_item.setBrush(QBrush(blur_pixmap))
+        rect_item.setPen(QPen(Qt.GlobalColor.transparent))
+        scene.addItem(rect_item)
+
+        blur = QGraphicsBlurEffect()
+        blur.setBlurRadius(5)  # This will now blur BOTH the box and the text paths
+        rect_item.setGraphicsEffect(blur)
+
+        scene.render(painter, QRectF(0, 0, blur_pixmap.width(), blur_pixmap.height()), scene.sceneRect())
+
+        path_y = shade_rect.y() + line_height
+        for path in painter_paths:
+            path_x = (usable_rect.width() / 2) - (path.boundingRect().width() / 2)
+            path.translate(path_x, path_y)
 
             brush.setColor(fill_color)
             brush.setStyle(Qt.BrushStyle.SolidPattern)
