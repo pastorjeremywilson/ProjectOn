@@ -2151,7 +2151,6 @@ class NewFontWidget(QWidget):
         self.font_sample.repaint()
 
     def change_font_sample(self):
-        print(self.slide_type)
         if self.font_face_combobox.currentText():
             font_name = self.font_face_combobox.currentText()
         else:
