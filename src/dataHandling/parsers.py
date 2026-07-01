@@ -276,17 +276,16 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
     verse_index = 0
     while verse_index < len(text):
         # add the current verse number and verse text to the lyric widget's text
-        this_verse = ' '.join(text[verse_index])
+        this_verse = ' '.join(text[verse_index]).strip()
         slide_data['parsed_text'] = f'{slide_data['parsed_text']} {this_verse}'.strip()
         verses_added += 1
 
         # repaint to the image from the lyric widget to get its current height
-        if painter.begin(image):
-            try:
-                lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(
-                    painter, slide_data, auto_fit=False)
-            finally:
-                painter.end()
+        try:
+            lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(
+                painter, slide_data, auto_fit=False)
+        finally:
+            painter.end()
 
         if lyrics_rect.height() > target_height:
             if verses_added == 1:
@@ -297,7 +296,8 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
                 # adding this verse overflowed the widget so remove this verse from the current lyric widget text,
                 # add the altered text to slide_texts, and reduce verse_index by one so that it gets added to the
                 # next set
-                slide_texts.append(slide_data['parsed_text'].replace(this_verse, '').strip())
+                this_segment = slide_data['parsed_text'].replace(this_verse, '').strip()
+                slide_texts.append(this_segment)
                 verse_index -= 1
             slide_data['parsed_text'] = ''
             verses_added = 0

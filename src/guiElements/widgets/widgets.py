@@ -1245,7 +1245,8 @@ class ImageCombobox(QComboBox):
             item_data = item.data(Qt.ItemDataRole.UserRole)
             pixmap = None
 
-            if item_data['type'] == 'song' or item_data['type'] == 'bible' or item_data['type'] == 'custom':
+            if (item_data
+                    and (item_data['type'] == 'song' or item_data['type'] == 'bible' or item_data['type'] == 'custom')):
                 if not item_data['override_global'] or item_data['override_global'] == 'False':
                     if item_data['type'] == self.type:
                         pixmap = self.itemIcon(self.currentIndex()).pixmap(QSize(50, 27))
@@ -1475,6 +1476,7 @@ class LyricDisplayWidget(QWidget):
         painter = QPainter()
         if painter.begin(self):
             try:
+                painter.fillRect(self.rect(), Qt.GlobalColor.black)
                 if self.gui.live_widget.slide_list.currentItem():
                     self.draw_slide(
                         painter,
@@ -1550,7 +1552,7 @@ class LyricDisplayWidget(QWidget):
             self.text = text
 
             # set the footer text
-            footer_text = [f'{slide_data['title']}({slide_data['author']})']
+            footer_text = [f'{slide_data['title']} ({slide_data['author']})']
         elif slide_data['type'] == 'image':
             if exists(self.gui.main.image_dir + '/' + slide_data['title']):
                 background_pixmap = QPixmap(self.gui.main.image_dir + '/' + slide_data['title'])
@@ -1634,9 +1636,10 @@ class LyricDisplayWidget(QWidget):
         painter.setBrush(brush)
         pen = QPen(fill_color)
         painter.setPen(pen)
-        painter.setFont(QFont(font.family(), self.gui.main.settings['footer_font_size']))
+        footer_font = QFont(font.family(), self.gui.main.settings['footer_font_size'])
+        painter.setFont(footer_font)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        font_metrics = painter.fontMetrics()
+        font_metrics = QFontMetrics(footer_font)
         line_height = font_metrics.height()
         footer_height = line_height * len(footer_text)
         footer_x = 20
@@ -1680,7 +1683,6 @@ class LyricDisplayWidget(QWidget):
                 painter.strokePath(path, pen)
 
             footer_y += line_height
-
         painter.restore()
 
         # build painter paths according to how many words will fit within the width of the screen, creating a new
@@ -1694,27 +1696,22 @@ class LyricDisplayWidget(QWidget):
             self.gui.display_widget.height() - footer_height - font_metrics.height()
         )
 
-        longest_line = 0
-        painter_paths = []
-
+        # create paths for each of the lines, splitting the line if it's too long for the usable rect
         lines = text.split('<br />')
+        painter_paths = []
+        painter.setFont(font)
+        font_metrics = QFontMetrics(font)
+        space_width = font_metrics.horizontalAdvance(' ')
+        line_height = font_metrics.height()
         while True:
-            longest_line = 0
-            painter.setFont(font)
-            font_metrics = painter.fontMetrics()
-            space_width = font_metrics.horizontalAdvance(' ')
-            line_height = font_metrics.boundingRect('Wy').height()
-            painter_paths.clear()
-
             for i in range(len(lines)):
                 line_words = lines[i].split(' ')
                 if len(line_words) == 0:
                     line_words = [' ']
+                line_path = QPainterPath()
+                line_x = 0
+                line_y = 0
 
-                # get the full length of this line to check if it is longer than the usable rect's width
-                full_line_path = QPainterPath()
-                full_line_x = 0
-                full_line_y = 0
                 for word in line_words:
                     if '<b>' in word:
                         font.setWeight(1000)
@@ -1723,8 +1720,15 @@ class LyricDisplayWidget(QWidget):
                     if '<u>' in word:
                         font.setUnderline(True)
 
-                    full_line_path.addText(QPointF(full_line_x, full_line_y), font, re.sub('<.*?>', '', word))
-                    full_line_x = full_line_path.boundingRect().width() + space_width
+                    if (line_path.boundingRect().width() + space_width + font_metrics.boundingRect(word).width()
+                            > usable_rect.width() - 80):
+                        # this word will overflow the usable rect; begin a new path
+                        painter_paths.append(line_path)
+                        line_path = QPainterPath()
+                        line_x = 0
+
+                    line_path.addText(QPointF(line_x, line_y), font, re.sub('<.*?>', '', word))
+                    line_x = line_path.boundingRect().width() + space_width
 
                     if '</b>' in word:
                         font.setWeight(QFont.Weight.Normal)
@@ -1732,57 +1736,25 @@ class LyricDisplayWidget(QWidget):
                         font.setItalic(False)
                     if '</u>' in word:
                         font.setUnderline(False)
-
-                line_segments = [line_words]
-                # split the line in two if the line overflows usable_rect
-                if full_line_path.boundingRect().width() > usable_rect.width() - 40:
-                    half_index = int(len(line_words) / 2)
-                    line_segments = [line_words[:half_index], line_words[half_index:]]
-
-                # draw the path(s) for this line
-                painter_path_x = 0
-                painter_path_y = 0
-                for segment in line_segments:
-                    painter_path = QPainterPath()
-                    for word in segment:
-                        if '<b>' in word:
-                            font.setWeight(1000)
-                        if '<i>' in word:
-                            font.setItalic(True)
-                        if '<u>' in word:
-                            font.setUnderline(True)
-
-                        painter_path.addText(
-                            QPointF(painter_path_x, painter_path_y),
-                            font,
-                            re.sub('<.*?>', '', word)
-                        )
-
-                        if '</b>' in word:
-                            font.setWeight(QFont.Weight.Normal)
-                        if '</i>' in word:
-                            font.setItalic(False)
-                        if '</u>' in word:
-                            font.setUnderline(False)
-
-                        painter_path_x = painter_path.boundingRect().width() + space_width
-
-                    painter_paths.append(painter_path)
-                    painter_path_x = 0
+                painter_paths.append(line_path)
 
             # get the total size of the paths that will be drawn for creating the shading rectangle
             total_height = 0
+            longest_line = 0
             for path in painter_paths:
                 total_height += line_height
                 if path.boundingRect().width() > longest_line:
                     longest_line = path.boundingRect().width()
 
-            # Calculate what the total size including the margins of the shadeing rectangle will be. If it
+            # Calculate what the total size including the margins of the shading rectangle will be. If it
             # overflows the usable rect, shrink the font by 2 points and allow loop.
-            if ((total_height + font_metrics.descent() + 40 > usable_rect.height()
-                    or longest_line + 80 > usable_rect.width())
-                    and font.pointSize() > 24 and auto_fit):
-                font.setPointSize(font.pointSize() - 2)
+            if auto_fit:
+                if ((total_height + font_metrics.descent() + 40 > usable_rect.height()
+                        or longest_line + 80 > usable_rect.width())
+                        and font.pointSize() > 24):
+                    font.setPointSize(font.pointSize() - 2)
+                else:
+                    break
             else:
                 break
 
@@ -1916,12 +1888,16 @@ class NewFontWidget(QWidget):
         self.setObjectName('font_widget')
         layout = QVBoxLayout(self)
 
-        sample_text = self.slide_type.capitalize() + ' Font Sample'
+        self.font_sample = QLabel()
+        layout.addWidget(self.font_sample)
+        layout.addSpacing(10)
+
+        """sample_text = self.slide_type.capitalize() + ' Font Sample'
         self.font_sample = FontSample(self, edit_widget=self.edit_widget)
         self.font_sample.text = sample_text
         self.font_sample.setObjectName('font_sample')
         layout.addWidget(self.font_sample)
-        layout.addSpacing(10)
+        layout.addSpacing(10)"""
 
         font_style_widget = QGroupBox()
         font_style_widget.setFont(self.gui.bold_font)
@@ -2180,58 +2156,82 @@ class NewFontWidget(QWidget):
         else:
             font_name = self.font_face_combobox.itemText(0)
 
-        self.font_sample.setFont(
-            QFont(
-                font_name,
-                self.font_size_spinbox.value(),
-                QFont.Weight.Bold))
-
         if self.font_color_button_group.checkedButton():
             color = self.font_color_button_group.checkedButton().objectName()
         else:
             color = 'black'
-            self.black_radio_button.blockSignals(True)
-            self.black_radio_button.setChecked(True)
-            self.black_radio_button.blockSignals(False)
 
         if color == 'black':
-            self.font_sample.fill_color = QColor(0, 0, 0)
+            fill_color = QColor(0, 0, 0)
         elif color == 'white':
-            self.font_sample.fill_color = QColor(255, 255, 255)
+            fill_color = QColor(255, 255, 255)
         else:
             fill_color = self.custom_font_color_radio_button.objectName()
             fill_color = fill_color.replace('rgb(', '')
             fill_color = fill_color.replace(')', '')
             fill_color_split = fill_color.split(', ')
             try:
-                self.font_sample.fill_color = QColor(
+                fill_color = QColor(
                     int(fill_color_split[0]), int(fill_color_split[1]), int(fill_color_split[2]))
             except Exception:
                 pass
 
-        if self.shadow_checkbox.isChecked():
-            self.font_sample.use_shadow = True
+        if self.slide_type == 'bible':
+            sample_text = f'{self.slide_type.capitalize()} Font Sample'
         else:
-            self.font_sample.use_shadow = False
+            sample_text = {'text': f'{self.slide_type.capitalize()} Font Sample'}
+        item_data = {
+            'type': self.slide_type,
+            'title': 'Bogus',
+            'author': '',
+            'copyright': '',
+            'ccli_song_number': '',
+            'text': 'Font Sample',
+            'parsed_text': sample_text,
+            'verse_order': '',
+            'use_footer': True,
+            'override_global': False,
+            'font_family': font_name,
+            'font_size': self.font_size_spinbox.value(),
+            'font_color': fill_color,
+            'background': '',
+            'use_shadow': self.shadow_checkbox.isChecked(),
+            'shadow_color': self.shadow_color_slider.color_slider.value(),
+            'shadow_offset': self.shadow_offset_slider.offset_slider.value(),
+            'use_outline': self.outline_checkbox.isChecked(),
+            'outline_color': self.outline_color_slider.color_slider.value(),
+            'outline_width': self.outline_width_slider.offset_slider.value(),
+            'use_shade': self.shade_behind_text_checkbox.isChecked(),
+            'shade_color': self.shade_color_slider.color_slider.value(),
+            'shade_opacity': self.shade_opacity_slider.color_slider.value(),
+            'audio_file': '',
+            'loop_audio': True,
+            'split_slides': False,
+            'auto_play': False,
+            'slide_delay': 6,
+            'file_name': '',
+            'url': '',
+            'folder': ''
+        }
+        pixmap = QPixmap(self.gui.display_widget.width(), self.gui.display_widget.height())
+        painter = QPainter()
+        lyrics_rect = QRect()
+        if painter.begin(pixmap):
+            try:
+                lyrics_rect, footer_height = self.gui.display_widget.lyric_widget.draw_slide(
+                    painter, item_data, auto_fit=False)
+            finally:
+                painter.end()
 
-        if self.outline_checkbox.isChecked():
-            self.font_sample.use_outline = True
-        else:
-            self.font_sample.use_outline = False
-
-        shadow_color = self.shadow_color_slider.color_slider.value()
-        self.font_sample.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
-        self.font_sample.shadow_offset = self.shadow_offset_slider.offset_slider.value()
-
-        outline_color = self.outline_color_slider.color_slider.value()
-        self.font_sample.outline_color = QColor(outline_color, outline_color, outline_color)
-        self.font_sample.outline_width = self.outline_width_slider.offset_slider.value()
-
-        self.font_sample.use_shade = self.shade_behind_text_checkbox.isChecked()
-        self.font_sample.shade_color = self.shade_color_slider.color_slider.value()
-        self.font_sample.shade_opacity = self.shade_opacity_slider.color_slider.value()
-
-        self.font_sample.repaint()
+        cropped_pixmap = pixmap.copy(
+            QRect(
+                int(lyrics_rect.x() - 20),
+                int(lyrics_rect.y() - 20),
+                int(lyrics_rect.width() + 40),
+                int(lyrics_rect.height() + 40)
+            )
+        )
+        self.font_sample.setPixmap(cropped_pixmap)
 
     def color_chooser(self):
         """
@@ -2265,6 +2265,10 @@ class NewFontWidget(QWidget):
         self.gui.main.save_settings()
         self.gui.apply_settings(theme_too=False)
         super().hideEvent(evt)
+
+    def showEvent(self, evt):
+        self.change_font_sample()
+        super().showEvent(evt)
 
 
 class FontComboboxDelegate(QStyledItemDelegate):

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.016
+ProjectOn v.1.10.0.017
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -82,10 +82,11 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.10.0.016'
+        self.version = 'v.1.10.0.017'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
+            return
             # Only intercept warnings (QtWarningMsg is 1)
             if mode == QtMsgType.QtWarningMsg:
                 print(f"\n--- Qt Warning Intercepted ---")
@@ -95,7 +96,7 @@ class ProjectOn(QObject):
                 print("-----------------------------\n")
 
         # Install the handler at the very start of your script
-        #qInstallMessageHandler(qt_message_handler)
+        qInstallMessageHandler(qt_message_handler)
         ################################################################
 
         # ensure we are working from the source root of the program
