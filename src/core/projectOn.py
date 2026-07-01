@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.017
+ProjectOn v.1.10.0.018
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -82,7 +82,7 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.10.0.017'
+        self.version = 'v.1.10.0.018'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
@@ -1603,7 +1603,7 @@ class ProjectOn(QObject):
 
         # set the last used directory in settings
         file_dir = os.path.dirname(filename)
-        file_name = filename[0].replace(file_dir, '').replace('/', '').replace('\\', '')
+        file_name = filename.replace(file_dir, '').replace('/', '').replace('\\', '')
         self.settings['last_save_dir'] = file_dir
 
         # add this file to the recently used services menu
