@@ -2151,6 +2151,7 @@ class NewFontWidget(QWidget):
         self.font_sample.repaint()
 
     def change_font_sample(self):
+        print(self.slide_type)
         if self.font_face_combobox.currentText():
             font_name = self.font_face_combobox.currentText()
         else:
@@ -2176,10 +2177,10 @@ class NewFontWidget(QWidget):
             except Exception:
                 pass
 
-        if self.slide_type == 'bible':
-            sample_text = f'{self.slide_type.capitalize()} Font Sample'
-        else:
+        if self.slide_type == 'song':
             sample_text = {'text': f'{self.slide_type.capitalize()} Font Sample'}
+        else:
+            sample_text = f'{self.slide_type.capitalize()} Font Sample'
         item_data = {
             'type': self.slide_type,
             'title': 'Bogus',
