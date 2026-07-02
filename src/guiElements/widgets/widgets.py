@@ -793,411 +793,6 @@ class FontSample(QLabel):
         return -1
 
 
-class FontWidget(QWidget):
-    """
-    Implements QWidget that contains all the settings that can be applied to the display font
-    """
-    mouse_release_signal = pyqtSignal(int)
-
-    def __init__(self, gui, slide_type, draw_border=True, applies_to_global=True):
-        """
-        Implements QWidget that contains all of the settings that can be applied to the display font
-        :param GUI gui: the current instance of GUI
-        :param bool draw_border: apply a border to the widgets
-        """
-        super().__init__()
-        self.gui = gui
-        self.slide_type = slide_type
-        self.draw_border = draw_border
-        self.applies_to_global = applies_to_global
-
-        #self.font_face_combobox = FontFaceComboBox(self.guiElements)
-        self.font_face_combobox = QFontComboBox()
-        self.font_size_spinbox = QSpinBox()
-        self.white_radio_button = QRadioButton('White')
-        self.black_radio_button = QRadioButton('Black')
-        self.custom_font_color_radio_button = QRadioButton('Custom')
-        self.font_color_button_group = QButtonGroup()
-        self.shadow_color_slider = ShadowSlider(self.gui)
-        self.shadow_offset_slider = OffsetSlider(self.gui)
-        self.shadow_checkbox = QCheckBox('Use Shadow')
-        self.outline_checkbox = QCheckBox('Use Outline')
-        self.outline_color_slider = ShadowSlider(self.gui)
-        self.outline_width_slider = OffsetSlider(self.gui)
-        self.shade_behind_text_checkbox = QCheckBox('Shade Behind Text')
-
-        self.mouse_release_signal.connect(lambda value: self.change_font(value))
-
-        self.setParent(self.gui.main_window)
-        self.setAttribute(Qt.WidgetAttribute.WA_AlwaysStackOnTop)
-        self.setWindowFlag(Qt.WindowType.Popup)
-        self.init_components()
-
-    def init_components(self):
-        self.setFixedWidth(950)
-        self.setObjectName('font_widget')
-        layout = QVBoxLayout(self)
-
-        sample_text = self.slide_type.capitalize() + ' Font Sample'
-        self.font_sample = FontSample(self)
-        self.font_sample.text = sample_text
-        self.font_sample.setObjectName('font_sample')
-        layout.addWidget(self.font_sample)
-
-        face_size_widget = QWidget()
-        layout.addWidget(face_size_widget)
-        face_size_layout = QHBoxLayout(face_size_widget)
-        face_size_layout.setContentsMargins(0, 0, 0, 0)
-
-        font_face_widget = QWidget()
-        face_size_layout.addWidget(font_face_widget)
-        font_face_layout = QVBoxLayout(font_face_widget)
-        font_face_layout.setContentsMargins(0, 0, 0, 0)
-
-        font_face_label = QLabel('Font Face')
-        font_face_label.setFont(self.gui.bold_font)
-        font_face_layout.addWidget(font_face_label)
-
-        self.font_face_combobox.setIconSize(QSize(1, 36))
-        self.font_face_combobox.setFont(self.gui.standard_font)
-        self.font_face_combobox.currentIndexChanged.connect(self.change_font)
-        font_face_layout.addWidget(self.font_face_combobox)
-
-        font_size_widget = QWidget()
-        face_size_layout.addWidget(font_size_widget)
-        font_size_layout = QVBoxLayout(font_size_widget)
-        font_size_layout.setContentsMargins(0, 0, 0, 0)
-
-        font_size_label = QLabel('Font Size:')
-        font_size_label.setFont(self.gui.bold_font)
-        font_size_layout.addWidget(font_size_label)
-
-        self.font_size_spinbox.setMaximumWidth(100)
-        self.font_size_spinbox.setMinimumHeight(40)
-        self.font_size_spinbox.setFont(self.gui.standard_font)
-        self.font_size_spinbox.setRange(10, 240)
-        self.font_size_spinbox.valueChanged.connect(self.change_font)
-        self.font_size_spinbox.installEventFilter(self)
-        font_size_layout.addWidget(self.font_size_spinbox)
-
-        font_color_widget = QWidget()
-        layout.addWidget(font_color_widget)
-        font_color_layout = QVBoxLayout(font_color_widget)
-        font_color_layout.setContentsMargins(0, 0, 0, 0)
-
-        font_color_label = QLabel('Font Color:')
-        font_color_label.setFont(self.gui.bold_font)
-        font_color_layout.addWidget(font_color_label)
-
-        color_button_widget = QWidget()
-        font_color_layout.addWidget(color_button_widget)
-        color_button_layout = QHBoxLayout(color_button_widget)
-        color_button_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.white_radio_button.setObjectName('white')
-        self.white_radio_button.setFont(self.gui.standard_font)
-        color_button_layout.addWidget(self.white_radio_button)
-
-        self.black_radio_button.setObjectName('black')
-        self.black_radio_button.setFont(self.gui.standard_font)
-        color_button_layout.addWidget(self.black_radio_button)
-
-        self.custom_font_color_radio_button.setObjectName('custom')
-        self.custom_font_color_radio_button.setFont(self.gui.standard_font)
-        self.custom_font_color_radio_button.setObjectName('custom_font_color_radio_button')
-        self.custom_font_color_radio_button.clicked.connect(self.color_chooser)
-        color_button_layout.addWidget(self.custom_font_color_radio_button)
-        color_button_layout.addStretch()
-
-        self.font_color_button_group.addButton(self.white_radio_button)
-        self.font_color_button_group.addButton(self.black_radio_button)
-        self.font_color_button_group.addButton(self.custom_font_color_radio_button)
-        self.font_color_button_group.buttonClicked.connect(self.change_font)
-
-        shadow_widget = QWidget()
-        layout.addSpacing(10)
-        layout.addWidget(shadow_widget)
-        shadow_layout = QHBoxLayout(shadow_widget)
-        shadow_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.shadow_checkbox.setFont(self.gui.bold_font)
-        self.shadow_checkbox.clicked.connect(self.change_font)
-        shadow_layout.addWidget(self.shadow_checkbox)
-        shadow_layout.addStretch()
-
-        self.shadow_color_slider = ShadowSlider(self.gui)
-        self.shadow_color_slider.setObjectName('shadow_color_slider')
-        shadow_layout.addWidget(self.shadow_color_slider)
-        shadow_layout.addSpacing(20)
-
-        self.shadow_offset_slider = OffsetSlider(self.gui)
-        self.shadow_offset_slider.setObjectName('shadow_offset_slider')
-        shadow_layout.addWidget(self.shadow_offset_slider)
-
-        outline_widget = QWidget()
-        layout.addSpacing(10)
-        layout.addWidget(outline_widget)
-        outline_layout = QHBoxLayout(outline_widget)
-        outline_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.outline_checkbox.setFont(self.gui.bold_font)
-        self.outline_checkbox.clicked.connect(self.change_font)
-        outline_layout.addWidget(self.outline_checkbox)
-        outline_layout.addStretch()
-
-        self.outline_color_slider = ShadowSlider(self.gui)
-        self.outline_color_slider.setObjectName('outline_color_slider')
-        self.outline_color_slider.color_title.setText('Outline Shade:')
-        outline_layout.addWidget(self.outline_color_slider)
-        outline_layout.addSpacing(20)
-
-        self.outline_width_slider = OffsetSlider(self.gui)
-        self.outline_width_slider.setObjectName('outline_width_slider')
-        self.outline_width_slider.offset_slider.setRange(1, 10)
-        self.outline_width_slider.max_label.setText('10px')
-        self.outline_width_slider.offset_title.setText('Outline Width:')
-        outline_layout.addWidget(self.outline_width_slider)
-
-        shade_widget = QWidget()
-        layout.addSpacing(10)
-        layout.addWidget(shade_widget)
-        shade_layout = QHBoxLayout(shade_widget)
-        shade_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.shade_behind_text_checkbox.setFont(self.gui.bold_font)
-        self.shade_behind_text_checkbox.clicked.connect(self.change_font)
-        shade_layout.addWidget(self.shade_behind_text_checkbox)
-        shade_layout.addStretch()
-
-        self.shade_color_slider = ShadowSlider(self.gui)
-        self.shade_color_slider.setObjectName('shade_color_slider')
-        shade_layout.addWidget(self.shade_color_slider)
-        shade_layout.addSpacing(20)
-
-        self.shade_opacity_slider = ShadowSlider(self.gui)
-        self.shade_opacity_slider.setObjectName('shade_opacity_slider')
-        self.shade_opacity_slider.color_title.setText('Shade Opacity:')
-        self.shade_opacity_slider.color_label.hide()
-        self.shade_opacity_slider.min_label.setText('Transparent')
-        self.shade_opacity_slider.max_label.setText('Opaque')
-        shade_layout.addWidget(self.shade_opacity_slider)
-
-    def blockSignals(self, block: bool):
-        """
-        method to block the signals of all widgets that would be updated during apply_settings
-        """
-        super().blockSignals(block)
-
-        # also block all children widgets connected to functions
-        self.font_face_combobox.blockSignals(block)
-        self.font_size_spinbox.blockSignals(block)
-        self.white_radio_button.blockSignals(block)
-        self.black_radio_button.blockSignals(block)
-        self.custom_font_color_radio_button.blockSignals(block)
-        self.font_color_button_group.blockSignals(block)
-        self.shadow_checkbox.blockSignals(block)
-        self.shadow_color_slider.color_slider.blockSignals(block)
-        self.shadow_offset_slider.offset_slider.blockSignals(block)
-        self.outline_checkbox.blockSignals(block)
-        self.outline_color_slider.color_slider.blockSignals(block)
-        self.outline_width_slider.offset_slider.blockSignals(block)
-
-    def apply_settings(self):
-        """
-        updates the various widgets to match the current settings
-        """
-        self.blockSignals(True)
-
-        font_face = self.gui.main.settings[f'{self.slide_type}_font_face']
-        self.font_face_combobox.setCurrentIndex(self.font_face_combobox.findText(font_face))
-
-        self.font_size_spinbox.setValue(self.gui.main.settings[f'{self.slide_type}_font_size'])
-
-        font_color = self.gui.main.settings[f'{self.slide_type}_font_color']
-        if font_color == 'white':
-            self.white_radio_button.setChecked(True)
-        elif font_color == 'black':
-            self.black_radio_button.setChecked(True)
-        else:
-            self.custom_font_color_radio_button.setChecked(True)
-            self.custom_font_color_radio_button.setText('Custom: ' + font_color)
-            self.custom_font_color_radio_button.setObjectName(font_color)
-
-        use_shadow = self.gui.main.settings[f'{self.slide_type}_use_shadow']
-        shadow_color = self.gui.main.settings[f'{self.slide_type}_shadow_color']
-        shadow_offset = self.gui.main.settings[f'{self.slide_type}_shadow_offset']
-
-        if use_shadow:
-            self.shadow_checkbox.setChecked(True)
-        self.shadow_color_slider.color_slider.setValue(shadow_color)
-        self.shadow_color_slider.change_sample(shadow_color)
-        self.shadow_offset_slider.offset_slider.setValue(shadow_offset)
-        self.shadow_offset_slider.current_label.setText(str(shadow_offset) + 'px')
-
-        use_outline = self.gui.main.settings[f'{self.slide_type}_use_outline']
-        outline_color = self.gui.main.settings[f'{self.slide_type}_outline_color']
-        outline_width = self.gui.main.settings[f'{self.slide_type}_outline_width']
-
-        self.outline_checkbox.setChecked(use_outline)
-        self.outline_color_slider.color_slider.setValue(outline_color)
-        self.outline_color_slider.change_sample(outline_color)
-        self.outline_width_slider.offset_slider.setValue(outline_width)
-        self.outline_width_slider.current_label.setText(str(outline_width) + 'px')
-        self.blockSignals(False)
-
-        if f'{self.slide_type}_use_shade' in self.gui.main.settings.keys():
-            self.shade_behind_text_checkbox.setChecked(self.gui.main.settings[f'{self.slide_type}_use_shade'])
-        if f'{self.slide_type}_shade_color' in self.gui.main.settings.keys():
-            self.shade_color_slider.color_slider.setValue(self.gui.main.settings[f'{self.slide_type}_shade_color'])
-        if f'{self.slide_type}_shade_opacity' in self.gui.main.settings.keys():
-            self.shade_opacity_slider.color_slider.setValue(self.gui.main.settings[f'{self.slide_type}_shade_opacity'])
-
-        self.change_font_sample()
-
-    def change_font(self, value: int | None = None):
-        """
-        updates ProjectOn.settings to the user's selected font settings
-        """
-
-        shadow_color = None
-        shadow_offset = None
-        outline_color = None
-        outline_width = None
-        if not self.signalsBlocked() and self.applies_to_global:
-            if value:
-                if self.sender().objectName() == 'shadow_color_slider':
-                    shadow_color = value
-                elif self.sender().objectName() == 'shadow_offset_slider':
-                    shadow_offset = value
-                elif self.sender().objectName() == 'outline_color_slider':
-                    outline_color = value
-                elif self.sender().objectName() == 'outline_width_slider':
-                    outline_width = value
-
-            new_font_face = self.font_face_combobox.currentText()
-
-            self.gui.main.settings[f'{self.slide_type}_font_face'] = self.font_face_combobox.currentText()
-            self.gui.main.settings[f'{self.slide_type}_font_size'] = self.font_size_spinbox.value()
-            if self.font_color_button_group.checkedButton():
-                self.gui.main.settings[f'{self.slide_type}_font_color'] = self.font_color_button_group.checkedButton().objectName()
-
-            self.gui.main.settings[f'{self.slide_type}_use_shadow'] = self.shadow_checkbox.isChecked()
-            if shadow_color:
-                self.gui.main.settings[f'{self.slide_type}_shadow_color'] = shadow_color
-            else:
-                self.gui.main.settings[f'{self.slide_type}_shadow_color'] = self.shadow_color_slider.color_slider.value()
-            if shadow_offset:
-                self.gui.main.settings[f'{self.slide_type}_shadow_offset'] = shadow_offset
-            else:
-                self.gui.main.settings[f'{self.slide_type}_shadow_offset'] = self.shadow_offset_slider.offset_slider.value()
-
-            self.gui.main.settings[f'{self.slide_type}_use_outline'] = self.outline_checkbox.isChecked()
-            if outline_color:
-                self.gui.main.settings[f'{self.slide_type}_outline_color'] = outline_color
-            else:
-                self.gui.main.settings[f'{self.slide_type}_outline_color'] = self.outline_color_slider.color_slider.value()
-            if outline_width:
-                self.gui.main.settings[f'{self.slide_type}_outline_width'] = outline_width
-            else:
-                self.gui.main.settings[f'{self.slide_type}_outline_width'] = self.outline_width_slider.offset_slider.value()
-
-            self.gui.main.settings[f'{self.slide_type}_use_shade'] = self.shade_behind_text_checkbox.isChecked()
-            self.gui.main.settings[f'{self.slide_type}_shade_color'] = self.shade_color_slider.color_slider.value()
-            self.gui.main.settings[f'{self.slide_type}_shade_opacity'] = self.shade_opacity_slider.color_slider.value()
-
-        self.change_font_sample()
-        self.font_sample.repaint()
-
-    def change_font_sample(self):
-        if self.font_face_combobox.currentText():
-            font_name = self.font_face_combobox.currentText()
-        else:
-            font_name = self.font_face_combobox.itemText(0)
-
-        self.font_sample.setFont(
-            QFont(
-                font_name,
-                self.font_size_spinbox.value(),
-                QFont.Weight.Bold))
-
-        if self.font_color_button_group.checkedButton():
-            color = self.font_color_button_group.checkedButton().objectName()
-        else:
-            color = 'black'
-            self.black_radio_button.blockSignals(True)
-            self.black_radio_button.setChecked(True)
-            self.black_radio_button.blockSignals(False)
-
-        if color == 'black':
-            self.font_sample.fill_color = QColor(0, 0, 0)
-        elif color == 'white':
-            self.font_sample.fill_color = QColor(255, 255, 255)
-        else:
-            fill_color = self.custom_font_color_radio_button.objectName()
-            fill_color = fill_color.replace('rgb(', '')
-            fill_color = fill_color.replace(')', '')
-            fill_color_split = fill_color.split(', ')
-            self.font_sample.fill_color = QColor(
-                int(fill_color_split[0]), int(fill_color_split[1]), int(fill_color_split[2]))
-
-        if self.shadow_checkbox.isChecked():
-            self.font_sample.use_shadow = True
-        else:
-            self.font_sample.use_shadow = False
-
-        if self.outline_checkbox.isChecked():
-            self.font_sample.use_outline = True
-        else:
-            self.font_sample.use_outline = False
-
-        shadow_color = self.shadow_color_slider.color_slider.value()
-        self.font_sample.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
-        self.font_sample.shadow_offset = self.shadow_offset_slider.offset_slider.value()
-
-        outline_color = self.outline_color_slider.color_slider.value()
-        self.font_sample.outline_color = QColor(outline_color, outline_color, outline_color)
-        self.font_sample.outline_width = self.outline_width_slider.offset_slider.value()
-
-        self.font_sample.use_shade = self.shade_behind_text_checkbox.isChecked()
-        self.font_sample.shade_color = self.shade_color_slider.color_slider.value()
-        self.font_sample.shade_opacity = self.shade_opacity_slider.color_slider.value()
-
-        self.font_sample.repaint()
-
-    def color_chooser(self):
-        """
-        creates a color dialog for the user to select a custom font color
-        """
-        sender = self.sender()
-        current_color = self.gui.main.settings[f'{self.slide_type}_font_color']
-        if current_color == 'white':
-            r, g, b = 255, 255, 255
-        elif current_color == 'black':
-            r, g, b = 0, 0, 0
-        else:
-            color_split = current_color.split(', ')
-            r, g, b = int(color_split[0]), int(color_split[1]), int(color_split[2])
-
-        color = QColorDialog.getColor(QColor(r, g, b), self)
-        rgb = color.getRgb()
-        if color.isValid():
-            color_string = str(rgb[0]) + ', ' + str(rgb[1]) + ', ' + str(rgb[2])
-            self.custom_font_color_radio_button.setText('Custom: ' + color_string)
-            self.custom_font_color_radio_button.setObjectName(color_string)
-            sender.setChecked(True)
-            self.change_font()
-
-        self.show()
-
-    def hideEvent(self, evt: QHideEvent):
-        """
-        overrides hideEvent to save settings when the widget is hidden
-        """
-        self.gui.main.save_settings()
-        self.gui.apply_settings(theme_too=False)
-        super().hideEvent(evt)
-
-
 class ImageCombobox(QComboBox):
     """
     Creates a custom QComboBox that displays a thumbnail of an image to be used.
@@ -1356,6 +951,10 @@ class LyricDisplayWidget(QWidget):
         if 'override_global' in slide_data.keys() and slide_data['override_global']:
             # use all of the relevent font data stored in slide_data
             font = QFont(slide_data['font_family'], slide_data['font_size'])
+            if 'font_weight' in slide_data.keys() and slide_data['font_weight'] is not None:
+                font.setWeight(slide_data['font_weight'])
+            else:
+                font.setWeight(0)
             fill_color = get_qcolor_from_str(self.gui.main, slide_data['font_color'], slide_data['type'])
             use_shadow = slide_data['use_shadow']
             shadow_color = QColor(
@@ -1370,7 +969,7 @@ class LyricDisplayWidget(QWidget):
             shade_color = slide_data['shade_color']
             shade_opacity = slide_data['shade_opacity']
         else:
-            # use the relevent font settings stored in ProjectOn.settings
+            # use the relevant font settings stored in ProjectOn.settings
             slide_type = slide_data['type']
             if not slide_type == 'song':
                 slide_type = 'bible'
@@ -1380,6 +979,7 @@ class LyricDisplayWidget(QWidget):
                 self.gui.main.settings[f'{slide_type}_font_face'],
                 self.gui.main.settings[f'{slide_type}_font_size']
             )
+            font.setWeight(self.gui.main.settings[f'{slide_type}_font_weight'])
 
             fill_color = get_qcolor_from_str(
                 self.gui.main, self.gui.main.settings[f'{slide_type}_font_color'], slide_type)
@@ -1651,8 +1251,10 @@ class LyricDisplayWidget(QWidget):
             self.gui.display_widget.width(),
             footer_height + 20
         )
+
+        # Paint the footer text. If we're not using shade behind text or there is no footer text, set the opacity to 0
         opacity = shade_opacity
-        if not use_shade or len(text.strip()) == 0:
+        if not use_shade or len(footer_text) == 0:
             opacity = 0
         painter.fillRect(
             footer_shade_rect,
@@ -1928,6 +1530,12 @@ class NewFontWidget(QWidget):
         font_style_layout.addWidget(self.font_size_spinbox)
         font_style_layout.addSpacing(10)
 
+        self.bold_checkbox = QCheckBox('Bold')
+        self.bold_checkbox.setFont(self.gui.standard_font)
+        self.bold_checkbox.stateChanged.connect(self.change_font)
+        font_style_layout.addWidget(self.bold_checkbox)
+        font_style_layout.addSpacing(10)
+
         font_color_label = QLabel('Font Color:')
         font_color_label.setFont(self.gui.bold_font)
         font_style_layout.addWidget(font_color_label)
@@ -2053,6 +1661,12 @@ class NewFontWidget(QWidget):
         else:
             # since the font either wasn't set or found, use QFont to find a similar font
             fallback_font = QFont(font_face)
+            if (f'{self.slide_type}_font_weight' in self.gui.main.settings.keys()
+                    and self.gui.main.settings[f'{self.slide_type}_font_weight'] is not None):
+                weight = self.gui.main.settings[f'{self.slide_type}_font_weight']
+            else:
+                weight = 50
+            fallback_font.setWeight(weight)
             resolved_name = QFontInfo(fallback_font).family()
             fallback_index = self.font_face_combobox.findText(resolved_name)
 
@@ -2061,7 +1675,6 @@ class NewFontWidget(QWidget):
             else:
                 self.font_face_combobox.setCurrentIndex(0)
 
-            self.font_face_combobox.setCurrentIndex(fallback_index)
             self.gui.main.settings[f'{self.slide_type}_font_face'] = self.font_face_combobox.currentText()
 
             if len(font_face.strip()) == 0:
@@ -2075,6 +1688,13 @@ class NewFontWidget(QWidget):
                 f'{message} {self.slide_type.capitalize()} font set to {self.font_face_combobox.currentText()}',
                 QMessageBox.StandardButton.Ok
             )
+
+        if (f'{self.slide_type}_font_weight' in self.gui.main.settings
+                and self.gui.main.settings[f'{self.slide_type}_font_weight'] is not None
+                and self.gui.main.settings[f'{self.slide_type}_font_weight'] == 100):
+            self.bold_checkbox.setChecked(True)
+        else:
+            self.bold_checkbox.setChecked(False)
 
         self.font_size_spinbox.setValue(self.gui.main.settings[f'{self.slide_type}_font_size'])
 
@@ -2139,10 +1759,12 @@ class NewFontWidget(QWidget):
                 elif self.sender().objectName() == 'outline_width_slider':
                     outline_width = value
 
-            new_font_face = self.font_face_combobox.currentText()
-
             self.gui.main.settings[f'{self.slide_type}_font_face'] = self.font_face_combobox.currentText()
             self.gui.main.settings[f'{self.slide_type}_font_size'] = self.font_size_spinbox.value()
+            if self.bold_checkbox.isChecked():
+                self.gui.main.settings[f'{self.slide_type}_font_weight'] = 100
+            else:
+                self.gui.main.settings[f'{self.slide_type}_font_weight'] = 0
             if self.font_color_button_group.checkedButton():
                 self.gui.main.settings[f'{self.slide_type}_font_color'] = self.font_color_button_group.checkedButton().objectName()
 
@@ -2174,30 +1796,39 @@ class NewFontWidget(QWidget):
         self.font_sample.repaint()
 
     def change_font_sample(self):
+        print('NewFontWidget.change_font_sample called')
         if self.font_face_combobox.currentText():
             font_name = self.font_face_combobox.currentText()
         else:
             font_name = self.font_face_combobox.itemText(0)
 
-        if self.font_color_button_group.checkedButton():
-            color = self.font_color_button_group.checkedButton().objectName()
+        if self.bold_checkbox.isChecked():
+            font_weight = 100
         else:
-            color = 'black'
+            font_weight = 0
 
-        if color == 'black':
-            fill_color = QColor(0, 0, 0)
-        elif color == 'white':
-            fill_color = QColor(255, 255, 255)
+        if self.font_color_button_group.checkedButton():
+            fill_color = self.font_color_button_group.checkedButton().objectName()
         else:
-            fill_color = self.custom_font_color_radio_button.objectName()
-            fill_color = fill_color.replace('rgb(', '')
-            fill_color = fill_color.replace(')', '')
-            fill_color_split = fill_color.split(', ')
-            try:
-                fill_color = QColor(
-                    int(fill_color_split[0]), int(fill_color_split[1]), int(fill_color_split[2]))
-            except Exception:
-                pass
+            fill_color = 'black'
+
+        if self.edit_widget:
+            override_global = self.edit_widget.override_global_button.isChecked()
+            if override_global:
+                background_button_text = self.edit_widget.background_button_group.checkedButton().text()
+                if 'global song' in background_button_text.lower():
+                    background = 'global_song'
+                elif 'global bible' in background_button_text.lower():
+                    background = 'global_bible'
+                elif 'solid color' in background_button_text.lower():
+                    background = self.edit_widget.background_button_group.button(2).objectName()
+                else:
+                    background = self.edit_widget.background_combobox.currentData(Qt.ItemDataRole.UserRole)
+            else:
+                background = f'global_{self.slide_type}'
+        else:
+            override_global = False
+            background = f'global_{self.slide_type}'
 
         if self.slide_type == 'song':
             sample_text = {'text': f'{self.slide_type.capitalize()} Font Sample'}
@@ -2205,7 +1836,7 @@ class NewFontWidget(QWidget):
             sample_text = f'{self.slide_type.capitalize()} Font Sample'
         item_data = {
             'type': self.slide_type,
-            'title': 'Bogus',
+            'title': '',
             'author': '',
             'copyright': '',
             'ccli_song_number': '',
@@ -2213,11 +1844,12 @@ class NewFontWidget(QWidget):
             'parsed_text': sample_text,
             'verse_order': '',
             'use_footer': True,
-            'override_global': False,
+            'override_global': override_global,
             'font_family': font_name,
+            'font_weight': font_weight,
             'font_size': self.font_size_spinbox.value(),
             'font_color': fill_color,
-            'background': '',
+            'background': background,
             'use_shadow': self.shadow_checkbox.isChecked(),
             'shadow_color': self.shadow_color_slider.color_slider.value(),
             'shadow_offset': self.shadow_offset_slider.offset_slider.value(),
@@ -2254,6 +1886,7 @@ class NewFontWidget(QWidget):
                 int(lyrics_rect.height() + 40)
             )
         )
+        print('NewFontWidget.change_font_sample: setting pixmap')
         self.font_sample.setPixmap(cropped_pixmap)
 
     def color_chooser(self):
@@ -2684,976 +2317,6 @@ class StandardItemWidget(QWidget):
             layout.addStretch()
 
         self.adjustSize()
-
-
-class SettingsWidget(QWidget):
-    wait_widget = None
-    song_background_combobox: ImageCombobox = None
-
-    def __init__(self, gui):
-        super().__init__()
-        self.gui = gui
-
-        self.accept_font_changes = False
-        self.setObjectName('settings_container')
-        self.setParent(self.gui.main_window)
-        self.min_width = 1000
-
-        #self.show_wait_widget()
-        self.init_components()
-        self.gui.main.app.processEvents()
-
-        #self.wait_widget.subtitle_label.setText('Applying Settings')
-        self.apply_settings()
-        self.song_font_settings_widget.change_font_sample()
-        self.bible_font_settings_widget.change_font_sample()
-
-        #self.show()
-
-        self.accept_font_changes = True
-        #self.wait_widget.subtitle_label.setText('Creating Font Sample')
-        #self.guiElements.main.app.processEvents()
-        #self.wait_widget.widget.deleteLater()
-
-    def show_wait_widget(self):
-        self.wait_widget = SimpleSplash(self.gui, 'Please wait...', subtitle=True)
-
-    def init_components(self):
-        self.setParent(self.gui.main_window)
-        self.setWindowTitle('Settings')
-        self.setWindowFlag(Qt.WindowType.Window)
-        self.setMinimumSize(self.min_width + 60, 800)
-        layout = QGridLayout(self)
-        layout.setRowStretch(0, 20)
-        layout.setRowStretch(1, 1)
-
-        self.settings_container = QTabWidget()
-        self.settings_container.setFont(self.gui.standard_font)
-        self.settings_container.setIconSize(QSize(36, 36))
-        self.settings_container.setStyleSheet('QTabBar::tab { height: 42px; }')
-        self.settings_container.setObjectName('tab_widget')
-
-        self.settings_container.addTab(self.ccli_settings(), 'CCLI Info')
-        self.settings_container.addTab(self.screen_settings(), 'Screen Settings')
-        self.settings_container.addTab(self.font_settings(), 'Font Settings')
-        self.settings_container.addTab(self.background_settings(), 'Background Settings')
-        self.settings_container.addTab(self.countdown_settings(), 'Countdown Settings')
-
-        self.settings_container.setTabIcon(0, QIcon('resources/gui_icons/ccli_settings.svg'))
-        self.settings_container.setTabIcon(1, QIcon('resources/gui_icons/screen_settings.svg'))
-        self.settings_container.setTabIcon(2, QIcon('resources/gui_icons/font_settings_settings.svg'))
-        self.settings_container.setTabIcon(3, QIcon('resources/gui_icons/background_settings.svg'))
-        self.settings_container.setTabIcon(4, QIcon('resources/gui_icons/countdown_settings.svg'))
-        layout.addWidget(self.settings_container)
-
-        button_widget = QWidget()
-        button_widget.setObjectName('button_widget')
-        button_layout = QHBoxLayout()
-        button_widget.setLayout(button_layout)
-        layout.addWidget(button_widget, 1, 0)
-
-        save_button = QPushButton('Save')
-        save_button.setFont(self.gui.standard_font)
-        save_button.clicked.connect(self.save)
-        button_layout.addStretch()
-        button_layout.addWidget(save_button)
-        button_layout.addSpacing(20)
-
-        cancel_button = QPushButton('Cancel')
-        cancel_button.setFont(self.gui.standard_font)
-        cancel_button.clicked.connect(self.cancel)
-        button_layout.addWidget(cancel_button)
-        button_layout.addStretch()
-
-    def ccli_settings(self):
-        widget = QWidget()
-        widget.setObjectName('settings_container')
-        layout = QVBoxLayout(widget)
-
-        ccli_title_label = QLabel('CCLI Information')
-        ccli_title_label.setFont(self.gui.bold_font)
-        ccli_title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(ccli_title_label)
-
-        ccli_widget = QWidget()
-        ccli_layout = QHBoxLayout()
-        ccli_widget.setLayout(ccli_layout)
-        layout.addWidget(ccli_widget)
-
-        ccli_label = QLabel('CCLI License #:')
-        ccli_label.setFont(self.gui.standard_font)
-        ccli_layout.addWidget(ccli_label)
-
-        self.ccli_line_edit = QLineEdit()
-        self.ccli_line_edit.setFont(self.gui.standard_font)
-        ccli_layout.addWidget(self.ccli_line_edit)
-        layout.addStretch()
-
-        return widget
-
-    def screen_settings(self):
-        widget = QWidget()
-        widget.setObjectName('settings_container')
-        widget.setMinimumWidth(self.min_width)
-        layout = QGridLayout()
-        layout.setSpacing(20)
-        widget.setLayout(layout)
-
-        index = 0
-        for screen in self.gui.main.app.screens():
-            app_screen_name = screen.name()
-            name_split = app_screen_name.split('\\')
-            name = name_split[len(name_split) - 1]
-
-            if screen.name() == self.gui.primary_screen.name():
-                primary = True
-            else:
-                primary = False
-
-            screen_pixmap = self.draw_screen_pixmap(name, primary, screen.size())
-            screen_icon_label = QLabel()
-            screen_icon_label.setPixmap(screen_pixmap)
-            layout.addWidget(screen_icon_label, 1, index)
-
-            model_label = QLabel(screen.model())
-            layout.addWidget(model_label, 2, index)
-
-            size_label = QLabel('Size: ' + str(screen.size().width()) + 'x' + str(screen.size().height()))
-            layout.addWidget(size_label, 3, index)
-
-            set_display_button = QRadioButton('Set as display screen')
-            set_display_button.setObjectName(app_screen_name)
-            layout.addWidget(set_display_button, 4, index)
-
-            if self.gui.secondary_screen:
-                if screen.name() == self.gui.secondary_screen.name():
-                    set_display_button.setChecked(True)
-            else:
-                set_display_button.setChecked(True)
-
-            index += 1
-
-        display_title_label = QLabel('Display Settings')
-        display_title_label.setFont(self.gui.bold_font)
-        display_title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(display_title_label, 0, 0, 1, index + 1)
-
-        self.screen_button_group = QButtonGroup()
-        id = 0
-        for button in widget.findChildren(QRadioButton):
-            self.screen_button_group.addButton(button, id)
-            id += 1
-
-        stage_display_title_label = QLabel('Stage Display Settings')
-        stage_display_title_label.setFont(self.gui.bold_font)
-        stage_display_title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(stage_display_title_label, 5, 0, 1, index + 1)
-
-        stage_display_widget = QWidget()
-        stage_display_layout = QHBoxLayout(stage_display_widget)
-        layout.addWidget(stage_display_widget, 6, 0, 1, index + 1)
-
-        text_only_radio_button = QRadioButton('Text Only')
-        text_only_radio_button.setFont(self.gui.standard_font)
-        text_only_radio_button.setToolTip('Display only the text of slides on the stage display. '
-                                          'Best for slower networks.')
-        stage_display_layout.addWidget(text_only_radio_button)
-
-        mirror_radio_button = QRadioButton('Mirror Display')
-        mirror_radio_button.setFont(self.gui.standard_font)
-        mirror_radio_button.setToolTip('The stage display will show exactly what appears on the display screen.')
-        stage_display_layout.addWidget(mirror_radio_button)
-        stage_display_layout.addStretch()
-
-        self.stage_display_button_group = QButtonGroup()
-        self.stage_display_button_group.addButton(text_only_radio_button, 0)
-        self.stage_display_button_group.addButton(mirror_radio_button, 1)
-
-        if 'mirror_stage_display' in self.gui.main.settings.keys() and self.gui.main.settings['mirror_stage_display']:
-            mirror_radio_button.setChecked(True)
-        else:
-            text_only_radio_button.setChecked(True)
-
-        if sys.platform == 'win32':
-            rendering_title_label = QLabel('Rendering')
-            rendering_title_label.setFont(self.gui.bold_font)
-            rendering_title_label.setContentsMargins(5, 5, 5, 5)
-            layout.addWidget(rendering_title_label, 7, 0, 1, index + 1)
-
-            self.software_checkbox = QCheckBox('Force Software Rendering')
-            self.software_checkbox.setFont(self.gui.standard_font)
-            self.software_checkbox.stateChanged.connect(self.rendering_restart)
-            layout.addWidget(self.software_checkbox, 8, 0, 1, index + 1)
-
-            software_details = QTextEdit(
-                'Rending web pages on some AMD radeon graphics cards may cause ProjectOn to quit unexpectedly. If you '
-                'are experiencing this behavior check this box, save your settings, and restart the program.'
-            )
-            software_details.setReadOnly(True)
-            software_details.setCursor(Qt.CursorShape.ArrowCursor)
-            software_details.setFont(self.gui.list_font)
-            layout.addWidget(software_details, 9, 0, 1, index + 1)
-
-        layout.setRowStretch(10, 100)
-
-        return widget
-
-    def update_settings(self):
-        widget = QWidget()
-        widget.setObjectName('settings_container')
-        widget.setMinimumWidth(self.min_width)
-        layout = QVBoxLayout()
-        widget.setLayout(layout)
-
-        display_title_label = QLabel('Preview Update Settings')
-        display_title_label.setFont(self.gui.bold_font)
-        display_title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(display_title_label)
-
-        explanation_label = QLabel(
-            'The rate at which the ProjectOn preview image and the stage view updates when a website or video is '
-            'being displayed (in Frames Per Second). Higher gives smoother updates but higher CPU usage.'
-        )
-        explanation_label.setFont(self.gui.standard_font)
-        layout.addWidget(explanation_label)
-
-        button_widget = QWidget()
-        layout.addWidget(button_widget)
-        button_layout = QHBoxLayout(button_widget)
-        button_layout.setContentsMargins(0, 0, 0, 0)
-
-        fps_1_radio_button = QRadioButton('1 FPS')
-        fps_1_radio_button.setFont(self.gui.standard_font)
-        button_layout.addWidget(fps_1_radio_button)
-
-        fps_5_radio_button = QRadioButton('5 FPS')
-        fps_5_radio_button.setFont(self.gui.standard_font)
-        button_layout.addWidget(fps_5_radio_button)
-
-        fps_10_radio_button = QRadioButton('10 FPS')
-        fps_10_radio_button.setFont(self.gui.standard_font)
-        button_layout.addWidget(fps_10_radio_button)
-
-        fps_24_radio_button = QRadioButton('24 FPS')
-        fps_24_radio_button.setFont(self.gui.standard_font)
-        button_layout.addWidget(fps_24_radio_button)
-        button_layout.addStretch()
-
-        self.fps_button_group = QButtonGroup()
-        self.fps_button_group.addButton(fps_1_radio_button, 1)
-        self.fps_button_group.addButton(fps_5_radio_button, 5)
-        self.fps_button_group.addButton(fps_10_radio_button, 10)
-        self.fps_button_group.addButton(fps_24_radio_button, 24)
-
-        return widget
-
-    def font_settings(self):
-        widget = QWidget()
-        widget.setMinimumWidth(self.min_width)
-        widget.setObjectName('settings_container')
-        layout = QVBoxLayout()
-        widget.setLayout(layout)
-
-        stage_title_label = QLabel('Stage Display Font Settings')
-        stage_title_label.setFont(self.gui.bold_font)
-        stage_title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(stage_title_label)
-
-        stage_font_widget = QWidget()
-        stage_font_layout = QHBoxLayout()
-        stage_font_widget.setLayout(stage_font_layout)
-        layout.addWidget(stage_font_widget)
-
-        stage_font_label = QLabel('Stage Display Font Size:')
-        stage_font_label.setFont(self.gui.bold_font)
-        stage_font_layout.addWidget(stage_font_label)
-
-        self.stage_font_spinbox = QSpinBox()
-        self.stage_font_spinbox.setRange(12, 120)
-        self.stage_font_spinbox.setMinimumSize(60, 30)
-        self.stage_font_spinbox.setFont(self.gui.standard_font)
-        self.stage_font_spinbox.installEventFilter(self)
-        stage_font_layout.addWidget(self.stage_font_spinbox)
-        stage_font_layout.addStretch()
-
-        title_label = QLabel('Global Font Settings')
-        title_label.setFont(self.gui.bold_font)
-        title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(title_label)
-
-        font_widget = QWidget()
-        font_layout = QVBoxLayout()
-        font_widget.setLayout(font_layout)
-        layout.addWidget(font_widget)
-
-        self.song_font_settings_widget = NewFontWidget(self.gui, 'song', draw_border=False)
-        font_layout.addWidget(self.song_font_settings_widget)
-        song_font_group_box = QGroupBox()
-        song_font_group_box.setTitle('Song Font Settings')
-        song_font_group_box.setFont(self.gui.standard_font)
-        song_font_group_box_layout = QVBoxLayout(song_font_group_box)
-        song_font_group_box_layout.addWidget(self.song_font_settings_widget)
-        font_layout.addWidget(song_font_group_box)
-        font_layout.addSpacing(20)
-
-        self.bible_font_settings_widget = NewFontWidget(self.gui, 'bible', draw_border=False)
-        #font_layout.addWidget(self.bible_font_settings_widget)
-        bible_font_group_box = QGroupBox()
-        bible_font_group_box.setTitle('Bible Font Settings')
-        bible_font_group_box.setFont(self.gui.standard_font)
-        bible_font_group_box_layout = QVBoxLayout(bible_font_group_box)
-        bible_font_group_box_layout.addWidget(self.bible_font_settings_widget)
-        font_layout.addWidget(bible_font_group_box)
-        layout.addStretch()
-
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        widget.adjustSize()
-        scroll_area.setWidget(widget)
-
-        return scroll_area
-
-    def background_settings(self):
-        widget = QWidget()
-        widget.setObjectName('settings_container')
-        widget.setMinimumWidth(self.min_width)
-        layout = QVBoxLayout()
-        widget.setLayout(layout)
-
-        title_label = QLabel('Global Background Settings')
-        title_label.setFont(self.gui.bold_font)
-        title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(title_label)
-
-        song_background_label = QLabel('Global Song Background:')
-        song_background_label.setFont(self.gui.standard_font)
-        layout.addWidget(song_background_label)
-
-        song_background_widget = QWidget()
-        song_background_layout = QHBoxLayout(song_background_widget)
-        layout.addWidget(song_background_widget)
-        layout.addSpacing(20)
-
-        self.song_background_combobox = ImageCombobox(self.gui, 'song', suppress_autosave=True)
-        self.song_background_combobox.setMaximumWidth(500)
-        song_background_layout.addWidget(self.song_background_combobox)
-        song_background_layout.addSpacing(20)
-
-        add_background_button = QPushButton('Import a Background')
-        add_background_button.setFont(self.gui.standard_font)
-        add_background_button.clicked.connect(self.import_background)
-        song_background_layout.addWidget(add_background_button)
-        song_background_layout.addSpacing(20)
-
-        delete_background_button = QPushButton('Delete a Background')
-        delete_background_button.setFont(self.gui.standard_font)
-        delete_background_button.clicked.connect(lambda: self.delete_background('background'))
-        song_background_layout.addWidget(delete_background_button)
-        song_background_layout.addStretch()
-
-        bible_background_label = QLabel('Global Bible Background:')
-        bible_background_label.setFont(self.gui.standard_font)
-        layout.addWidget(bible_background_label)
-
-        bible_background_widget = QWidget()
-        bible_background_layout = QHBoxLayout(bible_background_widget)
-        layout.addWidget(bible_background_widget)
-        layout.addSpacing(20)
-
-        self.bible_background_combobox = ImageCombobox(self.gui, 'bible', suppress_autosave=True)
-        self.bible_background_combobox.setMaximumWidth(500)
-        bible_background_layout.addWidget(self.bible_background_combobox)
-        bible_background_layout.addStretch()
-
-        logo_background_label = QLabel('Set Logo Image:')
-        logo_background_label.setFont(self.gui.standard_font)
-        layout.addWidget(logo_background_label)
-
-        logo_background_widget = QWidget()
-        logo_background_layout = QHBoxLayout(logo_background_widget)
-        layout.addWidget(logo_background_widget)
-        layout.addSpacing(20)
-
-        self.logo_background_combobox = ImageCombobox(self.gui, 'logo', suppress_autosave=True)
-        self.logo_background_combobox.setMaximumWidth(500)
-        logo_background_layout.addWidget(self.logo_background_combobox)
-        logo_background_layout.addSpacing(20)
-
-        logo_background_button = QPushButton('Add an Image')
-        logo_background_button.setFont(self.gui.standard_font)
-        logo_background_button.clicked.connect(self.gui.media_widget.add_image)
-        logo_background_layout.addWidget(logo_background_button)
-        logo_background_layout.addSpacing(20)
-
-        delete_image_button = QPushButton('Delete an Image')
-        delete_image_button.setFont(self.gui.standard_font)
-        delete_image_button.clicked.connect(lambda: self.delete_background('image'))
-        logo_background_layout.addWidget(delete_image_button)
-        logo_background_layout.addStretch()
-        layout.addStretch()
-
-        return widget
-
-    def countdown_settings(self):
-        widget = QWidget()
-        widget.setObjectName('settings_container')
-        layout = QVBoxLayout(widget)
-
-        title_label = QLabel('Service Countdown')
-        title_label.setFont(self.gui.bold_font)
-        title_label.setContentsMargins(5, 5, 5, 5)
-        layout.addWidget(title_label)
-
-        options_widget = QWidget()
-
-        self.use_countdown_checkbox = QCheckBox('Use Countdown')
-        self.use_countdown_checkbox.setToolTip('Show a timer that counts down the time until the service starts')
-        self.use_countdown_checkbox.stateChanged.connect(lambda: self.use_countdown_changed(options_widget))
-        self.use_countdown_checkbox.setChecked(self.gui.main.settings['countdown_settings']['use_countdown'])
-        self.use_countdown_changed(options_widget)
-        layout.addWidget(self.use_countdown_checkbox)
-
-        layout.addWidget(options_widget)
-        options_layout = QGridLayout(options_widget)
-
-        self.countdown_sample_label = QLabel('Service starts in 3:21')
-        options_layout.addWidget(self.countdown_sample_label, 0, 0, 1, 2)
-        font = QFont(
-            self.gui.main.settings['countdown_settings']['font_face'],
-            self.gui.main.settings['countdown_settings']['font_size']
-        )
-        if self.gui.main.settings['countdown_settings']['font_bold']:
-            font.setBold(True)
-        self.countdown_sample_label.setFont(font)
-        self.countdown_sample_label.setStyleSheet(
-            f'background-color: {self.gui.main.settings["countdown_settings"]["bg_color"]}; '
-            f'color: {self.gui.main.settings["countdown_settings"]["fg_color"]};'
-        )
-
-        font_face_label = QLabel('Font')
-        font_face_label.setFont(self.gui.standard_font)
-        options_layout.addWidget(font_face_label, 1, 0)
-
-        self.countdown_font_combobox = QFontComboBox()
-        delegate = FontComboboxDelegate(parent=self.countdown_font_combobox, row_height=36, font_size=16)
-        self.countdown_font_combobox.setItemDelegate(delegate)
-        self.countdown_font_combobox.setMinimumHeight(30)
-        self.countdown_font_combobox.setCurrentIndex(
-            self.countdown_font_combobox.findText(self.gui.main.settings['countdown_settings']['font_face']))
-        self.countdown_font_combobox.currentIndexChanged.connect(self.countdown_changed)
-        options_layout.addWidget(self.countdown_font_combobox, 2, 0)
-
-        font_size_label = QLabel('Font Size')
-        font_size_label.setFont(self.gui.standard_font)
-        options_layout.addWidget(font_size_label, 1, 1)
-
-        self.countdown_size_combobox = QComboBox()
-        self.countdown_size_combobox.setFont(self.gui.standard_font)
-        self.countdown_size_combobox.setMinimumHeight(40)
-        for i in range(10, 161, 2):
-            self.countdown_size_combobox.addItem(str(i))
-        for i in range(self.countdown_size_combobox.count()):
-            if self.countdown_size_combobox.itemText(i) == str(self.gui.main.settings['countdown_settings']['font_size']):
-                self.countdown_size_combobox.setCurrentIndex(i)
-                break
-        self.countdown_size_combobox.currentIndexChanged.connect(self.countdown_changed)
-
-        options_layout.addWidget(self.countdown_size_combobox, 2, 1)
-
-        self.countdown_bold_checkbox = QCheckBox('Bold')
-        self.countdown_bold_checkbox.setFont(self.gui.standard_font)
-        self.countdown_bold_checkbox.setChecked(self.gui.main.settings['countdown_settings']['font_bold'])
-        self.countdown_bold_checkbox.stateChanged.connect(self.countdown_changed)
-        options_layout.addWidget(self.countdown_bold_checkbox, 2, 2)
-
-        location_label = QLabel('Position')
-        location_label.setFont(self.gui.standard_font)
-        options_layout.addWidget(location_label, 1, 3)
-
-        self.countdown_position_combobox = QComboBox()
-        self.countdown_position_combobox.setFont(self.gui.standard_font)
-        self.countdown_position_combobox.addItem('Top', 'top_full')
-        self.countdown_position_combobox.addItem('Bottom', 'bottom_full')
-        if 'top' in self.gui.main.settings['countdown_settings']['position']:
-            self.countdown_position_combobox.setCurrentIndex(0)
-        elif 'bottom' in self.gui.main.settings['countdown_settings']['position']:
-            self.countdown_position_combobox.setCurrentIndex(1)
-        options_layout.addWidget(self.countdown_position_combobox, 2, 3)
-
-        start_time_label = QLabel('Service Start Time')
-        start_time_label.setFont(self.gui.standard_font)
-        options_layout.addWidget(start_time_label, 3, 0)
-
-        self.countdown_start_time_widget = QTimeEdit()
-        self.countdown_start_time_widget.setMinimumHeight(40)
-        self.countdown_start_time_widget.setFont(self.gui.standard_font)
-        self.countdown_start_time_widget.setTime(
-            QTime(
-                self.gui.main.settings['countdown_settings']['start_time'][0],
-                self.gui.main.settings['countdown_settings']['start_time'][1],
-                0,
-                0
-            )
-        )
-        options_layout.addWidget(self.countdown_start_time_widget, 4, 0)
-
-        show_time_label = QLabel('Time to Begin Countdown')
-        show_time_label.setFont(self.gui.standard_font)
-        options_layout.addWidget(show_time_label, 3, 1)
-
-        self.countdown_display_time_widget = QTimeEdit()
-        self.countdown_display_time_widget.setMinimumHeight(40)
-        self.countdown_display_time_widget.setFont(self.gui.standard_font)
-        self.countdown_display_time_widget.setTime(
-            QTime(
-                self.gui.main.settings['countdown_settings']['display_time'][0],
-                self.gui.main.settings['countdown_settings']['display_time'][1],
-                0,
-                0
-            )
-        )
-        options_layout.addWidget(self.countdown_display_time_widget, 4, 1)
-
-        background_color_label = QLabel('Countdown Background Color')
-        background_color_label.setFont(self.gui.standard_font)
-        options_layout.addWidget(background_color_label, 5, 0)
-
-        self.bg_color_swatch = ClickableColorSwatch(self.gui)
-        self.bg_color_swatch.make_color_swatch_pixmap(self.gui.main.settings['countdown_settings']['bg_color'])
-        self.bg_color_swatch.color_changed.connect(self.countdown_changed)
-        options_layout.addWidget(self.bg_color_swatch, 6, 0)
-
-        foreground_color_label = QLabel('Countdown Font Color')
-        foreground_color_label.setFont(self.gui.standard_font)
-        options_layout.addWidget(foreground_color_label, 5, 1)
-
-        self.fg_color_swatch = ClickableColorSwatch(self.gui)
-        self.fg_color_swatch.make_color_swatch_pixmap(self.gui.main.settings['countdown_settings']['fg_color'])
-        self.fg_color_swatch.color_changed.connect(self.countdown_changed)
-        options_layout.addWidget(self.fg_color_swatch, 6, 1)
-        layout.addStretch()
-
-        return widget
-
-    def use_countdown_changed(self, options_widget: QWidget):
-        if self.use_countdown_checkbox.isChecked():
-            options_widget.show()
-        else:
-            options_widget.hide()
-
-    def countdown_changed(self):
-        font = QFont(self.countdown_font_combobox.currentText(), int(self.countdown_size_combobox.currentText()))
-        if self.countdown_bold_checkbox.isChecked():
-            font.setBold(True)
-        self.countdown_sample_label.setFont(font)
-
-        bg_image = self.bg_color_swatch.pixmap().toImage()
-        pixel_color = bg_image.pixelColor(10, 10)
-        bg_color = f'rgba({pixel_color.red()}, {pixel_color.green()}, {pixel_color.blue()}, {pixel_color.alpha()})'
-
-        fg_image = self.fg_color_swatch.pixmap().toImage()
-        pixel_color = fg_image.pixelColor(10, 10)
-        fg_color = f'rgb({pixel_color.red()}, {pixel_color.green()}, {pixel_color.blue()})'
-
-        self.countdown_sample_label.setStyleSheet(f'background-color: {bg_color}; color: {fg_color};')
-        self.countdown_sample_label.repaint()
-
-    def rendering_restart(self):
-        QMessageBox.warning(
-            self,
-            'Restart Required',
-            'The program needs to be restarted in order for rendering changes\nto take effect. Please restart after saving your changes.',
-            QMessageBox.StandardButton.Ok
-        )
-
-    def eventFilter(self, obj: QObject, evt: QEvent):
-        if evt.type() == QEvent.Type.Wheel:
-            return True
-        else:
-            return super().eventFilter(obj, evt)
-
-    def draw_screen_pixmap(self, name: str, primary: bool, size: QSize):
-        ratio = size.width() / size.height()
-        height = 100
-        width = int(100 * ratio)
-
-        pixmap = QPixmap(width, height)
-        pixmap.fill(QColor(0, 0, 0, 0))
-
-        painter = QPainter(pixmap)
-        pen = QPen()
-        pen.setColor(Qt.GlobalColor.gray)
-        pen.setWidth(10)
-        brush = QBrush()
-        brush.setColor(Qt.GlobalColor.blue)
-
-        painter.setPen(pen)
-        painter.setBrush(brush)
-
-        path = QPainterPath()
-        path.addRoundedRect(QRectF(0, 0, width, height), 5, 5)
-        painter.fillPath(path, QColor(85, 85, 170))
-        painter.drawPath(path)
-
-        text_rect = painter.fontMetrics().boundingRect(name)
-        text_pos = QPointF((width / 2) - (text_rect.width() / 2), (height / 2) - (text_rect.height() / 2))
-        pen.setColor(Qt.GlobalColor.white)
-        painter.setPen(pen)
-        painter.drawText(text_pos, name)
-
-        if primary:
-            text_pos.setY(text_pos.y() + text_rect.height() + 5)
-            painter.drawText(text_pos, '(primary)')
-
-        painter.end()
-        return pixmap
-
-    def color_chooser(self):
-        sender = self.sender()
-        color = QColorDialog.getColor(QColor(Qt.GlobalColor.black), self)
-        rgb = color.getRgb()
-        color_string = str(rgb[0]) + ', ' + str(rgb[1]) + ', ' + str(rgb[2])
-        self.custom_font_color_radio_button.setText('Custom: ' + color_string)
-        self.custom_font_color_radio_button.setObjectName(color_string)
-        sender.setChecked(True)
-        self.change_font_sample()
-
-    def image_chooser(self):
-        file = QFileDialog.getOpenFileName(self, 'Choose Image File', os.path.expanduser('~') + '/Pictures')
-        if len(file[0]) > 0:
-            file_split = file[0].split('/')
-            file_name = file_split[len(file_split) - 1]
-            self.background_line_edit.setText(file_name)
-            self.gui.main.copy_image(file[0])
-        self.background_image_radio_button.setChecked(True)
-
-    def import_background(self):
-        result = QFileDialog.getOpenFileName(
-            self.gui.main_window, 'Choose Background Image', os.path.expanduser('~') + '/Pictures')
-        if len(result[0]) > 0:
-            file_name = ''
-            try:
-                file_name_split = result[0].split('/')
-                file_name = file_name_split[len(file_name_split) - 1]
-                shutil.copy(result[0], self.gui.main.background_dir + '/' + file_name)
-            except Exception:
-                self.gui.main.error_log()
-
-            from core.runnables import IndexImages
-            ii = IndexImages(self.gui.main, 'backgrounds')
-            ii.add_image_index(self.gui.main.background_dir + '/' + file_name, 'background')
-
-            self.song_background_combobox.refresh()
-            self.bible_background_combobox.refresh()
-            self.gui.tool_bar.song_background_combobox.refresh()
-            self.gui.tool_bar.bible_background_combobox.refresh()
-
-            self.song_background_combobox.update()
-            self.bible_background_combobox.update()
-            self.gui.tool_bar.song_background_combobox.update()
-            self.gui.tool_bar.bible_background_combobox.update()
-
-            self.song_background_combobox.setCurrentIndex(
-                self.song_background_combobox.findData(
-                    self.gui.main.settings['global_song_background'])
-            )
-            self.bible_background_combobox.setCurrentIndex(
-                self.bible_background_combobox.findData(
-                    self.gui.main.settings['global_bible_background'])
-            )
-            self.gui.tool_bar.song_background_combobox.setCurrentIndex(
-                self.gui.tool_bar.song_background_combobox.findData(
-                    self.gui.main.settings['global_song_background'])
-            )
-            self.gui.tool_bar.bible_background_combobox.setCurrentIndex(
-                self.gui.tool_bar.bible_background_combobox.findData(
-                    self.gui.main.settings['global_bible_background'])
-            )
-
-            self.gui.apply_settings()
-
-    def delete_background(self, type: str):
-        dialog = QDialog()
-        layout = QVBoxLayout()
-        dialog.setLayout(layout)
-
-        label = QLabel()
-        current_song_background = ''
-        current_bible_background = ''
-        current_image = ''
-        if type == 'background':
-            label.setText('Choose a background to remove:')
-            current_bible_background = self.bible_background_combobox.currentData(Qt.ItemDataRole.UserRole)
-            current_song_background = self.song_background_combobox.currentData(Qt.ItemDataRole.UserRole)
-        elif type == 'image':
-            label.setText('Choose an image item to remove:')
-            current_image = self.logo_background_combobox.currentData(Qt.ItemDataRole.UserRole)
-        label.setFont(self.gui.standard_font)
-        layout.addWidget(label)
-
-        combobox = None
-        if type == 'background':
-            combobox = ImageCombobox(self.gui, type='delete_background')
-        elif type == 'image':
-            combobox = ImageCombobox(self.gui, type='delete_image')
-        if combobox:
-            combobox.removeItem(1)
-            combobox.removeItem(0)
-            layout.addWidget(combobox)
-
-        button_widget = QWidget()
-        button_layout = QHBoxLayout()
-        button_widget.setLayout(button_layout)
-        layout.addWidget(button_widget)
-
-        remove_button = QPushButton('Remove')
-        remove_button.setFont(self.gui.standard_font)
-        remove_button.clicked.connect(lambda: dialog.done(0))
-        button_layout.addWidget(remove_button)
-
-        cancel_button = QPushButton('Cancel')
-        cancel_button.setFont(self.gui.standard_font)
-        cancel_button.clicked.connect(lambda: dialog.done(1))
-        button_layout.addWidget(cancel_button)
-
-        response = dialog.exec()
-
-        if response == 0:
-            file_name = combobox.currentData(Qt.ItemDataRole.UserRole)
-            try:
-                if type == 'background':
-                    os.remove(self.gui.main.background_dir + '/' + file_name)
-                elif type == 'image':
-                    os.remove(self.gui.main.image_dir + '/' + file_name)
-            except FileNotFoundError:
-                QMessageBox.information(
-                    self.gui.main_window, 'Not Found', 'File not found. Reindexing images.', QMessageBox.StandardButton.Ok)
-
-            splash = SimpleSplash(self.gui, 'Reindexing Images. Please Wait...')
-            from core.runnables import IndexImages
-            ii = IndexImages(self.gui.main, 'backgrounds')
-            self.gui.main.thread_pool.start(ii)
-            self.gui.main.thread_pool.waitForDone()
-
-            self.song_background_combobox.refresh()
-            self.bible_background_combobox.refresh()
-            self.gui.tool_bar.song_background_combobox.refresh()
-            self.gui.tool_bar.bible_background_combobox.refresh()
-
-            self.song_background_combobox.update()
-            self.bible_background_combobox.update()
-            self.gui.tool_bar.song_background_combobox.update()
-            self.gui.tool_bar.bible_background_combobox.update()
-
-            self.song_background_combobox.setCurrentIndex(
-                self.song_background_combobox.findData(
-                    self.gui.main.settings['global_song_background'])
-            )
-            self.bible_background_combobox.setCurrentIndex(
-                self.bible_background_combobox.findData(
-                    self.gui.main.settings['global_bible_background'])
-            )
-            self.gui.tool_bar.song_background_combobox.setCurrentIndex(
-                self.gui.tool_bar.song_background_combobox.findData(
-                    self.gui.main.settings['global_song_background'])
-            )
-            self.gui.tool_bar.bible_background_combobox.setCurrentIndex(
-                self.gui.tool_bar.bible_background_combobox.findData(
-                    self.gui.main.settings['global_bible_background'])
-            )
-
-            splash.widget.deleteLater()
-
-            QMessageBox.information(
-                self,
-                f'{type.capitalize()} Removed',
-                file_name + ' removed.',
-                QMessageBox.StandardButton.Ok
-            )
-
-            # remove deleted item from the database thumbnails and refresh the appropriate combobox(es)
-            if type == 'background':
-                connection = sqlite3.connect(self.gui.main.database)
-                cursor = connection.cursor()
-                cursor.execute('DELETE FROM backgroundThumbnails WHERE fileName="' + file_name + '";')
-                connection.commit()
-                connection.close()
-
-                self.song_background_combobox.refresh()
-                self.bible_background_combobox.refresh()
-                self.gui.tool_bar.song_background_combobox.refresh()
-                self.gui.tool_bar.bible_background_combobox.refresh()
-
-                current_song_index = self.song_background_combobox.findData(
-                    current_song_background, Qt.ItemDataRole.UserRole)
-                if current_song_index == -1:
-                    self.song_background_combobox.setCurrentIndex(0)
-                    self.gui.tool_bar.song_background_combobox.setCurrentIndex(0)
-                else:
-                    self.song_background_combobox.setCurrentIndex(current_song_index)
-                    self.gui.tool_bar.song_background_combobox.setCurrentIndex(current_song_index)
-
-                current_bible_index = self.bible_background_combobox.findData(
-                    current_bible_background, Qt.ItemDataRole.UserRole)
-                if current_bible_index == -1:
-                    self.bible_background_combobox.setCurrentIndex(0)
-                    self.gui.tool_bar.bible_background_combobox.setCurrentIndex(0)
-                else:
-                    self.bible_background_combobox.setCurrentIndex(current_bible_index)
-                    self.gui.tool_bar.bible_background_combobox.setCurrentIndex(current_bible_index)
-
-            elif type == 'image':
-                connection = sqlite3.connect(self.gui.main.database)
-                cursor = connection.cursor()
-                cursor.execute('DELETE FROM backgroundThumbnails WHERE fileName="' + file_name + '";')
-                connection.commit()
-                connection.close()
-
-                self.logo_background_combobox.refresh()
-                current_image_index = self.logo_background_combobox.findData(current_image, Qt.ItemDataRole.UserRole)
-                if current_image_index == -1:
-                    self.logo_background_combobox.setCurrentIndex(0)
-                else:
-                    self.logo_background_combobox.setCurrentIndex(current_image_index)
-
-    def apply_settings(self):
-        if self.gui.main.settings:
-            try:
-                if 'ccli_num' in self.gui.main.settings.keys():
-                    self.ccli_line_edit.setText(self.gui.main.settings['ccli_num'])
-
-                screen_found = False
-                for button in self.screen_button_group.buttons():
-                    if button.objectName() == self.gui.main.settings['selected_screen_name']:
-                        button.setChecked(True)
-                        screen_found = True
-
-                if not screen_found:
-                    for button in self.screen_button_group.buttons():
-                        if 'primary' not in button.text():
-                            button.setChecked(True)
-
-                if 'force_software_rendering' in self.gui.main.settings.keys() and sys.platform == 'win32':
-                    self.software_checkbox.blockSignals(True)
-                    self.software_checkbox.setChecked(self.gui.main.settings['force_software_rendering'])
-                    self.software_checkbox.blockSignals(False)
-
-                self.song_font_settings_widget.apply_settings()
-                self.bible_font_settings_widget.apply_settings()
-
-                if 'stage_font_size' in self.gui.main.settings.keys():
-                    self.stage_font_spinbox.setValue(int(self.gui.main.settings['stage_font_size']))
-
-                self.song_background_combobox.blockSignals(True)
-                self.bible_background_combobox.blockSignals(True)
-                self.logo_background_combobox.blockSignals(True)
-
-                self.song_background_combobox.setCurrentIndex(
-                    self.song_background_combobox.findData(
-                        self.gui.main.settings['global_song_background'], Qt.ItemDataRole.UserRole))
-                self.bible_background_combobox.setCurrentIndex(
-                    self.bible_background_combobox.findData(
-                        self.gui.main.settings['global_bible_background'], Qt.ItemDataRole.UserRole))
-                self.logo_background_combobox.setCurrentIndex(
-                    self.logo_background_combobox.findData(
-                        self.gui.main.settings['logo_image'], Qt.ItemDataRole.UserRole))
-
-                self.song_background_combobox.blockSignals(False)
-                self.bible_background_combobox.blockSignals(False)
-                self.logo_background_combobox.blockSignals(False)
-            except Exception:
-                self.gui.main.error_log()
-
-    def save(self):
-        if not self.screen_button_group.checkedButton().objectName() == self.gui.main.settings['selected_screen_name']:
-            screen_name = self.screen_button_group.checkedButton().objectName()
-
-            self.gui.main.settings['selected_screen_name'] = screen_name
-            primary_screen = None
-            secondary_screen = None
-
-            if len(self.gui.main.app.screens()) == 1:
-                primary_screen = self.gui.main.app.screens()[0]
-                secondary_screen = self.gui.main.app.screens()[0]
-            else:
-                for screen in self.gui.main.app.screens():
-                    if screen_name in screen.name():
-                        secondary_screen = screen
-                    else:
-                        primary_screen = screen
-
-            self.gui.position_screens(primary_screen, secondary_screen)
-
-        if sys.platform == 'win32':
-            self.gui.main.settings['force_software_rendering'] = self.software_checkbox.isChecked()
-
-        self.gui.main.settings['song_font_face'] = self.song_font_settings_widget.font_face_combobox.currentText()
-        self.gui.main.settings['song_font_size'] = self.song_font_settings_widget.font_size_spinbox.value()
-        self.gui.main.settings['song_font_color'] = (
-            self.song_font_settings_widget.font_color_button_group.checkedButton().objectName())
-        self.gui.main.settings['song_use_shadow'] = self.song_font_settings_widget.shadow_checkbox.isChecked()
-        self.gui.main.settings['song_shadow_color'] = self.song_font_settings_widget.shadow_color_slider.color_slider.value()
-        self.gui.main.settings['song_shadow_offset'] = self.song_font_settings_widget.shadow_offset_slider.offset_slider.value()
-        self.gui.main.settings['song_use_outline'] = self.song_font_settings_widget.outline_checkbox.isChecked()
-        self.gui.main.settings['song_outline_color'] = self.song_font_settings_widget.outline_color_slider.color_slider.value()
-        self.gui.main.settings['song_outline_width'] = self.song_font_settings_widget.outline_width_slider.offset_slider.value()
-
-        self.gui.main.settings['bible_font_face'] = self.bible_font_settings_widget.font_face_combobox.currentText()
-        self.gui.main.settings['bible_font_size'] = self.bible_font_settings_widget.font_size_spinbox.value()
-        self.gui.main.settings['bible_font_color'] = (
-            self.bible_font_settings_widget.font_color_button_group.checkedButton().objectName())
-        self.gui.main.settings['bible_use_shadow'] = self.bible_font_settings_widget.shadow_checkbox.isChecked()
-        self.gui.main.settings['bible_shadow_color'] = self.bible_font_settings_widget.shadow_color_slider.color_slider.value()
-        self.gui.main.settings['bible_shadow_offset'] = self.bible_font_settings_widget.shadow_offset_slider.offset_slider.value()
-        self.gui.main.settings['bible_use_outline'] = self.bible_font_settings_widget.outline_checkbox.isChecked()
-        self.gui.main.settings['bible_outline_color'] = self.bible_font_settings_widget.outline_color_slider.color_slider.value()
-        self.gui.main.settings['bible_outline_width'] = self.bible_font_settings_widget.outline_width_slider.offset_slider.value()
-
-        self.gui.main.settings['global_song_background'] = self.song_background_combobox.itemData(
-            self.song_background_combobox.currentIndex(), Qt.ItemDataRole.UserRole
-        )
-        self.gui.main.settings['global_bible_background'] = self.bible_background_combobox.itemData(
-            self.bible_background_combobox.currentIndex(), Qt.ItemDataRole.UserRole
-        )
-        self.gui.main.settings['logo_image'] = self.logo_background_combobox.itemData(
-            self.logo_background_combobox.currentIndex(), Qt.ItemDataRole.UserRole
-        )
-        self.gui.main.settings['ccli_num'] = self.ccli_line_edit.text()
-        self.gui.main.settings['stage_font_size'] = self.stage_font_spinbox.value()
-
-        self.gui.main.settings['update_fps'] = self.fps_button_group.id(self.fps_button_group.checkedButton())
-
-        if self.stage_display_button_group.checkedId() == 0:
-            self.gui.main.settings['mirror_stage_display'] = False
-        else:
-            self.gui.main.settings['mirror_stage_display'] = True
-
-        self.gui.main.settings['countdown_settings']['use_countdown'] = self.use_countdown_checkbox.isChecked()
-        self.gui.main.settings['countdown_settings']['font_face'] = self.countdown_font_combobox.currentText()
-        self.gui.main.settings['countdown_settings']['font_size'] = int(self.countdown_size_combobox.currentText())
-        self.gui.main.settings['countdown_settings']['font_bold'] = self.countdown_bold_checkbox.isChecked()
-        self.gui.main.settings['countdown_settings']['position'] = self.countdown_position_combobox.currentData(Qt.ItemDataRole.UserRole)
-        bg_qcolor = self.bg_color_swatch.pixmap().toImage().pixelColor(10, 10)
-        bg_color = f'rgba({bg_qcolor.red()}, {bg_qcolor.green()}, {bg_qcolor.blue()}, {bg_qcolor.alpha()})'
-        self.gui.main.settings['countdown_settings']['bg_color'] = bg_color
-        fg_qcolor = self.fg_color_swatch.pixmap().toImage().pixelColor(10, 10)
-        fg_color = f'rgb({fg_qcolor.red()}, {fg_qcolor.green()}, {fg_qcolor.blue()})'
-        self.gui.main.settings['countdown_settings']['fg_color'] = fg_color
-        self.gui.main.settings['countdown_settings']['start_time'] = [
-            self.countdown_start_time_widget.time().hour(),
-            self.countdown_start_time_widget.time().minute()
-        ]
-        self.gui.main.settings['countdown_settings']['display_time'] = [
-            self.countdown_display_time_widget.time().hour(),
-            self.countdown_display_time_widget.time().minute()
-        ]
-
-        self.gui.main.save_settings()
-        self.gui.apply_settings(theme_too=False)
-        self.hide()
-
-    def cancel(self):
-        self.hide()
 
 
 class IndexedSettingsWidget(QWidget):

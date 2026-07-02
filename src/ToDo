@@ -21,6 +21,7 @@ Done:
     Display not updating from live
     Avoid auto-fit text when parsing scripture and songs
     Window title file name not correct
+    Save font weight in settings/saved service so that finding closest matching font will be more accurate
 
 To Do:
 

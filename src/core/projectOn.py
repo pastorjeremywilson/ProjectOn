@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.020
+ProjectOn v.1.10.0.021
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -82,7 +82,7 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.10.0.020'
+        self.version = 'v.1.10.0.021'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):

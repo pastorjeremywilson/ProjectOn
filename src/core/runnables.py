@@ -12,6 +12,8 @@ from PyQt5.QtCore import QRunnable, Qt, QByteArray, QBuffer, QIODevice, QTimer
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QWidget
 
+from dataHandling.declarations import DEFAULT_SETTINGS
+
 
 class CheckFiles(QRunnable):
     """
@@ -80,32 +82,20 @@ class CheckFiles(QRunnable):
         self.main.bible_dir = self.main.data_dir + '/bibles'
         self.main.video_dir = self.main.data_dir + '/videos'
 
-        # provide default settings should the settings file not exist
-        default_settings = {
-            'selected_screen_name': '',
-            'font_face': 'Helvetica',
-            'font_size': 60,
-            'font_color': 'white',
-            'global_song_background': '',
-            'global_bible_background': '',
-            'logo_image': '',
-            'last_save_dir': './saved services',
-            'last_status_count': 0,
-            'stage_font_size': 60
-        }
-
+        # check that the settings file exists; set to DEFAULT_SETTINGS if not
         if exists(self.main.data_dir + '/settings.json'):
             with open(self.main.data_dir + '/settings.json', 'r') as file:
                 try:
                     self.main.settings = json.loads(file.read())
                 except json.decoder.JSONDecodeError:
-                    self.main.settings = default_settings
+                    self.main.settings = DEFAULT_SETTINGS.copy()
         else:
-            self.main.settings = default_settings
+            self.main.settings = DEFAULT_SETTINGS.copy()
 
-        for key in default_settings:
+        # add any key/value pairs from DEFAULT_SETTINGS missing in settings
+        for key in DEFAULT_SETTINGS:
             if key not in self.main.settings.keys():
-                self.main.settings[key] = default_settings[key]
+                self.main.settings[key] = DEFAULT_SETTINGS[key]
 
         self.main.settings['used_services'] = device_specific_settings['used_services']
         self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']

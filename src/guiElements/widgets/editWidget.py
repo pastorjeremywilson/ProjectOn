@@ -504,9 +504,11 @@ class EditWidget(QDialog):
 
         background_song_radio_button = QRadioButton('Use Global Song Background')
         background_song_radio_button.setFont(self.gui.standard_font)
+        background_song_radio_button.clicked.connect(self.font_widget.change_font_sample)
 
         background_bible_default_radio_button = QRadioButton('Use Global Bible Background')
         background_bible_default_radio_button.setFont(self.gui.standard_font)
+        background_bible_default_radio_button.clicked.connect(self.font_widget.change_font_sample)
 
         background_color_radio_button = QRadioButton('Solid Color')
         background_color_radio_button.setFont(self.gui.standard_font)
@@ -518,6 +520,7 @@ class EditWidget(QDialog):
 
         self.background_image_radio_button = QRadioButton('Image')
         self.background_image_radio_button.setFont(self.gui.standard_font)
+        self.background_image_radio_button.clicked.connect(self.background_combobox_change)
 
         self.background_button_group = QButtonGroup()
         self.background_button_group.setObjectName('background_button_group')
@@ -645,7 +648,7 @@ class EditWidget(QDialog):
 
     def background_combobox_change(self):
         self.background_button_group.button(3).setChecked(True)
-        self.font_widget.font_sample.repaint()
+        self.font_widget.change_font_sample()
 
     def update_preview_widget(self):
         """
@@ -937,6 +940,11 @@ class EditWidget(QDialog):
             if self.font_widget.font_face_combobox.itemText(i) == font_face:
                 self.font_widget.font_face_combobox.setCurrentIndex(i)
                 break
+
+        if self.data['font_weight'] is not None:
+            self.font_widget.bold_checkbox.setChecked(self.data['font_weight'])
+        else:
+            self.font_widget.bold_checkbox.setChecked(False)
 
         # check the proper font color radio button
         if len(self.data['font_color']) == 0 or 'global' in self.data['font_color']:
@@ -1352,6 +1360,7 @@ class EditWidget(QDialog):
         else:
             self.background_button_group.button(2).setObjectName(color_string)
             sender.setChecked(True)
+        self.font_widget.change_font_sample()
 
     def image_chooser(self):
         """
@@ -1513,6 +1522,11 @@ class EditWidget(QDialog):
             self.data['font_family'] = self.font_widget.font_face_combobox.currentText()
         else:
             self.data['font_family'] = self.font_widget.font_face_combobox.itemText(0)
+
+        if self.font_widget.bold_checkbox.isChecked():
+            self.data['font_weight'] = 100
+        else:
+            self.data['font_weight'] = 0
 
         if self.font_widget.font_color_button_group.checkedButton():
             self.data['font_color'] = self.font_widget.font_color_button_group.checkedButton().objectName()
