@@ -11,7 +11,7 @@ from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSigna
     QModelIndex, QObject, QByteArray, QBuffer, QIODevice, QUrl
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics, QFocusEvent, QMouseEvent, QResizeEvent, \
-    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent, QMoveEvent, QShowEvent
+    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent, QMoveEvent, QShowEvent, QFontInfo
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem, QVideoWidget
 from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
@@ -2046,12 +2046,35 @@ class NewFontWidget(QWidget):
         self.blockSignals(True)
 
         font_face = self.gui.main.settings[f'{self.slide_type}_font_face']
-        if len(font_face.strip()) > 0:
-            self.font_face_combobox.setCurrentIndex(
-                self.font_face_combobox.findText(font_face, Qt.MatchFlag.MatchFixedString))
+        # check for the saved font name in the font combobox
+        index = self.font_face_combobox.findText(font_face, Qt.MatchFlag.MatchFixedString)
+        if len(font_face.strip()) > 0 and index > -1:
+            self.font_face_combobox.setCurrentIndex(index)
         else:
-            self.font_face_combobox.setCurrentIndex(0)
+            # since the font either wasn't set or found, use QFont to find a similar font
+            fallback_font = QFont(font_face)
+            resolved_name = QFontInfo(fallback_font).family()
+            fallback_index = self.font_face_combobox.findText(resolved_name)
+
+            if fallback_index != -1:
+                self.font_face_combobox.setCurrentIndex(fallback_index)
+            else:
+                self.font_face_combobox.setCurrentIndex(0)
+
+            self.font_face_combobox.setCurrentIndex(fallback_index)
             self.gui.main.settings[f'{self.slide_type}_font_face'] = self.font_face_combobox.currentText()
+
+            if len(font_face.strip()) == 0:
+                message = f'{self.slide_type.capitalize()} font was not set.'
+            else:
+                message = f'The font, {font_face}, was not found.'
+                
+            QMessageBox.information(
+                self.gui.main_window,
+                'Font Not Found',
+                f'{message} {self.slide_type.capitalize()} font set to {self.font_face_combobox.currentText()}',
+                QMessageBox.StandardButton.Ok
+            )
 
         self.font_size_spinbox.setValue(self.gui.main.settings[f'{self.slide_type}_font_size'])
 
