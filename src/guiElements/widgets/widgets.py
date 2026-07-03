@@ -24,6 +24,8 @@ from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QLi
     QGraphicsScene, QStackedWidget, QSizePolicy, QGraphicsBlurEffect, QGraphicsPixmapItem
 
 from core.runnables import SlideAutoPlay, TimedPreviewUpdate
+from dataHandling.databaseFunctions import get_audio_data, copy_image, save_song, save_custom, save_image, save_video, \
+    save_web_item, delete_items_from_db
 from dataHandling.parsers import get_qcolor_from_str
 from importExport.openlpImport import OpenLPImport
 
@@ -433,7 +435,7 @@ class DisplayWidget(QStackedWidget):
                     and item_data['audio_file']
                     and len(item_data['audio_file']) > 0
                     and not self.media_player):
-                audio_data = self.gui.main.get_audio_data(item_data['audio_file'])
+                audio_data = get_audio_data(self.gui.main.database, item_data['audio_file'])
                 if audio_data == -2:
                     QMessageBox.critical(
                         self.gui.main_window,
@@ -3049,7 +3051,7 @@ class IndexedSettingsWidget(QWidget):
             file_split = file[0].split('/')
             file_name = file_split[len(file_split) - 1]
             self.background_line_edit.setText(file_name)
-            self.gui.main.copy_image(file[0])
+            copy_image(self.gui.main.background_dir, file[0])
         self.background_image_radio_button.setChecked(True)
 
     def import_background(self):
@@ -4099,15 +4101,15 @@ class CustomTreeWidget(QTreeWidget):
                 data['folder'] = ''
                 item.setData(0, Qt.ItemDataRole.UserRole, data)
                 if data['type'] == 'song':
-                    self.gui.main.save_song(data, old_title=data['title'])
+                    save_song(self.gui.main.database, data, old_title=data['title'])
                 elif data['type'] == 'custom':
-                    self.gui.main.save_custom(data, old_title=data['title'])
+                    save_custom(self.gui.main.database, data, old_title=data['title'])
                 elif data['type'] == 'image':
-                    self.gui.main.save_image(data, old_title=data['title'])
+                    save_image(self.gui.main.database, data, old_title=data['title'])
                 elif data['type'] == 'video':
-                    self.gui.main.save_video(data, old_title=data['title'])
+                    save_video(self.gui.main.database, data, old_title=data['title'])
                 elif data['type'] == 'web':
-                    self.gui.main.save_web_item(data, old_title=data['title'])
+                    save_web_item(self.gui.main.database, data, old_title=data['title'])
         else:
             for item in items:
                 if simple_splash:
@@ -4123,15 +4125,15 @@ class CustomTreeWidget(QTreeWidget):
                 data['folder'] = target_item.data(0, Qt.ItemDataRole.UserRole)['title']
                 item.setData(0, Qt.ItemDataRole.UserRole, data)
                 if data['type'] == 'song':
-                    self.gui.main.save_song(data, old_title=data['title'])
+                    save_song(self.gui.main.database, data, old_title=data['title'])
                 elif data['type'] == 'custom':
-                    self.gui.main.save_custom(data, old_title=data['title'])
+                    save_custom(self.gui.main.database, data, old_title=data['title'])
                 elif data['type'] == 'image':
-                    self.gui.main.save_image(data, old_title=data['title'])
+                    save_image(self.gui.main.database, data, old_title=data['title'])
                 elif data['type'] == 'video':
-                    self.gui.main.save_video(data, old_title=data['title'])
+                    save_video(self.gui.main.database, data, old_title=data['title'])
                 elif data['type'] == 'web':
-                    self.gui.main.save_web_item(data, old_title=data['title'])
+                    save_web_item(self.gui.main.database, data, old_title=data['title'])
 
         for item in items:
             parent = item.parent()
@@ -4385,7 +4387,7 @@ class CustomTreeWidget(QTreeWidget):
                 items_to_delete_from_db.add((data['type'], data['file_name']))
             else:
                 items_to_delete_from_db.add((data['type'], data['title']))
-        self.gui.main.delete_items_from_db(items_to_delete_from_db)
+        delete_items_from_db(self.gui, items_to_delete_from_db)
 
         # remove each selected item from the tree
         for item in items:

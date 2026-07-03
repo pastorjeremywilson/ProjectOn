@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QHBoxLayout, QPushButton, QLabel, \
     QMessageBox, QFileDialog, QApplication
 
+from dataHandling.databaseFunctions import get_song_data, get_song_titles
 from guiElements.widgets.widgets import SimpleSplash
 
 
@@ -38,7 +39,7 @@ class OpenlyricsExport(QWidget):
         self.song_list = QListWidget()
         self.song_list.setObjectName('song_list')
         self.song_list.setFont(self.gui.standard_font)
-        for title in self.gui.main.get_song_titles():
+        for title in get_song_titles(self.gui.main.database):
             item = QListWidgetItem(title, self.song_list)
             item.setCheckState(Qt.CheckState.Unchecked)
 
@@ -112,7 +113,7 @@ class OpenlyricsExport(QWidget):
                     QApplication.processEvents()
                     counter += 1
 
-                    song_data = self.gui.main.get_song_data(title)
+                    song_data = get_song_data(self.gui.main.database, title)
 
                     song = ElementTree.Element('song')
                     song.set('xmlns', 'http://openlyrics.info/namespace/2009/song')

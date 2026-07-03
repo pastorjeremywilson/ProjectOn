@@ -12,6 +12,8 @@ from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabe
     QApplication, QTreeWidgetItem
 
 from dataHandling import parsers, declarations
+from dataHandling.databaseFunctions import get_all_songs, get_all_custom_slides, get_all_images, get_all_videos, \
+    get_all_web, get_folders, save_image, save_video, save_web_item
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
 from guiElements.widgets.editWidget import EditWidget
 from dataHandling.getScripture import GetScripture
@@ -605,8 +607,8 @@ class MediaWidget(QTabWidget):
         with all of the songs.
         """
         self.song_list.clear()
-        all_songs = self.gui.main.get_all_songs()
-        all_folders = self.gui.main.get_folders('song')
+        all_songs = get_all_songs(self.gui.main.database)
+        all_folders = get_folders(self.gui.main.database, 'song')
 
         pixmap = QPixmap('resources/gui_icons/song_icon.svg')
         pixmap = pixmap.scaled(
@@ -673,8 +675,8 @@ class MediaWidget(QTabWidget):
         custom slide widget's QTreeWidget.
         """
         self.custom_list.clear()
-        slides = self.gui.main.get_all_custom_slides()
-        all_folders = self.gui.main.get_folders('custom')
+        slides = get_all_custom_slides(self.gui.main.database)
+        all_folders = get_folders(self.gui.main.database, 'custom')
 
         pixmap = QPixmap('resources/gui_icons/custom_slide_icon.svg')
         pixmap = pixmap.scaled(
@@ -709,8 +711,8 @@ class MediaWidget(QTabWidget):
         image widget's QTreeWidget.
         """
         self.image_list.clear()
-        all_images = self.gui.main.get_all_images()
-        all_folders = self.gui.main.get_folders('images')
+        all_images = get_all_images(self.gui.main.database)
+        all_folders = get_folders(self.gui.main.database, 'images')
 
         # first, create the folders the image slides belong to
         folder_items = {}
@@ -741,8 +743,8 @@ class MediaWidget(QTabWidget):
         in the video widget's QListWidget.
         """
         self.video_list.clear()
-        all_videos = self.gui.main.get_all_videos()
-        all_folders = self.gui.main.get_folders('videos')
+        all_videos = get_all_videos(self.gui.main.database)
+        all_folders = get_folders(self.gui.main.database, 'videos')
 
         # first, create the folders the image slides belong to
         folder_items = {}
@@ -772,8 +774,8 @@ class MediaWidget(QTabWidget):
         web widget's QListWidget.
         """
         self.web_list.clear()
-        all_web = self.gui.main.get_all_web()
-        all_folders = self.gui.main.get_folders('web')
+        all_web = get_all_web(self.gui.main.database)
+        all_folders = get_folders(self.gui.main.database, 'web')
 
         # first, create the folders the image slides belong to
         folder_items = {}
@@ -961,7 +963,7 @@ class MediaWidget(QTabWidget):
                 data['title'] = file_name
                 data['background'] = pixmap
                 data['folder'] = ''
-                self.gui.main.save_image(data)
+                save_image(self.gui.main.database, data)
 
                 # create the new image item in the image_list
                 pixmap = data['background'].scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
@@ -1085,9 +1087,9 @@ class MediaWidget(QTabWidget):
         data['title'] = title
         data['url'] = url
         if old_title:
-            self.gui.main.save_web_item(data, old_title)
+            save_web_item(self.gui.main.database, data, old_title)
         else:
-            self.gui.main.save_web_item(data)
+            save_web_item(self.gui.main.database, data)
         self.populate_web_list()
 
     def add_video(self):
@@ -1224,7 +1226,7 @@ class MediaWidget(QTabWidget):
         pixmap_icon = data['background'].scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
 
         self.video_list.add_item(title, data, item_pixmap=pixmap_icon)
-        self.gui.main.save_video(data)
+        save_video(self.gui.main.database, data)
 
         QMessageBox.information(
             self.gui.main_window,

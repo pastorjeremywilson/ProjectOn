@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit
     QMessageBox, QDialog, QFileDialog, QCheckBox
 from cryptography.fernet import Fernet
 
+from dataHandling.databaseFunctions import save_song
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
 from guiElements.widgets.widgets import SimpleSplash
 
@@ -412,7 +413,7 @@ class SongselectImport(QDialog):
             Qt.TransformationMode.SmoothTransformation
         )
 
-        self.gui.main.save_song(song_data)
+        save_song(self.gui.main.database, song_data)
         self.gui.media_widget.song_list.add_item(song_data['title'], song_data, pixmap)
 
         self.gui.media_widget.song_list.setCurrentItem(

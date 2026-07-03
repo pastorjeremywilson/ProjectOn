@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QLineEdit, QWidget, QHBoxLayout, \
     QPushButton, QRadioButton, QButtonGroup
 
+from dataHandling.databaseFunctions import save_song, get_song_titles
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
 from dataHandling.parsers import parse_song_data
 from guiElements.widgets.widgets import SimpleSplash
@@ -330,7 +331,7 @@ class Importers:
                 self.save_song(data)
 
     def save_song(self, song_data: dict):
-        if song_data['title'] in self.gui.main.get_song_titles():
+        if song_data['title'] in get_song_titles(self.gui.main.database):
             dialog = QDialog(self.gui.main_window)
             dialog.setLayout(QVBoxLayout())
             dialog.setWindowTitle('Song Title Exists')
@@ -371,7 +372,7 @@ class Importers:
 
         save_widget = SimpleSplash(self.gui, 'Saving...')
 
-        self.gui.main.save_song(song_data)
+        save_song(self.gui.main.database, song_data)
         self.gui.media_widget.populate_song_list()
 
         self.gui.media_widget.song_list.setCurrentItem(

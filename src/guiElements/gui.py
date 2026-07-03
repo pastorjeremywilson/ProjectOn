@@ -5,17 +5,15 @@ import re
 import shutil
 import sys
 import tempfile
-import time
 from datetime import datetime
 from os.path import exists
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QUrl, QTimer, QSizeF, QRect, QByteArray, QBuffer, QIODevice, \
-    QSize, QCoreApplication, QPoint
-from PyQt5.QtGui import QFont, QPixmap, QColor, QIcon, QKeySequence, QTextDocument, QScreen, QPainter
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRect, QByteArray, QBuffer, QIODevice, QSize
+from PyQt5.QtGui import QFont, QPixmap, QIcon, QKeySequence, QTextDocument, QScreen, QPainter
+from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile, QWebEngineSettings
+from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineProfile
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
     QGraphicsView, QGraphicsScene, QTextEdit, QApplication, QTreeWidgetItem
@@ -31,9 +29,9 @@ from guiElements.widgets.mediaWidget import MediaWidget
 from guiElements.widgets.oosWidget import OOSWidget
 from importExport.openlyricsExport import OpenlyricsExport
 from guiElements.widgets.previewWidget import PreviewWidget
-from core.runnables import TimedPreviewUpdate, SlideAutoPlay, CountdownTimer
+from core.runnables import CountdownTimer
 from guiElements.widgets.widgets import Toolbar, IndexedSettingsWidget, CustomMainWindow, DisplayWidget, \
-    LyricDisplayWidget, StandardItemWidget, CountdownWidget
+    StandardItemWidget, CountdownWidget
 from importExport.songselectImport import SongselectImport
 
 
@@ -141,8 +139,6 @@ class GUI(QObject):
         self.main.app.processEvents()
         self.main.check_db(self.main.database)
 
-        self.main.get_song_titles()
-
         self.main.update_status_signal.emit('Indexing Images', 'status')
         self.main.app.processEvents()
 
@@ -201,6 +197,7 @@ class GUI(QObject):
             self.display_widget.show()
 
         self.check_update()
+        print(self.main.database)
 
     def check_files(self):
         if 'linux' in sys.platform:

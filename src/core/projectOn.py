@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.022
+ProjectOn v.1.10.0.023
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import base64
 import threading
 import json
-import logging
 import os.path
 import shutil
 import socket
@@ -36,14 +35,11 @@ from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
     QByteArray, QBuffer, QIODevice, qInstallMessageHandler
-from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
-from PyQt5.QtMultimedia import QMediaPlayer
+from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
-    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction, QTreeWidgetItem
+    QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
 
-from dataHandling.declarations import SLIDE_DATA_DEFAULTS, SQL_COLUMN_TO_DICTIONARY_SONG, \
-    SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN, SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN, DB_STRUCTURE, SLIDE_DATA_DATA_TYPES, \
-    SQL_COLUMN_TO_DICTIONARY_CUSTOM
+from dataHandling.declarations import DB_STRUCTURE
 from guiElements.gui import GUI
 from core.runnables import SaveSettings, ServerCheckTimer
 from guiElements.widgets.widgets import SimpleSplash, StandardItemWidget
@@ -82,7 +78,7 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.10.0.022'
+        self.version = 'v.1.10.0.023'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
@@ -378,7 +374,7 @@ class ProjectOn(QObject):
 
         return True
 
-    def get_all_songs(self) -> list[str]:
+    '''def get_all_songs(self) -> list[str]:
         """
         Retrieves all song data from the ProjectOn database's 'songs' table
         :return: list[str]: all songs and their data
@@ -1070,7 +1066,7 @@ class ProjectOn(QObject):
         except Exception:
             self.error_log()
             if connection:
-                connection.close()
+                connection.close()'''
 
     def save_settings(self):
         """

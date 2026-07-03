@@ -8,6 +8,7 @@ from xml.etree import ElementTree as ET
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QLineEdit, QPushButton, QProgressBar, \
     QFileDialog, QMessageBox, QDialog
 
+from dataHandling.databaseFunctions import save_song
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
 from dataHandling.parsers import parse_song_data
 
@@ -129,7 +130,7 @@ class OpenLPImport:
                 data['verse_order'] = verse_order
                 data['text'] = self.convert_lyrics(song[3])
 
-                self.gui.main.save_song(data)
+                save_song(self.gui.main.database, data)
 
             self.gui.media_widget.populate_song_list()
             self.widget.done(0)

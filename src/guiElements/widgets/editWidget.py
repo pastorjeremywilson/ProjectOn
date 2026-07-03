@@ -13,6 +13,8 @@ from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, 
     QMenu, QAction, QTreeWidget, QTreeWidgetItem, QApplication
 
 from dataHandling import parsers
+from dataHandling.databaseFunctions import get_audio_clip_names, save_audio, copy_image, save_song, get_song_titles, \
+    get_custom_titles, save_custom
 from dataHandling.parsers import parse_song_data
 from guiElements.widgets.formattableTextEdit import FormattableTextEdit
 from guiElements.widgets.widgets import StandardItemWidget, PrintDialog, SimpleSplash, NewFontWidget
@@ -376,7 +378,7 @@ class EditWidget(QDialog):
             self.audio_combobox.setFont(self.gui.standard_font)
             audio_layout.addWidget(self.audio_combobox)
             audio_layout.addSpacing(20)
-            results = self.gui.main.get_audio_clip_names()
+            results = get_audio_clip_names(self.gui.main.database)
             self.audio_combobox.addItem('Choose an Audio File')
             for result in results:
                 self.audio_combobox.addItem(result[0])
@@ -810,7 +812,7 @@ class EditWidget(QDialog):
         try:
             with open(file_name, 'rb') as file:
                 audio_data = file.read()
-            result = self.gui.main.save_audio(name, audio_format, audio_data)
+            result = save_audio(self.gui.main.database, name, audio_format, audio_data)
             if result == -2:
                 QMessageBox.information(
                     self,
@@ -1384,7 +1386,7 @@ class EditWidget(QDialog):
         if len(file[0]) > 0:
             file_split = file[0].split('/')
             file_name = file_split[len(file_split) - 1]
-            self.gui.main.copy_image(file[0])
+            copy_image(self.gui.main.background_dir, file[0])
         self.background_image_radio_button.setChecked(True)
 
     def add_tag(self):
@@ -1680,7 +1682,7 @@ class EditWidget(QDialog):
         self.update_song_data()
         if self.new_item:
             # make sure this title doesn't already exist; prompt for new title if it does
-            if self.title_line_edit.text() in self.gui.main.get_song_titles():
+            if self.title_line_edit.text() in get_song_titles(self.gui.main.database):
                 dialog = QDialog(self.gui.main_window)
                 dialog.setLayout(QVBoxLayout())
                 dialog.setWindowTitle('Song Title Exists')
@@ -1719,7 +1721,7 @@ class EditWidget(QDialog):
 
         save_widget = SimpleSplash(self.gui, 'Saving...', parent=self)
 
-        self.gui.main.save_song(self.data, self.old_title)
+        save_song(self.gui.main.database, self.data, self.old_title)
 
         # create an item or change the data of an existing item in the media widget's song list item for this song
         if self.new_item:
@@ -1766,7 +1768,7 @@ class EditWidget(QDialog):
 
         if self.new_item:
             # make sure this title doesn't already exist; prompt for new title if it does
-            if self.title_line_edit.text() in self.gui.main.get_custom_titles():
+            if self.title_line_edit.text() in get_custom_titles(self.gui.main.database):
                 dialog = QDialog(self.gui.main_window)
                 dialog.setLayout(QVBoxLayout())
                 dialog.setWindowTitle('Custom Slide Title Exists')
@@ -1805,7 +1807,7 @@ class EditWidget(QDialog):
                     return
 
         self.save_widget = SimpleSplash(self.gui, 'Saving...')
-        self.gui.main.save_custom(self.data, self.old_title)
+        save_custom(self.gui.main.database, self.data, self.old_title)
 
         # create an item or change the data of an existing item in the media widget's custom list item for this custom slide
         if self.new_item:
