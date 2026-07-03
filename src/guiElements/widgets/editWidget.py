@@ -192,21 +192,21 @@ class EditWidget(QDialog):
             lyrics_toggle.released.connect(self.toggle_lyrics)
             lyrics_header_layout.addWidget(lyrics_toggle, 1, 0, Qt.AlignmentFlag.AlignLeft)
 
-            add_lyrics_label = QLabel('Add lyrics')
-            add_lyrics_label.setFont(self.gui.standard_font)
-            add_lyrics_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-            lyrics_header_layout.addWidget(add_lyrics_label, 0, 1, Qt.AlignmentFlag.AlignRight)
+            self.add_lyrics_label = QLabel('Add lyrics')
+            self.add_lyrics_label.setFont(self.gui.standard_font)
+            self.add_lyrics_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+            lyrics_header_layout.addWidget(self.add_lyrics_label, 0, 1, Qt.AlignmentFlag.AlignRight)
 
-            add_lyrics_button = QPushButton()
-            add_lyrics_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
-            add_lyrics_button.setToolTip('Add a block of lyrics')
-            add_lyrics_button.clicked.connect(self.add_lyrics_block)
-            lyrics_header_layout.addWidget(add_lyrics_button, 1, 1, Qt.AlignmentFlag.AlignRight)
+            self.add_lyrics_button = QPushButton()
+            self.add_lyrics_button.setIcon(QIcon('resources/gui_icons/add_icon.svg'))
+            self.add_lyrics_button.setToolTip('Add a block of lyrics')
+            self.add_lyrics_button.clicked.connect(self.add_lyrics_block)
+            lyrics_header_layout.addWidget(self.add_lyrics_button, 1, 1, Qt.AlignmentFlag.AlignRight)
 
-            help_label = QLabel('Hint: Double click a lyric block to edit it')
-            help_label.setObjectName('help_label')
-            help_label.setFont(self.gui.standard_font)
-            lyrics_header_layout.addWidget(help_label, 2, 0)
+            self.help_label = QLabel('Hint: Double click a lyric block to edit it')
+            self.help_label.setObjectName('help_label')
+            self.help_label.setFont(self.gui.standard_font)
+            lyrics_header_layout.addWidget(self.help_label, 2, 0)
 
         if self.type == 'song':
             lyrics_layout.setRowStretch(0, 1)
@@ -335,6 +335,12 @@ class EditWidget(QDialog):
             ending_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             ending_button.clicked.connect(self.add_tag)
             toolbar_layout.addWidget(ending_button)
+
+            tag_help_label = QLabel('Hint: Right-click on a tag in your lyrics to remove it')
+            tag_help_label.setObjectName('help_label')
+            tag_help_label.setFont(self.gui.standard_font)
+            toolbar_layout.addWidget(tag_help_label)
+
             toolbar_layout.addStretch()
 
         self.preview_label_one = QLabel()
@@ -632,6 +638,9 @@ class EditWidget(QDialog):
             self.song_order_list_widget.hide()
             self.preview_label_one.hide()
             self.preview_label_two.hide()
+            self.add_lyrics_label.hide()
+            self.add_lyrics_button.hide()
+            self.help_label.hide()
             self.tool_bar.show()
         else:
             self.data['text'] = self.get_simplified_text(self.lyrics_text_edit.text_edit.toHtml())
@@ -645,6 +654,9 @@ class EditWidget(QDialog):
             self.song_order_list_widget.show()
             self.preview_label_one.show()
             self.preview_label_two.show()
+            self.add_lyrics_label.show()
+            self.add_lyrics_button.show()
+            self.help_label.show()
 
     def background_combobox_change(self):
         self.background_button_group.button(3).setChecked(True)
@@ -663,6 +675,8 @@ class EditWidget(QDialog):
         painter = QPainter()
 
         self.data['parsed_text'] = {}
+        if self.lyrics_list_widget.currentIndex().data(Qt.ItemDataRole.UserRole) is None:
+            return
         self.data['parsed_text']['text'] = self.lyrics_list_widget.currentIndex().data(Qt.ItemDataRole.UserRole)[1]
         shade_rect = 0
         footer_height = 0

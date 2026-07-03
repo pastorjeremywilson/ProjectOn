@@ -8,6 +8,13 @@ General Theme Colors:
     Disabled: #505052
 */
 
+/*-------------------- lyrics_text_edit --------------------*/
+QWidget[objectName="lyrics_text_edit"] {
+    background: #f0f0f2;
+    color: #000000;
+    border: 1px solid #aaaaff;
+}
+
 /*-------------------- edit_main_widget --------------------*/
 QWidget[objectName="edit_main_widget"] {
     background: #ffffff;
@@ -496,7 +503,7 @@ QTabWidget::pane {
 }
 
 /*-------------------- QTextEdit --------------------*/
-QTextEdit {
+QTextEdit, CustomTextEdit {
     background: white;
     color: #000000;
     border: 1px solid #f0f0f2;

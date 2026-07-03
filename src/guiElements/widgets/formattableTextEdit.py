@@ -52,7 +52,8 @@ class FormattableTextEdit(QWidget):
 
         layout.addWidget(button_widget)
 
-        self.text_edit = CustomTextEdit()
+        self.text_edit = CustomTextEdit(lyrics_text_edit=True)
+        self.text_edit.setObjectName('lyrics_text_edit')
         self.text_edit.setFont(self.gui.standard_font)
         self.text_edit.cursorPositionChanged.connect(self.set_style_buttons)
         self.text_edit.selectionChanged.connect(self.set_style_buttons)
@@ -224,52 +225,20 @@ class CustomTextEdit(QTextEdit):
 
             if '[' in text and ']' in text:
                 menu = QMenu()
-                if self.gui.main.settings['theme'] == 'dark':
-                    menu.setStyleSheet(
-                        'QMenu {'
-                        'background: #000000;'
-                        'color: #e0e0e0;'
-                        '}'
-                        'QMenu::item {'
-                        'background: #000000;'
-                        'color: #e0e0e0;'
-                        '}'
-                        'QMenu::item:hover {'
-                        'background: #555588;'
-                        '}'
-                        'QMenu::item:selected {'
-                        'background: #444466;'
-                        '}'
-                        'QMenu::item:pressed {'
-                        'background: #444466;'
-                        '}'
-                    )
-                else:
-                    menu.setStyleSheet(
-                        'QMenu {'
-                        'background: #f0f0f0;'
-                        'color: #000000;'
-                        '}'
-                        'QMenu::item {'
-                        'background: #f0f0f0;'
-                        'color: #000000;'
-                        '}'
-                        'QMenuBar::item:hover {'
-                        'background: #aaaaff;'
-                        '}'
-                        'QMenu::item:selected {'
-                        'background: #aaaaff;'
-                        '}'
-                        'QMenu::item:pressed {'
-                        'background: #aaaaff;'
-                        '}'
-                    )
 
                 remove_tag_action = QAction('Remove Tag')
                 remove_tag_action.triggered.connect(lambda: self.remove_tag(cursor))
                 menu.addAction(remove_tag_action)
 
                 menu.exec(self.mapToGlobal(self.click_pos))
+            else:
+                menu = self.createStandardContextMenu()
+                if menu:
+                    menu.exec(self.cursor().pos())
+        else:
+            menu = self.createStandardContextMenu()
+            if menu:
+                menu.exec(self.cursor().pos())
 
     def remove_tag(self, cursor: QTextCursor):
         if self.objectName() == 'lyrics_text_edit':

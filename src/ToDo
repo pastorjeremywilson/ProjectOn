@@ -22,8 +22,10 @@ Done:
     Avoid auto-fit text when parsing scripture and songs
     Window title file name not correct
     Save font weight in settings/saved service so that finding closest matching font will be more accurate
+    Darken background of QTextEdit in editor/all lyrics in light theme
+    Remove "add lyrics" from editor when editing all lyrics and hint: double-click
 
 To Do:
-
+    
 Future Releases:
     Video backgrounds

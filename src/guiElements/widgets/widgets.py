@@ -1796,7 +1796,6 @@ class NewFontWidget(QWidget):
         self.font_sample.repaint()
 
     def change_font_sample(self):
-        print('NewFontWidget.change_font_sample called')
         if self.font_face_combobox.currentText():
             font_name = self.font_face_combobox.currentText()
         else:
@@ -1886,7 +1885,6 @@ class NewFontWidget(QWidget):
                 int(lyrics_rect.height() + 40)
             )
         )
-        print('NewFontWidget.change_font_sample: setting pixmap')
         self.font_sample.setPixmap(cropped_pixmap)
 
     def color_chooser(self):
