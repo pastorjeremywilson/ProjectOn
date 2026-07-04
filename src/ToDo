@@ -24,10 +24,10 @@ Done:
     Save font weight in settings/saved service so that finding closest matching font will be more accurate
     Darken background of QTextEdit in editor/all lyrics in light theme
     Remove "add lyrics" from editor when editing all lyrics and hint: double-click
-
-To Do:
     Test adding and removing all media types
     Test import/export
+
+To Do:
     
 Future Releases:
     Video backgrounds

@@ -1,3 +1,4 @@
+import json
 import os
 import re
 from xml.etree import ElementTree
@@ -129,21 +130,21 @@ class OpenlyricsExport(QWidget):
 
                     authors = ElementTree.SubElement(properties, 'authors')
                     author = ElementTree.SubElement(authors, 'author')
-                    author.text = song_data[1]
+                    author.text = song_data['author']
 
                     copyright = ElementTree.SubElement(properties, 'copyright')
-                    copyright.text = song_data[2]
+                    copyright.text = song_data['copyright']
 
                     verse_order = ElementTree.SubElement(properties, 'verseOrder')
-                    verse_order.text = song_data[5]
+                    verse_order.text = song_data['verse_order']
 
                     ccli_number = ElementTree.SubElement(properties, 'ccliNo')
-                    ccli_number.text = song_data[3]
+                    ccli_number.text = song_data['ccli_song_number']
 
                     lyrics = ElementTree.SubElement(song, 'lyrics')
 
-                    if '[' in song_data[4]:
-                        lyric_split = song_data[4].split('[')
+                    if '[' in song_data['text']:
+                        lyric_split = song_data['text'].split('[')
                         for segment in lyric_split:
                             if len(segment) > 0:
                                 tag_split = segment.split(']')

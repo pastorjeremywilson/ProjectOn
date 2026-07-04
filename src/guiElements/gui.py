@@ -983,7 +983,11 @@ class GUI(QObject):
         text_edit = QTextEdit()
         text_edit.setFont(self.standard_font)
         text_edit.setReadOnly(True)
-        text_edit.setHtml(self.web_engine_page.messages)
+        if self.web_engine_page and self.web_engine_page.messages:
+            messages = self.web_engine_page.messages
+        else:
+            messages = 'No Web Page Messages'
+        text_edit.setHtml(messages)
         layout.addWidget(text_edit)
 
         button_widget = QWidget()

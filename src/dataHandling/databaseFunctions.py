@@ -308,7 +308,7 @@ def get_audio_clip_names(database) -> list[str] | int:
         return -1
 
 
-def get_audio_data(database: str, name: str) -> list[str] | int:
+def get_audio_data(database: str, name: str) -> tuple[QByteArray, str] | int:
     """
     Retrieves all the audio data for the given audio clip
     :param str database: string path to the database

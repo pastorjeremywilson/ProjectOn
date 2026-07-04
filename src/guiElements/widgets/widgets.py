@@ -3,15 +3,16 @@ import re
 import shutil
 import sqlite3
 import sys
+import tempfile
 from os.path import exists
 
 import requests
 from PyQt5 import sip
-from PyQt5.QtCore import Qt, QSize, QEvent, QMargins, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF, QTime, \
+from PyQt5.QtCore import Qt, QSize, QEvent, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF, QTime, \
     QModelIndex, QObject, QByteArray, QBuffer, QIODevice, QUrl
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics, QFocusEvent, QMouseEvent, QResizeEvent, \
-    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent, QMoveEvent, QShowEvent, QFontInfo
+    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent, QFontInfo
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem, QVideoWidget
 from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
@@ -319,7 +320,20 @@ class DisplayWidget(QStackedWidget):
         media_player.setVideoOutput(video_widget)
 
         def media_error(err):
-            QMessageBox.information(self.gui.main_window, f'Media Error', 'Unable to play video:\n{err}',
+            detailed_message = media_player.errorString()
+            meta_object = media_player.metaObject()
+            enum_index = meta_object.indexOfEnumerator("Error")
+            meta_enum = meta_object.enumerator(enum_index)
+            error_enum_name = meta_enum.valueToKey(err)
+            if not error_enum_name:
+                error_enum_name = "UnknownError"
+
+            error_text = (
+                f"Unable to play media.\n\n"
+                f"Error Code: {err} ({error_enum_name})\n"
+                f"Details: {detailed_message}"
+            )
+            QMessageBox.information(self.gui.main_window, 'Media Error', error_text,
                                     QMessageBox.StandardButton.Ok)
         media_player.error.connect(media_error)
 
@@ -336,7 +350,8 @@ class DisplayWidget(QStackedWidget):
         def position_changed(position):
             if media_player.state() == QMediaPlayer.StoppedState and position > 0:
                 position = 0
-            self.gui.live_widget.seek_slider.setValue(position)
+            if not self.gui.live_widget.seek_slider.isSliderDown():
+                self.gui.live_widget.seek_slider.setValue(position)
             total_seconds = position // 1000
             hours = total_seconds // 3600
             minutes = (total_seconds // 60) % 60
@@ -433,8 +448,7 @@ class DisplayWidget(QStackedWidget):
             # start playing audio if this is a custom slide with audio, but only if audio isn't already playing
             if (item_data['type'] == 'custom'
                     and item_data['audio_file']
-                    and len(item_data['audio_file']) > 0
-                    and not self.media_player):
+                    and len(item_data['audio_file']) > 0):
                 audio_data = get_audio_data(self.gui.main.database, item_data['audio_file'])
                 if audio_data == -2:
                     QMessageBox.critical(
@@ -452,11 +466,14 @@ class DisplayWidget(QStackedWidget):
                         QMessageBox.StandardButton.Ok
                     )
                 else:
-                    byte_array = QByteArray(audio_data[0])
-                    audio_buffer = QBuffer()
-                    audio_buffer.setData(byte_array)
-                    audio_buffer.open(QIODevice.ReadOnly)
-                    self.media_player.setMedia(QMediaContent(), self.audio_buffer)
+                    # instead of passing a QBuffer to the media player, use a tempfile instead
+                    self.temp_audio_file = tempfile.NamedTemporaryFile(delete=False,
+                                                                       suffix=f'.{audio_data[1]}')
+                    self.temp_audio_file.write(audio_data[0])
+                    self.temp_audio_file.flush()
+                    self.temp_audio_file.close()
+                    file_url = QUrl.fromLocalFile(self.temp_audio_file.name)
+                    self.media_player.setMedia(QMediaContent(file_url))
 
                     if item_data['loop_audio'] is True:
                         def repeat_media():
@@ -466,7 +483,7 @@ class DisplayWidget(QStackedWidget):
                         self.media_player.mediaStatusChanged.connect(repeat_media)
                     else:
                         self.media_player.stateChanged.connect(self.media_playing_change)
-
+                    print('playing')
                     self.media_player.play()
 
             # cycle through text paragraphs if auto-play is enabled for this custom slide
@@ -981,7 +998,10 @@ class LyricDisplayWidget(QWidget):
                 self.gui.main.settings[f'{slide_type}_font_face'],
                 self.gui.main.settings[f'{slide_type}_font_size']
             )
-            font.setWeight(self.gui.main.settings[f'{slide_type}_font_weight'])
+            if 'font_weight' in slide_data.keys() and slide_data['font_weight'] is not None:
+                font.setWeight(slide_data['font_weight'])
+            else:
+                font.setWeight(0)
 
             fill_color = get_qcolor_from_str(
                 self.gui.main, self.gui.main.settings[f'{slide_type}_font_color'], slide_type)

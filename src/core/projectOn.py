@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.0.023
+ProjectOn v.1.10.0.024
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -78,7 +78,7 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.10.0.023'
+        self.version = 'v.1.10.0.024'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
@@ -101,6 +101,8 @@ class ProjectOn(QObject):
 
         if sys.platform == 'win32':
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
+        elif sys.platform == 'linux':
+            os.environ["QT_GST_ALLOW_VIDEO_OVERLAY"] = "0"
 
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
         QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
