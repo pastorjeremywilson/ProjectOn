@@ -231,32 +231,32 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
     # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
     # that needs to be parsed into verses and their corresponding verse numbers
     if type(text) is str:
+        # start by finding the verse numbers in the text
         verse_numbers = []
-        skip_next = False
+        adding_numbers = False
+        current_number = ''
         for i in range(len(text)):
-            if text[i].isnumeric() and not skip_next:
-                verse_number = text[i]
-                if i < len(text) - 1 and text[i + 1].isnumeric():
-                    verse_number += text[i + 1]
-                    skip_next = True
-                verse_numbers.append(verse_number)
-            else:
-                skip_next = False
+            if text[i].isnumeric():
+                adding_numbers = True
+            elif adding_numbers:
+                verse_numbers.append(current_number)
+                current_number = ''
+                adding_numbers = False
 
-        text_split = []
-        for i in range(len(verse_numbers)):
-            verse_index = text.index(verse_numbers[i])
-            number_length = len(verse_numbers[i])
-            if i < len(verse_numbers) - 1:
-                text_split.append(
-                    [
-                        verse_numbers[i],
-                        text[verse_index + number_length:text.index(verse_numbers[i + 1])]
-                    ]
-                )
-            else:
-                text_split.append([verse_numbers[i], text[verse_index + number_length:]])
-        text: list[str] = text_split
+            if adding_numbers:
+                current_number += text[i]
+
+        # pick out the text between those verse numbers
+        split_text = []
+        for i in range(len(verse_numbers) - 1):
+            pattern = f'{verse_numbers[i]}.*?{verse_numbers[i + 1]}'
+            text_portion = re.findall(pattern, text)[0]
+            text_portion = text_portion.replace(verse_numbers[i], '').replace(verse_numbers[i + 1], '').strip()
+            split_text.append([verse_numbers[i], text_portion])
+
+        # add the text after the last verse number
+        split_text.append([verse_numbers[-1], text.split(verse_numbers[-1])[1].strip()])
+        text = split_text
 
     # clear the text of the lyric widget and instantiate a painter that will allow calculating the text height
     lyrics_rect = QRect(0, 0, 0, 0)
