@@ -26,6 +26,10 @@ Done:
     Remove "add lyrics" from editor when editing all lyrics and hint: double-click
     Test adding and removing all media types
     Test import/export
+    Fix automatic font scaling in QFont when Windows display scaling is being used
+    Fix parsing foul-up when single verse overflows
+    Fix line spacing too big when adjusting font size
+    Fix in-verse number appearing in preview/live slide title
 
 To Do:
     

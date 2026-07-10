@@ -968,8 +968,13 @@ class LyricDisplayWidget(QWidget):
 
     def set_font(self, slide_data):
         if 'override_global' in slide_data.keys() and slide_data['override_global']:
-            # use all of the relevent font data stored in slide_data
-            font = QFont(slide_data['font_family'], slide_data['font_size'])
+            # first, convert the stored point size of the font to pixel size in order to avoid any system scaling
+            font_pixel_size = round((slide_data['font_size'] * 96) / 72.0)
+
+            # use all the relevant font data stored in slide_data
+            font = QFont(slide_data['font_family'])
+            font.setPixelSize(font_pixel_size)
+
             if 'font_weight' in slide_data.keys() and slide_data['font_weight'] is not None:
                 font.setWeight(slide_data['font_weight'])
             else:
@@ -994,10 +999,10 @@ class LyricDisplayWidget(QWidget):
                 slide_type = 'bible'
 
             # Set the main font face, size, and color
-            font = QFont(
-                self.gui.main.settings[f'{slide_type}_font_face'],
-                self.gui.main.settings[f'{slide_type}_font_size']
-            )
+            # first, convert the stored point size of the font to pixel size in order to avoid any system scaling
+            font_pixel_size = round((self.gui.main.settings[f'{slide_type}_font_size'] * 96) / 72.0)
+            font = QFont(self.gui.main.settings[f'{slide_type}_font_face'])
+            font.setPixelSize(font_pixel_size)
             if 'font_weight' in slide_data.keys() and slide_data['font_weight'] is not None:
                 font.setWeight(slide_data['font_weight'])
             else:
@@ -1248,6 +1253,7 @@ class LyricDisplayWidget(QWidget):
 
             painter.drawPixmap(x, y, scaled_pixmap)
 
+        # remove/convert any remaining html tags from the text
         text = re.sub('<p.*?>', '', text)
         text = re.sub('</p>', '', text)
         text = re.sub('\n', '<br />', text)
@@ -1258,7 +1264,9 @@ class LyricDisplayWidget(QWidget):
         painter.setBrush(brush)
         pen = QPen(fill_color)
         painter.setPen(pen)
-        footer_font = QFont(font.family(), self.gui.main.settings['footer_font_size'])
+        footer_font_pixel_size = round((self.gui.main.settings['footer_font_size'] * 96) / 72.0)
+        footer_font = QFont(font.family())
+        footer_font.setPixelSize(round(footer_font_pixel_size))
         painter.setFont(footer_font)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         font_metrics = QFontMetrics(footer_font)
@@ -1320,14 +1328,14 @@ class LyricDisplayWidget(QWidget):
             self.gui.display_widget.height() - footer_height - font_metrics.height()
         )
 
-        # create paths for each of the lines, splitting the line if it's too long for the usable rect
+        # create paths for each of the lines, shrinking the font if the paths are too big for the usable rect
         lines = text.split('<br />')
         painter_paths = []
         painter.setFont(font)
-        font_metrics = QFontMetrics(font)
-        space_width = font_metrics.horizontalAdvance(' ')
-        line_height = font_metrics.height()
         while True:
+            font_metrics = QFontMetrics(font)
+            line_height = font_metrics.height()
+            space_width = font_metrics.horizontalAdvance(' ')
             for i in range(len(lines)):
                 line_words = lines[i].split(' ')
                 if len(line_words) == 0:
@@ -1375,8 +1383,9 @@ class LyricDisplayWidget(QWidget):
             if auto_fit:
                 if ((total_height + font_metrics.descent() + 40 > usable_rect.height()
                         or longest_line + 80 > usable_rect.width())
-                        and font.pointSize() > 24):
-                    font.setPointSize(font.pointSize() - 2)
+                        and font.pixelSize() > 24):
+                    font.setPixelSize(font.pixelSize() - 4)
+                    painter_paths = []
                 else:
                     break
             else:

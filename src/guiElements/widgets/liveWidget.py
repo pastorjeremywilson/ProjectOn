@@ -1,3 +1,5 @@
+import json
+
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtGui import QIcon, QKeyEvent
 from PyQt5.QtMultimedia import QMediaPlayer
@@ -251,6 +253,7 @@ class CustomListWidget(QListWidget):
         if self.currentItem():
             self.gui.display_widget.change_display()
             self.gui.main.remote_server.socketio.emit('change_current_slide', str(self.currentRow()))
+            data = self.currentItem().data(Qt.ItemDataRole.UserRole)
 
     def keyPressEvent(self, evt: QKeyEvent):
         """

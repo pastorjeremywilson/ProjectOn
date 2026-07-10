@@ -189,9 +189,12 @@ def parse_song_data(display_widget, settings: dict, song_data: dict):
 def parse_scripture_by_verse(gui, text: str | list[str]):
     """
     Take a passage of scripture and split it according to how many verses will fit on the display screen, given
-    the current font and size.
+    the current font and size. In order to be usable, text must be a list of lists in the following format:
+    [['first verse number', 'first verse text'], ['second verse number', 'second verse text'], ...]
+    Returned will be a list comprised of the verse(s) that fit on the screen.
     :param GUI gui: The current instance of GUI
     :param str | list of str text: The bible passage to be split
+    :return: list[str]
     """
     # create a slide data dict for the lyric widget drawing method to use
     slide_data = {
@@ -270,15 +273,19 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
             painter.end()
     target_height = gui.display_widget.height() - footer_height - 40
 
+    # Walk through the verses one at a time, adding a verse each time until it overflows the usable area of the slide.
+    # When it does overflow, remove the last added verse and append the verse(s) to slide_texts.
     slide_texts = []
     verses_added = 0
     parse_failed = False
     verse_index = 0
+    this_segment = ''
     while verse_index < len(text):
         # add the current verse number and verse text to the lyric widget's text
         this_verse = ' '.join(text[verse_index]).strip()
-        slide_data['parsed_text'] = f'{slide_data['parsed_text']} {this_verse}'.strip()
+        this_segment = f'{this_segment} {this_verse}'.strip()
         verses_added += 1
+        slide_data['parsed_text'] = this_segment
 
         # repaint to the image from the lyric widget to get its current height
         try:
@@ -291,31 +298,27 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
             if verses_added == 1:
                 # just this one verse overflowed the widget, so set parse_failed and add this verse to slide_texts
                 parse_failed = True
-                slide_texts.append(this_verse)
+                slide_texts.append(this_segment)
             else:
                 # adding this verse overflowed the widget so remove this verse from the current lyric widget text,
                 # add the altered text to slide_texts, and reduce verse_index by one so that it gets added to the
                 # next set
-                this_segment = slide_data['parsed_text'].replace(this_verse, '').strip()
-                slide_texts.append(this_segment)
+                this_segment = this_segment.replace(this_verse, '').strip()
                 verse_index -= 1
-            slide_data['parsed_text'] = ''
+                slide_texts.append(this_segment)
+            this_segment = ''
             verses_added = 0
         verse_index += 1
-    slide_texts.append(slide_data['parsed_text'])
+    slide_texts.append(this_segment)
 
-    # show an error message should parsing fail
+    # show an error message should the parsing fail
     if parse_failed:
         QMessageBox.information(
             gui.main_window,
             'Scripture parsing failed',
-            'A verse in this passage is too long to fit on the display screen. Consider decreasing the font '
-            'size or use a higher resolution display.',
+            'A verse in this passage is too long to fit on the display screen. It will be resized to fit the screen.',
             QMessageBox.StandardButton.Ok
         )
-        for verse in text:
-            if len(verse[1].strip()) > 0:
-                slide_texts.append(verse[0] + ' ' + verse[1])
 
     return slide_texts
 

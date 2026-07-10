@@ -70,8 +70,11 @@ class GetScripture:
                 if parsed_reference['chapter_end'] == parsed_reference['chapter_start']:
                     chapters = [parsed_reference['chapter_start']]
                 else:
-                    for i in range(int(parsed_reference['chapter_start']), int(parsed_reference['chapter_end']) + 1):
-                        chapters.append(str(i))
+                    try:
+                        for i in range(int(parsed_reference['chapter_start']), int(parsed_reference['chapter_end']) + 1):
+                            chapters.append(str(i))
+                    except ValueError:
+                        return (-1, 'malformed chapter number')
 
                 end_verse = 0
                 for chapter in chapters:
@@ -100,7 +103,7 @@ class GetScripture:
 
                             for child in chapter_element:
                                 try:
-                                    # if more than one chapter is involved and we're not working on the last chapter
+                                    # if more than one chapter is involved, and we're not working on the last chapter
                                     # set the end verse rediculously high so that all verses to the end of the chapter
                                     # are fetched. Also, set the start verse to 1 if we're not on the first chapter.
                                     verse_start = int(parsed_reference['verse_start'])
@@ -115,7 +118,14 @@ class GetScripture:
                                         if not chapter == chapters[0]:
                                             verse_start = 1
 
-                                    if (verse_start <= int(child.get('vnumber')) <= verse_end):
+                                    if 'vnumber' in child.keys():
+                                        child_verse_num = int(child.get('vnumber'))
+                                    elif 'vref' in child.keys():
+                                        child_verse_num = int(child.get('vref'))
+                                    else:
+                                        return (-1, 'bad key in bible xml file')
+
+                                    if (verse_start <= child_verse_num <= verse_end):
                                         verse_number = child.get('vnumber')
                                         this_verse = child.text
                                         scripture_text.append(

@@ -1397,11 +1397,11 @@ class GUI(QObject):
         if type(item) == QTreeWidgetItem:
             if not item.data(0, Qt.ItemDataRole.UserRole):
                 return
-            slide_data = item.data(0, Qt.ItemDataRole.UserRole)
+            slide_data = item.data(0, Qt.ItemDataRole.UserRole).copy()
         else:
             if not item.data(Qt.ItemDataRole.UserRole):
                 return
-            slide_data = item.data(Qt.ItemDataRole.UserRole)
+            slide_data = item.data(Qt.ItemDataRole.UserRole).copy()
 
         self.preview_widget.slide_list.clear()
         self.preview_widget.preview_label.clear()
@@ -1462,59 +1462,58 @@ class GUI(QObject):
             # find the verse range for each segment of scripture
             slide_texts = slide_data['parsed_text']
             for i in range(len(slide_texts)):
-                list_item = QListWidgetItem()
-                first_num_found = False
-                first_num = ''
-                last_num = ''
-
+                # remove any html formatting from the text
                 scripture_text = re.sub('<.*?>', '', slide_texts[i])
-                next_chapter = False
-                index = 0
-                while index < len(scripture_text): # iterate through the characters in this text to find all the numbers
-                    this_number = ''
-                    if scripture_text[index].isnumeric(): # work through the next few characters until no longer a number
-                        while scripture_text[index].isnumeric():
-                            this_number += scripture_text[index]
-                            index += 1
+                # get all numbers from this string
+                numbers = re.findall(r'\d+', scripture_text)
+                # don't add a list item if the scripture text is empty or if it doesn't contain any numbers
+                if len(scripture_text) > 0 and len(numbers) > 0:
+                    list_item = QListWidgetItem()
 
-                        if not first_num_found:
-                            first_num = this_number
-                            first_num_found = True
+                    # check that the numbers are sequential; if one is not, it's a number contained in the verse, not
+                    # a verse number
+                    next_chapter = False
+                    good_numbers = []
+                    for number in numbers:
+                        if len(good_numbers) > 0:
+                            if int(number) == int(good_numbers[-1]) + 1 or int(number) == 1:
+                                good_numbers.append(number)
+                            if int(number) == 1:
+                                next_chapter = True
                         else:
-                            last_num = this_number
+                            good_numbers.append(number)
 
-                        if i > 0 and this_number == '1':
-                            next_chapter = True
-
-                    index += 1
-
-                if next_chapter:
-                    current_chapter = str(int(current_chapter) + 1)
-
-                if last_num == '':
-                    if ':' in title:
-                        new_title = f'{book} {current_chapter}:{first_num}'
-                    else:
-                        new_title = f'{book} {first_num}'
-                else:
-                    if ':' in title:
-                        if int(first_num) > int(last_num):
-                            new_title = f'{book} {str(int(current_chapter) - 1)}:{first_num}-{current_chapter}:{last_num}'
+                    # create the slide's title based on first num and, if present, last num
+                    first_num = good_numbers[0]
+                    last_num = good_numbers[-1]
+                    if len(good_numbers) > 1:
+                        if ':' in title:
+                            if next_chapter:
+                                new_title = f'{book} {current_chapter}:{first_num}-{str(int(current_chapter) + 1)}:{last_num}'
+                            else:
+                                new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
                         else:
-                            new_title = f'{book} {current_chapter}:{first_num}-{last_num}'
+                            new_title = f'{book} {first_num}-{last_num}'
                     else:
-                        new_title = f'{book} {first_num}-{last_num}'
+                        if ':' in title:
+                            new_title = f'{book} {current_chapter}:{first_num}'
+                        else:
+                            new_title = f'{book} {first_num}'
 
-                slide_data['type'] = 'bible'
-                slide_data['title'] = new_title
-                slide_data['parsed_text'] = slide_texts[i]
-                slide_data['author'] = slide_data['author']
-                list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                    if next_chapter:
+                        current_chapter = str(int(current_chapter) + 1)
+                        next_chapter = False
 
-                lyric_widget = StandardItemWidget(self, new_title, slide_texts[i], None, True)
-                list_item.setSizeHint(lyric_widget.sizeHint())
-                self.preview_widget.slide_list.addItem(list_item)
-                self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+                    slide_data['type'] = 'bible'
+                    slide_data['title'] = new_title
+                    slide_data['parsed_text'] = slide_texts[i]
+                    slide_data['author'] = slide_data['author']
+                    list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+                    lyric_widget = StandardItemWidget(self, new_title, slide_texts[i], None, True)
+                    list_item.setSizeHint(lyric_widget.sizeHint())
+                    self.preview_widget.slide_list.addItem(list_item)
+                    self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
         elif slide_data['type'] == 'image':
             lyric_widget = StandardItemWidget(self, slide_data['title'])
@@ -1768,9 +1767,7 @@ class GUI(QObject):
         :param list[str] text: The text of the scripture passage
         :param str version: The version of the bible this passage is from
         :param bool scripture_edited: Whether this text was edited
-        :return:
         """
-
         item = QListWidgetItem()
         slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
         if scripture_edited:

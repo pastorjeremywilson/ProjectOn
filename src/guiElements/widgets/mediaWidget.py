@@ -1298,22 +1298,33 @@ class MediaWidget(QTabWidget):
         if not self.formatted_reference:
             return
 
-        passages = []
-        text_split = self.scripture_text_edit.toPlainText().split()
-        add_verse = False
-        verse_number = False
-        verse_words = []
-        for item in text_split:
-            item = item.strip()
-            if add_verse and not item.isdigit():
-                verse_words.append(item)
+        scripture_text = self.scripture_text_edit.toPlainText()
+
+        # get all numbers from this string
+        numbers = re.findall(r'\d+', scripture_text)
+        # check that the numbers are sequential; if one is not, it's a number contained in the verse, not
+        # a verse number
+        good_numbers = []
+        for number in numbers:
+            if len(good_numbers) > 0:
+                if int(number) == int(good_numbers[-1]) + 1 or int(number) == 1:
+                    good_numbers.append(number)
             else:
-                if verse_number:
-                    passages.append([verse_number, ' '.join(verse_words).strip()])
-                    verse_words = []
-                verse_number = item
-                add_verse = True
-        passages.append([verse_number, ' '.join(verse_words).strip()])
+                good_numbers.append(number)
+
+        passages = []
+        next_verse_num = 0
+        for i in range(1, len(good_numbers)):
+            this_verse_num = good_numbers[i - 1]
+            next_verse_num = good_numbers[i]
+            verse = re.findall(rf'{this_verse_num}.*?{next_verse_num}', scripture_text)[0]
+            verse = verse.replace(this_verse_num, '').replace(next_verse_num, '').strip()
+            passages.append([this_verse_num, verse])
+            text_to_remove = f'{this_verse_num} {verse}'
+            scripture_text = scripture_text.replace(text_to_remove, '').strip()
+        last_verse = re.findall(rf'{next_verse_num}.*', scripture_text)[0]
+        last_verse = last_verse.replace(next_verse_num, '').strip()
+        passages.append([next_verse_num, last_verse])
 
         reference = self.formatted_reference
         version = self.bible_selector_combobox.currentText()
