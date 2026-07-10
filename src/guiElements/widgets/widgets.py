@@ -1273,16 +1273,17 @@ class LyricDisplayWidget(QWidget):
         line_height = font_metrics.height()
         footer_height = line_height * len(footer_text)
         footer_x = 20
-        footer_y = self.gui.display_widget.height() - footer_height
+        footer_y = self.gui.display_widget.height() - footer_height - 20
 
         footer_shade_rect = QRectF(
             0,
-            footer_y - line_height,
+            footer_y,
             self.gui.display_widget.width(),
             footer_height + 20
         )
 
-        # Paint the footer text. If we're not using shade behind text or there is no footer text, set the opacity to 0
+        # Paint the footer shade rectangle. If we're not using shade behind text or there is no footer text,
+        # set the opacity to 0
         opacity = shade_opacity
         if not use_shade or len(footer_text) == 0:
             opacity = 0
@@ -1292,6 +1293,7 @@ class LyricDisplayWidget(QWidget):
         )
 
         painter.save()
+        footer_y += line_height
         for line in footer_text:
             # Create a path for this line of text
             path = QPainterPath()
