@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.11.0.rc2
+ProjectOn v.1.11.0.rc3
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -78,7 +78,7 @@ class ProjectOn(QObject):
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.11.0.rc2'
+        self.version = 'v.1.11.0.rc3'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
@@ -433,7 +433,6 @@ class ProjectOn(QObject):
                 'type': item_data['type']
             }
             if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_bible':
-                print(json.dumps(item_data, indent=4))
                 service_items[i]['text'] = item_data['parsed_text']
             elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 service_items[i]['text'] = item_data['parsed_text']
@@ -719,30 +718,24 @@ class ProjectOn(QObject):
                             self.gui.media_widget.add_song_to_service(song_items[0].clone())
 
                     elif service_dict[key]['type'] == 'bible':
-                        if not self.gui.main.get_scripture:
-                            from dataHandling.getScripture import GetScripture
-                            self.get_scripture = GetScripture(self)
-                        passages = self.get_scripture.get_passage(service_dict[key]['title'])
+                        if 'version' in service_dict[key].keys() and len(service_dict[key]['version']) > 0:
+                            self.gui.media_widget.bible_selector_combobox.setCurrentText(service_dict[key]['version'])
+                        self.gui.media_widget.scripture_text_edited = False
 
-                        if passages[0] == -1:
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Error Loading Scripture',
-                                'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
-                                QMessageBox.StandardButton.Ok
-                            )
-                        else:
-                            reference = service_dict[key]['title']
-                            version = self.gui.media_widget.bible_selector_combobox.currentText()
-                            self.gui.add_scripture_item(reference, passages[1], version, scripture_edited=False)
+                        reference = service_dict[key]['title']
+                        self.gui.media_widget.add_scripture_to_service(reference)
 
                     elif service_dict[key]['type'] == 'custom_bible':
                         try:
-                            reference = service_dict[key]['title']
+                            if 'version' in service_dict[key].keys() and len(service_dict[key]['version']) > 0:
+                                self.gui.media_widget.bible_selector_combobox.setCurrentText(service_dict[key]['version'])
+
+                            self.gui.media_widget.formatted_reference = service_dict[key]['title']
                             text = service_dict[key]['text']
                             text = ' '.join(text)
-                            version = self.gui.media_widget.bible_selector_combobox.currentText()
-                            self.gui.add_scripture_item(reference, text, version, scripture_edited=True)
+                            self.gui.media_widget.scripture_text_edit.setText(text)
+                            self.gui.media_widget.scripture_text_edited = True
+                            self.gui.media_widget.add_scripture_to_service()
                         except KeyError:
                             pass
 

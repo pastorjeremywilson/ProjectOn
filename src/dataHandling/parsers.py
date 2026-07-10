@@ -193,7 +193,7 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
     [['first verse number', 'first verse text'], ['second verse number', 'second verse text'], ...]
     Returned will be a list comprised of the verse(s) that fit on the screen.
     :param GUI gui: The current instance of GUI
-    :param str | list of str text: The bible passage to be split
+    :param str | list of str text: The bible passage to be parsed
     :return: list[str]
     """
     # create a slide data dict for the lyric widget drawing method to use
@@ -234,32 +234,7 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
     # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
     # that needs to be parsed into verses and their corresponding verse numbers
     if type(text) is str:
-        # start by finding the verse numbers in the text
-        verse_numbers = []
-        adding_numbers = False
-        current_number = ''
-        for i in range(len(text)):
-            if text[i].isnumeric():
-                adding_numbers = True
-            elif adding_numbers:
-                verse_numbers.append(current_number)
-                current_number = ''
-                adding_numbers = False
-
-            if adding_numbers:
-                current_number += text[i]
-
-        # pick out the text between those verse numbers
-        split_text = []
-        for i in range(len(verse_numbers) - 1):
-            pattern = f'{verse_numbers[i]}.*?{verse_numbers[i + 1]}'
-            text_portion = re.findall(pattern, text)[0]
-            text_portion = text_portion.replace(verse_numbers[i], '').replace(verse_numbers[i + 1], '').strip()
-            split_text.append([verse_numbers[i], text_portion])
-
-        # add the text after the last verse number
-        split_text.append([verse_numbers[-1], text.split(verse_numbers[-1])[1].strip()])
-        text = split_text
+        text = split_scripture_string(text)
 
     # clear the text of the lyric widget and instantiate a painter that will allow calculating the text height
     lyrics_rect = QRect(0, 0, 0, 0)
@@ -321,6 +296,55 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
         )
 
     return slide_texts
+
+def split_scripture_string(text):
+    """
+    Function to take a string containing bible passages with their verse numbers and return a list formatted as such:
+    [
+        ['first verse number', 'first verse text without number'],
+        ['second verse number', 'second verse text without number'],
+        ...
+    ]
+    :return: list[str]: the split passages
+    """
+    # remove any html formatting from the text
+    text = re.sub('<.*?>', '', text)
+
+    # get all numbers from this string
+    numbers = re.findall(r'\d+', text)
+
+    # check that the numbers are sequential; if one is not, it's a number contained in the verse, not
+    # a verse number
+    next_chapter = False
+    good_numbers = []
+    for number in numbers:
+        if len(good_numbers) > 0:
+            if int(number) == int(good_numbers[-1]) + 1 or int(number) == 1:
+                good_numbers.append(number)
+            if int(number) == 1:
+                next_chapter = True
+        else:
+            good_numbers.append(number)
+
+    passages = []
+    next_verse_num = 0
+    for i in range(1, len(good_numbers)):
+        this_verse_num = good_numbers[i - 1]
+        next_verse_num = good_numbers[i]
+
+        verse = re.findall(rf'{this_verse_num}.*?{next_verse_num}', text)[0]
+        verse = verse.replace(this_verse_num, '').replace(next_verse_num, '').strip()
+
+        passages.append([this_verse_num, verse])
+
+        text_to_remove = f'{this_verse_num} {verse}'
+        text = text.replace(text_to_remove, '').strip()
+
+    last_verse = re.findall(rf'{next_verse_num}.*', text)[0]
+    last_verse = last_verse.replace(next_verse_num, '').strip()
+    passages.append([next_verse_num, last_verse])
+
+    return passages
 
 def get_qcolor_from_str(main, font_color: str, slide_type: str):
     """

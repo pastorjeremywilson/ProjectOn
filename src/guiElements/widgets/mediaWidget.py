@@ -15,6 +15,7 @@ from dataHandling import parsers, declarations
 from dataHandling.databaseFunctions import get_all_songs, get_all_custom_slides, get_all_images, get_all_videos, \
     get_all_web, get_folders, save_image, save_video, save_web_item
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
+from dataHandling.parsers import split_scripture_string
 from guiElements.widgets.editWidget import EditWidget
 from dataHandling.getScripture import GetScripture
 from guiElements.widgets.widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash, CustomTreeWidget
@@ -189,9 +190,6 @@ class MediaWidget(QTabWidget):
                 self.gui.main.settings['default_bible'] = bibles[0][0]
                 self.bible_selector_combobox.setCurrentIndex(0)
                 self.gui.main.save_settings()
-                tree = ElementTree.parse(self.gui.main.settings['default_bible'])
-                root = tree.getroot()
-                name = root.attrib['biblename']
 
         self.bible_selector_combobox.currentIndexChanged.connect(self.change_bible)
         bible_selector_layout.addWidget(self.bible_selector_combobox)
@@ -228,7 +226,6 @@ class MediaWidget(QTabWidget):
 
         self.bible_search_status_label = QLabel()
         self.bible_search_status_label.setFont(QFont('Helvetica', 8))
-        fm = bible_search_label.fontMetrics()
         scripture_layout.addWidget(self.bible_search_status_label)
 
         button_widget = QWidget()
@@ -824,7 +821,7 @@ class MediaWidget(QTabWidget):
         Method that retrieves the text in the bible widget's bible_search_line_edit and runs it through GetScripture,
         placing the results in the scripture_text_edit of the bible widget.
         """
-        self.passages = None
+        passages = None
         self.formatted_reference = False
         text = self.bible_search_line_edit.text()
 
@@ -839,6 +836,16 @@ class MediaWidget(QTabWidget):
             self.gui.main.get_scripture = GetScripture(self.gui.main)
 
         self.scripture_text_edit.clear()
+        # self.gui.main.get_scripture.get_passag(text) will return either:
+        # [
+        #   'book name',
+        #   [
+        #       ['first verse number', 'first verse text without number'],
+        #       ['second verse number', 'second verse text without number'],
+        #       ...
+        #   ]
+        # ]
+        # or [-1, 'error message']
         self.passages = self.gui.main.get_scripture.get_passage(text)
 
         if self.passages and not self.passages[0] == -1:
@@ -854,7 +861,7 @@ class MediaWidget(QTabWidget):
 
             scripture = ''
             for passage in self.passages[1]:
-                scripture += passage[0] + ' ' + passage[1] + ' '
+                scripture += ' '.join(passage) + ' '
 
             self.scripture_text_edit.setText(scripture.strip())
             self.scripture_text_edited = False
@@ -1289,46 +1296,61 @@ class MediaWidget(QTabWidget):
         self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
         self.gui.changes = True
 
-    def add_scripture_to_service(self):
+    def add_scripture_to_service(self, reference: str | None = None) -> None:
         """
         Method to add the scripture passage contained in the bible widget's scripture_text_edit to the order of
         service's QListWidget
         :return: None
         """
-        if not self.formatted_reference:
+        if not self.formatted_reference and reference is None:
             return
 
-        scripture_text = self.scripture_text_edit.toPlainText()
+        if type(reference) is str:
+            if not self.gui.main.get_scripture:
+                self.gui.main.get_scripture = GetScripture(self.gui.main)
+            passages = self.gui.main.get_scripture.get_passage(reference)[1]
+        else:
+            scripture_text = self.scripture_text_edit.toPlainText()
+            passages = split_scripture_string(scripture_text)
+            reference = self.formatted_reference
 
-        # get all numbers from this string
-        numbers = re.findall(r'\d+', scripture_text)
-        # check that the numbers are sequential; if one is not, it's a number contained in the verse, not
-        # a verse number
-        good_numbers = []
-        for number in numbers:
-            if len(good_numbers) > 0:
-                if int(number) == int(good_numbers[-1]) + 1 or int(number) == 1:
-                    good_numbers.append(number)
-            else:
-                good_numbers.append(number)
-
-        passages = []
-        next_verse_num = 0
-        for i in range(1, len(good_numbers)):
-            this_verse_num = good_numbers[i - 1]
-            next_verse_num = good_numbers[i]
-            verse = re.findall(rf'{this_verse_num}.*?{next_verse_num}', scripture_text)[0]
-            verse = verse.replace(this_verse_num, '').replace(next_verse_num, '').strip()
-            passages.append([this_verse_num, verse])
-            text_to_remove = f'{this_verse_num} {verse}'
-            scripture_text = scripture_text.replace(text_to_remove, '').strip()
-        last_verse = re.findall(rf'{next_verse_num}.*', scripture_text)[0]
-        last_verse = last_verse.replace(next_verse_num, '').strip()
-        passages.append([next_verse_num, last_verse])
-
-        reference = self.formatted_reference
         version = self.bible_selector_combobox.currentText()
-        self.gui.add_scripture_item(reference, passages, version, self.scripture_text_edited)
+
+        item = QListWidgetItem()
+        slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
+        if self.scripture_text_edited:
+            slide_data['type'] = 'custom_bible'
+        else:
+            slide_data['type'] = 'bible'
+
+        slide_data['title'] = reference
+        slide_data['text'] = self.passages
+        slide_data['parsed_text'] = parsers.parse_scripture_by_verse(self.gui, passages)
+        slide_data['author'] = version
+        item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+        if len(slide_data['parsed_text']) == 0:
+            QMessageBox.information(
+                self.main_window,
+                'No Verses',
+                'No verses were found in the passage. Please ensure that your scripture passage includes verse numbers.',
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
+        label_pixmap = self.gui.global_bible_background_pixmap.scaled(
+            50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        if self.scripture_text_edited:
+            widget = StandardItemWidget(self.gui, reference, 'Scripture (edited)', label_pixmap)
+        else:
+            widget = StandardItemWidget(self.gui, reference, 'Scripture', label_pixmap)
+        item.setSizeHint(widget.sizeHint())
+
+        self.gui.oos_widget.oos_list_widget.addItem(item)
+        self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+        self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
+
         self.gui.changes = True
 
     def add_custom_to_service(self, item: QTreeWidgetItem | None = None, row: int | None = None):

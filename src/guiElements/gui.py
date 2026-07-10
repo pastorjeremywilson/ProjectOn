@@ -197,7 +197,6 @@ class GUI(QObject):
             self.display_widget.show()
 
         self.check_update()
-        print(self.main.database)
 
     def check_files(self):
         if 'linux' in sys.platform:
@@ -1160,6 +1159,7 @@ class GUI(QObject):
                     if (self.main.settings['global_bible_background']
                             in self.tool_bar.bible_background_combobox.itemData(i, Qt.ItemDataRole.UserRole)):
                         index = i
+
             # set the bible background combobox to the saved bible background
             if index and not index == -1:
                 self.tool_bar.bible_background_combobox.setCurrentIndex(index)
@@ -1167,9 +1167,8 @@ class GUI(QObject):
                 pixmap = QPixmap(self.main.background_dir + '/' + self.main.settings['global_bible_background'])
                 pixmap = self.size_background_to_screen(pixmap)
                 self.global_bible_background_pixmap = pixmap
-
-            # show a message and set to default if the song background wasn't found
             else:
+                # show a message and set to default if the song background wasn't found
                 if not self.main.settings["global_song_background"] == 'choose_global':
                     QMessageBox.information(
                         self.main_window,
@@ -1759,47 +1758,6 @@ class GUI(QObject):
                     self.display_widget.show_lyric_widget()
 
         self.live_widget.slide_list.setFocus()
-
-    def add_scripture_item(self, reference: str, text: str | list[str], version: str, scripture_edited: bool):
-        """
-        Method to take a block of scripture and add it as a QListWidgetItem to the order of service widget.
-        :param str reference: The scripture passage's reference from the bible
-        :param list[str] text: The text of the scripture passage
-        :param str version: The version of the bible this passage is from
-        :param bool scripture_edited: Whether this text was edited
-        """
-        item = QListWidgetItem()
-        slide_data = declarations.SLIDE_DATA_DEFAULTS.copy()
-        if scripture_edited:
-            slide_data['type'] = 'custom_bible'
-        else:
-            slide_data['type'] = 'bible'
-        slide_data['title'] = reference
-        slide_data['text'] = text
-        slide_data['parsed_text'] = parsers.parse_scripture_by_verse(self, text)
-        slide_data['author'] = version
-        item.setData(Qt.ItemDataRole.UserRole, slide_data)
-
-        if len(slide_data['parsed_text']) == 0:
-            QMessageBox.information(
-                self.main_window,
-                'No Verses',
-                'No verses were found in the passage. Please ensure that your scripture passage includes verse numbers.',
-                QMessageBox.StandardButton.Ok
-            )
-            return
-
-        label_pixmap = self.global_bible_background_pixmap.scaled(
-            50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        if scripture_edited:
-            widget = StandardItemWidget(self, reference, 'Scripture (edited)', label_pixmap)
-        else:
-            widget = StandardItemWidget(self, reference, 'Scripture', label_pixmap)
-        item.setSizeHint(widget.sizeHint())
-        self.oos_widget.oos_list_widget.addItem(item)
-        self.oos_widget.oos_list_widget.setItemWidget(item, widget)
-        self.oos_widget.oos_list_widget.scrollToItem(item)
-        self.oos_widget.oos_list_widget.setCurrentItem(item)
 
 
 class CustomWebEnginePage(QWebEnginePage):

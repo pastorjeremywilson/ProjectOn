@@ -128,10 +128,11 @@ class GetScripture:
                                     if (verse_start <= child_verse_num <= verse_end):
                                         verse_number = child.get('vnumber')
                                         this_verse = child.text
+                                        print(f'{verse_number}: {this_verse}')
                                         scripture_text.append(
                                             [
                                                 verse_number,
-                                                re.sub(r'\s+', ' ', this_verse).strip() + ' '
+                                                re.sub(r'\s+', ' ', this_verse).strip()
                                             ]
                                         )
                                 except ValueError:
@@ -144,7 +145,6 @@ class GetScripture:
                     else:
                         self.main.gui.media_widget.bible_search_status_label.setText('unable to standardize book')
                         return (-1, 'unable to standardize book')
-
             else:
                 self.main.gui.media_widget.bible_search_status_label.setText('unable to parse reference')
                 return (-1, 'unable to parse reference')
