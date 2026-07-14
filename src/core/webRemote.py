@@ -71,7 +71,6 @@ class RemoteServer:
 
                 elif b'logo_screen' in request.data:
                     self.gui.display_logo_screen_signal.emit()
-
                     
                 elif b'item_back' in request.data:
                     self.slide_button('item_back')
@@ -174,13 +173,15 @@ class RemoteServer:
         except Exception:
             self.gui.main.error_log()
 
-    def update_stage_text(self, stage_html, font_size, slide_info):
+    def update_stage_text(self, stage_html: str, font_size: int, slide_info: str):
         with self.app.app_context():
             self.socketio.emit('update_stage', [stage_html, font_size, slide_info])
+            return '', 200
 
-    def update_stage_image(self, jpg_bytes, slide_info):
+    def update_stage_image(self, jpg_bytes: bytes, slide_info: str):
         with self.app.app_context():
             self.socketio.emit('update_display', [jpg_bytes, slide_info])
+            return '', 200
 
     def get_all_gui_data(self):
         class_tag = ''
@@ -188,20 +189,21 @@ class RemoteServer:
         remote_oos_buttons = ''
         current_row = self.gui.oos_widget.oos_list_widget.currentRow()
         for i in range(self.gui.oos_widget.oos_list_widget.count()):
-            title = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title']
+            if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole):
+                title = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['title']
 
-            if i == current_row:
-                class_tag = 'class="current" '
-            else:
-                class_tag = ''
+                if i == current_row:
+                    class_tag = 'class="current" '
+                else:
+                    class_tag = ''
 
-            remote_oos_buttons += f"""
-                <button id="oos{str(i)}" {class_tag}type="button" name="oos_button" value="{str(i)}" onclick="oosClick(event)">
-                    <span class="title">
-                        {title}
-                    </span>
-                </button>
-                <br />"""
+                remote_oos_buttons += f"""
+                    <button id="oos{str(i)}" {class_tag}type="button" name="oos_button" value="{str(i)}" onclick="oosClick(event)">
+                        <span class="title">
+                            {title}
+                        </span>
+                    </button>
+                    <br />"""
 
         slide_buttons = ''
         current_row = self.gui.live_widget.slide_list.currentRow()
@@ -236,9 +238,10 @@ class RemoteServer:
 
         return remote_oos_buttons, slide_buttons
     
-    def slide_button(self, button):
-        self.gui.live_widget.web_button_signal.emit(button)
-        return '', 200
+    def slide_button(self, button: str):
+        with self.app.app_context():
+            self.gui.live_widget.web_button_signal.emit(button)
+            return '', 200
 
 
 class RemoteServerHandler(BaseHTTPRequestHandler):

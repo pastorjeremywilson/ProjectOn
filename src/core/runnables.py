@@ -10,7 +10,9 @@ from os.path import exists
 import requests
 from PyQt5.QtCore import QRunnable, Qt, QByteArray, QBuffer, QIODevice, QTimer
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QFileDialog, QWidget
+
+from dataHandling.declarations import DEFAULT_SETTINGS
 
 
 class CheckFiles(QRunnable):
@@ -30,6 +32,7 @@ class CheckFiles(QRunnable):
             os.mkdir(os.path.expanduser('~/AppData/Roaming/ProjectOn'))
         self.main.device_specific_config_file = os.path.expanduser('~/AppData/Roaming/ProjectOn/localConfig.json')
 
+        device_specific_settings = {}
         if not exists(self.main.device_specific_config_file):
             device_specific_settings = {
                 'used_services': '',
@@ -79,32 +82,20 @@ class CheckFiles(QRunnable):
         self.main.bible_dir = self.main.data_dir + '/bibles'
         self.main.video_dir = self.main.data_dir + '/videos'
 
-        # provide default settings should the settings file not exist
-        default_settings = {
-            'selected_screen_name': '',
-            'font_face': 'Helvetica',
-            'font_size': 60,
-            'font_color': 'white',
-            'global_song_background': '',
-            'global_bible_background': '',
-            'logo_image': '',
-            'last_save_dir': './saved services',
-            'last_status_count': 0,
-            'stage_font_size': 60
-        }
-
+        # check that the settings file exists; set to DEFAULT_SETTINGS if not
         if exists(self.main.data_dir + '/settings.json'):
             with open(self.main.data_dir + '/settings.json', 'r') as file:
                 try:
                     self.main.settings = json.loads(file.read())
                 except json.decoder.JSONDecodeError:
-                    self.main.settings = default_settings
+                    self.main.settings = DEFAULT_SETTINGS.copy()
         else:
-            self.main.settings = default_settings
+            self.main.settings = DEFAULT_SETTINGS.copy()
 
-        for key in default_settings:
+        # add any key/value pairs from DEFAULT_SETTINGS missing in settings
+        for key in DEFAULT_SETTINGS:
             if key not in self.main.settings.keys():
-                self.main.settings[key] = default_settings[key]
+                self.main.settings[key] = DEFAULT_SETTINGS[key]
 
         self.main.settings['used_services'] = device_specific_settings['used_services']
         self.main.settings['last_save_dir'] = device_specific_settings['last_save_dir']
@@ -129,7 +120,7 @@ class IndexImages(QRunnable):
     :param str type: Directory to index - 'backgrounds' or 'images'
     :param bool force: Optional, force a reindexing whether needed or not
     """
-    def __init__(self, main, type, force=False):
+    def __init__(self, main, type: str, force: bool | None = False):
         """
         :param ProjectOn main: The current instance of ProjectOn
         :param str type: Directory to index - 'backgrounds' or 'images'
@@ -146,64 +137,70 @@ class IndexImages(QRunnable):
             self.directory = self.main.image_dir
 
     def run(self):
-        connection = sqlite3.connect(self.main.database)
-        cursor = connection.cursor()
+        connection = None
+        try:
+            connection = sqlite3.connect(self.main.database)
+            cursor = connection.cursor()
 
-        thumbnails = cursor.execute('SELECT fileName FROM ' + self.table).fetchall()
-        database_list = []
-        for record in thumbnails:
-            database_list.append(record[0])
+            thumbnails = cursor.execute('SELECT fileName FROM ' + self.table).fetchall()
+            database_list = []
+            for record in thumbnails:
+                database_list.append(record[0])
 
-        file_list = os.listdir(self.directory)
-        file_types = ['jpg', 'png', 'svg', 'bmp']
-        filtered_files = []
-        for file in file_list:
-            file_type = file.split('.')[1]
-            if file_type in file_types:
-                filtered_files.append(file)
+            file_list = os.listdir(self.directory)
+            file_types = ['jpg', 'png', 'svg', 'bmp']
+            filtered_files = []
+            for file in file_list:
+                file_type = file.split('.')[1]
+                if file_type in file_types:
+                    filtered_files.append(file)
 
-        reindex = False
-        for file in database_list:
-            if self.main.initial_startup:
-                self.main.update_status_signal.emit(f'Checking Database for {file}', 'info')
-            if file not in filtered_files:
-                reindex = True
-                break
-
-        for file in filtered_files:
-            if self.main.initial_startup:
-                self.main.update_status_signal.emit(f'Checking Folder for {file}', 'info')
-            if file not in database_list:
-                reindex = True
-                break
-
-        if not reindex and not self.force:
-            return
-
-        cursor.execute('DELETE FROM ' + self.table)
-        connection.commit()
-        for file in file_list:
-            file_type = file.split('.')[1]
-            if file_type in file_types:
+            reindex = False
+            for file in database_list:
                 if self.main.initial_startup:
-                    self.main.update_status_signal.emit(f'Indexing {file}', 'info')
-                pixmap = QPixmap(self.directory + '/' + file)
-                scaled_pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                    self.main.update_status_signal.emit(f'Checking Database for {file}', 'info')
+                if file not in filtered_files:
+                    reindex = True
+                    break
 
-                thumbnail_array = QByteArray()
-                thumbnail_buffer = QBuffer(thumbnail_array)
-                thumbnail_buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-                scaled_pixmap.save(thumbnail_buffer, 'JPG')
-                thumbnail_blob = bytes(thumbnail_array.data())
-                thumbnail_buffer.close()
+            for file in filtered_files:
+                if self.main.initial_startup:
+                    self.main.update_status_signal.emit(f'Checking Folder for {file}', 'info')
+                if file not in database_list:
+                    reindex = True
+                    break
 
-                cursor.execute(f'INSERT INTO {self.table} (fileName, image) '
-                               f'VALUES("{file}", ?)', (thumbnail_blob,))
+            if not reindex and not self.force:
+                return
 
-        connection.commit()
-        connection.close()
+            cursor.execute('DELETE FROM ' + self.table)
+            connection.commit()
+            for file in file_list:
+                file_type = file.split('.')[1]
+                if file_type in file_types:
+                    if self.main.initial_startup:
+                        self.main.update_status_signal.emit(f'Indexing {file}', 'info')
+                    pixmap = QPixmap(self.directory + '/' + file)
+                    scaled_pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
-    def add_image_index(self, file, type):
+                    thumbnail_array = QByteArray()
+                    thumbnail_buffer = QBuffer(thumbnail_array)
+                    thumbnail_buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                    scaled_pixmap.save(thumbnail_buffer, 'JPG')
+                    thumbnail_blob = bytes(thumbnail_array.data())
+                    thumbnail_buffer.close()
+
+                    cursor.execute(f'INSERT INTO {self.table} (fileName, image) '
+                                   f'VALUES("{file}", ?)', (thumbnail_blob,))
+
+            connection.commit()
+            connection.close()
+        except Exception as ex:
+            self.main.error_log(f'Error in IndexImages.run: {str(ex)}')
+            if connection:
+                connection.close()
+
+    def add_image_index(self, file: str, type: str):
         """
         Does the work of adding the file name and image blob to the proper table in the program's database.
         :param str file: The file location
@@ -315,7 +312,7 @@ class TimedPreviewUpdate(QRunnable):
     def __init__(self, gui):
         """
         Used to update the preview image in the live widget when a video is playing.
-        :param gui.GUI gui: The current instance of GUI
+        :param guiElements.GUI gui: The current instance of GUI
         """
         super().__init__()
         self.gui = gui
@@ -331,7 +328,7 @@ class TimedPreviewUpdate(QRunnable):
 
 
 class SlideAutoPlay(QRunnable):
-    def __init__(self, gui, text, interval):
+    def __init__(self, gui, interval: int):
         """
         Cycles through the text in a list of strings, changing the display widget's lyrics based on a given interval
         :param gui: the current instance of GUI
@@ -341,7 +338,6 @@ class SlideAutoPlay(QRunnable):
         super().__init__()
         self.gui = gui
         self.interval = interval
-        self.text = text
         self.keep_running = True
 
     def run(self):
@@ -361,7 +357,7 @@ class CountdownTimer(QTimer):
         start_time (datetime.time): The start time of the service.
         display_time (datetime.time): The time to start showing the countdown widget.
     """
-    def __init__(self, settings, countdown_widget, start_time, display_time):
+    def __init__(self, settings: dict, countdown_widget: QWidget, start_time: datetime, display_time: datetime):
         super().__init__()
         self.settings = settings
         self.countdown_widget = countdown_widget

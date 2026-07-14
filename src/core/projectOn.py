@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.10.3
+ProjectOn v.1.11.0
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -18,9 +18,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import base64
 import threading
 import json
-import logging
 import os.path
 import shutil
 import socket
@@ -34,16 +34,15 @@ from os.path import exists
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
-    qInstallMessageHandler, QThread
-from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QPen, QIcon
+    QByteArray, QBuffer, QIODevice, qInstallMessageHandler
+from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
 
-from dataHandling.declarations import SLIDE_DATA_DEFAULTS, SQL_COLUMN_TO_DICTIONARY_SONG, SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN, \
-    SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN, DB_STRUCTURE, SLIDE_DATA_DATA_TYPES, SQL_COLUMN_TO_DICTIONARY_CUSTOM
-from gui.gui import GUI
+from dataHandling.declarations import DB_STRUCTURE
+from guiElements.gui import GUI
 from core.runnables import SaveSettings, ServerCheckTimer
-from gui.widgets.widgets import SimpleSplash, StandardItemWidget
+from guiElements.widgets.widgets import SimpleSplash, StandardItemWidget
 from core.webRemote import RemoteServer
 
 
@@ -55,10 +54,14 @@ class ProjectOn(QObject):
     app = None
     data_dir = None
     user_dir = None
+    config_file = None
     database = None
+    background_dir = None
+    image_dir = None
     bible_dir = None
+    video_dir = None
     get_scripture = None
-    settings = None
+    settings = {}
     remote_server = None
     splash_widget = None
     status_label = None
@@ -70,13 +73,16 @@ class ProjectOn(QObject):
     thread_pool = None
     status_update_count = 0
     updating_label = False
+    server_check_timer = None
 
     def __init__(self):
         super().__init__()
         sys.excepthook = log_unhandled_exception
+        self.version = 'v.1.11.0'
 
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
+            return
             # Only intercept warnings (QtWarningMsg is 1)
             if mode == QtMsgType.QtWarningMsg:
                 print(f"\n--- Qt Warning Intercepted ---")
@@ -86,7 +92,7 @@ class ProjectOn(QObject):
                 print("-----------------------------\n")
 
         # Install the handler at the very start of your script
-        #qInstallMessageHandler(qt_message_handler)
+        qInstallMessageHandler(qt_message_handler)
         ################################################################
 
         # ensure we are working from the source root of the program
@@ -95,6 +101,8 @@ class ProjectOn(QObject):
 
         if sys.platform == 'win32':
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
+        elif sys.platform == 'linux':
+            os.environ["QT_GST_ALLOW_VIDEO_OVERLAY"] = "0"
 
         os.environ['QTWEBENGINE_DISABLE_SANDBOX'] = '1'
         QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
@@ -102,7 +110,7 @@ class ProjectOn(QObject):
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (
             "--ignore-gpu-blacklist "
             "--enable-native-gpu-memory-buffers "
-            "--disable-gpu-sandbox "  # can help on some setups
+            "--disable-gpu-sandbox "
             "--enable-accelerated-video-decode "
             "--enable-features=ExperimentalJavaScript"
         )
@@ -142,18 +150,18 @@ class ProjectOn(QObject):
             if '.pro' in arg:
                 self.load_service(arg)
 
-        self.app.processEvents()
+        #self.app.processEvents()
 
         self.server_check_timer = ServerCheckTimer(self.remote_server, self.gui)
         self.server_check_timer.start()
 
         self.app.exec()
 
-    def update_status_label(self, text, type):
+    def update_status_label(self, text: str, update_type: str):
         """
         Updates the splash widget with the given text.
         :param str text: The text to be displayed
-        :param str type: Use 'status' if this will be an update to the status text under the main text
+        :param str update_type: Use 'status' if this will be an update to the status text under the main text
         """
         # just in case
         if not self.initial_startup:
@@ -161,7 +169,7 @@ class ProjectOn(QObject):
 
         if self.splash_widget and not self.updating_label: # prevent access violation by ensuring processEvents has finished
             self.updating_label = True
-            if type == 'status':
+            if update_type == 'status':
                 self.status_label.setText(text)
             else:
                 self.info_label.setText(text)
@@ -171,9 +179,11 @@ class ProjectOn(QObject):
             self.updating_label = False
             self.status_update_count += 1
 
-    def make_splash_screen(self, last_status_count):
+    def make_splash_screen(self, last_status_count: int):
         """
         Create the splash screen that will show progress as the program is loading
+        :param int last_status_count: The total number of update calls last time the program was run; used for setting
+        the upper range of the QProgressBar
         """
         self.splash_widget = QWidget()
         self.splash_widget.setObjectName('splash_widget')
@@ -196,7 +206,7 @@ class ProjectOn(QObject):
                 160, 160, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
         icon_layout.addWidget(icon_label)
 
-        version_label = QLabel('v.1.10.3')
+        version_label = QLabel(self.version)
         version_label.setStyleSheet('color: white')
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         icon_layout.addWidget(version_label, Qt.AlignmentFlag.AlignCenter)
@@ -243,442 +253,133 @@ class ProjectOn(QObject):
         self.splash_widget.raise_()
         self.splash_widget.setFocus()
 
-    def get_all_songs(self):
+    def check_database_update(self) -> bool:
         """
-        Retrieves all song data from the ProjectOn database's 'songs' table
-        :return: list of str result
-        """
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-
-            # check that the database has the newest columns
-            result = cursor.execute('PRAGMA table_info(songs)').fetchall()
-            updated_table = False
-            columns = []
-            for record in result:
-                columns.append(record[1])
-                if record[1] == 'shade_opacity':
-                    updated_table = True
-            if not updated_table:
-                self.update_table(connection, cursor, 'songs')
-
-            result = cursor.execute('SELECT * FROM songs ORDER BY title').fetchall()
-
-            # there's been enough variation in how data is stored across versions that we're going to
-            # convert the stored sql data to the standardized slide data, including making sure the
-            # data types are standardized in each dictionary
-            all_songs = []
-            for song in result:
-                data = SLIDE_DATA_DEFAULTS.copy()
-                data['type'] = 'song'
-                for i in range(len(columns)):
-                    if 'global' in str(song[i]):
-                        data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = song[i]
-                    elif song[i] is not None and type(song[i]) is not int and song[i].lower() == 'true':
-                        data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = True
-                    elif song[i] is not None and type(song[i]) is not int and song[i].lower() == 'false':
-                        data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = False
-                    elif song[i] is not None:
-                        data[SQL_COLUMN_TO_DICTIONARY_SONG[i]] = SLIDE_DATA_DATA_TYPES[SQL_COLUMN_TO_DICTIONARY_SONG[i]](song[i])
-                all_songs.append(data)
-
-            return all_songs
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-            return -1
-
-    def update_table(self, connection, cursor, table):
-        column_names = [
-            ['use_shade', 'False'],
-            ['shade_color', '0'],
-            ['shade_opacity', '75']
-        ]
-        for name in column_names:
-            cursor.execute(f'ALTER TABLE {table} ADD {name[0]} TEXT;')
-            cursor.execute(f'UPDATE {table} SET {name[0]}={str(name[1])}')
-        connection.commit()
-
-    def get_all_custom_slides(self):
-        """
-        Retrieves all custom slide data from the ProjectOn database's 'customSlides' table
-        :return: list of str result
-        """
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-
-            # check that the database has the newest columns
-            result = cursor.execute('PRAGMA table_info(customSlides)').fetchall()
-            updated_table = False
-            columns = []
-            for record in result:
-                columns.append(record[1])
-                if record[1] == 'shade_opacity':
-                    updated_table = True
-            if not updated_table:
-                self.update_table(connection, cursor, 'customSlides')
-
-            result = cursor.execute('SELECT * FROM customSlides ORDER BY title').fetchall()
-
-            # there's been enough variation in how data is stored across versions that we're going to
-            # convert the stored sql data to the standardized slide data, including making sure the
-            # data types are standardized in each dictionary
-            all_custom = []
-            for custom in result:
-                data = SLIDE_DATA_DEFAULTS.copy()
-                data['type'] = 'custom'
-                for i in range(len(columns)):
-                    if 'global' in str(custom[i]):
-                        data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = custom[i]
-                    elif custom[i] is not None and type(custom[i]) is not int and custom[i].lower() == 'true':
-                        data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = True
-                    elif custom[i] is not None and type(custom[i]) is not int and custom[i].lower() == 'false':
-                        data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = False
-                    elif custom[i] is not None:
-                        data[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]] = SLIDE_DATA_DATA_TYPES[SQL_COLUMN_TO_DICTIONARY_CUSTOM[i]](custom[i])
-                all_custom.append(data)
-            connection.close()
-            return all_custom
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-            return -1
-
-    def get_song_data(self, title):
-        """
-        Gets the song data for a particular song where the 'title' column matches 'title'
-        :param str title: the song title
-        :return: list of str result
-        """
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-            result = cursor.execute('SELECT * FROM songs WHERE title="' + title + '"').fetchone()
-            connection.close()
-            return result
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-            return -1
-
-    def get_custom_data(self, title):
-        """
-        Gets the song data for a particular custom slide where the 'title' column matches 'title'
-        :param str title: the title (name) of the custom slide
-        :return: list of str result
-        """
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-            result = cursor.execute('SELECT * FROM customSlides WHERE title="' + title + '"').fetchone()
-            connection.close()
-            return result
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-            return -1
-
-    def get_audio_clip_names(self):
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-            result = cursor.execute('SELECT "name" FROM "audio";').fetchall()
-            connection.close()
-            return result
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-            return -1
-
-    def get_audio_data(self, name):
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-            result = cursor.execute(f'SELECT data, format FROM audio WHERE name="{name}";').fetchone()
-            if len(result) == 0:
-                return -2
-            connection.close()
-            return result
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-            return -1
-
-    def save_audio(self, name, audio_format, audio_data):
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-            result = cursor.execute(f'SELECT "name" FROM "audio" WHERE "name"="{name}";').fetchall()
-            if len(result) > 0:
-                return -2
-            cursor.execute(
-                f'INSERT INTO audio (name, format, data) VALUES ("{name}", "{audio_format}", ?);', (audio_data,))
-            connection.commit()
-            connection.close()
-            return 0
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-            return -1
-
-    def copy_image(self, file):
-        """
-        Creates a copy of an image file chosen by the user and stores it in this program's data folder
-        :param str file: the image's file name
-        """
-        try:
-            file_split = file.split('/')
-            file_name = file_split[len(file_split) - 1]
-
-            if not exists(self.image_dir + '/' + file_name):
-                shutil.copy(file, self.image_dir + '/' + file_name)
-        except Exception:
-            self.error_log()
-
-    def save_song(self, data, old_title=None):
-        """
-        Takes song data as a string list, ordered by the column order of the 'songs' table of the program's database,
-        and inserts or updates that data in the database.
-        :param list of str song_data: The song's data in columnar order
-        :param str old_title: Optional, the song's original title so that it can be updated instead of inserted
-        """
-        connection = None
-        try:
-            for key in data.keys():
-                if type(data[key]) == str:
-                    data[key] = data[key].replace('"', '""')
-
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-
-            # if old_title has been provided, this song already exists in the database and we need to use UPDATE
-            if old_title:
-                sql = 'UPDATE songs SET '
-                for key in data.keys():
-                    if key in SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN.keys():
-                        sql += f'{SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN[key]}="{data[key]}",'
-                sql = sql[:-1] + f' WHERE title="{old_title}";'
-            else: # use INSERT INTO instead
-                sql = 'INSERT INTO songs ('
-                for key in data.keys():
-                    if key in SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN.keys():
-                        sql += SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN[key] + ','
-                sql = sql[:-1] + ') VALUES ("'
-                for key in data.keys():
-                    if key in SLIDE_DICTIONARY_TO_SONG_SQL_COLUMN.keys():
-                        sql += f'{data[key]}","'
-                sql = sql[:-2] + ');'
-
-            cursor.execute(sql)
-            connection.commit()
-            connection.close()
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-
-    def get_song_titles(self):
-        """
-        Retrieves just the titles of all songs in the database.
-        :return list of str song_titles: Song titles
+        Method to check the current database version, updating the database if it's not current
+        :return: True if up to date or update successful
         """
         connection = sqlite3.connect(self.database)
         cursor = connection.cursor()
-        data = cursor.execute('SELECT title FROM songs ORDER BY title').fetchall()
-        song_titles = []
-        for item in data:
-            song_titles.append(item[0])
+        db_version = cursor.execute('PRAGMA user_version').fetchone()[0]
 
-        return song_titles
-
-    def get_custom_titles(self):
-        """
-        Retrieves just the titles of all custom slides in the database.
-        :return list of str custom_titles: Custom slide titles
-        """
-        connection = sqlite3.connect(self.database)
-        cursor = connection.cursor()
-        data = cursor.execute('SELECT title FROM customSlides').fetchall()
-        custom_titles = []
-        for item in data:
-            custom_titles.append(item[0])
-
-        return custom_titles
-
-    def save_custom(self, data, old_title):
-        """
-        Takes custom slide data as a string list, ordered by the column order of the 'customSlides' table of the
-        program's database, and inserts or updates that data in the database.
-        :param list of str custom_data: The custom slide's data in columnar order
-        :param str old_title: Optional, the custom slide's original title so that it can be updated instead of inserted
-        """
-        connection = None
-
-        try:
-            for key in data.keys():
-                if type(data[key]) == str:
-                    data[key] = data[key].replace('"', '""')
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-
-            # if old_title has been provided, this song already exists in the database and we need to use UPDATE
-            if old_title:
-                sql = 'UPDATE customSlides SET '
-                for key in data.keys():
-                    if key in SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN.keys():
-                        sql += f'{SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN[key]}="{data[key]}",'
-                sql = sql[:-1] + f' WHERE title="{old_title}";'
-            else: # use INSERT INTO instead
-                sql = 'INSERT INTO customSlides ('
-                for key in data.keys():
-                    if key in SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN.keys():
-                        sql += SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN[key] + ','
-                sql = sql[:-1] + ') VALUES ("'
-                for key in data.keys():
-                    if key in SLIDE_DICTIONARY_TO_CUSTOM_SQL_COLUMN.keys():
-                        sql += f'{data[key]}","'
-                sql = sql[:-2] + ');'
-
-            cursor.execute(sql)
-            connection.commit()
+        if db_version == 2:
+            # this is the most recent version
             connection.close()
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
+            return True
+        elif db_version > 2:
+            QMessageBox.critical(
+                None,
+                'Database Mismatch',
+                'Your database was created/updated by a newer verison of ProjectOn. Please install the newest '
+                'version of ProjectOn and try again.'
+            )
+            sys.exit(-2)
 
-    def save_web_item(self, title, url):
-        """
-        Stores the title and url of a web slide to the program's database. Checks the database first to see if the
-        given title already exists.
-        :param str title: The title of the web slide
-        :param url: The url the web slide is to fetch
-        """
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-            result = cursor.execute('SELECT * FROM web WHERE title="' + title + '"').fetchone()
-
-            if result:
-                sql = ('UPDATE web SET url="' + url + '" WHERE title="' + title + '"')
-                cursor.execute(sql)
-                connection.commit()
-                connection.close()
-            else:
-                sql = ('INSERT INTO web (title, url) VALUES ("' + title + '", "' + url + '")')
-                cursor.execute(sql)
-                connection.commit()
-                connection.close()
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-
-    def delete_item(self, item):
-        """
-        Provides a method of deleting a given item from the program's database.
-        :param QListWidgetItem item: The item to be removed
-        """
-        connection = None
-        try:
-            if item.data(Qt.ItemDataRole.UserRole)['type'] == 'song':
-                table = 'songs'
-                description = 'Song'
-            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
-                table = 'customSlides'
-                description = 'Custom Slide'
-            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'video':
-                file_name = item.data(Qt.ItemDataRole.UserRole)['file_name']
-                os.remove(self.video_dir + '/' + file_name)
-                filename_split = file_name.split('.')
-                thumbnail_filename = '.'.join(filename_split[:len(filename_split) - 1]) + '.jpg'
-                os.remove(self.video_dir + '/' + thumbnail_filename)
-                return
-            elif item.data(Qt.ItemDataRole.UserRole)['type'] == 'web':
-                table = 'web'
-                description = 'Web Page'
-            else:
-                return
-
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-            cursor.execute('DELETE FROM ' + table + ' WHERE title="' + item.data(Qt.ItemDataRole.UserRole)['title'] + '"')
-            connection.commit()
-            connection.close()
-
-            return 0
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
-
-            return -1
-
-    def delete_all_songs(self):
-        """
-        Provides a method for removing all of the songs from the database's 'songs' table. Checks and double-checks
-        with the user that they really want to do this.
-        """
-        result = QMessageBox.question(
-            self.gui.main_window,
-            'Really Delete?',
-            'This will remove ALL SONGS from your database. This cannot be undone. Really DELETE ALL SONGS?',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+        date = datetime.now().strftime('%Y-%m-%d_%H.%M.%S')
+        db_backup_loc = f'{self.data_dir}/backups/projecton.{date}.db'
+        QMessageBox.information(
+            None,
+            'Updating Database',
+            f'Your database will be upgraded to the newest version. A backup of your old database will be created'
+            f'at {db_backup_loc}'
         )
 
-        if result == QMessageBox.StandardButton.Yes:
-            second_result = QMessageBox.question(
-                self.gui.main_window,
-                'Really Delete?',
-                'Just making sure: Do you really want to DELETE ALL SONGS?',
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
-            )
-            if not second_result == QMessageBox.StandardButton.Yes:
-                return
-        else:
-            return
+        if not exists(f'{self.data_dir}/backups'):
+            os.mkdir(f'{self.data_dir}/backups')
+        shutil.copy(self.database, db_backup_loc)
 
-        connection = None
-        try:
-            connection = sqlite3.connect(self.database)
-            cursor = connection.cursor()
-            cursor.execute('DELETE FROM songs')
+        # first, check for the second-most-recently added columns in the songs table
+        result = cursor.execute('PRAGMA table_info(songs)').fetchall()
+        columns = []
+        for record in result:
+            columns.append(record[1])
+
+        if not 'shade_opacity' in columns:
+            column_names = [
+                ['use_shade', 'False'],
+                ['shade_color', '0'],
+                ['shade_opacity', '75']
+            ]
+            for name in column_names:
+                cursor.execute(f'ALTER TABLE songs ADD {name[0]} TEXT;')
+                cursor.execute(f'UPDATE songs SET {name[0]}={str(name[1])}')
             connection.commit()
-            connection.close()
 
-            QMessageBox.information(
-                self.gui.main_window,
-                'Songs Deleted',
-                'All songs have been removed.',
-                QMessageBox.StandardButton.Ok
-            )
-            self.gui.media_widget.song_list.clear()
-        except Exception:
-            self.error_log()
-            if connection:
-                connection.close()
+        # check for the 'folder' column in the songs table
+        if not 'folder' in columns:
+            cursor.execute('ALTER TABLE songs ADD folder TEXT default "";')
+            connection.commit()
+
+        # check for the 'folder' column in the customSlides table
+        result = cursor.execute('PRAGMA table_info(customSlides)').fetchall()
+        columns = []
+        for record in result:
+            columns.append(record[1])
+
+        if not 'folder' in columns:
+            cursor.execute('ALTER TABLE customSlides ADD folder TEXT default "";')
+            cursor.execute('UPDATE customSlides SET folder="";')
+            connection.commit()
+
+        # check for the 'folder' column in the imageThumbnails table
+        result = cursor.execute('PRAGMA table_info(imageThumbnails)').fetchall()
+        columns = []
+        for record in result:
+            columns.append(record[1])
+
+        if not 'folder' in columns:
+            cursor.execute('ALTER TABLE imageThumbnails ADD folder TEXT default "";')
+            connection.commit()
+
+        # check that the videos table exists
+        result = cursor.execute(f'SELECT name FROM sqlite_schema WHERE type="table" AND name="videos";').fetchall()
+        if len(result) == 0:
+            cursor.execute('CREATE TABLE videos (filename TEXT DEFAULT "", thumbnail BLOB, folder TEXT DEFAULT "");')
+
+        files = os.listdir(self.video_dir)
+        for file in files:
+            video_file = None
+            if file.endswith('.jpg'):
+                name_only = file.split('.')[0]
+                for other_file in files:
+                    if other_file.startswith(name_only) and not other_file.endswith('.jpg'):
+                        video_file = other_file
+
+                if video_file:
+                    pixmap = QPixmap(self.video_dir + '/' + file)
+                    pixmap = pixmap.scaled(96, 54, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                           Qt.TransformationMode.SmoothTransformation)
+
+                    array = QByteArray()
+                    buffer = QBuffer(array)
+                    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                    pixmap.save(buffer, 'JPG')
+                    blob = bytes(array.data())
+
+                    sql = 'INSERT INTO videos (filename, thumbnail, folder) VALUES (?, ?, ?)'
+                    cursor.execute(sql, (video_file, blob, ''))
+                    connection.commit()
+
+        # check for the 'folder' column in the web table
+        result = cursor.execute('PRAGMA table_info(web)').fetchall()
+        columns = []
+        for record in result:
+            columns.append(record[1])
+
+        if not 'folder' in columns:
+            cursor.execute('ALTER TABLE web ADD folder TEXT default "";')
+            connection.commit()
+
+        cursor.execute('PRAGMA user_version = 2')
+        connection.commit()
+        connection.close()
+
+        return True
 
     def save_settings(self):
         """
-        Saves all of the settings currently stored in the self.settings variable to the settings.json file in the
-        program's data directory.
+        Saves all the settings currently stored in the self.settings dict to the settings.json file in the
+        program's data directory by threading the SaveSettings class.
         """
         save_settings = SaveSettings(self)
         self.thread_pool.start(save_settings)
@@ -694,110 +395,177 @@ class ProjectOn(QObject):
                 'There are no Order of Service items to save.',
                 QMessageBox.StandardButton.Ok
             )
-            return
+            return 0
+
+        service_items = {
+            'global_song_background': self.settings['global_song_background'],
+            'global_bible_background': self.settings['global_bible_background'],
+            'song_font_face': self.settings['song_font_face'],
+            'song_font_size': self.settings['song_font_size'],
+            'song_font_color': self.settings['song_font_color'],
+            'song_use_shadow': self.settings['song_use_shadow'],
+            'song_shadow_color': self.settings['song_shadow_color'],
+            'song_shadow_offset': self.settings['song_shadow_offset'],
+            'song_use_outline': self.settings['song_use_outline'],
+            'song_outline_color': self.settings['song_outline_color'],
+            'song_outline_width': self.settings['song_outline_width'],
+            'song_use_shade': self.settings['song_use_shade'],
+            'song_shade_color': self.settings['song_shade_color'],
+            'song_shade_opacity': self.settings['song_shade_opacity'],
+            'bible_font_face': self.settings['bible_font_face'],
+            'bible_font_size': self.settings['bible_font_size'],
+            'bible_font_color': self.settings['bible_font_color'],
+            'bible_use_shadow': self.settings['bible_use_shadow'],
+            'bible_shadow_color': self.settings['bible_shadow_color'],
+            'bible_shadow_offset': self.settings['bible_shadow_offset'],
+            'bible_use_outline': self.settings['bible_use_outline'],
+            'bible_outline_color': self.settings['bible_outline_color'],
+            'bible_outline_width': self.settings['bible_outline_width'],
+            'bible_use_shade': self.settings['bible_use_shade'],
+            'bible_shade_color': self.settings['bible_shade_color'],
+            'bible_shade_opacity': self.settings['bible_shade_opacity']
+        }
+
+        for i in range(self.gui.oos_widget.oos_list_widget.count()):
+            item_data = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+            service_items[i] = {
+                'title': item_data['title'],
+                'type': item_data['type']
+            }
+            if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_bible':
+                service_items[i]['text'] = item_data['parsed_text']
+            elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
+                service_items[i]['text'] = item_data['parsed_text']
+
+        result = self.complete_save(service_items, 'pro')
+        return result
+
+    def save_frozen_service(self):
+        """
+        Saves the user's current order of service as well as each item's full dataset so that it preserves the slides
+        exactly as they are, ignoring any changes made in the program apart from the service.
+        """
+
+        if self.gui.oos_widget.oos_list_widget.count() == 0:
+            QMessageBox.information(
+                self.gui.main_window,
+                'Nothing to do',
+                'There are no Order of Service items to save.',
+                QMessageBox.StandardButton.Ok
+            )
+            return 0
+
+        service_items = {
+            'global_song_background': self.settings['global_song_background'],
+            'global_bible_background': self.settings['global_bible_background'],
+            'song_font_face': self.settings['song_font_face'],
+            'song_font_size': self.settings['song_font_size'],
+            'song_font_color': self.settings['song_font_color'],
+            'song_use_shadow': self.settings['song_use_shadow'],
+            'song_shadow_color': self.settings['song_shadow_color'],
+            'song_shadow_offset': self.settings['song_shadow_offset'],
+            'song_use_outline': self.settings['song_use_outline'],
+            'song_outline_color': self.settings['song_outline_color'],
+            'song_outline_width': self.settings['song_outline_width'],
+            'song_use_shade': self.settings['song_use_shade'],
+            'song_shade_color': self.settings['song_shade_color'],
+            'song_shade_opacity': self.settings['song_shade_opacity'],
+            'bible_font_face': self.settings['bible_font_face'],
+            'bible_font_size': self.settings['bible_font_size'],
+            'bible_font_color': self.settings['bible_font_color'],
+            'bible_use_shadow': self.settings['bible_use_shadow'],
+            'bible_shadow_color': self.settings['bible_shadow_color'],
+            'bible_shadow_offset': self.settings['bible_shadow_offset'],
+            'bible_use_outline': self.settings['bible_use_outline'],
+            'bible_outline_color': self.settings['bible_outline_color'],
+            'bible_outline_width': self.settings['bible_outline_width'],
+            'bible_use_shade': self.settings['bible_use_shade'],
+            'bible_shade_color': self.settings['bible_shade_color'],
+            'bible_shade_opacity': self.settings['bible_shade_opacity']
+        }
+
+        for i in range(self.gui.oos_widget.oos_list_widget.count()):
+            service_items[i] = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+            for key in service_items[i].keys():
+                if type(service_items[i][key]) == QPixmap:
+                    byte_array = QByteArray()
+                    buffer = QBuffer(byte_array)
+                    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                    service_items[i][key].save(buffer, "PNG")
+                    raw_bytes = byte_array.data()
+                    base64_bytes = base64.b64encode(raw_bytes)
+                    base64_string = base64_bytes.decode('utf-8')
+                    service_items[i][key] = base64_string
+
+        result = self.complete_save(service_items, 'proj')
+        return result
+
+    def complete_save(self, service_items, file_type):
+        if len(self.settings['last_save_dir']) > 0:
+            save_dir = os.path.expanduser(self.settings['last_save_dir'])
+        else:
+            save_dir = os.path.expanduser('~' + '/Documents')
+
+        if self.gui.current_file and self.gui.current_file.endswith(file_type):
+            file_loc = self.gui.current_file
+        else:
+            if file_type == 'proj':
+                QMessageBox.information(
+                    self.gui.main_window,
+                    'Save Fixed Service',
+                    'This will lock the current slide content directly into the file. '
+                    'Any future changes you make to these items in your library will not affect this specific service. '
+                    'Fixed services are saved with a ".proj" extension.',
+                    QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel
+                )
+            type_text = 'Service'
+            if file_type == 'proj':
+                type_text = 'Fixed Service'
+            result = QFileDialog.getSaveFileName(
+                self.gui.main_window,
+                'Save Service File',
+                save_dir,
+                f'ProjectOn {type_text} File (*.{file_type})')
+            if len(result[0]) == 0:
+                return -1
+            file_loc = result[0]
+            if not file_loc.endswith(file_type):
+                file_loc += f'.{file_type}'
 
         try:
-            service_items = {
-                'global_song_background': self.settings['global_song_background'],
-                'global_bible_background': self.settings['global_bible_background'],
-                'song_font_face': self.settings['song_font_face'],
-                'song_font_size': self.settings['song_font_size'],
-                'song_font_color': self.settings['song_font_color'],
-                'song_use_shadow': self.settings['song_use_shadow'],
-                'song_shadow_color': self.settings['song_shadow_color'],
-                'song_shadow_offset': self.settings['song_shadow_offset'],
-                'song_use_outline': self.settings['song_use_outline'],
-                'song_outline_color': self.settings['song_outline_color'],
-                'song_outline_width': self.settings['song_outline_width'],
-                'song_use_shade': self.settings['song_use_shade'],
-                'song_shade_color': self.settings['song_shade_color'],
-                'song_shade_opacity': self.settings['song_shade_opacity'],
-                'bible_font_face': self.settings['bible_font_face'],
-                'bible_font_size': self.settings['bible_font_size'],
-                'bible_font_color': self.settings['bible_font_color'],
-                'bible_use_shadow': self.settings['bible_use_shadow'],
-                'bible_shadow_color': self.settings['bible_shadow_color'],
-                'bible_shadow_offset': self.settings['bible_shadow_offset'],
-                'bible_use_outline': self.settings['bible_use_outline'],
-                'bible_outline_color': self.settings['bible_outline_color'],
-                'bible_outline_width': self.settings['bible_outline_width'],
-                'bible_use_shade': self.settings['bible_use_shade'],
-                'bible_shade_color': self.settings['bible_shade_color'],
-                'bible_shade_opacity': self.settings['bible_shade_opacity']
-            }
+            with open(file_loc, 'w') as file:
+                json.dump(service_items, file, indent=4)
 
-            for i in range(self.gui.oos_widget.oos_list_widget.count()):
-                item_data = self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)
-                service_items[i] = {
-                    'title': item_data['title'],
-                    'type': item_data['type']
-                }
-                if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_bible':
-                    service_items[i]['text'] = item_data['parsed_text']
-                elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
-                    service_items[i]['text'] = item_data['parsed_text']
+            directory = os.path.dirname(file_loc)
+            filename = file_loc.replace(directory, '').replace('/', '')
+            self.settings['last_save_dir'] = directory
+            self.save_settings()
 
-            dialog_needed = True
-            if self.gui.current_file:
-                dialog_needed = False
-            elif len(self.settings['last_save_dir']) > 0:
-                save_dir = self.settings['last_save_dir']
-            else:
-                save_dir = os.path.expanduser('~' + '/Documents')
+            QMessageBox.information(
+                self.gui.main_window,
+                'File Saved',
+                'Service saved as\n' + file_loc.replace('/', '\\'),
+                QMessageBox.StandardButton.Ok
+            )
 
-            result = 'saved'
-            if dialog_needed:
-                result = QFileDialog.getSaveFileName(
-                    self.gui.main_window,
-                    'Save Service File',
-                    save_dir,
-                    'ProjectOn Service File (*.pro)')
+            # add this file to the recently used services menu
+            self.add_to_recently_used(directory, filename)
 
-            if len(result[0]) > 0:
-                try:
-                    if result == 'saved':
-                        file_loc = self.gui.current_file
-                    else:
-                        file_loc = result[0]
-
-                    with open(file_loc, 'w') as file:
-                        json.dump(service_items, file, indent=4)
-
-                    directory = os.path.dirname(file_loc)
-                    filename = file_loc.replace(directory, '').replace('/', '')
-                    self.settings['last_save_dir'] = directory
-                    self.save_settings()
-
-                    QMessageBox.information(
-                        self.gui.main_window,
-                        'File Saved',
-                        'Service saved as\n' + file_loc.replace('/', '\\'),
-                        QMessageBox.StandardButton.Ok
-                    )
-
-                    # add this file to the recently used services menu
-                    self.add_to_recently_used(directory, filename)
-
-                    self.gui.current_file = file_loc
-                    self.gui.changes = False
-                    self.gui.main_window.setWindowTitle(f'ProjectOn - {filename}')
-                    return 1
-                except Exception as ex:
-                    QMessageBox.information(
-                        self.gui.main_window,
-                        'Save Error',
-                        'There was a problem saving the service: '
-                        + file_loc.replace('/', '\\') + '\n\n' + str(ex),
-                        QMessageBox.StandardButton.Ok
-                    )
-                    return -1
-            else:
-                return -1
-        except Exception:
-            self.error_log()
+            self.gui.current_file = file_loc
+            self.gui.changes = False
+            self.gui.main_window.setWindowTitle(f'ProjectOn - {filename}')
+            return 0
+        except Exception as ex:
+            QMessageBox.information(
+                self.gui.main_window,
+                'Save Error',
+                'There was a problem saving the service: '
+                + file_loc.replace('/', '\\') + '\n\n' + str(ex),
+                QMessageBox.StandardButton.Ok
+            )
             return -1
 
-    def load_service(self, filename=None):
+    def load_service(self, filename: str | None = None):
         """
         Provides a method for loading an order of service from a service file. Will open a file dialog to the user's
         last-accessed directory (if available) if a filename is not supplied.
@@ -822,7 +590,7 @@ class ProjectOn(QObject):
         if save_result == -1:
             return
 
-        # open a file dialog if flename was not provided
+        # open a file dialog if filename was not provided
         if not filename:
             if len(self.settings['last_save_dir']) > 0:
                 open_dir = self.settings['last_save_dir']
@@ -833,25 +601,24 @@ class ProjectOn(QObject):
                 self.gui.main_window,
                 'Load Service File',
                 open_dir,
-                'ProjectOn Service Files (*.pro)'
+                'ProjectOn Service Files (*.pro *.proj)'
             )
         else:
-            result = [filename]
+            result = [filename, '']
+
+        if len(result[0]) > 0:
+            self.finish_load(result[0])
+
+    def finish_load(self, filename):
+        self.gui.oos_widget.oos_list_widget.clear()
 
         # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
         # provide a splash
-        if len(result[0]) > 0:
-            wait_widget = SimpleSplash(self.gui, 'Loading service...')
-            service_dict = None
-
-            try:
-                with open(result[0], 'r') as file:
-                    service_dict = json.load(file)
-
-                json.dumps(service_dict, indent=4)
-            except Exception:
-                logging.exception('')
-
+        wait_widget = SimpleSplash(self.gui, 'Loading service...')
+        service_dict = None
+        try:
+            with open(filename, 'r') as file:
+                service_dict = json.load(file)
             if not service_dict:
                 QMessageBox.information(
                     self.gui.main_window,
@@ -860,275 +627,292 @@ class ProjectOn(QObject):
                     QMessageBox.StandardButton.Ok
                 )
                 return
+        except Exception:
+            self.error_log()
+            return
 
-            if 'global_song_background' in service_dict.keys():
-                self.settings['global_song_background'] = service_dict['global_song_background']
-            if 'global_bible_background' in service_dict.keys():
-                self.settings['global_bible_background'] = service_dict['global_bible_background']
+        # change the background and font options in the current settings
+        if 'global_song_background' in service_dict.keys():
+            self.settings['global_song_background'] = service_dict['global_song_background']
+            self.gui.global_song_background_pixmap = QPixmap(
+                self.background_dir + '/' + self.settings['global_song_background'])
+        if 'global_bible_background' in service_dict.keys():
+            self.settings['global_bible_background'] = service_dict['global_bible_background']
+            self.gui.global_bible_background_pixmap = QPixmap(
+                self.background_dir + '/' + self.settings['global_bible_background'])
 
-            slide_types = ['song', 'bible']
-            for slide_type in slide_types:
-                if f'{slide_type}_font_face' in service_dict.keys():
-                    self.settings[f'{slide_type}_font_face'] = service_dict[f'{slide_type}_font_face']
-                if f'{slide_type}_font_size' in service_dict.keys():
-                    self.settings[f'{slide_type}_font_size'] = service_dict[f'{slide_type}_font_size']
-                if f'{slide_type}_font_color' in service_dict.keys():
-                    self.settings[f'{slide_type}_font_color'] = service_dict[f'{slide_type}_font_color']
-                if f'{slide_type}_use_shadow' in service_dict.keys():
-                    self.settings[f'{slide_type}_use_shadow'] = service_dict[f'{slide_type}_use_shadow']
-                if f'{slide_type}_shadow_color' in service_dict.keys():
-                    self.settings[f'{slide_type}_shadow_color'] = service_dict[f'{slide_type}_shadow_color']
-                if f'{slide_type}_shadow_offset' in service_dict.keys():
-                    self.settings[f'{slide_type}_shadow_offset'] = service_dict[f'{slide_type}_shadow_offset']
-                if f'{slide_type}_use_outline' in service_dict.keys():
-                    self.settings[f'{slide_type}_use_outline'] = service_dict[f'{slide_type}_use_outline']
-                if f'{slide_type}_outline_color' in service_dict.keys():
-                    self.settings[f'{slide_type}_outline_color'] = service_dict[f'{slide_type}_outline_color']
-                if f'{slide_type}_outline_width' in service_dict.keys():
-                    self.settings[f'{slide_type}_outline_width'] = service_dict[f'{slide_type}_outline_width']
-                if f'{slide_type}_use_shade' in service_dict.keys():
-                    self.settings[f'{slide_type}_use_shade'] = service_dict[f'{slide_type}_use_shade']
-                if f'{slide_type}_shade_color' in service_dict.keys():
-                    self.settings[f'{slide_type}_shade_color'] = service_dict[f'{slide_type}_shade_color']
-                if f'{slide_type}_shade_opacity' in service_dict.keys():
-                    self.settings[f'{slide_type}_shade_opacity'] = service_dict[f'{slide_type}_shade_opacity']
+        slide_types = ['song', 'bible']
+        for slide_type in slide_types:
+            if f'{slide_type}_font_face' in service_dict.keys():
+                self.settings[f'{slide_type}_font_face'] = service_dict[f'{slide_type}_font_face']
+            if f'{slide_type}_font_size' in service_dict.keys():
+                self.settings[f'{slide_type}_font_size'] = service_dict[f'{slide_type}_font_size']
+            if f'{slide_type}_font_color' in service_dict.keys():
+                self.settings[f'{slide_type}_font_color'] = service_dict[f'{slide_type}_font_color']
+            if f'{slide_type}_use_shadow' in service_dict.keys():
+                self.settings[f'{slide_type}_use_shadow'] = service_dict[f'{slide_type}_use_shadow']
+            if f'{slide_type}_shadow_color' in service_dict.keys():
+                self.settings[f'{slide_type}_shadow_color'] = service_dict[f'{slide_type}_shadow_color']
+            if f'{slide_type}_shadow_offset' in service_dict.keys():
+                self.settings[f'{slide_type}_shadow_offset'] = service_dict[f'{slide_type}_shadow_offset']
+            if f'{slide_type}_use_outline' in service_dict.keys():
+                self.settings[f'{slide_type}_use_outline'] = service_dict[f'{slide_type}_use_outline']
+            if f'{slide_type}_outline_color' in service_dict.keys():
+                self.settings[f'{slide_type}_outline_color'] = service_dict[f'{slide_type}_outline_color']
+            if f'{slide_type}_outline_width' in service_dict.keys():
+                self.settings[f'{slide_type}_outline_width'] = service_dict[f'{slide_type}_outline_width']
+            if f'{slide_type}_use_shade' in service_dict.keys():
+                self.settings[f'{slide_type}_use_shade'] = service_dict[f'{slide_type}_use_shade']
+            if f'{slide_type}_shade_color' in service_dict.keys():
+                self.settings[f'{slide_type}_shade_color'] = service_dict[f'{slide_type}_shade_color']
+            if f'{slide_type}_shade_opacity' in service_dict.keys():
+                self.settings[f'{slide_type}_shade_opacity'] = service_dict[f'{slide_type}_shade_opacity']
 
-            self.gui.apply_settings()
+        # handle the loading differently depending on whether this is a standard service file or a frozen service file
+        if filename.endswith('.pro'):
+            def make_missing_item(slide_type: str, title: str):
+                # Creates a placeholder list widget item when a saved item is not found
+                QMessageBox.information(
+                    None,
+                    'Song Missing',
+                    f'Saved {slide_type} "{title}" not found in current database. '
+                    f'Inserting placeholder.',
+                    QMessageBox.StandardButton.Ok
+                )
+
+                pixmap = QPixmap(50, 27)
+                pixmap.fill(QColor(255, 255, 255, 50))
+                icon = QPixmap('resources/gui_icons/x_icon.svg')
+                icon = icon.scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+                painter = QPainter(pixmap)
+                icon_loc = QPoint(
+                    int(pixmap.width() / 2 - icon.width() / 2),
+                    int(pixmap.height() / 2 - icon.height() / 2)
+                )
+                painter.drawPixmap(icon_loc, icon)
+                painter.end()
+
+                placeholder_item = QListWidgetItem()
+                placeholder_widget = StandardItemWidget(
+                    self.gui,
+                    'Missing custom slide: ' + service_dict[key]['title'],
+                    icon=pixmap
+                )
+                placeholder_item.setSizeHint(placeholder_widget.sizeHint())
+                self.gui.oos_widget.oos_list_widget.addItem(placeholder_item)
+                self.gui.oos_widget.oos_list_widget.setItemWidget(placeholder_item, placeholder_widget)
 
             # walk through the items saved in the file and load their QListWidgetItems into the order of service widget
-            self.gui.oos_widget.oos_list_widget.clear()
             for key in service_dict:
                 if key.isnumeric():
                     if service_dict[key]['type'] == 'song':
-                        try:
-                            song_item = self.gui.media_widget.song_list.findItems(
-                                service_dict[key]['title'], Qt.MatchFlag.MatchExactly)[0].clone()
-                        except IndexError:
-                            song_item = None
+                        song_items = self.gui.media_widget.song_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not song_item:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                None,
-                                'Song Missing',
-                                f'Saved song "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing song: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                        if len(song_items) == 0:
+                            make_missing_item('song', service_dict[key]['title'])
                         else:
-                            self.gui.media_widget.add_song_to_service(song_item, from_load_service=True)
+                            self.gui.media_widget.add_song_to_service(song_items[0].clone())
 
                     elif service_dict[key]['type'] == 'bible':
-                        if not self.gui.main.get_scripture:
-                            from dataHandling.getScripture import GetScripture
-                            self.get_scripture = GetScripture(self)
-                        passages = self.get_scripture.get_passage(service_dict[key]['title'])
+                        if 'version' in service_dict[key].keys() and len(service_dict[key]['version']) > 0:
+                            self.gui.media_widget.bible_selector_combobox.setCurrentText(service_dict[key]['version'])
+                        self.gui.media_widget.scripture_text_edited = False
 
-                        if passages[0] == -1:
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Error Loading Scripture',
-                                'Unable to load scripture passage "' + service_dict[key]['title'] + '". "' + passages[1] + '"',
-                                QMessageBox.StandardButton.Ok
-                            )
-                        else:
-                            reference = service_dict[key]['title']
-                            version = self.gui.media_widget.bible_selector_combobox.currentText()
-                            self.gui.add_scripture_item(reference, passages[1], version, scripture_edited=False)
+                        reference = service_dict[key]['title']
+                        self.gui.media_widget.add_scripture_to_service(reference)
+
                     elif service_dict[key]['type'] == 'custom_bible':
                         try:
-                            reference = service_dict[key]['title']
+                            if 'version' in service_dict[key].keys() and len(service_dict[key]['version']) > 0:
+                                self.gui.media_widget.bible_selector_combobox.setCurrentText(service_dict[key]['version'])
+
+                            self.gui.media_widget.formatted_reference = service_dict[key]['title']
                             text = service_dict[key]['text']
-                            passages = []
-                            for item in text:
-                                passage_split = item.split()
-                                passages.append([passage_split[0], ' '.join(passage_split[1:])])
-                            version = self.gui.media_widget.bible_selector_combobox.currentText()
-                            self.gui.add_scripture_item(reference, passages, version, scripture_edited=True)
+                            text = ' '.join(text)
+                            self.gui.media_widget.scripture_text_edit.setText(text)
+                            self.gui.media_widget.scripture_text_edited = True
+                            self.gui.media_widget.add_scripture_to_service()
                         except KeyError:
                             pass
 
                     elif service_dict[key]['type'] == 'custom':
-                        try:
-                            custom_item = self.gui.media_widget.custom_list.findItems(
-                                service_dict[key]['title'], Qt.MatchFlag.MatchExactly)[0]
-                        except IndexError:
-                            custom_item = None
+                        custom_items = self.gui.media_widget.custom_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not custom_item:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                None,
-                                'Custom Slide Missing',
-                                f'Saved custom slide "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing custom slide: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                        if len(custom_items) == 0:
+                            make_missing_item('custom slide', service_dict[key]['title'])
                         else:
-                            widget_item = QListWidgetItem()
-                            item_data = custom_item.data(Qt.ItemDataRole.UserRole).copy()
-                            widget_item.setData(Qt.ItemDataRole.UserRole, item_data)
-
-                            if item_data['override_global'] == 'False' or not item_data['background']:
-                                pixmap = self.gui.global_bible_background_pixmap
-                                pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                                       Qt.TransformationMode.SmoothTransformation)
-                            elif item_data['background'] == 'global_song':
-                                pixmap = self.gui.global_song_background_pixmap
-                                pixmap = pixmap.scaled(
-                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            elif item_data['background'] == 'global_bible':
-                                pixmap = self.gui.global_bible_background_pixmap
-                                pixmap = pixmap.scaled(
-                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-                            elif 'rgb(' in item_data['background']:
-                                pixmap = QPixmap(50, 27)
-                                painter = QPainter(pixmap)
-                                brush = QBrush(QColor(item_data['background']))
-                                painter.fillRect(pixmap.rect(), brush)
-                                painter.end()
-                            else:
-                                pixmap = QPixmap(
-                                    self.gui.main.background_dir + '/' + item_data['background'])
-                                pixmap = pixmap.scaled(
-                                    50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-
-                            widget = StandardItemWidget(
-                                self.gui, item_data['title'], 'Custom', pixmap)
-
-                            widget_item.setSizeHint(widget.sizeHint())
-                            self.gui.oos_widget.oos_list_widget.addItem(widget_item)
-                            self.gui.oos_widget.oos_list_widget.setItemWidget(widget_item, widget)
+                            self.gui.media_widget.add_custom_to_service(custom_items[0].clone())
 
                     elif service_dict[key]['type'] == 'image':
-                        image_item = None
-                        for i in range(self.gui.media_widget.image_list.count()):
-                            if (self.gui.media_widget.image_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
-                                    == service_dict[key]['title']):
-                                image_item = self.gui.media_widget.image_list.item(i).clone()
-                                break
+                        image_items = self.gui.media_widget.image_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not image_item:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Custom Slide Missing',
-                                f'Saved image slide "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing image slide: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                        if len(image_items) == 0:
+                            make_missing_item('image', service_dict[key]['title'])
                         else:
-                            pixmap = QPixmap(image_item.data(Qt.ItemDataRole.UserRole)['thumbnail'])
-                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                                   Qt.TransformationMode.SmoothTransformation)
-
-                            widget = StandardItemWidget(
-                                self.gui, image_item.data(Qt.ItemDataRole.UserRole)['title'], 'Image', pixmap)
-
-                            image_item.setSizeHint(widget.sizeHint())
-                            self.gui.oos_widget.oos_list_widget.addItem(image_item)
-                            self.gui.oos_widget.oos_list_widget.setItemWidget(image_item, widget)
+                            self.gui.media_widget.add_image_to_service(image_items[0].clone())
 
                     elif service_dict[key]['type'] == 'video':
-                        video_item = None
-                        for i in range(self.gui.media_widget.video_list.count()):
-                            if (self.gui.media_widget.video_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
-                                    == service_dict[key]['title']):
-                                video_item = self.gui.media_widget.video_list.item(i).clone()
+                        video_items = self.gui.media_widget.video_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not video_item:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Custom Slide Missing',
-                                f'Saved video "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing video: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                        if len(video_items) == 0:
+                            make_missing_item('video', service_dict[key]['title'])
                         else:
-                            pixmap = QPixmap(
-                                self.gui.main.video_dir + '/' + video_item.data(Qt.ItemDataRole.UserRole)['file_name'].split('.')[
-                                    0] + '.jpg')
-                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
-                                                   Qt.TransformationMode.SmoothTransformation)
-
-                            widget = StandardItemWidget(
-                                self.gui, video_item.data(Qt.ItemDataRole.UserRole)['title'], 'Video', pixmap)
-
-                            video_item.setSizeHint(widget.sizeHint())
-                            self.gui.oos_widget.oos_list_widget.addItem(video_item)
-                            self.gui.oos_widget.oos_list_widget.setItemWidget(video_item, widget)
+                            self.gui.media_widget.add_video_to_service(video_items[0].clone())
 
                     elif service_dict[key]['type'] == 'web':
-                        web_item = None
-                        for i in range(self.gui.media_widget.web_list.count()):
-                            if (self.gui.media_widget.web_list.item(i).data(Qt.ItemDataRole.UserRole)['title']
-                                    == service_dict[key]['title']):
-                                web_item = self.gui.media_widget.web_list.item(i)
+                        web_items = self.gui.media_widget.web_list.findItems(
+                            service_dict[key]['title'],
+                            Qt.MatchFlag.MatchFixedString | Qt.MatchFlag.MatchRecursive,
+                            0
+                        )
 
-                        if not web_item:
-                            title = service_dict[key]['title']
-                            QMessageBox.information(
-                                self.gui.main_window,
-                                'Web Slide Missing',
-                                f'Saved web slide "{title}" not found in current database. '
-                                f'Inserting placeholder.',
-                                QMessageBox.StandardButton.Ok
-                            )
-                            item = QListWidgetItem('Missing web slide: ' + service_dict[key]['title'])
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                        if len(web_items) == 0:
+                            make_missing_item('web', service_dict[key]['title'])
                         else:
-                            item = QListWidgetItem()
-                            item.setData(Qt.ItemDataRole.UserRole, web_item.data(Qt.ItemDataRole.UserRole).copy())
+                            self.gui.media_widget.add_web_to_service(web_items[0].clone())
+        elif filename.endswith('.proj'):
+            # walk through the items saved in the file and load their QListWidgetItems into the order of service widget
+            self.gui.oos_widget.oos_list_widget.clear()
+            for key in service_dict:
+                if key.isnumeric():
+                    # first, look for values that might be PNG bytes
+                    data = service_dict[key]
+                    for data_key in data:
+                        # test to see if this key's value contains the bytes for a PNG image
+                        # convert to a pixmap if so
+                        if type(data[data_key]) is str and len(data[data_key]) > 90:
+                            try:
+                                decoded_bytes = base64.b64decode(
+                                    service_dict[key][data_key].encode('utf-8'), validate=True)
+                                if decoded_bytes.startswith(b'\x89PNG\r\n\x1a\n'):
+                                    # these are the bytes of a PNG image
+                                    pixmap = QPixmap()
+                                    pixmap.loadFromData(decoded_bytes)
+                                    service_dict[key][data_key] = pixmap
+                            except Exception:
+                                pass
 
+                    # create a QListWidgetItem and its itemWidget for each service item based on the stored data
+                    item = QListWidgetItem()
+                    item.setData(Qt.ItemDataRole.UserRole, service_dict[key])
+
+                    # create the proper icon for this slide type
+                    if data['type'] == 'song':
+                        if not data['override_global'] or data['background'] == 'global_song':
+                            pixmap = self.gui.global_song_background_pixmap
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                        elif data['background'] == 'global_bible':
+                            pixmap = self.gui.global_bible_background_pixmap
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                        elif 'rgb(' in data['background']:
                             pixmap = QPixmap(50, 27)
                             painter = QPainter(pixmap)
-                            brush = QBrush(Qt.GlobalColor.black)
-                            pen = QPen(Qt.GlobalColor.white)
-                            painter.setPen(pen)
+                            rgb = data['background'].replace('rgb(', '')
+                            rgb = rgb.replace(')', '')
+                            rgb_split = rgb.split(',')
+                            brush = QBrush(QColor.fromRgb(
+                                int(rgb_split[0].strip()), int(rgb_split[1].strip()), int(rgb_split[2].strip())))
                             painter.setBrush(brush)
                             painter.fillRect(pixmap.rect(), brush)
-                            painter.setFont(self.gui.bold_font)
-                            painter.drawText(QPoint(2, 20), 'WWW')
                             painter.end()
+                        else:
+                            pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                    elif data['type'] == 'bible' or data['type'] == 'custom_bible':
+                        pixmap = self.gui.global_bible_background_pixmap.scaled(
+                            50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                    elif data['type'] == 'custom':
+                        if not data['override_global'] or data['background'] == 'global_bible':
+                            pixmap = self.gui.global_bible_background_pixmap
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                        elif data['background'] == 'global_song':
+                            pixmap = self.gui.global_song_background_pixmap
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                        elif 'rgb(' in data['background']:
+                            pixmap = QPixmap(50, 27)
+                            painter = QPainter(pixmap)
+                            brush = QBrush(QColor(data['background']))
+                            painter.fillRect(pixmap.rect(), brush)
+                            painter.end()
+                        else:
+                            pixmap = QPixmap(self.gui.main.background_dir + '/' + data['background'])
+                            pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                                   Qt.TransformationMode.SmoothTransformation)
+                    elif service_dict[key]['type'] == 'image':
+                        pixmap = data['background']
+                        pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                               Qt.TransformationMode.SmoothTransformation)
+                    elif service_dict[key]['type'] == 'video':
+                        pixmap = QPixmap(
+                            self.gui.main.video_dir + '/' + data['file_name'].split('.')[0] + '.jpg')
+                        pixmap = pixmap.scaled(50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                               Qt.TransformationMode.SmoothTransformation)
+                    elif service_dict[key]['type'] == 'web':
+                        pixmap = QPixmap(50, 27)
+                        pixmap.fill(QColor(255, 255, 255, 50))
+                        icon = QPixmap('resources/gui_icons/web_icon.svg')
+                        icon = icon.scaledToHeight(20, Qt.TransformationMode.SmoothTransformation)
+                        painter = QPainter(pixmap)
+                        icon_loc = QPoint(
+                            int(pixmap.width() / 2 - icon.width() / 2),
+                            int(pixmap.height() / 2 - icon.height() / 2)
+                        )
+                        painter.drawPixmap(icon_loc, icon)
+                        painter.end()
+                    else:
+                        pixmap = QPixmap()
 
-                            widget = StandardItemWidget(
-                                self.gui, web_item.data(Qt.ItemDataRole.UserRole)['title'], 'Web', pixmap)
+                    widget = StandardItemWidget(self.gui, data['title'], icon=pixmap)
+                    item.setSizeHint(widget.sizeHint())
+                    self.gui.oos_widget.oos_list_widget.addItem(item)
+                    self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
 
-                            item.setSizeHint(widget.sizeHint())
-                            self.gui.oos_widget.oos_list_widget.addItem(item)
-                            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+        # update the gui to reflect the changes loaded from the service file
+        self.gui.current_file = filename
 
-            self.gui.current_file = result[0]
+        self.gui.preview_widget.slide_list.clear()
+        self.gui.preview_widget.preview_label.clear()
+        self.gui.live_widget.slide_list.clear()
+        self.gui.live_widget.preview_label.clear()
 
-            self.gui.preview_widget.slide_list.clear()
-            self.gui.live_widget.slide_list.clear()
+        # set the last used directory in settings
+        file_dir = os.path.dirname(filename)
+        file_name = filename.replace(file_dir, '').replace('/', '').replace('\\', '')
+        self.settings['last_save_dir'] = file_dir
 
-            # set the last used directory in settings
-            file_dir = os.path.dirname(result[0])
-            file_name = result[0].replace(file_dir, '').replace('/', '').replace('\\', '')
-            self.settings['last_save_dir'] = file_dir
+        # add this file to the recently used services menu
+        self.add_to_recently_used(file_dir, file_name)
 
-            # add this file to the recently used services menu
-            self.add_to_recently_used(file_dir, file_name)
+        # apply any settings changes
+        self.gui.apply_settings()
 
-            # apply any settings changes
-            self.gui.apply_settings()
+        self.gui.changes = False
+        wait_widget.widget.deleteLater()
 
-            self.gui.changes = False
-            wait_widget.widget.deleteLater()
+        self.gui.main_window.setWindowTitle(f'ProjectOn - {file_name}')
 
-            self.gui.main_window.setWindowTitle(f'ProjectOn - {file_name}')
-
-    def add_to_recently_used(self, directory, file_name):
+    def add_to_recently_used(self, directory: str, file_name: str):
         """
         Provides a method to add a file to the user's recently used file menu if this file doesn't already exist
         there.
@@ -1340,12 +1124,13 @@ class ProjectOn(QObject):
             QMessageBox.StandardButton.Ok
         )
 
-    def error_log(self, log_text=None):
+    def error_log(self, log_text: str | None = None):
         """
         Method to write a traceback to the program's error log file as well as show the user the error.
         """
         if not log_text: # if text was provided, we're only logging information
             tb = traceback.walk_tb(sys.exc_info()[2])
+            message_box_text = ''
             for frame, line_no in tb:
                 clss = ''
                 if 'self' in frame.f_locals.keys():
@@ -1369,7 +1154,7 @@ class ProjectOn(QObject):
                 date_time = time.ctime(time.time())
                 log_text = (f'\n{date_time}:\n'
                             f'    {sys.exc_info()[1]} on line {line_num} of {file_name} in {clss}.{method}')
-            print(log_text)
+            print(f'ProjectOn.error_log log text: {log_text}')
 
             message_box = QMessageBox()
             message_box.setIconPixmap(QPixmap('resources/gui_icons/face-palm.png'))
@@ -1382,7 +1167,7 @@ class ProjectOn(QObject):
             log_text = (f'\n{date_time}:\n' + log_text)
 
         if 'linux' in sys.platform:
-            log_location = os.path.expanduser('~/.ProjectOn/error.log')
+            log_location = os.path.expanduser('~/.config/ProjectOn/error.log')
         else:
             log_location = os.path.expanduser('~/AppData/Roaming/ProjectOn/error.log')
 
@@ -1393,7 +1178,7 @@ class ProjectOn(QObject):
         with open(log_location, 'a') as file:
             file.write(log_text)
 
-    def check_db(self, db_file):
+    def check_db(self, db_file: str):
         db_structure = DB_STRUCTURE.copy()
         connection = sqlite3.connect(db_file)
         cursor = connection.cursor()
@@ -1607,6 +1392,32 @@ class ProjectOn(QObject):
             QMessageBox.StandardButton.Ok
         )
 
+    def copy_file_with_progress(self, src, dst, callback=None, chunk_size=1024 * 1024):
+        """
+        Copies a file from src to dst and reports progress via a callback function.
+        chunk_size defaults to 1MB.
+        :param str src: source file
+        :param str dst: destination file
+        :param callable callback: callback function to report progress
+        :param int chunk_size: chunk size in bytes
+        """
+        total_size = os.path.getsize(src)
+        bytes_copied = 0
+
+        with open(src, 'rb') as fsrc:
+            with open(dst, 'wb') as fdst:
+                while True:
+                    chunk = fsrc.read(chunk_size)
+                    if not chunk:
+                        break
+                    fdst.write(chunk)
+                    bytes_copied += len(chunk)
+
+                    # Calculate percentage and send it to the callback
+                    if callback:
+                        percentage = int((bytes_copied / total_size) * 100)
+                        callback(percentage)
+
 
 def log_unhandled_exception(exc_type, exc_value, exc_traceback):
     """
@@ -1641,7 +1452,7 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
                 f'    {exc_type}\n'
                 f'    {exc_value}\n'
                 f'    {full_traceback}')
-    print(log_text)
+    print(f'log_unhandled_exception log text: {log_text}')
 
     if 'linux' in sys.platform:
         user_dir = os.path.expanduser('~/.config/ProjectOn')

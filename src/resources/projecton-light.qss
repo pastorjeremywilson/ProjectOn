@@ -8,10 +8,22 @@ General Theme Colors:
     Disabled: #505052
 */
 
+/*-------------------- lyrics_text_edit --------------------*/
+QWidget[objectName="lyrics_text_edit"] {
+    background: #f0f0f2;
+    color: #000000;
+    border: 1px solid #aaaaff;
+}
+
 /*-------------------- edit_main_widget --------------------*/
 QWidget[objectName="edit_main_widget"] {
     background: #ffffff;
     color: #000000;
+}
+
+/*-------------------- editor_widget --------------------*/
+QWidget[objectName="editor_widget"] {
+    background: #aaaaff;
 }
 
 /*-------------------- font_widget --------------------*/
@@ -44,9 +56,6 @@ QListView[objectName="lyrics_list_widget"]::item:hover {
     color: #000000;
 }
 QListView[objectName="lyrics_list_widget"]::item:selected {
-    background: #aaaaff;
-}
-QListView[objectName="lyrics_list_widget"] QWidget[objectName="editor_widget"] {
     background: #aaaaff;
 }
 
@@ -85,13 +94,19 @@ QWidget[objectName="simple_splash"] {
     background: #5555aa;
     color: #ffffff;
 }
+
+/*-------------------- simple_splash_container --------------------*/
 QWidget[objectName="simple_splash_container"] {
     border: 3px solid white;
 }
+
+/*-------------------- simple_splash_label --------------------*/
 QWidget[objectName="simple_splash_label"] {
     padding: 10px;
     color: #ffffff;
 }
+
+/*-------------------- simple_splash_subtitle_label --------------------*/
 QWidget[objectName="simple_splash_subtitle_label"] {
     color: #ffffff;
     padding-bottom: 10px;
@@ -228,27 +243,36 @@ QLineEdit:focus {
     padding: 2px;
 }
 
-/*-------------------- QListView --------------------*/
-QListView {
+/*-------------------- QListWidget --------------------*/
+QListWidget {
     background: #f0f0f2;
+    color: #000000;
+    outline: none;
 }
-QListView::item {
+QListWidget::item {
     background: #eeeeff;
     color: #000000;
 }
-QListView::item:hover {
+QListWidget::item:hover {
     background: #e0e0e2;
     color: #000000;
 }
-QListView::item:selected {
-    background: #aaaaff;
-    color: #000000;
+QListWidget::item:selected,
+QListWidget::item:selected:!active {
+    background-color: #aaaaff;
+    color: #ffffff;
 }
-
-/*-------------------- QListWidget --------------------*/
-QListWidget {
-    background: #ffffff;
-    color: #000000;
+QListWidget::item:selected:active {
+    background-color: #aaaaff;
+    color: #ffffff;
+    border-bottom: 3px solid #5555aa;
+}
+QListWidget[objectName="oos_list_widget"]::item,
+QListWidget[objectName="oos_list_widget"]::item:!selected,
+QListWidget[objectName="oos_list_widget"]::item:selected,
+QListWidget[objectName="oos_list_widget"]::item:selected:!active,
+QListWidget[objectName="oos_list_widget"]::item:selected:active {
+    color: transparent;
 }
 
 /*-------------------- QMainWindow --------------------*/
@@ -303,14 +327,14 @@ QMessageBox {
 
 /*-------------------- QProgressBar --------------------*/
 QProgressBar {
+    border: 3px solid #555588;
+    text-align: center;
     color: #000000;
     background-color: #ffffff;
-    border: 1px solid #000000;
-    text-align: right;
 }
 QProgressBar::chunk {
-    background-color: #5555aa;
-    color: #ffffff;
+    background-color: #aaaaff;
+    color: #aaaaff;
 }
 
 /*-------------------- QPushButton --------------------*/
@@ -407,6 +431,9 @@ QScrollBar::sub-page:vertical {
 /*-------------------- QSlider --------------------*/
 QSlider::handle {
     background-color: #aaaaff;
+    border: 1px solid #f0f0f2;
+    height: 16px;
+    border-radius: 3px;
 }
 QSlider::handle:hover {
     background-color: #5555aa;
@@ -472,10 +499,11 @@ QTabBar::tab:last {
 /*-------------------- QTabWidget --------------------*/
 QTabWidget::pane {
     background: #ffffff;
+    border: 2px solid #aaaaff;
 }
 
 /*-------------------- QTextEdit --------------------*/
-QTextEdit {
+QTextEdit, CustomTextEdit {
     background: white;
     color: #000000;
     border: 1px solid #f0f0f2;
@@ -508,6 +536,33 @@ QTimeEdit::up-button:hover, QTimeEdit::down-button:hover {
     background: #aaaaff;
 }
 
+/*-------------------- QTreeWidget --------------------*/
+QTreeWidget {
+    background: #ffffff;
+    selection-background-color: #aaaaff;
+}
+QTreeWidget::item {
+    background: #eeeeff;
+    color: transparent;
+}
+QTreeWidget::item:hover {
+    background: #e0e0e2;
+    color: transparent;
+}
+QTreeWidget::item:selected,
+QTreeWidget::item:selected:!active,
+QTreeWidget::item:selected:active {
+    background-color: #aaaaff;
+    color: transparent;
+    border-bottom: 3px solid #5555aa;
+}
+QTreeWidget::branch:has-children:closed {
+    image: url(resources/gui_icons/expand_icon.svg);
+}
+QTreeWidget::branch:has-children:open {
+    image: url(resources/gui_icons/collapse_icon.svg);
+}
+
 /*-------------------- QWebEngineView --------------------*/
 QWebEngineView {
     background: #ffffff;
@@ -515,10 +570,10 @@ QWebEngineView {
 }
 
 QWebEngineView {
-    id: thisWeb
+    id: thisWeb;
 
-    anchors.fill: parent
-    url: dlViewModel.targetUrl
+    anchors.fill: parent;
+    url: dlViewModel.targetUrl;
 
     onNewViewRequested: function (request) {
         // Any user can trigger newViewRequested by simply holding the CTRL key while clicking any hyperlink.
@@ -530,5 +585,5 @@ QWebEngineView {
         // testing that was not the case. This is the ONLY thing that managed
         // to avoid a crash:
         request.openIn(thisWeb)
-    }
+    };
 }

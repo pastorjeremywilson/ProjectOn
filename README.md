@@ -16,26 +16,18 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.10.3?
-***Three bugs crept into version 1.10.0 where the black/logo screen buttons stopped working, slide editor was retaining
-    slide info when creating a second new song/custom slide, and new Custom Slide titles weren't saving. 
-    This version fixes those.***
-
-This is a pretty major update, addressing a variety of fixes I've been wanting to make to the program's usability
-and reliability.
-- Redesigned the song/custom slide editor to be cleaner and more intuitive
-- Updated the help screen to reflect recent changes
-- More accuracy and consistency when positioning text on the slides
-- Improved the responsiveness of the remote control web page
-- Improved the reliability of the various types of song imports
-- Added to the "Tools" menu "Move Data Folder" and "Select Existing Data Folder" for more control over where the data folder is stored, and to select an existing data folder that is different from the one currently being used
-- Major improvements to the way data is stored and handled for each type of slide
-- Lots of bug improvements under the hood as well as visual improvements to the GUI
+# What's New in Version 1.11.0?
+This is another major update that adds some more functionality and quality improvements:
+- Media items can now be sorted into folders<
+- Can now specify how backgrounds that don't fit the display screen are resized: stretch, fit, or fill
+- Added the ability to make the chosen font bold
+- Added a combination progress/seek bar to video and audio
+- Many other bug fixes and improvements under the hood
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.10.3) and run
+system only. Download the current ProjectOn installer (v.1.11.0) and run
 it on your computer.
 
 # Using ProjectOn

@@ -1,18 +1,21 @@
 import re
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtCore import QRect, Qt
+from PyQt5.QtGui import QFont, QColor, QImage, QPainter
 from PyQt5.QtWidgets import QMessageBox
 
+from dataHandling.declarations import SLIDE_DATA_DEFAULTS
 
-def parse_song_data(gui, song_data):
+
+def parse_song_data(display_widget, settings: dict, song_data: dict):
     """
     Method to take the stored lyrics of a song and parse them out according to their segment markers (i.e. [V1])
     :param GUI gui: The current instance of GUI
-    :param str lyrics: The raw lyrics data
+    :param dict song_data: The raw lyrics data
     """
     if 'text' not in song_data.keys() or len(song_data['text'].strip()) == 0:
         return
+
     # start by building a dictionary of segment text keyed to their corresponding tags
     lyric_dictionary = {}
     lyrics = song_data['text']
@@ -61,6 +64,9 @@ def parse_song_data(gui, song_data):
     else:
         iterable = lyric_dictionary
 
+    # create a QImage to use as a canvas for the text size calculations
+    image = QImage(display_widget.width(), display_widget.height(), QImage.Format.Format_ARGB32_Premultiplied)
+    painter = QPainter()
     for segment in iterable:
         item_num = [i for i in segment if i.isdigit()]
 
@@ -114,88 +120,26 @@ def parse_song_data(gui, song_data):
                 new_text = re.sub('</span>', '</u>', new_text)
                 segment_text = segment_text.replace(text, new_text)
 
-        # set the font, using the song's font data if override_global is True
-        if song_data['override_global']:
-            font_face = song_data['font_family']
-            font_size = int(song_data['font_size'])
-            font_color = song_data['font_color']
-
-            if 'global' in str(song_data['use_shadow']):
-                use_shadow = gui.main.settings['song_use_global']
-            else:
-                use_shadow = song_data['use_shadow']
-
-            if 'global' in str(song_data['shadow_color']):
-                shadow_color = gui.main.settings['song_shadow_color']
-            else:
-                shadow_color = song_data['shadow_color']
-
-            if 'global' in str(song_data['shadow_offset']):
-                shadow_offset = gui.main.settings['song_shadow_offset']
-            else:
-                shadow_offset = song_data['shadow_offset']
-
-            if 'global' in str(song_data['use_outline']):
-                use_outline = gui.min.settings['song_use_outline']
-            else:
-                use_outline = song_data['use_outline']
-
-            if 'global' in str(song_data['outline_color']):
-                outline_color = gui.main.settings['song_outline_color']
-            else:
-                outline_color = song_data['outline_color']
-
-            if 'global' in str(song_data['outline_width']):
-                outline_width = gui.main.settings['song_outline_width']
-            else:
-                outline_width = song_data['outline_width']
-        else:
-            font_face = gui.main.settings['song_font_face']
-            font_size = gui.main.settings['song_font_size']
-            font_color = gui.main.settings['song_font_color']
-            use_shadow = gui.main.settings['song_use_shadow']
-            shadow_color = gui.main.settings['song_shadow_color']
-            shadow_offset = gui.main.settings['song_shadow_offset']
-            use_outline = gui.main.settings['song_use_outline']
-            outline_color = gui.main.settings['song_outline_color']
-            outline_width = gui.main.settings['song_outline_width']
-
-        lyric_widget = gui.sample_lyric_widget
-
-        lyric_widget.setFont(QFont(font_face, font_size, QFont.Weight.Bold))
-        lyric_widget.footer_label.setFont(QFont(font_face, gui.global_footer_font_size))
-        lyric_widget.use_shadow = use_shadow
-        lyric_widget.shadow_color = QColor(shadow_color, shadow_color, shadow_color)
-        lyric_widget.shadow_offset = shadow_offset
-        lyric_widget.use_outline = use_outline
-        lyric_widget.outline_color = QColor(outline_color, outline_color, outline_color)
-        lyric_widget.outline_width = outline_width
-
         segment_text = '<p style="text-align: center; line-height: 120%;">' + segment_text + '</p>'
 
         segment_text = re.sub('<span.*?>', '', segment_text)
         segment_text = re.sub('</span>', '', segment_text)
-        gui.sample_lyric_widget.setText(segment_text)
+        song_data['parsed_text'] = {}
+        song_data['parsed_text']['text'] = segment_text
 
         segment_count = 1
 
-        footer_text = ''
-        footer_height = 0
-        if song_data['use_footer'] or song_data['use_footer'] == 'True':
-            if len(song_data['author']) > 0:
-                footer_text += song_data['author']
-            if len(song_data['copyright']) > 0:
-                footer_text += '\n\u00A9' + song_data['copyright'].replace('\n', ' ')
-            if len(song_data['ccli_song_number']) > 0:
-                footer_text += '\nCCLI Song #: ' + song_data['ccli_song_number']
-            if len(gui.main.settings['ccli_num']) > 0:
-                footer_text += '\nCCLI License #: ' + gui.main.settings['ccli_num']
-            gui.sample_lyric_widget.footer_label.setText(footer_text)
-            footer_height = gui.sample_lyric_widget.footer_label.height()
-
-        lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
-        lyric_widget_height = lyrics_rect.height()
-        target_height = gui.display_widget.height() - footer_height - 40
+        lyric_widget_height = 0
+        target_height = 0
+        if painter.begin(image):
+            try:
+                lyrics_rect, footer_height = display_widget.lyric_widget.draw_slide(painter, song_data, auto_fit=False)
+                lyric_widget_height = lyrics_rect.height()
+                target_height = display_widget.height() - footer_height - 40
+            finally:
+                painter.end()
+        else:
+            print('Unable to initialize painter')
 
         # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
         if lyric_widget_height > target_height:
@@ -242,178 +186,207 @@ def parse_song_data(gui, song_data):
 
     return segments
 
-def parse_scripture_item(gui, text):
-    """
-    Method to take a scripture passage and divide it up according to what will fit on the screen given the current
-    font and size.
-    :param GUI gui: The current instance of GUI
-    :param str text: The scripture text to be parsed
-    """
-    gui.sample_lyric_widget.lyric_label.setFont(
-        QFont(gui.global_font_face, gui.global_font_size, QFont.Weight.Bold))
-    gui.sample_lyric_widget.lyric_label.setText(
-        '<p style="text-align: center; line-height: 120%;">' + text + '<p>')
-    gui.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
-    gui.sample_lyric_widget.lyric_label.adjustSize()
-
-    slide_texts = []
-    if gui.sample_lyric_widget.lyric_label.sizeHint().height() > 920:
-        words = text.split(' ')
-
-        gui.sample_lyric_widget.lyric_label.setText('<p style="text-align: center; line-height: 120%;">')
-        gui.sample_lyric_widget.lyric_label.adjustSize()
-        count = 0
-        word_index = 0
-        segment_indices = []
-        current_segment_index = 0
-        while word_index < len(words) - 1:
-            segment_indices.append([])
-            while (gui.sample_lyric_widget.lyric_label.sizeHint().height() <= 920 and word_index < len(words) - 1):
-                if count > 0:
-                    gui.sample_lyric_widget.lyric_label.setText(
-                        gui.sample_lyric_widget.lyric_label.text().replace(
-                            '</p>', '') + ' ' + words[word_index].strip() + ' </p>')
-                else:
-                    gui.sample_lyric_widget.lyric_label.setText(
-                        '<p style="text-align: center; line-height: 120%;">' + words[
-                            word_index].strip() + ' </p>')
-                gui.sample_lyric_widget.lyric_label.adjustSize()
-                segment_indices[current_segment_index].append(word_index)
-                word_index += 1
-                count += 1
-
-            if len(segment_indices[current_segment_index]) > 1 and word_index < len(words) - 1:
-                segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
-                word_index -= 1
-                current_segment_index += 1
-            elif word_index == len(words) - 1:
-                segment_indices[current_segment_index].append(word_index)
-
-            gui.sample_lyric_widget.lyric_label.setText('<p style="text-align: center; line-height: 120%;">')
-            gui.sample_lyric_widget.lyric_label.adjustSize()
-            count = 0
-
-        for indices in segment_indices:
-            if len(indices) > 0:
-                current_segment = ''
-                for index in indices:
-                    current_segment += words[index] + ' '
-                slide_texts.append(current_segment)
-    else:
-        slide_texts.append(f'<p style="text-align: center; line-height: 120%;">{text}</p>')
-
-    return slide_texts
-
-def parse_scripture_by_verse(gui, text):
+def parse_scripture_by_verse(gui, text: str | list[str]):
     """
     Take a passage of scripture and split it according to how many verses will fit on the display screen, given
-    the current font and size.
+    the current font and size. In order to be usable, text must be a list of lists in the following format:
+    [['first verse number', 'first verse text'], ['second verse number', 'second verse text'], ...]
+    Returned will be a list comprised of the verse(s) that fit on the screen.
     :param GUI gui: The current instance of GUI
-    :param list of str text: The bible passage to be split
+    :param str | list of str text: The bible passage to be parsed
+    :return: list[str]
     """
-    # configure the hidden sample widget according to the current font
-    gui.sample_lyric_widget.setFont(QFont(gui.main.settings['bible_font_face'], gui.main.settings['bible_font_size']))
-    gui.sample_lyric_widget.footer_label.setText('bogus reference') # just a placeholder
-
-    # get the size values for the lyric widget, footer label, and font metrics
-    slide_texts = []
+    # create a slide data dict for the lyric widget drawing method to use
+    slide_data = {
+        'type': 'bible',
+        'title': '',
+        'author': '',
+        'copyright': '',
+        'ccli_song_number': '',
+        'text': text,
+        'parsed_text': '',
+        'verse_order': '',
+        'use_footer': True,
+        'override_global': False,
+        'font_family': gui.main.settings['bible_font_face'],
+        'font_size': gui.main.settings['bible_font_size'],
+        'font_color': gui.main.settings['bible_font_color'],
+        'background': gui.global_bible_background_pixmap,
+        'use_shadow': gui.main.settings['bible_use_shadow'],
+        'shadow_color': gui.main.settings['bible_shadow_color'],
+        'shadow_offset': gui.main.settings['bible_shadow_offset'],
+        'use_outline': gui.main.settings['bible_use_outline'],
+        'outline_color': gui.main.settings['bible_outline_color'],
+        'outline_width': gui.main.settings['bible_outline_width'],
+        'use_shade': gui.main.settings['bible_use_shade'],
+        'shade_color': gui.main.settings['bible_shade_color'],
+        'shade_opacity': gui.main.settings['bible_shade_opacity'],
+        'audio_file': '',
+        'loop_audio': True,
+        'split_slides': False,
+        'auto_play': False,
+        'slide_delay': 6,
+        'file_name': '',
+        'url': '',
+        'folder': ''
+    }
 
     # In the event that a simple string is received instead of a list of stings, this is a custom scripture passage
     # that needs to be parsed into verses and their corresponding verse numbers
     if type(text) is str:
-        verse_numbers = []
-        skip_next = False
-        for i in range(len(text)):
-            if text[i].isnumeric() and not skip_next:
-                verse_number = text[i]
-                if i < len(text) - 1 and text[i + 1].isnumeric():
-                    verse_number += text[i + 1]
-                    skip_next = True
-                verse_numbers.append(verse_number)
-            else:
-                skip_next = False
+        text = split_scripture_string(text)
 
-        text_split = []
-        for i in range(len(verse_numbers)):
-            verse_index = text.index(verse_numbers[i])
-            number_length = len(verse_numbers[i])
-            if i < len(verse_numbers) - 1:
-                text_split.append(
-                    [
-                        verse_numbers[i],
-                        text[verse_index + number_length:text.index(verse_numbers[i + 1])]
-                    ]
-                )
-            else:
-                text_split.append([verse_numbers[i], text[verse_index + number_length:]])
-        text = text_split
+    # clear the text of the lyric widget and instantiate a painter that will allow calculating the text height
+    lyrics_rect = QRect(0, 0, 0, 0)
+    footer_height = 0
+    image = QImage(gui.display_widget.width(), gui.display_widget.height(), QImage.Format_ARGB32_Premultiplied)
+    painter = QPainter()
+    if painter.begin(image):
+        try:
+            lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(painter, slide_data, auto_fit=False)
+        finally:
+            painter.end()
+    target_height = gui.display_widget.height() - footer_height - 40
 
-    verse_index = 0
-    segment_indices = []
-    current_segment_index = 0
-    recursion_count = 0
+    # Walk through the verses one at a time, adding a verse each time until it overflows the usable area of the slide.
+    # When it does overflow, remove the last added verse and append the verse(s) to slide_texts.
+    slide_texts = []
+    verses_added = 0
     parse_failed = False
+    verse_index = 0
+    this_segment = ''
     while verse_index < len(text):
-        if recursion_count > len(text):
-            parse_failed = True
-            break
-        recursion_count += 1
+        # add the current verse number and verse text to the lyric widget's text
+        this_verse = ' '.join(text[verse_index]).strip()
+        this_segment = f'{this_segment} {this_verse}'.strip()
+        verses_added += 1
+        slide_data['parsed_text'] = this_segment
 
-        # keep adding verses until the text overflows its widget, remove the last verse, and add to the slide texts
-        segment_indices.append([])
-        count = 0
-        gui.sample_lyric_widget.setText('')
-        lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
-        target_height = gui.display_widget.height() - footer_height - 40
-        while lyrics_rect.height() < target_height:
-            if count > 0:
-                if verse_index < len(text):
-                    gui.sample_lyric_widget.setText(
-                        gui.sample_lyric_widget.text + ' ' + text[verse_index][0] + ' ' + text[verse_index][1])
-                    lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
-                else:
-                    break
+        # repaint to the image from the lyric widget to get its current height
+        try:
+            lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(
+                painter, slide_data, auto_fit=False)
+        finally:
+            painter.end()
+
+        if lyrics_rect.height() > target_height:
+            if verses_added == 1:
+                # just this one verse overflowed the widget, so set parse_failed and add this verse to slide_texts
+                parse_failed = True
+                slide_texts.append(this_segment)
             else:
-                gui.sample_lyric_widget.setText(text[verse_index][0] + ' ' + text[verse_index][1])
-                lyrics_rect, footer_height = gui.sample_lyric_widget.calculate_painted_text()
-
-            segment_indices[current_segment_index].append(verse_index)
-            count += 1
-            verse_index += 1
-
-        if len(segment_indices[current_segment_index]) > 1:
-            if not verse_index == len(text):
-                segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
+                # adding this verse overflowed the widget so remove this verse from the current lyric widget text,
+                # add the altered text to slide_texts, and reduce verse_index by one so that it gets added to the
+                # next set
+                this_segment = this_segment.replace(this_verse, '').strip()
                 verse_index -= 1
-            elif verse_index == len(text) and lyrics_rect.height() > target_height:
-                segment_indices[current_segment_index].pop(len(segment_indices[current_segment_index]) - 1)
-                verse_index -= 1
+                slide_texts.append(this_segment)
+            this_segment = ''
+            verses_added = 0
+        verse_index += 1
+    slide_texts.append(this_segment)
 
-        elif not verse_index == len(text):
-            verse_index -= 1
-        current_segment_index += 1
-
-    # show an error message should parsing fail
+    # show an error message should the parsing fail
     if parse_failed:
         QMessageBox.information(
             gui.main_window,
             'Scripture parsing failed',
-            'A verse in this passage is too long to fit on the display screen. Consider decreasing the font '
-            'size or use a higher resolution display.',
+            'A verse in this passage is too long to fit on the display screen. It will be resized to fit the screen.',
             QMessageBox.StandardButton.Ok
         )
-        for verse in text:
-            if len(verse[1].strip()) > 0:
-                slide_texts.append(verse[0] + ' ' + verse[1])
-    else:
-        for indices in segment_indices:
-            if len(indices) > 0:
-                current_segment = ''
-                for index in indices:
-                    current_segment += text[index][0] + ' ' + text[index][1] + ' '
-                slide_texts.append(current_segment.strip())
 
     return slide_texts
+
+def split_scripture_string(text):
+    """
+    Function to take a string containing bible passages with their verse numbers and return a list formatted as such:
+    [
+        ['first verse number', 'first verse text without number'],
+        ['second verse number', 'second verse text without number'],
+        ...
+    ]
+    :return: list[str]: the split passages
+    """
+    # remove any html formatting from the text
+    text = re.sub('<.*?>', '', text)
+
+    # get all numbers from this string
+    numbers = re.findall(r'\d+', text)
+
+    # check that the numbers are sequential; if one is not, it's a number contained in the verse, not
+    # a verse number
+    next_chapter = False
+    good_numbers = []
+    for number in numbers:
+        if len(good_numbers) > 0:
+            if int(number) == int(good_numbers[-1]) + 1 or int(number) == 1:
+                good_numbers.append(number)
+            if int(number) == 1:
+                next_chapter = True
+        else:
+            good_numbers.append(number)
+
+    passages = []
+    next_verse_num = 0
+    for i in range(1, len(good_numbers)):
+        this_verse_num = good_numbers[i - 1]
+        next_verse_num = good_numbers[i]
+
+        verse = re.findall(rf'{this_verse_num}.*?{next_verse_num}', text)[0]
+        verse = verse.replace(this_verse_num, '').replace(next_verse_num, '').strip()
+
+        passages.append([this_verse_num, verse])
+
+        text_to_remove = f'{this_verse_num} {verse}'
+        text = text.replace(text_to_remove, '').strip()
+
+    last_verse = re.findall(rf'{next_verse_num}.*', text)[0]
+    last_verse = last_verse.replace(next_verse_num, '').strip()
+    passages.append([next_verse_num, last_verse])
+
+    return passages
+
+def get_qcolor_from_str(main, font_color: str, slide_type: str):
+    """
+    Method to convert a string font color to a QColor object
+    :param font_color: String font color (white, rgb(255, 255, 255), #ffffff, etc.)
+    :param slide_type: The type of slide this color will be applied to
+    :return QColor: QColor object
+    """
+    if font_color == 'white':
+        font_color = QColor(Qt.GlobalColor.white)
+    elif font_color == 'black':
+        font_color = QColor(Qt.GlobalColor.black)
+    elif '#' in font_color:
+        color = font_color.replace('#', '')
+        rgb_color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
+        font_color = QColor(rgb_color)
+    elif 'rgb' in font_color or ',' in font_color:
+        color = font_color.replace('rgb(', '').replace(')', '')
+        font_color_split = color.split(', ')
+        font_color = QColor(
+            int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+    else:
+        if slide_type == 'song':
+            if main.settings['song_font_color'] == 'black':
+                font_color = QColor(0, 0, 0)
+            elif main.settings['song_font_color'] == 'white':
+                font_color = QColor(255, 255, 255)
+            else:
+                font_color_split = main.settings['font_color'].split(', ')
+                font_color = QColor(
+                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+        else:
+            if main.settings['bible_font_color'] == 'black':
+                font_color = QColor(0, 0, 0)
+            elif main.settings['bible_font_color'] == 'white':
+                font_color = QColor(255, 255, 255)
+            else:
+                font_color_split = main.settings['bible_font_color'].split(', ')
+                font_color = QColor(
+                    int(font_color_split[0]), int(font_color_split[1]), int(font_color_split[2]))
+
+    return font_color
 
 
 class ParseScriptureReference:

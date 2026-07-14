@@ -1,3 +1,4 @@
+import json
 import os
 import re
 from xml.etree import ElementTree
@@ -6,7 +7,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QHBoxLayout, QPushButton, QLabel, \
     QMessageBox, QFileDialog, QApplication
 
-from gui.widgets.widgets import SimpleSplash
+from dataHandling.databaseFunctions import get_song_data, get_song_titles
+from guiElements.widgets.widgets import SimpleSplash
 
 
 class OpenlyricsExport(QWidget):
@@ -38,7 +40,7 @@ class OpenlyricsExport(QWidget):
         self.song_list = QListWidget()
         self.song_list.setObjectName('song_list')
         self.song_list.setFont(self.gui.standard_font)
-        for title in self.gui.main.get_song_titles():
+        for title in get_song_titles(self.gui.main.database):
             item = QListWidgetItem(title, self.song_list)
             item.setCheckState(Qt.CheckState.Unchecked)
 
@@ -112,7 +114,7 @@ class OpenlyricsExport(QWidget):
                     QApplication.processEvents()
                     counter += 1
 
-                    song_data = self.gui.main.get_song_data(title)
+                    song_data = get_song_data(self.gui.main.database, title)
 
                     song = ElementTree.Element('song')
                     song.set('xmlns', 'http://openlyrics.info/namespace/2009/song')
@@ -128,21 +130,21 @@ class OpenlyricsExport(QWidget):
 
                     authors = ElementTree.SubElement(properties, 'authors')
                     author = ElementTree.SubElement(authors, 'author')
-                    author.text = song_data[1]
+                    author.text = song_data['author']
 
                     copyright = ElementTree.SubElement(properties, 'copyright')
-                    copyright.text = song_data[2]
+                    copyright.text = song_data['copyright']
 
                     verse_order = ElementTree.SubElement(properties, 'verseOrder')
-                    verse_order.text = song_data[5]
+                    verse_order.text = song_data['verse_order']
 
                     ccli_number = ElementTree.SubElement(properties, 'ccliNo')
-                    ccli_number.text = song_data[3]
+                    ccli_number.text = song_data['ccli_song_number']
 
                     lyrics = ElementTree.SubElement(song, 'lyrics')
 
-                    if '[' in song_data[4]:
-                        lyric_split = song_data[4].split('[')
+                    if '[' in song_data['text']:
+                        lyric_split = song_data['text'].split('[')
                         for segment in lyric_split:
                             if len(segment) > 0:
                                 tag_split = segment.split(']')

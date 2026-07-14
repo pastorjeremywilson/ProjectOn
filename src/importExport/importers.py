@@ -7,9 +7,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QLineEdit, QWidget, QHBoxLayout, \
     QPushButton, QRadioButton, QButtonGroup
 
+from dataHandling.databaseFunctions import save_song, get_song_titles
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
 from dataHandling.parsers import parse_song_data
-from gui.widgets.widgets import SimpleSplash
+from guiElements.widgets.widgets import SimpleSplash
 
 
 class Importers:
@@ -21,7 +22,7 @@ class Importers:
     def __init__(self, gui):
         self.gui = gui
 
-    def do_import(self, import_type):
+    def do_import(self, import_type: int):
         self.import_type = import_type
 
         dialog = QDialog(self.gui.main_window)
@@ -151,7 +152,7 @@ class Importers:
 
         return files
 
-    def import_chordpro(self, files):
+    def import_chordpro(self, files: list[str]):
         for file in files:
             file_contents = ''
             with open(file, 'r', encoding='utf-8') as current_file:
@@ -164,103 +165,117 @@ class Importers:
                     f'{file} is not a valid ChordPro file.',
                     QMessageBox.StandardButton.Ok
                 )
-            else:
-                content_split = file_contents.split('\n')
-                song_title = ''
-                author = ''
-                ccli_song_number = ''
-                copyright = ''
-                segments = []
-                order = ''
-                save_lyrics = False
-                lyrics = ''
-                tag = ''
+                return
 
-                data = SLIDE_DATA_DEFAULTS.copy()
-                data['type'] = 'song'
-                
-                content_tags = re.findall(r'\{.*?}', file_contents)
-                content_data = re.split(r'\{.*?}', file_contents)[1:]
+            content_split = file_contents.split('\n')
+            song_title = ''
+            author = ''
+            ccli_song_number = ''
+            copyright = ''
+            segments = []
+            order = ''
+            save_lyrics = False
+            lyrics = ''
+            tag = ''
 
-                # the block of text below the final tag should contain the CCLI song number and/or the copyright info
-                final_block = content_data[-1]
-                final_block_split = final_block.split('\n')
+            data = SLIDE_DATA_DEFAULTS.copy()
+            data['type'] = 'song'
 
-                ccli_song_number = ''
-                copyright = ''
-                for i in range(len(final_block_split)):
-                    if 'ccli' in final_block_split[i].lower() and not 'license' in final_block_split[i].lower():
-                        for character in final_block_split[i]:
-                            if character.isdigit():
-                                ccli_song_number += character
-                    if '©' in final_block_split[i] or 'copyright' in final_block_split[i].lower():
-                        copyright = ' | '.join(final_block_split[i:]).strip()
+            content_tags = re.findall(r'\{.*?}', file_contents)
+            content_data = re.split(r'\{.*?}', file_contents)[1:]
 
-                data['ccli_song_number'] = ccli_song_number
-                data['copyright'] = copyright
+            # the block of text below the final tag should contain the CCLI song number and/or the copyright info
+            final_block = content_data[-1]
+            final_block_split = final_block.split('\n')
 
-                # separate the ccli/copyright info from the text of the final lyrics block
-                final_block = ''
-                for item in final_block_split:
-                    if 'ccli' in item.lower() or '©' in item or 'copyright' in item:
-                        break
-                    else:
-                        final_block += item + '\n'
-                content_data[-1] = final_block.strip()
+            ccli_song_number = ''
+            copyright = ''
+            for i in range(len(final_block_split)):
+                if 'ccli' in final_block_split[i].lower() and not 'license' in final_block_split[i].lower():
+                    for character in final_block_split[i]:
+                        if character.isdigit():
+                            ccli_song_number += character
+                if '©' in final_block_split[i] or 'copyright' in final_block_split[i].lower():
+                    copyright = ' | '.join(final_block_split[i:]).strip()
 
-                title = ''
-                subtitle = ''
-                author = ''
-                lyrics = ''
-                order = ''
-                for i in range(len(content_tags)):
-                    if '{' in content_tags[i] and not 'comment:' in content_tags[i].lower():
-                        if 'title' in content_tags[i].lower() and not 'subtitle' in content_tags[i].lower():
-                            title = content_tags[i].split(':')[1].replace('}', '').strip()
-                        elif 'subtitle:' in content_tags[i]:
-                            subtitle = content_tags[i].split(':')[1].replace('}', '').strip()
-                        elif ('artist' in content_tags[i]
-                              or 'composer' in content_tags[i]
-                              or 'lyricist' in content_tags[i]):
-                            author += content_tags[i].split(':')[1].replace('}', '').strip() + ' | '
-                        elif 'ccli:' in content_tags[i]:
-                            data['ccli_song_number'] = content_tags[i].split(':')[1].replace('}', '').strip()
-                        elif 'copyright' in content_tags[i]:
-                            data['copyright'] = content_tags[i].split(':')[1].replace('}', '').strip()
-                    else:
-                        tag = content_tags[i].split(':')[1].replace('}', '').strip()
-                        if not any(x.isdigit() for x in tag):
-                            tag += ' 1'
-                        tag_split = tag.split(' ')
-                        short_tag = tag_split[0][0].lower() + tag_split[1]
-                        cleaned_lyrics = re.sub(r'\[.*?]', '', content_data[i])
-                        lyrics_split = cleaned_lyrics.split('\n')
-                        cleaned_lyrics = ''
-                        for lyric in lyrics_split:
-                            cleaned_lyrics += re.sub(r'\s+', ' ', lyric.strip()) + '\n'
-                        lyrics += f'[{tag}]\n{cleaned_lyrics.strip()}\n'
-                        order += short_tag + ' '
+            data['ccli_song_number'] = ccli_song_number
+            data['copyright'] = copyright
 
-                if len(subtitle.strip()) > 0:
-                    data['title'] = title + ' ' + subtitle
+            # separate the ccli/copyright info from the text of the final lyrics block
+            final_block = ''
+            for item in final_block_split:
+                if 'ccli' in item.lower() or '©' in item or 'copyright' in item:
+                    break
                 else:
-                    data['title'] = title.strip()
-                if author.endswith(' | '):
-                    author = author[:-3]
-                data['author'] = author.strip()
-                data['verse_order'] = order.strip()
-                data['text'] = lyrics.strip()
-                data['parsed_text'] = parse_song_data(self.gui, data)
+                    final_block += item + '\n'
+            content_data[-1] = final_block.strip()
 
-                self.save_song(data)
+            title = ''
+            subtitle = ''
+            author = ''
+            lyrics = ''
+            order = ''
+            for i in range(len(content_tags)):
+                if '{' in content_tags[i] and not 'comment:' in content_tags[i].lower():
+                    if 'title' in content_tags[i].lower() and not 'subtitle' in content_tags[i].lower():
+                        title = content_tags[i].split(':')[1].replace('}', '').strip()
+                    elif 'subtitle:' in content_tags[i]:
+                        subtitle = content_tags[i].split(':')[1].replace('}', '').strip()
+                    elif ('artist' in content_tags[i]
+                          or 'composer' in content_tags[i]
+                          or 'lyricist' in content_tags[i]):
+                        author += content_tags[i].split(':')[1].replace('}', '').strip() + ' | '
+                    elif 'ccli:' in content_tags[i]:
+                        data['ccli_song_number'] = content_tags[i].split(':')[1].replace('}', '').strip()
+                    elif 'copyright' in content_tags[i]:
+                        data['copyright'] = content_tags[i].split(':')[1].replace('}', '').strip()
+                else:
+                    tag = content_tags[i].split(':')[1].replace('}', '').strip()
+                    if not any(x.isdigit() for x in tag):
+                        tag += ' 1'
+                    tag_split = tag.split(' ')
 
-    def import_openlyrics(self, files):
+                    # check the given tag against valid ProjectOn tags
+                    valid_tags = [
+                        'verse',
+                        'chorus',
+                        'pre-chorus',
+                        'bridge',
+                        'tag',
+                        'ending'
+                    ]
+                    if tag_split[0].strip().lower() not in valid_tags:
+                        tag_split[0] = 'Tag'
+                        tag = 'Tag ' + tag_split[1]
+                        
+                    short_tag = tag_split[0][0].lower() + tag_split[1]
+                    cleaned_lyrics = re.sub(r'\[.*?]', '', content_data[i])
+                    lyrics_split = cleaned_lyrics.split('\n')
+                    cleaned_lyrics = ''
+                    for lyric in lyrics_split:
+                        cleaned_lyrics += re.sub(r'\s+', ' ', lyric.strip()) + '\n'
+                    lyrics += f'[{tag}]\n{cleaned_lyrics.strip()}\n'
+                    order += short_tag + ' '
+
+            if len(subtitle.strip()) > 0:
+                data['title'] = title + ' ' + subtitle
+            else:
+                data['title'] = title.strip()
+            if author.endswith(' | '):
+                author = author[:-3]
+            data['author'] = author.strip()
+            data['verse_order'] = order.strip()
+            data['text'] = lyrics.strip()
+
+            self.save_song(data)
+
+    def import_openlyrics(self, files: list[str]):
         for file in files:
             file_contents = ''
             with open(file, 'r', encoding='utf-8') as current_file:
                 file_contents = current_file.read()
 
-            if '<title>' not in file_contents:
+            if '<title>' not in file_contents and '<titles>' not in file_contents:
                 QMessageBox.information(
                     self.gui.main_window,
                     'Invalid File',
@@ -281,13 +296,17 @@ class Importers:
 
                 data = SLIDE_DATA_DEFAULTS.copy()
 
-                song_title = ''
+                song_title = None
                 song_titles = root.findall('.//properties/titles/title', ns)
                 for element in song_titles:
                     if song_title:
                         song_title += ' (' + element.text + ')'
                     else:
-                        song_title = element.text
+                        if 'lang' in element.keys():
+                            if element.attrib['lang'] == 'en':
+                                song_title = element.text
+                        else:
+                            song_title = element.text
                 data['title'] = song_title
 
                 author = ''
@@ -300,13 +319,16 @@ class Importers:
                 data['author'] = author
 
                 data['copyright'] = ''
-                data['copyright'] += root.find('.//properties/copyright', ns).text
+                if root.find('.//properties/copyrights', ns):
+                    data['copyright'] += root.find('.//properties/copyright', ns).text
 
                 data['ccli_song_number'] = ''
-                data['ccli_song_number'] += root.find('.//properties/ccliNo', ns).text
+                if root.find('.//properties/ccli_song_number', ns):
+                    data['ccli_song_number'] += root.find('.//properties/ccliNo', ns).text
 
                 data['verse_order'] = ''
-                data['verse_order'] += root.find('.//properties/verseOrder', ns).text
+                if root.find('.//properties/verse_order', ns):
+                    data['verse_order'] += root.find('.//properties/verseOrder', ns).text
 
                 lyrics_element = root.find('.//lyrics', ns)
                 lyrics = ''
@@ -327,12 +349,11 @@ class Importers:
                             lyric_block = re.sub(r'\s+', ' ', lyric_block)
                             lyrics += lyric_block.strip() + '\n'
                 data['text'] = lyrics
-                data['parsed_text'] = parse_song_data(self.gui, data)
 
                 self.save_song(data)
 
-    def save_song(self, song_data):
-        if song_data['title'] in self.gui.main.get_song_titles():
+    def save_song(self, song_data: dict):
+        if song_data['title'] in get_song_titles(self.gui.main.database):
             dialog = QDialog(self.gui.main_window)
             dialog.setLayout(QVBoxLayout())
             dialog.setWindowTitle('Song Title Exists')
@@ -373,10 +394,10 @@ class Importers:
 
         save_widget = SimpleSplash(self.gui, 'Saving...')
 
-        self.gui.main.save_song(song_data)
+        save_song(self.gui.main.database, song_data)
         self.gui.media_widget.populate_song_list()
 
         self.gui.media_widget.song_list.setCurrentItem(
-            self.gui.media_widget.song_list.findItems(song_data['title'], Qt.MatchFlag.MatchExactly)[0])
+            self.gui.media_widget.song_list.findItems(song_data['title'].lower(), Qt.MatchFlag.MatchExactly)[0])
 
         save_widget.widget.deleteLater()

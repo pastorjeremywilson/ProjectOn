@@ -5,16 +5,16 @@ from os.path import exists
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, Qt
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QFont, QIcon, QPixmap
 from PyQt5.QtWebEngineCore import QWebEngineUrlRequestInterceptor
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings, QWebEnginePage
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton, QWidget, QLineEdit, QVBoxLayout, QSizePolicy, \
     QMessageBox, QDialog, QFileDialog, QCheckBox
 from cryptography.fernet import Fernet
 
+from dataHandling.databaseFunctions import save_song
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
-from dataHandling.parsers import parse_song_data
-from gui.widgets.widgets import SimpleSplash
+from guiElements.widgets.widgets import SimpleSplash
 
 
 class SongselectImport(QDialog):
@@ -198,7 +198,7 @@ class SongselectImport(QDialog):
         else:
             return -1, -1
 
-    def enable_ok(self, user_line_edit, password_line_edit, ok_button):
+    def enable_ok(self, user_line_edit: QLineEdit, password_line_edit: QLineEdit, ok_button: QPushButton):
         if len(user_line_edit.text()) > 0 and len(password_line_edit.text()) > 0:
             ok_button.setEnabled(True)
 
@@ -224,7 +224,7 @@ class SongselectImport(QDialog):
                                        ).format(user_name=user_name, password=password)
             result = self._run_javascript(script_set_login_fields)
 
-    def _run_javascript(self, script):
+    def _run_javascript(self, script: str):
         """
         Run a script and returns the result
 
@@ -240,23 +240,24 @@ class SongselectImport(QDialog):
             """
             self.got_web_stuff = True
             self.web_stuff = result
+
         self.web_engine_view.page().runJavaScript(script, handle_result)
         wait_for(lambda: self.got_web_stuff, 5.0)
         return self.web_stuff
 
-    def get_song_number_from_url(self, url):
+    def get_song_number_from_url(self, url: str):
         """
         Gets the ccli song number for a song from the url
 
         :return: String containing ccli song number, None is returned if not found
         """
-        ccli_number_regex = re.compile(r'.*?Songs\/([0-9]+).*', re.IGNORECASE)
+        ccli_number_regex = re.compile(r'.*?Songs/([0-9]+).*', re.IGNORECASE)
         regex_matches = ccli_number_regex.match(url)
         if regex_matches:
             return regex_matches.group(1)
         return None
 
-    def update_url(self, new_url):
+    def update_url(self, new_url: QUrl):
         self.url_bar.setText(new_url.toString())
 
     def download_requested(self, download_item):
@@ -401,15 +402,22 @@ class SongselectImport(QDialog):
         song_data['copyright'] = copyright
         song_data['ccli_song_number'] = song_number
         song_data['verse_order'] = order
-        song_data['parsed_text'] = parse_song_data(self.gui, song_data)
 
         save_widget = SimpleSplash(self.gui, 'Saving...')
 
-        self.gui.main.save_song(song_data)
-        self.gui.media_widget.populate_song_list()
+        pixmap = QPixmap('resources/gui_icons/song_icon.svg')
+        pixmap = pixmap.scaled(
+            20,
+            20,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+
+        save_song(self.gui.main.database, song_data)
+        self.gui.media_widget.song_list.add_item(song_data['title'], song_data, pixmap)
 
         self.gui.media_widget.song_list.setCurrentItem(
-            self.gui.media_widget.song_list.findItems(song_title, Qt.MatchFlag.MatchExactly)[0])
+            self.gui.media_widget.song_list.findItems(song_data['title'].lower(), Qt.MatchFlag.MatchExactly, 0)[0])
 
         save_widget.widget.deleteLater()
         self.done(0)
@@ -419,16 +427,20 @@ class WebEnginePage (QWebEnginePage):
     def __init__(self):
         super().__init__()
 
-    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
+    def javaScriptConsoleMessage(self,
+                                 level: QWebEnginePage.JavaScriptConsoleMessageLevel,
+                                 message: str,
+                                 lineNumber: int,
+                                 sourceID: str):
         print(f"JS Console ({level}): {message} at {sourceID}:{lineNumber}")
 
 
 class RequestInterceptor(QWebEngineUrlRequestInterceptor):
-    def __init__(self, headers):
+    def __init__(self, headers: dict):
         super().__init__()
         self.headers = headers
 
-    def set_headers(self,headers):
+    def set_headers(self, headers: dict):
         self.headers = headers
 
     def interceptRequest(self, info):
