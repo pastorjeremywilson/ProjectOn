@@ -135,10 +135,6 @@ class GUI(QObject):
 
         self.main.make_splash_screen(self.main.settings['last_status_count'])
 
-        self.main.update_status_signal.emit('Checking Database Integrity', 'status')
-        self.main.app.processEvents()
-        self.main.check_db(self.main.database)
-
         self.main.update_status_signal.emit('Indexing Images', 'status')
         self.main.app.processEvents()
 

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.11.0
+ProjectOn v.1.11.0.001
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import base64
+import logging
 import threading
 import json
 import os.path
@@ -77,9 +78,21 @@ class ProjectOn(QObject):
 
     def __init__(self):
         super().__init__()
-        sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.11.0'
 
+        # ensure we are working from the source root of the program
+        self.file_dir = os.path.dirname(os.path.dirname(__file__))
+        os.chdir(self.file_dir)
+
+        self.debug = True
+        sys.excepthook = log_unhandled_exception
+        self.version = 'v.1.11.0.001'
+
+        self.logger = create_logger(self.file_dir)
+        if self.debug:
+            self.logger.debug('=============================================================')
+            self.logger.debug(f'Excepthook, logging established. Version = {self.version}')
+            self.logger.debug('=============================================================')
+            
         ########## For Debugging, not necessary in production ##########
         def qt_message_handler(mode, context, message):
             return
@@ -95,10 +108,7 @@ class ProjectOn(QObject):
         qInstallMessageHandler(qt_message_handler)
         ################################################################
 
-        # ensure we are working from the source root of the program
-        self.file_dir = os.path.dirname(os.path.dirname(__file__))
-        os.chdir(self.file_dir)
-
+        if self.debug: self.logger.debug(f'Platform: {sys.platform}')
         if sys.platform == 'win32':
             os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
         elif sys.platform == 'linux':
@@ -128,6 +138,7 @@ class ProjectOn(QObject):
         s.connect(('192.255.255.255', 1))
         self.ip = s.getsockname()[0]
         self.port = 15171
+        if self.debug: self.logger.debug(f'Created socket at {self.ip}:{self.port}')
 
         self.update_status_signal.emit('Creating GUI', 'status')
         self.app.processEvents()
@@ -148,9 +159,8 @@ class ProjectOn(QObject):
         # load a service file if given at runtime
         for arg in sys.argv:
             if '.pro' in arg:
+                if self.debug: self.logger.debug(f'Loading file on startup: {arg}')
                 self.load_service(arg)
-
-        #self.app.processEvents()
 
         self.server_check_timer = ServerCheckTimer(self.remote_server, self.gui)
         self.server_check_timer.start()
@@ -262,6 +272,8 @@ class ProjectOn(QObject):
         cursor = connection.cursor()
         db_version = cursor.execute('PRAGMA user_version').fetchone()[0]
 
+        if self.debug: self.logger.debug(f'Database version = {db_version}')
+
         if db_version == 2:
             # this is the most recent version
             connection.close()
@@ -274,6 +286,8 @@ class ProjectOn(QObject):
                 'version of ProjectOn and try again.'
             )
             sys.exit(-2)
+
+        if self.debug: self.logger.debug(f'Updating Database:')
 
         date = datetime.now().strftime('%Y-%m-%d_%H.%M.%S')
         db_backup_loc = f'{self.data_dir}/backups/projecton.{date}.db'
@@ -288,6 +302,8 @@ class ProjectOn(QObject):
             os.mkdir(f'{self.data_dir}/backups')
         shutil.copy(self.database, db_backup_loc)
 
+        if self.debug: self.logger.debug(f'\tDatabase backed up to {db_backup_loc}')
+
         # first, check for the second-most-recently added columns in the songs table
         result = cursor.execute('PRAGMA table_info(songs)').fetchall()
         columns = []
@@ -295,6 +311,7 @@ class ProjectOn(QObject):
             columns.append(record[1])
 
         if not 'shade_opacity' in columns:
+            if self.debug: self.logger.debug(f'\tcreating shade_opacity column')
             column_names = [
                 ['use_shade', 'False'],
                 ['shade_color', '0'],
@@ -307,6 +324,7 @@ class ProjectOn(QObject):
 
         # check for the 'folder' column in the songs table
         if not 'folder' in columns:
+            if self.debug: self.logger.debug(f'\tcreating folder column in songs table')
             cursor.execute('ALTER TABLE songs ADD folder TEXT default "";')
             connection.commit()
 
@@ -317,6 +335,7 @@ class ProjectOn(QObject):
             columns.append(record[1])
 
         if not 'folder' in columns:
+            if self.debug: self.logger.debug(f'\tcreating folder column in customSlides table')
             cursor.execute('ALTER TABLE customSlides ADD folder TEXT default "";')
             cursor.execute('UPDATE customSlides SET folder="";')
             connection.commit()
@@ -328,12 +347,14 @@ class ProjectOn(QObject):
             columns.append(record[1])
 
         if not 'folder' in columns:
+            if self.debug: self.logger.debug(f'\tcreating folder column in imageThumbnails table')
             cursor.execute('ALTER TABLE imageThumbnails ADD folder TEXT default "";')
             connection.commit()
 
         # check that the videos table exists
         result = cursor.execute(f'SELECT name FROM sqlite_schema WHERE type="table" AND name="videos";').fetchall()
         if len(result) == 0:
+            if self.debug: self.logger.debug(f'\tcreating videos table')
             cursor.execute('CREATE TABLE videos (filename TEXT DEFAULT "", thumbnail BLOB, folder TEXT DEFAULT "");')
 
         files = os.listdir(self.video_dir)
@@ -367,6 +388,7 @@ class ProjectOn(QObject):
             columns.append(record[1])
 
         if not 'folder' in columns:
+            if self.debug: self.logger.debug(f'\tcreating folder column in web table')
             cursor.execute('ALTER TABLE web ADD folder TEXT default "";')
             connection.commit()
 
@@ -501,6 +523,10 @@ class ProjectOn(QObject):
         return result
 
     def complete_save(self, service_items, file_type):
+        if self.debug: self.logger.debug(f'Saving service as {file_type} file. Service items:'
+                                         f'\n--------------------'
+                                         f'\n{json.dumps(service_items, indent=4)}'
+                                         f'\n--------------------')
         if len(self.settings['last_save_dir']) > 0:
             save_dir = os.path.expanduser(self.settings['last_save_dir'])
         else:
@@ -533,12 +559,14 @@ class ProjectOn(QObject):
                 file_loc += f'.{file_type}'
 
         try:
+            if self.debug: self.logger.debug(f'Saving service to {file_loc}')
             with open(file_loc, 'w') as file:
                 json.dump(service_items, file, indent=4)
 
             directory = os.path.dirname(file_loc)
             filename = file_loc.replace(directory, '').replace('/', '')
             self.settings['last_save_dir'] = directory
+            if self.debug: self.logger.debug(f'Changed last_save_dir to {directory}')
             self.save_settings()
 
             QMessageBox.information(
@@ -610,6 +638,7 @@ class ProjectOn(QObject):
             self.finish_load(result[0])
 
     def finish_load(self, filename):
+        if self.debug: self.logger.debug(f'Loading service from {filename}')
         self.gui.oos_widget.oos_list_widget.clear()
 
         # because songs and bible verses are parsed as the order of service is being loaded, and this can take a bit,
@@ -630,6 +659,11 @@ class ProjectOn(QObject):
         except Exception:
             self.error_log()
             return
+
+        if self.debug: self.logger.debug(f'service_dict retrieved from file:'
+                                         f'\n--------------------'
+                                         f'\n{json.dumps(service_dict, indent=4)}'
+                                         f'\n--------------------')
 
         # change the background and font options in the current settings
         if 'global_song_background' in service_dict.keys():
@@ -946,6 +980,7 @@ class ProjectOn(QObject):
             used_services.append([directory, file_name])
             self.settings['used_services'] = used_services
             self.save_settings()
+            if self.debug: self.logger.debug(f'Added {directory}, {file_name} fo used_services')
 
     def import_xml_bible(self):
         file = QFileDialog.getOpenFileName(
@@ -959,10 +994,13 @@ class ProjectOn(QObject):
         if len(file[0]) == 0:
             return
 
+        if self.debug: self.logger.debug(f'Importing xml bible file: {file[0]}')
+
         file_name_split = file[0].split('/')
         file_name = file_name_split[len(file_name_split) - 1]
         new_location = self.bible_dir + '/' + file_name
         shutil.copy(file[0], new_location)
+        if self.debug: self.logger.debug(f'Copied {file[0]} to {new_location}')
 
         result = QMessageBox.question(
             self.gui.main_window,
@@ -1060,6 +1098,7 @@ class ProjectOn(QObject):
         if not len(result[0]) > 0:
             return
         backup_file_name = result[0]
+        if self.debug: self.logger.debug(f'Creating data backup file at {backup_file_name}')
         wait_widget = SimpleSplash(self.gui, 'Backing Up Data...', subtitle=True)
 
         zf = zipfile.ZipFile(
@@ -1080,6 +1119,7 @@ class ProjectOn(QObject):
                         self.app.processEvents()
         zf.close()
         wait_widget.widget.deleteLater()
+        if self.debug: self.logger.debug(f'Backup file created at {backup_file_name}')
 
     def restore_from_backup(self):
         result = QMessageBox.information(
@@ -1098,6 +1138,7 @@ class ProjectOn(QObject):
             os.path.expanduser('~/Documents'),
             'ZIP Files (*.zip)'
         )
+        if self.debug: self.logger.debug(f'Restoring backup from {result[0]}')
 
         if len(result[0]) == 0 or not zipfile.is_zipfile(result[0]):
             return
@@ -1113,6 +1154,7 @@ class ProjectOn(QObject):
             ss.subtitle_label.setText(file.filename)
             self.app.processEvents()
             try:
+                if self.debug: self.logger.debug(f'\trestoring {file} to {destination}')
                 zf.extract(file, destination)
             except Exception as ex:
                 self.error_log()
@@ -1178,48 +1220,6 @@ class ProjectOn(QObject):
         with open(log_location, 'a') as file:
             file.write(log_text)
 
-    def check_db(self, db_file: str):
-        db_structure = DB_STRUCTURE.copy()
-        connection = sqlite3.connect(db_file)
-        cursor = connection.cursor()
-        changes_made = False
-        log_text = ''
-        for table_name in db_structure.keys():
-            result = cursor.execute(
-                f'SELECT name FROM sqlite_master WHERE type = "table" AND name = "{table_name}";').fetchall()
-            if len(result) == 0: # this means the table doesn't exist and must be created
-                date_time = time.ctime(time.time())
-                log_text += f'\n{date_time}:\n    database missing table {table_name}; creating table'
-
-                sql = f'CREATE TABLE {table_name} ('
-                for column in db_structure[table_name]:
-                    sql += f'{column} {db_structure[table_name][column]}, '
-                sql = sql[:-2]
-                sql += ');'
-
-                cursor.execute(sql)
-                changes_made = True
-            else: # this means the table exists and now will be checked that all columns exist
-                result = connection.execute(f'PRAGMA table_info({table_name});').fetchall()
-                existing_columns = []
-                for column in result:
-                    existing_columns.append(column[1])
-
-                for column in db_structure[table_name]:
-                    if column not in existing_columns:
-                        date_time = time.ctime(time.time())
-                        log_text += f'\n{date_time}:\n    table {table_name} missing column {column}; creating column'
-
-                        cursor.execute(
-                            f'ALTER TABLE {table_name} ADD COLUMN {column} {db_structure[table_name][column]};')
-                        changes_made = True
-                        
-        if changes_made:
-            connection.commit()
-            self.error_log(log_text)
-
-        connection.close()
-
     def move_data_folder(self):
         response = QMessageBox.information(
             self.gui.main_window,
@@ -1240,6 +1240,7 @@ class ProjectOn(QObject):
 
         old_path = self.data_dir
         new_path = result + '/data'
+        if self.debug: self.logger.debug(f'Moving data folder from {old_path} to {new_path}')
         if 'win' in sys.platform:
             old_path = old_path.replace('/', '\\')
             new_path = new_path.replace('/', '\\')
@@ -1266,6 +1267,7 @@ class ProjectOn(QObject):
                 QMessageBox.StandardButton.Ok
             )
             return
+        if self.debug: self.logger.debug(f'\tCopied data folder from {old_path} to {new_path}')
 
         splash.widget.deleteLater()
         self.app.processEvents()
@@ -1279,6 +1281,7 @@ class ProjectOn(QObject):
         )
 
         if result == QMessageBox.StandardButton.Yes:
+            if self.debug: self.logger.debug(f'\tDeleting old data folder at {old_path}')
             splash = SimpleSplash(self.gui, 'Deleting old data folder...', parent=self.gui.main_window)
             splash.widget.raise_()
             self.app.processEvents()
@@ -1297,6 +1300,7 @@ class ProjectOn(QObject):
         new_path = new_path.replace('\\', '/')
         self.data_dir = new_path
         self.settings['data_dir'] = new_path
+        if self.debug: self.logger.debug(f'\tSet data_dir to {new_path}')
         save_settings = SaveSettings(self)
         thread = threading.Thread(target=save_settings.run())
         thread.start()
@@ -1321,6 +1325,7 @@ class ProjectOn(QObject):
         )
         if len(result) == 0:
             return
+
         target_directory = result
 
         if not exists(result + '/projecton.db'):
@@ -1331,6 +1336,7 @@ class ProjectOn(QObject):
                 QMessageBox.StandardButton.Ok
             )
             return
+        if self.debug: self.logger.debug(f'Selecting data folder located at {result}')
 
         common_folders = [
             'videos',
@@ -1472,3 +1478,17 @@ def log_unhandled_exception(exc_type, exc_value, exc_traceback):
     message_box.setStandardButtons(QMessageBox.StandardButton.Close)
     message_box.adjustSize()
     message_box.exec()
+
+
+def create_logger(path):
+    logger = logging.getLogger('projecton')
+    logger.setLevel(logging.DEBUG)
+
+    log_format = logging.Formatter(
+        "%(asctime)s | [%(filename)s:%(lineno)d -> %(funcName)s()]: %(message)s")
+
+    file_handler = logging.FileHandler(f'{path}/projecton_debug.log', mode='a')
+    file_handler.setFormatter(log_format)
+    logger.addHandler(file_handler)
+
+    return logger
