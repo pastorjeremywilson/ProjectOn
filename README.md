@@ -16,9 +16,8 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.11.0.rc3?
-This is a pretty major update, addressing a variety of fixes I've been wanting to make to the program's usability
-and reliability.
+# What's New in Version 1.11.0?
+This is another major update that adds some more functionality and quality improvements:
 - Media items can now be sorted into folders<
 - Can now specify how backgrounds that don't fit the display screen are resized: stretch, fit, or fill
 - Added the ability to make the chosen font bold
@@ -28,7 +27,7 @@ and reliability.
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.11.0.rc3) and run
+system only. Download the current ProjectOn installer (v.1.11.0) and run
 it on your computer.
 
 # Using ProjectOn
