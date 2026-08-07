@@ -64,9 +64,6 @@ def parse_song_data(display_widget, settings: dict, song_data: dict):
     else:
         iterable = lyric_dictionary
 
-    # create a QImage to use as a canvas for the text size calculations
-    image = QImage(display_widget.width(), display_widget.height(), QImage.Format.Format_ARGB32_Premultiplied)
-    painter = QPainter()
     for segment in iterable:
         item_num = [i for i in segment if i.isdigit()]
 
@@ -128,18 +125,9 @@ def parse_song_data(display_widget, settings: dict, song_data: dict):
         song_data['parsed_text']['text'] = segment_text
 
         segment_count = 1
-
-        lyric_widget_height = 0
-        target_height = 0
-        if painter.begin(image):
-            try:
-                lyrics_rect, footer_height = display_widget.lyric_widget.draw_slide(painter, song_data, auto_fit=False)
-                lyric_widget_height = lyrics_rect.height()
-                target_height = display_widget.height() - footer_height - 40
-            finally:
-                painter.end()
-        else:
-            print('Unable to initialize painter')
+        footer_height, lyrics_rect = display_widget.lyric_widget.calculate_slide(song_data)
+        lyric_widget_height = lyrics_rect.height()
+        target_height = display_widget.height() - footer_height - 40
 
         # check each segment against the lyric widget's height to see if that segment's text needs to be split in half
         if lyric_widget_height > target_height:
@@ -237,15 +225,7 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
         text = split_scripture_string(text)
 
     # clear the text of the lyric widget and instantiate a painter that will allow calculating the text height
-    lyrics_rect = QRect(0, 0, 0, 0)
-    footer_height = 0
-    image = QImage(gui.display_widget.width(), gui.display_widget.height(), QImage.Format_ARGB32_Premultiplied)
-    painter = QPainter()
-    if painter.begin(image):
-        try:
-            lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(painter, slide_data, auto_fit=False)
-        finally:
-            painter.end()
+    footer_height, lyrics_rect = gui.display_widget.lyric_widget.calculate_slide(slide_data)
     target_height = gui.display_widget.height() - footer_height - 40
 
     # Walk through the verses one at a time, adding a verse each time until it overflows the usable area of the slide.
@@ -262,12 +242,7 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
         verses_added += 1
         slide_data['parsed_text'] = this_segment
 
-        # repaint to the image from the lyric widget to get its current height
-        try:
-            lyrics_rect, footer_height = gui.display_widget.lyric_widget.draw_slide(
-                painter, slide_data, auto_fit=False)
-        finally:
-            painter.end()
+        footer_height, lyrics_rect = gui.display_widget.lyric_widget.calculate_slide(slide_data)
 
         if lyrics_rect.height() > target_height:
             if verses_added == 1:

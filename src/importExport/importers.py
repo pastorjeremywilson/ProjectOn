@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLab
 
 from dataHandling.databaseFunctions import save_song, get_song_titles
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
-from dataHandling.parsers import parse_song_data
 from guiElements.widgets.widgets import SimpleSplash
 
 

@@ -398,28 +398,28 @@ QScrollBar:vertical {
     margin: 22px 0 22px 0;
 }
 QScrollBar::handle:vertical {
-    background: #aaaaff;
+    background: #5555aa;
     min-height: 20px;
 }
 QScrollBar::add-line:vertical {
     height: 20px;
-    background: #aaaaff;
+    background: #5555aa;
     border: none;
     subcontrol-position: bottom;
     subcontrol-origin: margin;
 }
 QScrollBar::sub-line:vertical {
     height: 20px;
-    background: #aaaaff;
+    background: #5555aa;
     border: none;
     subcontrol-position: top;
     subcontrol-origin: margin;
 }
 QScrollBar::up-arrow:vertical {
-    image: url('resources/gui_icons/scroll_up_arrow.svg');
+    image: url('resources/gui_icons/scroll_up_arrow_white.svg');
 }
 QScrollBar::down-arrow:vertical {
-    image: url('resources/gui_icons/scroll_down_arrow.svg');
+    image: url('resources/gui_icons/scroll_down_arrow_white.svg');
 }
 QScrollBar::add-page:vertical {
     background: #f0f0f2;

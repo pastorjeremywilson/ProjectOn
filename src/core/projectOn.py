@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.11.0.001
+ProjectOn v.1.11.0.002
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -35,7 +35,7 @@ from os.path import exists
 from xml.etree import ElementTree
 
 from PyQt5.QtCore import Qt, QThreadPool, pyqtSignal, QObject, QPoint, QCoreApplication, QtMsgType, \
-    QByteArray, QBuffer, QIODevice, qInstallMessageHandler
+    QByteArray, QBuffer, QIODevice, qInstallMessageHandler, QTimer
 from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
@@ -85,7 +85,7 @@ class ProjectOn(QObject):
 
         self.debug = True
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.11.0.001'
+        self.version = 'v.1.11.0.002'
 
         self.logger = create_logger(self.file_dir)
         if self.debug:
@@ -410,6 +410,10 @@ class ProjectOn(QObject):
         """
         Saves the user's current order of service to a file chosen by the user.
         """
+        self.gui.status_signal.emit('show_widget', '')
+        self.gui.status_signal.emit('set_text', 'Saving service...')
+        self.gui.status_signal.emit('start_movie', '')
+
         if self.gui.oos_widget.oos_list_widget.count() == 0:
             QMessageBox.information(
                 self.gui.main_window,
@@ -460,6 +464,7 @@ class ProjectOn(QObject):
                 service_items[i]['text'] = item_data['parsed_text']
 
         result = self.complete_save(service_items, 'pro')
+
         return result
 
     def save_frozen_service(self):
@@ -569,12 +574,12 @@ class ProjectOn(QObject):
             if self.debug: self.logger.debug(f'Changed last_save_dir to {directory}')
             self.save_settings()
 
-            QMessageBox.information(
+            """QMessageBox.information(
                 self.gui.main_window,
                 'File Saved',
                 'Service saved as\n' + file_loc.replace('/', '\\'),
                 QMessageBox.StandardButton.Ok
-            )
+            )"""
 
             # add this file to the recently used services menu
             self.add_to_recently_used(directory, filename)
@@ -582,6 +587,11 @@ class ProjectOn(QObject):
             self.gui.current_file = file_loc
             self.gui.changes = False
             self.gui.main_window.setWindowTitle(f'ProjectOn - {filename}')
+
+            self.gui.status_signal.emit('set_text', 'Service has been saved.')
+            self.gui.status_signal.emit('stop_movie', '')
+            QTimer.singleShot(5000, lambda: self.gui.status_signal.emit('hide_widget', ''))
+
             return 0
         except Exception as ex:
             QMessageBox.information(
@@ -591,6 +601,11 @@ class ProjectOn(QObject):
                 + file_loc.replace('/', '\\') + '\n\n' + str(ex),
                 QMessageBox.StandardButton.Ok
             )
+
+            self.gui.status_signal.emit('set_text', 'Service has not been saved!.')
+            self.gui.status_signal.emit('stop_movie', '')
+            QTimer.singleShot(5000, lambda: self.gui.status_signal.emit('hide_widget', ''))
+
             return -1
 
     def load_service(self, filename: str | None = None):

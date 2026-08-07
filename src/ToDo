@@ -1,35 +1,8 @@
 Done:
-    Added ability to sort media items into folders
-    Fixed black/logo screen buttons on web remote not working
-    Fixed Title not saving in new custom slide
-    Fixed custom slide data being retained after saving new slide
-    Add copying/thumbnail feedback when importing a video
-    Figure out why new videos aren't saving to database
-    See about changing thumbnails for video import to bytes instead of files
-    Style QProgressBar
-    Unload video if loaded during remove
-    Add video playing progress bar or slider
-    Fix Ignore update not working
-    Figure out why preview label in live widget isn't staying centered for videos and web slides
-    Figure out why video isn't going back to zero at end after scrubbing
-    Set window positions and maximized states before showing
-    Consolidated all display widgets into the DisplayWidget class, switched DisplayWidget to a QStackedWidget
-    Add stretch/fit/fill to settings and modify lyric widget to use settings
-    Test on dual-screen. Preview might be changing the live display.
-    Allow sorting media into folders
-    Last used directory not saving
-    Display not updating from live
-    Avoid auto-fit text when parsing scripture and songs
-    Window title file name not correct
-    Save font weight in settings/saved service so that finding closest matching font will be more accurate
-    Darken background of QTextEdit in editor/all lyrics in light theme
-    Remove "add lyrics" from editor when editing all lyrics and hint: double-click
-    Test adding and removing all media types
-    Test import/export
-    Fix automatic font scaling in QFont when Windows display scaling is being used
-    Fix parsing foul-up when single verse overflows
-    Fix line spacing too big when adjusting font size
-    Fix in-verse number appearing in preview/live slide title
+    Reduce parse time in send to preview
+    remove all references to parse all songs
+    attach parse scripture to calculate
+    Attach countdown widget to display widget
 
 To Do:
     

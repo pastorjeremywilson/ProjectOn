@@ -353,14 +353,13 @@ class CountdownTimer(QTimer):
     Implements QTimer to check every second whether the service countdown widget should be displayed, and to change
     the text of the widget's label.
     Args:
-        countdown_widget (CountdownWidget): The countdown widget to be manipulated.
+        gui: The current instance of GUI
         start_time (datetime.time): The start time of the service.
         display_time (datetime.time): The time to start showing the countdown widget.
     """
-    def __init__(self, settings: dict, countdown_widget: QWidget, start_time: datetime, display_time: datetime):
+    def __init__(self, gui, start_time: datetime, display_time: datetime):
         super().__init__()
-        self.settings = settings
-        self.countdown_widget = countdown_widget
+        self.gui = gui
         self.start_time = start_time
         self.display_time = display_time
 
@@ -368,19 +367,20 @@ class CountdownTimer(QTimer):
         self.timeout.connect(self.operate_countdown)
 
     def operate_countdown(self):
-        if self.settings['countdown_settings']['use_countdown']:
+        if self.gui.main.settings['countdown_settings']['use_countdown']:
             if datetime.now() > self.start_time:
                 self.stop()
-                self.countdown_widget.hide_self_signal.emit()
+                if self.gui.countdown_widget:
+                    self.gui.show_hide_countdown_widget_signal.emit('hide')
             elif datetime.now() >= self.display_time:
-                if self.countdown_widget.isHidden():
-                    self.countdown_widget.show_self_signal.emit()
+                if self.gui.countdown_widget:
+                    self.gui.show_hide_countdown_widget_signal.emit('show')
                 time_remaining = self.start_time - datetime.now()
                 minutes = str(time_remaining.seconds / 60).split('.')[0]
                 seconds = str(time_remaining.seconds % 60)
                 if len(seconds) == 1:
                     seconds = '0' + seconds
-                self.countdown_widget.update_label_signal.emit(f'Service starts in {minutes}:{seconds}')
+                self.gui.countdown_widget.update_label_signal.emit(f'Service starts in {minutes}:{seconds}')
             else:
-                if not self.countdown_widget.isHidden():
-                    self.countdown_widget.hide_self_signal.emit()
+                if self.gui.countdown_widget and not self.gui.countdown_widget.isHidden():
+                    self.gui.show_hide_countdown_widget_signal.emit('hide')

@@ -4,7 +4,7 @@ import re
 from os.path import exists
 from threading import Thread
 
-from PyQt5.QtCore import Qt, QSize, QPoint
+from PyQt5.QtCore import Qt, QSize, QPoint, QTimer
 from PyQt5.QtGui import QColor, QPixmap, QPainter, QBrush, QIcon, QTextCursor, QFont, QTextDocument, QDrag, \
     QStandardItemModel, QStandardItem, QFontMetrics, QImage
 from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout, QLineEdit, \
@@ -1668,6 +1668,10 @@ class EditWidget(QDialog):
         Method to save user's changes for the song type editor.
         """
 
+        self.gui.status_signal.emit('show_widget', '')
+        self.gui.status_signal.emit('set_text', 'Saving song...')
+        self.gui.status_signal.emit('start_movie', '')
+
         self.update_song_data()
         # title is essential for the database, prompt user for title if not inputted
         if len(self.title_line_edit.text()) == 0:
@@ -1756,6 +1760,10 @@ class EditWidget(QDialog):
         self.done(0)
         save_widget.widget.deleteLater()
 
+        self.gui.status_signal.emit('set_text', 'Song has been saved.')
+        self.gui.status_signal.emit('stop_movie', '')
+        QTimer.singleShot(5000, lambda: self.gui.status_signal.emit('hide_widget', ''))
+
         thread = Thread(target=self.gui.media_widget.build_song_search_index())
         thread.start()
 
@@ -1763,6 +1771,10 @@ class EditWidget(QDialog):
         """
         Method to save user's changes for the custom slide type editor.
         """
+
+        self.gui.status_signal.emit('show_widget', '')
+        self.gui.status_signal.emit('set_text', 'Saving custom slide...')
+        self.gui.status_signal.emit('start_movie', '')
 
         self.update_custom_data()
 
@@ -1841,6 +1853,10 @@ class EditWidget(QDialog):
 
         self.done(0)
         self.save_widget.widget.deleteLater()
+
+        self.gui.status_signal.emit('set_text', 'Custom slide has been saved.')
+        self.gui.status_signal.emit('stop_movie', '')
+        QTimer.singleShot(5000, lambda: self.gui.status_signal.emit('hide_widget', ''))
 
     def get_simplified_text(self, lyrics: str):
         break_tag = '<br />'
