@@ -514,13 +514,17 @@ class DisplayWidget(QStackedWidget):
             Qt.AspectRatioMode.IgnoreAspectRatio,
             Qt.TransformationMode.SmoothTransformation
         )
-        stage_html = re.sub('<p.*?>', '', self.lyric_widget.text)
-        stage_html = stage_html.replace('</p>', '')
-        stage_html = f'<p style="align-text: center;">{stage_html}</p>'
+
+        if item_data['type'] == 'song' or item_data['type'] == 'custom' or 'bible' in item_data['type']:
+            stage_html = re.sub('<p.*?>', '', self.lyric_widget.text)
+            stage_html = stage_html.replace('</p>', '')
+            stage_html = f'<p style="align-text: center;">{stage_html}</p>'
+        else:
+            stage_html = f'<p style="align-text: center;">{item_data["title"]}</p>'
 
         slide_number = self.gui.live_widget.slide_list.currentRow() + 1
         num_slides = self.gui.live_widget.slide_list.count()
-        slide_info = f'Slide {slide_number} of {num_slides}'
+        slide_info = f'Slide<br>{slide_number} of {num_slides}'
 
         if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
             self.gui.live_widget.preview_label.setPixmap(pixmap)
@@ -1885,11 +1889,6 @@ class NewFontWidget(QWidget):
         outline_color = None
         outline_width = None
         if not self.signalsBlocked() and self.applies_to_global:
-            # check to see if the font face or size has changed; re-parse the songs if so
-            if (self.font_size_spinbox.value() is not self.previous_font_size or
-                    self.font_face_combobox.currentText() is not self.previous_font_face):
-                self.parse_debounce_timer.start()
-
             if value:
                 if self.sender().objectName() == 'shadow_color_slider':
                     shadow_color = value

@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.11.0.002
+ProjectOn v.1.11.0.003
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -83,11 +83,15 @@ class ProjectOn(QObject):
         self.file_dir = os.path.dirname(os.path.dirname(__file__))
         os.chdir(self.file_dir)
 
-        self.debug = True
+        self.debug = False
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.11.0.002'
+        self.version = 'v.1.11.0.003'
 
-        self.logger = create_logger(self.file_dir)
+        if sys.platform == 'win32':
+            self.user_dir = os.path.expanduser('~') + '/AppData/Roaming/ProjectOn'
+        else:
+            self.user_dir = os.path.expanduser('~') + '/.config/Projecton'
+        self.logger = create_logger(self.user_dir)
         if self.debug:
             self.logger.debug('=============================================================')
             self.logger.debug(f'Excepthook, logging established. Version = {self.version}')
@@ -1501,6 +1505,12 @@ def create_logger(path):
 
     log_format = logging.Formatter(
         "%(asctime)s | [%(filename)s:%(lineno)d -> %(funcName)s()]: %(message)s")
+
+    if not exists(path):
+        os.makedirs(path)
+    if not exists(f'{path}/projecton_debug.log'):
+        with open(f'{path}/projecton_debug.log', 'w') as file:
+            pass
 
     file_handler = logging.FileHandler(f'{path}/projecton_debug.log', mode='a')
     file_handler.setFormatter(log_format)
