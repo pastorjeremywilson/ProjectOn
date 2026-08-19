@@ -78,7 +78,6 @@ class LiveWidget(QWidget):
         self.seek_slider.setFont(self.gui.standard_font)
         self.seek_slider.setOrientation(Qt.Orientation.Horizontal)
         def slider_moved():
-            print(self.seek_slider.value(), self.gui.display_widget.media_player.state(), self.seek_slider.maximum(), self.seek_slider.minimum())
             if self.gui.display_widget.media_player:
                 if self.gui.display_widget.media_player.state() == QMediaPlayer.StoppedState:
                     self.gui.display_widget.media_player.pause()

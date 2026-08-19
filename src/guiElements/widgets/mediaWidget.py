@@ -1,8 +1,6 @@
 import os
 import re
 import shutil
-import time
-from functools import partial
 from os.path import exists
 from threading import Thread
 from xml.etree import ElementTree
@@ -1341,6 +1339,8 @@ class MediaWidget(QTabWidget):
         else:
             scripture_text = self.scripture_text_edit.toPlainText()
             passages = split_scripture_string(scripture_text)
+            if len(passages) == 0:
+                return
             reference = self.formatted_reference
 
         version = self.bible_selector_combobox.currentText()

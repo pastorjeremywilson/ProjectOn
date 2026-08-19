@@ -417,8 +417,9 @@ class DisplayWidget(QStackedWidget):
 
         # handle stopping the media player carefully to avoid an Access Violation
         if self.media_player:
-            if self.media_player.state == QMediaPlayer.PlayingState:
-                self.media_player.pause()
+            print(f'DisplayWidget.change_display: media player state: {self.media_player.state()}')
+            if self.media_player.state() == QMediaPlayer.PlayingState:
+                self.media_player.stop()
                 self.media_player.setPosition(0)
 
             # return statusChanged to its default function in case loop audio has been used
@@ -443,6 +444,8 @@ class DisplayWidget(QStackedWidget):
             self.setCurrentWidget(self.lyric_widget)
 
             # start playing audio if this is a custom slide with audio, but only if audio isn't already playing
+            if item_data['type'] == 'custom':
+                print(f'DisplayWidget.change_display: audio_file: {item_data['audio_file']}, loop_audio: {item_data['loop_audio']}')
             if (item_data['type'] == 'custom'
                     and item_data['audio_file']
                     and len(item_data['audio_file']) > 0):
@@ -479,7 +482,11 @@ class DisplayWidget(QStackedWidget):
 
                         self.media_player.mediaStatusChanged.connect(repeat_media)
                     else:
-                        self.media_player.stateChanged.connect(self.media_playing_change)
+                        def media_playing_change():
+                            if self.media_player.mediaStatus() == QMediaPlayer.EndOfMedia:
+                                self.media_player.stop()
+                                self.media_player.setPosition(0)
+                        self.media_player.stateChanged.connect(media_playing_change)
                     self.media_player.play()
 
             # cycle through text paragraphs if auto-play is enabled for this custom slide

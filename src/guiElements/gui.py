@@ -1483,14 +1483,13 @@ class GUI(QObject):
             else:
                 item.setData(Qt.ItemDataRole.UserRole, slide_data)
             for text in slide_data['parsed_text']:
-                if len(text.strip()) > 0:
-                    lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
-                    list_item = QListWidgetItem()
-                    slide_data['parsed_text'] = text
-                    list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
-                    list_item.setSizeHint(lyric_widget.sizeHint())
-                    self.preview_widget.slide_list.addItem(list_item)
-                    self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+                lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
+                list_item = QListWidgetItem()
+                slide_data['parsed_text'] = text
+                list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                list_item.setSizeHint(lyric_widget.sizeHint())
+                self.preview_widget.slide_list.addItem(list_item)
+                self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
         elif slide_data['type'] == 'bible' or slide_data['type'] == 'custom_bible':
             title = slide_data['title']

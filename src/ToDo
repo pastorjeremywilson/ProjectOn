@@ -3,8 +3,11 @@ Done:
     remove all references to parse all songs
     attach parse scripture to calculate
     Attach countdown widget to display widget
+    Fixed custom slide with no words not being sent to preview
+    Fixed media player not stopping when changing slides
 
 To Do:
-    
+    Fix scripture that spans across chapter!
+
 Future Releases:
     Video backgrounds

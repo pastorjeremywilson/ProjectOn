@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.11.0.003
+ProjectOn v.1.11.0.004
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -40,7 +40,7 @@ from PyQt5.QtGui import QPixmap, QFont, QPainter, QBrush, QColor, QIcon
 from PyQt5.QtWidgets import QApplication, QLabel, QListWidgetItem, QWidget, QVBoxLayout, QFileDialog, QMessageBox, \
     QProgressBar, QHBoxLayout, QDialog, QLineEdit, QPushButton, QAction
 
-from dataHandling.declarations import DB_STRUCTURE
+from dataHandling.declarations import DB_STRUCTURE, SLIDE_DATA_DEFAULTS
 from guiElements.gui import GUI
 from core.runnables import SaveSettings, ServerCheckTimer
 from guiElements.widgets.widgets import SimpleSplash, StandardItemWidget
@@ -85,7 +85,7 @@ class ProjectOn(QObject):
 
         self.debug = False
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.11.0.003'
+        self.version = 'v.1.11.0.004'
 
         if sys.platform == 'win32':
             self.user_dir = os.path.expanduser('~') + '/AppData/Roaming/ProjectOn'
@@ -463,7 +463,8 @@ class ProjectOn(QObject):
                 'type': item_data['type']
             }
             if self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom_bible':
-                service_items[i]['text'] = item_data['parsed_text']
+                print(json.dumps(item_data, indent=4))
+                service_items[i]['text'] = item_data['text']
             elif self.gui.oos_widget.oos_list_widget.item(i).data(Qt.ItemDataRole.UserRole)['type'] == 'custom':
                 service_items[i]['text'] = item_data['parsed_text']
 
@@ -772,7 +773,9 @@ class ProjectOn(QObject):
 
                     elif service_dict[key]['type'] == 'bible':
                         if 'version' in service_dict[key].keys() and len(service_dict[key]['version']) > 0:
-                            self.gui.media_widget.bible_selector_combobox.setCurrentText(service_dict[key]['version'])
+                            version = service_dict[key]['version']
+                        else:
+                            version = self.gui.media_widget.bible_selector_combobox.currentText()
                         self.gui.media_widget.scripture_text_edited = False
 
                         reference = service_dict[key]['title']
@@ -781,14 +784,31 @@ class ProjectOn(QObject):
                     elif service_dict[key]['type'] == 'custom_bible':
                         try:
                             if 'version' in service_dict[key].keys() and len(service_dict[key]['version']) > 0:
-                                self.gui.media_widget.bible_selector_combobox.setCurrentText(service_dict[key]['version'])
+                                version = service_dict[key]['version']
+                            else:
+                                version = self.gui.media_widget.bible_selector_combobox.currentText()
 
-                            self.gui.media_widget.formatted_reference = service_dict[key]['title']
-                            text = service_dict[key]['text']
-                            text = ' '.join(text)
-                            self.gui.media_widget.scripture_text_edit.setText(text)
-                            self.gui.media_widget.scripture_text_edited = True
-                            self.gui.media_widget.add_scripture_to_service()
+                            # create an oos list widget item based on the data as stored in the file
+                            item = QListWidgetItem()
+                            slide_data = SLIDE_DATA_DEFAULTS.copy()
+                            slide_data['type'] = 'custom_bible'
+                            slide_data['type'] = 'bible'
+                            slide_data['title'] = service_dict[key]['title']
+                            slide_data['text'] = service_dict[key]['text']
+                            slide_data['author'] = version
+                            item.setData(Qt.ItemDataRole.UserRole, slide_data)
+
+                            label_pixmap = self.gui.global_bible_background_pixmap.scaled(
+                                50, 27, Qt.AspectRatioMode.IgnoreAspectRatio,
+                                Qt.TransformationMode.SmoothTransformation)
+                            widget = StandardItemWidget(
+                                self.gui, slide_data['title'], 'Scripture (edited)', label_pixmap)
+                            item.setSizeHint(widget.sizeHint())
+
+                            self.gui.oos_widget.oos_list_widget.addItem(item)
+                            self.gui.oos_widget.oos_list_widget.setItemWidget(item, widget)
+                            self.gui.oos_widget.oos_list_widget.scrollToItem(item)
+                            self.gui.oos_widget.oos_list_widget.setCurrentItem(item)
                         except KeyError:
                             pass
 

@@ -228,47 +228,41 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
     footer_height, lyrics_rect = gui.display_widget.lyric_widget.calculate_slide(slide_data)
     target_height = gui.display_widget.height() - footer_height - 40
 
-    # Walk through the verses one at a time, adding a verse each time until it overflows the usable area of the slide.
-    # When it does overflow, remove the last added verse and append the verse(s) to slide_texts.
-    slide_texts = []
-    verses_added = 0
     parse_failed = False
-    verse_index = 0
-    this_segment = ''
-    while verse_index < len(text):
-        # add the current verse number and verse text to the lyric widget's text
-        this_verse = ' '.join(text[verse_index]).strip()
-        this_segment = f'{this_segment} {this_verse}'.strip()
-        verses_added += 1
-        slide_data['parsed_text'] = this_segment
+    if len(text) == 1:
+        slide_texts = [text[0][1]]
+    else:
+        # Walk through the verses one at a time, adding a verse each time until it overflows the usable area of the slide.
+        # When it does overflow, remove the last added verse and append the verse(s) to slide_texts.
+        slide_texts = []
+        verses_added = 0
+        verse_index = 0
+        this_segment = ''
+        while verse_index < len(text):
+            # add the current verse number and verse text to the lyric widget's text
+            this_verse = ' '.join(text[verse_index]).strip()
+            this_segment = f'{this_segment} {this_verse}'.strip()
+            verses_added += 1
+            slide_data['parsed_text'] = this_segment
 
-        footer_height, lyrics_rect = gui.display_widget.lyric_widget.calculate_slide(slide_data)
+            footer_height, lyrics_rect = gui.display_widget.lyric_widget.calculate_slide(slide_data)
 
-        if lyrics_rect.height() > target_height:
-            if verses_added == 1:
-                # just this one verse overflowed the widget, so set parse_failed and add this verse to slide_texts
-                parse_failed = True
-                slide_texts.append(this_segment)
-            else:
-                # adding this verse overflowed the widget so remove this verse from the current lyric widget text,
-                # add the altered text to slide_texts, and reduce verse_index by one so that it gets added to the
-                # next set
-                this_segment = this_segment.replace(this_verse, '').strip()
-                verse_index -= 1
-                slide_texts.append(this_segment)
-            this_segment = ''
-            verses_added = 0
-        verse_index += 1
-    slide_texts.append(this_segment)
-
-    # show an error message should the parsing fail
-    if parse_failed:
-        QMessageBox.information(
-            gui.main_window,
-            'Scripture parsing failed',
-            'A verse in this passage is too long to fit on the display screen. It will be resized to fit the screen.',
-            QMessageBox.StandardButton.Ok
-        )
+            if lyrics_rect.height() > target_height:
+                if verses_added == 1:
+                    # just this one verse overflowed the widget, so set parse_failed and add this verse to slide_texts
+                    parse_failed = True
+                    slide_texts.append(this_segment)
+                else:
+                    # adding this verse overflowed the widget so remove this verse from the current lyric widget text,
+                    # add the altered text to slide_texts, and reduce verse_index by one so that it gets added to the
+                    # next set
+                    this_segment = this_segment.replace(this_verse, '').strip()
+                    verse_index -= 1
+                    slide_texts.append(this_segment)
+                this_segment = ''
+                verses_added = 0
+            verse_index += 1
+        slide_texts.append(this_segment)
 
     return slide_texts
 
@@ -283,7 +277,7 @@ def split_scripture_string(text):
     :return: list[str]: the split passages
     """
     # remove any html formatting from the text
-    text = re.sub('<.*?>', '', text)
+    text = re.sub('<.*?>', '', text).strip()
 
     # get all numbers from this string
     numbers = re.findall(r'\d+', text)
@@ -301,8 +295,23 @@ def split_scripture_string(text):
         else:
             good_numbers.append(number)
 
+    if len(good_numbers) == 0:
+        QMessageBox.information(
+            None,
+            "Invalid passage",
+            "Verse number(s) required to show bible passage. Please try again.",
+            QMessageBox.StandardButton.Ok
+        )
+        return []
+
+    # check that the first verse number hasn't been deleted
+    if not text[0].isdigit():
+        prior_number = int(numbers[0]) - 1
+        text = f'{str(prior_number)} {text}'
+        good_numbers.insert(0, str(prior_number))
+
     passages = []
-    next_verse_num = 0
+    next_verse_num = '0'
     for i in range(1, len(good_numbers)):
         this_verse_num = good_numbers[i - 1]
         next_verse_num = good_numbers[i]
@@ -315,9 +324,11 @@ def split_scripture_string(text):
         text_to_remove = f'{this_verse_num} {verse}'
         text = text.replace(text_to_remove, '').strip()
 
-    last_verse = re.findall(rf'{next_verse_num}.*', text)[0]
-    last_verse = last_verse.replace(next_verse_num, '').strip()
-    passages.append([next_verse_num, last_verse])
+    last_verse = re.findall(rf'{good_numbers[-1]}.*', text)
+
+    if len(last_verse) > 0:
+        last_verse = last_verse[0].replace(next_verse_num, '').strip()
+        passages.append([next_verse_num, last_verse])
 
     return passages
 
