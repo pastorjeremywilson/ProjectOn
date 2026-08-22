@@ -113,7 +113,35 @@ class GUI(QObject):
         self.audio_output = None
         self.main = main
 
-        display_geometry = self.main.app.primaryScreen().geometry()
+        self.check_files()
+
+        self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
+
+        # check number of screens, set the primary to the app's primary screen and the secondary to the same if only one
+        self.screens = self.main.app.screens()
+        if len(self.screens) > 1:
+            self.primary_screen = self.main.app.primaryScreen()
+            for screen in self.screens:
+                if screen != self.primary_screen:
+                    self.secondary_screen = screen
+
+            if self.main.debug:
+                self.main.logger.debug(f'primary screen: {self.primary_screen.name()}, secondary screen: {self.secondary_screen.name()}')
+        else:
+            self.primary_screen = self.main.app.primaryScreen()
+            self.secondary_screen = self.main.app.primaryScreen()
+
+        # if settings exist, set the secondary screen (the display screen) to the one in the settings
+        if self.main.debug:
+            self.main.logger.debug(f'selected screen name: {self.main.settings['selected_screen_name']}')
+        if len(self.main.settings) > 0 and len(self.main.settings["selected_screen_name"].strip()) > 0:
+            for screen in self.screens:
+                if screen.name() == self.main.settings['selected_screen_name']:
+                    self.secondary_screen = screen
+                else:
+                    self.primary_screen = screen
+
+        display_geometry = self.primary_screen.geometry()
         if display_geometry.width() < 1920:
             self.standard_font.setPointSize(10)
             self.bold_font.setPointSize(10)
@@ -143,8 +171,6 @@ class GUI(QObject):
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        self.check_files()
-
         self.main.make_splash_screen(self.main.settings['last_status_count'])
 
         self.main.update_status_signal.emit('Indexing Images', 'status')
@@ -159,27 +185,6 @@ class GUI(QObject):
         ii = IndexImages(self.main, 'images')
         self.main.thread_pool.start(ii)
         self.main.thread_pool.waitForDone()
-
-        self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
-
-        # check number of screens, set the primary to the app's primary screen and the secondary to the same if only one
-        self.screens = self.main.app.screens()
-        if len(self.screens) > 1:
-            self.primary_screen = self.main.app.primaryScreen()
-            for screen in self.screens:
-                if screen != self.primary_screen:
-                    self.secondary_screen = screen
-        else:
-            self.primary_screen = self.main.app.primaryScreen()
-            self.secondary_screen = self.main.app.primaryScreen()
-
-        # if settings exist, set the secondary screen (the display screen) to the one in the settings
-        if len(self.main.settings) > 0 and len(self.main.settings["selected_screen_name"].strip()) > 0:
-            for screen in self.screens:
-                if screen.name() == self.main.settings['selected_screen_name']:
-                    self.secondary_screen = screen
-                else:
-                    self.primary_screen = screen
 
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
@@ -1333,21 +1338,27 @@ class GUI(QObject):
         """
         self.primary_screen = primary_screen
         self.secondary_screen = secondary_screen
+        if self.main.debug:
+            self.main.logger.debug(f"primary screen: {primary_screen.name()}, secondary screen: {secondary_screen.name()}")
 
         gui_geometry = self.primary_screen.geometry()
         display_geometry = self.secondary_screen.geometry()
 
+        if self.main.debug:
+            self.main.logger.debug(f"gui geometry: {gui_geometry}, display geometry: {display_geometry}")
+            self.main.logger.debug(f"gui geometry top-left {gui_geometry.topLeft()}, display geometry top-left: {display_geometry.topLeft()}")
+
         self.main_window.setGeometry(gui_geometry)
-        self.main_window.move(gui_geometry.topLeft())
         self.main_window.setWindowState(Qt.WindowState.WindowMaximized)
+        self.main_window.move(gui_geometry.topLeft())
         self.main_window.raise_()
 
         self.display_widget_container.setGeometry(display_geometry)
         self.display_widget_container.setFixedSize(display_geometry.width(), display_geometry.height())
-        self.display_widget_container.move(display_geometry.topLeft())
         self.display_widget_container.setWindowState(Qt.WindowState.WindowFullScreen)
+        self.display_widget_container.move(display_geometry.topLeft())
         self.display_widget_container.raise_()
-        self.display_widget.adjustSize()
+        #self.display_widget.adjustSize()
 
         # hide the display widget if there is only one screen; set the initial state of the screen buttons
         self.tool_bar.black_screen_button.setChecked(False)

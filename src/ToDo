@@ -5,9 +5,11 @@ Done:
     Attach countdown widget to display widget
     Fixed custom slide with no words not being sent to preview
     Fixed media player not stopping when changing slides
+    Fix scripture that spans across chapter!
+    Fixed display screen not positioned correctly on dual-monitor setups
+    Fixed crash on "None" for verse number in parse_scripture_by_verse
 
 To Do:
-    Fix scripture that spans across chapter!
 
 Future Releases:
     Video backgrounds

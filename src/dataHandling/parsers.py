@@ -240,28 +240,31 @@ def parse_scripture_by_verse(gui, text: str | list[str]):
         this_segment = ''
         while verse_index < len(text):
             # add the current verse number and verse text to the lyric widget's text
-            this_verse = ' '.join(text[verse_index]).strip()
-            this_segment = f'{this_segment} {this_verse}'.strip()
-            verses_added += 1
-            slide_data['parsed_text'] = this_segment
+            if not text[verse_index][0]: # in some pslams, the psalm introduction will be added with no verse number; ignore it
+                verse_index += 1
+            else:
+                this_verse = ' '.join(text[verse_index]).strip()
+                this_segment = f'{this_segment} {this_verse}'.strip()
+                verses_added += 1
+                slide_data['parsed_text'] = this_segment
 
-            footer_height, lyrics_rect = gui.display_widget.lyric_widget.calculate_slide(slide_data)
+                footer_height, lyrics_rect = gui.display_widget.lyric_widget.calculate_slide(slide_data)
 
-            if lyrics_rect.height() > target_height:
-                if verses_added == 1:
-                    # just this one verse overflowed the widget, so set parse_failed and add this verse to slide_texts
-                    parse_failed = True
-                    slide_texts.append(this_segment)
-                else:
-                    # adding this verse overflowed the widget so remove this verse from the current lyric widget text,
-                    # add the altered text to slide_texts, and reduce verse_index by one so that it gets added to the
-                    # next set
-                    this_segment = this_segment.replace(this_verse, '').strip()
-                    verse_index -= 1
-                    slide_texts.append(this_segment)
-                this_segment = ''
-                verses_added = 0
-            verse_index += 1
+                if lyrics_rect.height() > target_height:
+                    if verses_added == 1:
+                        # just this one verse overflowed the widget, so set parse_failed and add this verse to slide_texts
+                        parse_failed = True
+                        slide_texts.append(this_segment)
+                    else:
+                        # adding this verse overflowed the widget so remove this verse from the current lyric widget text,
+                        # add the altered text to slide_texts, and reduce verse_index by one so that it gets added to the
+                        # next set
+                        this_segment = this_segment.replace(this_verse, '').strip()
+                        verse_index -= 1
+                        slide_texts.append(this_segment)
+                    this_segment = ''
+                    verses_added = 0
+                verse_index += 1
         slide_texts.append(this_segment)
 
     return slide_texts

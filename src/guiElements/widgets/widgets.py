@@ -3469,10 +3469,12 @@ class IndexedSettingsWidget(QWidget):
                 secondary_screen = screens[0]
             else:
                 for screen in screens:
-                    if screen_name == screen.name():
+                    if screen.name() == screen_name:
                         secondary_screen = screen
                     else:
                         primary_screen = screen
+
+            self.gui.main.logger.debug(f'primary screen: {primary_screen.name()}, secondary screen: {secondary_screen.name()}')
 
         if sys.platform == 'win32':
             self.gui.main.settings['force_software_rendering'] = self.software_checkbox.isChecked()
