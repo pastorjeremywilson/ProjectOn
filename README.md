@@ -20,7 +20,7 @@ projection needs of a church service.
 This update fixes some important bugs
 - Fixed inordinately long parse time when sending songs and bible verses to the preview
 - The "Countdown to service" bar is no attached to the main display window
-- Fixed custom slide containing no words noe being sent to preview
+- Fixed custom slide containing no words not being sent to preview
 - Fixed media player not stopping when changing slides
 - Fixed occasional problem parsing scripture that spans across chapters
 - Fixed display screen not positioning properly on dual-monitor setups
