@@ -5,18 +5,20 @@ import re
 import shutil
 import sys
 import tempfile
+import time
 from datetime import datetime
 from os.path import exists
+from threading import Thread
 
 import requests
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRect, QByteArray, QBuffer, QIODevice, QSize
-from PyQt5.QtGui import QFont, QPixmap, QIcon, QKeySequence, QTextDocument, QScreen, QPainter
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QRect, QByteArray, QBuffer, QIODevice, QSize, QTimer, QThread
+from PyQt5.QtGui import QFont, QPixmap, QIcon, QKeySequence, QTextDocument, QScreen, QPainter, QMovie
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineProfile
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QListWidgetItem, \
     QMessageBox, QHBoxLayout, QTextBrowser, QPushButton, QFileDialog, QDialog, QProgressBar, QCheckBox, QAction, \
-    QGraphicsView, QGraphicsScene, QTextEdit, QApplication, QTreeWidgetItem
+    QGraphicsView, QGraphicsScene, QTextEdit, QApplication, QTreeWidgetItem, QTreeWidgetItemIterator
 
 from dataHandling import parsers, declarations
 from dataHandling.declarations import DEFAULT_SETTINGS
@@ -31,7 +33,7 @@ from importExport.openlyricsExport import OpenlyricsExport
 from guiElements.widgets.previewWidget import PreviewWidget
 from core.runnables import CountdownTimer
 from guiElements.widgets.widgets import Toolbar, IndexedSettingsWidget, CustomMainWindow, DisplayWidget, \
-    StandardItemWidget, CountdownWidget
+    StandardItemWidget, CountdownWidget, DisplayWidgetContainer
 from importExport.songselectImport import SongselectImport
 
 
@@ -94,6 +96,9 @@ class GUI(QObject):
     grab_display_signal = pyqtSignal()
     server_alert_signal = pyqtSignal()
     change_current_live_item_signal = pyqtSignal()
+    status_signal = pyqtSignal(str, str)
+    parse_finished_signal = pyqtSignal()
+    show_hide_countdown_widget_signal = pyqtSignal(str)
 
     def __init__(self, main):
         """
@@ -108,7 +113,35 @@ class GUI(QObject):
         self.audio_output = None
         self.main = main
 
-        display_geometry = self.main.app.primaryScreen().geometry()
+        self.check_files()
+
+        self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
+
+        # check number of screens, set the primary to the app's primary screen and the secondary to the same if only one
+        self.screens = self.main.app.screens()
+        if len(self.screens) > 1:
+            self.primary_screen = self.main.app.primaryScreen()
+            for screen in self.screens:
+                if screen != self.primary_screen:
+                    self.secondary_screen = screen
+
+            if self.main.debug:
+                self.main.logger.debug(f'primary screen: {self.primary_screen.name()}, secondary screen: {self.secondary_screen.name()}')
+        else:
+            self.primary_screen = self.main.app.primaryScreen()
+            self.secondary_screen = self.main.app.primaryScreen()
+
+        # if settings exist, set the secondary screen (the display screen) to the one in the settings
+        if self.main.debug:
+            self.main.logger.debug(f'selected screen name: {self.main.settings['selected_screen_name']}')
+        if len(self.main.settings) > 0 and len(self.main.settings["selected_screen_name"].strip()) > 0:
+            for screen in self.screens:
+                if screen.name() == self.main.settings['selected_screen_name']:
+                    self.secondary_screen = screen
+                else:
+                    self.primary_screen = screen
+
+        display_geometry = self.primary_screen.geometry()
         if display_geometry.width() < 1920:
             self.standard_font.setPointSize(10)
             self.bold_font.setPointSize(10)
@@ -123,21 +156,22 @@ class GUI(QObject):
         self.grab_display_signal.connect(self.grab_display)
         self.server_alert_signal.connect(self.show_server_alert)
         self.change_current_live_item_signal.connect(self.change_current_live_item)
+        self.status_signal.connect(self.update_status_bar)
+        self.parse_finished_signal.connect(self.parse_finished)
+        self.show_hide_countdown_widget_signal.connect(self.show_hide_countdown_widget)
         self.shadow_color = 0
         self.shadow_offset = 6
         self.widget_item_background_color = 'white'
         self.widget_item_font_color = 'black'
 
+        self.status_widget = QWidget()
+        self.spinner_label = QLabel()
+        self.status_label = QLabel()
+
         self.light_style_sheet = open('resources/projecton-light.qss', 'r').read()
         self.dark_style_sheet = open('resources/projecton-dark.qss', 'r').read()
 
-        self.check_files()
-
         self.main.make_splash_screen(self.main.settings['last_status_count'])
-
-        self.main.update_status_signal.emit('Checking Database Integrity', 'status')
-        self.main.app.processEvents()
-        self.main.check_db(self.main.database)
 
         self.main.update_status_signal.emit('Indexing Images', 'status')
         self.main.app.processEvents()
@@ -151,27 +185,6 @@ class GUI(QObject):
         ii = IndexImages(self.main, 'images')
         self.main.thread_pool.start(ii)
         self.main.thread_pool.waitForDone()
-
-        self.main.update_status_signal.emit('Creating GUI: Configuring Screens', 'status')
-
-        # check number of screens, set the primary to the app's primary screen and the secondary to the same if only one
-        self.screens = self.main.app.screens()
-        if len(self.screens) > 1:
-            self.primary_screen = self.main.app.primaryScreen()
-            for screen in self.screens:
-                if screen != self.primary_screen:
-                    self.secondary_screen = screen
-        else:
-            self.primary_screen = self.main.app.primaryScreen()
-            self.secondary_screen = self.main.app.primaryScreen()
-
-        # if settings exist, set the secondary screen (the display screen) to the one in the settings
-        if len(self.main.settings) > 0 and len(self.main.settings["selected_screen_name"].strip()) > 0:
-            for screen in self.screens:
-                if screen.name() == self.main.settings['selected_screen_name']:
-                    self.secondary_screen = screen
-                else:
-                    self.primary_screen = screen
 
         self.main.update_status_signal.emit('Creating GUI: Building Main Window', 'status')
 
@@ -192,9 +205,9 @@ class GUI(QObject):
 
         self.main_window.show()
         if self.primary_screen == self.secondary_screen:
-            self.display_widget.hide()
+            self.display_widget_container.hide()
         else:
-            self.display_widget.show()
+            self.display_widget_container.show()
 
         self.check_update()
 
@@ -444,10 +457,13 @@ class GUI(QObject):
         self.central_widget.setLayout(self.central_layout)
 
         self.main.update_status_signal.emit('Creating GUI: Building Display Widget', 'status')
+        self.display_widget_container = DisplayWidgetContainer(self)
+        self.display_widget_container.setWindowIcon(QIcon('resources/branding/logo.svg'))
+        self.display_widget_container.setWindowTitle('ProjectOn Display Window')
+        self.display_widget_container.setCursor(Qt.CursorShape.BlankCursor)
         self.display_widget = DisplayWidget(self)
-        self.display_widget.setWindowIcon(QIcon('resources/branding/logo.svg'))
-        self.display_widget.setWindowTitle('ProjectOn Display Window')
-        self.display_widget.setCursor(Qt.CursorShape.BlankCursor)
+        self.display_widget_container.layout().addWidget(self.display_widget)
+        self.display_widget_container.layout().addWidget(self.countdown_widget)
 
     def add_widgets(self):
         """
@@ -487,6 +503,19 @@ class GUI(QObject):
         self.main.update_status_signal.emit('Creating GUI: Adding Live Widget', 'status')
         self.live_widget = LiveWidget(self)
         self.central_layout.addWidget(self.live_widget, 1, 3, 2, 1)
+
+        status_layout = QHBoxLayout(self.status_widget)
+        self.central_layout.addWidget(self.status_widget, 3, 0, 1, 4)
+        self.status_widget.hide()
+
+        movie = QMovie('resources/gui_icons/logo_spinner/logo_spinner.gif')
+        movie.setScaledSize(QSize(20, 20))
+        self.spinner_label.setMovie(movie)
+        status_layout.addWidget(self.spinner_label)
+
+        self.status_label.setFont(self.standard_font)
+        status_layout.addWidget(self.status_label)
+        status_layout.addStretch()
 
     def create_menu_bar(self):
         """
@@ -560,7 +589,7 @@ class GUI(QObject):
 
         hide_action = tool_menu.addAction('Show/Hide Display Screen')
         hide_action.setShortcut(QKeySequence('Ctrl+D'))
-        hide_action.triggered.connect(self.display_widget.show_hide)
+        hide_action.triggered.connect(self.display_widget_container.show_hide)
 
         black_action = tool_menu.addAction('Show/Hide Black Screen')
         black_action.setShortcut(QKeySequence('Ctrl+B'))
@@ -777,6 +806,22 @@ class GUI(QObject):
                     os.system(f'start \"\" {save_location}')
                     self.main_window.close()
                     sys.exit(0)
+
+    def update_status_bar(self, command, text):
+        if command == 'show_widget':
+            self.status_widget.show()
+        elif command == 'hide_widget':
+            self.status_widget.hide()
+        elif command == 'set_text':
+            self.status_label.setText(text)
+        elif command == 'start_movie':
+            self.spinner_label.movie().start()
+        elif command == 'stop_movie':
+            self.spinner_label.movie().stop()
+        QApplication.processEvents()
+
+    def parse_finished(self):
+        QTimer.singleShot(5000, lambda: self.status_signal.emit('hide_widget', ''))
 
     def print_oos(self):
         """
@@ -1009,25 +1054,8 @@ class GUI(QObject):
         if self.error_in_loop:
             return
 
-        current_widget = self.display_widget.currentWidget()
-        if not current_widget:
-            return
-
-        pixmap = QPixmap(current_widget.size())
-
-        # 3. Determine the correct capturing pipeline based on the widget class type
-        # Check for web engine view (adjust the class name matching your import)
-        if current_widget == self.display_widget.web_view:
-            # Web engines require a QPainter pass over their internal render method
-            painter = QPainter(pixmap)
-            current_widget.render(painter)
-            painter.end()
-        elif current_widget == self.display_widget.video_widget:
-            # Videos still require a window handle grab
-            pixmap = self.secondary_screen.grabWindow(self.display_widget.video_widget.winId())
-        else:
-            # Standard lyric text or image slide grab
-            pixmap = current_widget.grab()
+        pixmap = QPixmap(self.display_widget_container.size())
+        self.display_widget_container.render(pixmap)
 
         try:
             if pixmap:
@@ -1189,7 +1217,7 @@ class GUI(QObject):
             if self.main.settings['countdown_settings']['use_countdown']:
                 if self.countdown_widget:
                     self.countdown_widget.deleteLater()
-                    self.main.app.processEvents()
+                    QApplication.processEvents()
                 if self.countdown_timer:
                     self.countdown_timer.stop()
 
@@ -1206,7 +1234,7 @@ class GUI(QObject):
                     self.main.settings['countdown_settings']['bg_color'],
                     self.main.settings['countdown_settings']['fg_color']
                 )
-                self.countdown_widget.hide()
+                self.countdown_widget.setParent(self.display_widget_container)
 
                 now_time = datetime.now()
                 start_time = datetime(
@@ -1227,10 +1255,31 @@ class GUI(QObject):
                     0,
                     0
                 )
-                self.countdown_timer = CountdownTimer(self.main.settings, self.countdown_widget, start_time, display_time)
+
+                # place the display widget and countdown widget in their proper positions
+                if self.countdown_widget:
+                    self.display_widget_container.layout().removeWidget(self.countdown_widget)
+                if self.display_widget:
+                    self.display_widget_container.layout().removeWidget(self.display_widget)
+                self.display_widget_container.update()
+
+                if self.main.settings['countdown_settings']['position'] == 'top_full':
+                    self.display_widget_container.layout().addWidget(self.countdown_widget)
+                    self.display_widget_container.layout().addWidget(self.display_widget)
+                elif self.main.settings['countdown_settings']['position'] == 'bottom_full':
+                    self.display_widget_container.layout().addWidget(self.display_widget)
+                    self.display_widget_container.layout().addWidget(self.countdown_widget)
+                self.display_widget_container.update()
+
+                # recreate the countdown timer with the new settings
+                self.countdown_timer = CountdownTimer(
+                    self, start_time, display_time)
                 self.countdown_timer.start()
             else:
                 if self.countdown_widget:
+                    self.display_widget_container.removeWidget(self.countdown_widget)
+                    self.display_widget_container.update()
+                    self.display_widget.adjustSize()
                     self.countdown_widget.deleteLater()
                     self.main.app.processEvents()
                 if self.countdown_timer:
@@ -1289,28 +1338,36 @@ class GUI(QObject):
         """
         self.primary_screen = primary_screen
         self.secondary_screen = secondary_screen
+        if self.main.debug:
+            self.main.logger.debug(f"primary screen: {primary_screen.name()}, secondary screen: {secondary_screen.name()}")
 
         gui_geometry = self.primary_screen.geometry()
         display_geometry = self.secondary_screen.geometry()
 
+        if self.main.debug:
+            self.main.logger.debug(f"gui geometry: {gui_geometry}, display geometry: {display_geometry}")
+            self.main.logger.debug(f"gui geometry top-left {gui_geometry.topLeft()}, display geometry top-left: {display_geometry.topLeft()}")
+
         self.main_window.setGeometry(gui_geometry)
-        self.main_window.move(gui_geometry.topLeft())
         self.main_window.setWindowState(Qt.WindowState.WindowMaximized)
+        self.main_window.move(gui_geometry.topLeft())
         self.main_window.raise_()
 
-        self.display_widget.setGeometry(display_geometry)
-        self.display_widget.move(display_geometry.topLeft())
-        self.display_widget.setWindowState(Qt.WindowState.WindowMaximized)
-        self.display_widget.raise_()
+        self.display_widget_container.setGeometry(display_geometry)
+        self.display_widget_container.setFixedSize(display_geometry.width(), display_geometry.height())
+        self.display_widget_container.setWindowState(Qt.WindowState.WindowFullScreen)
+        self.display_widget_container.move(display_geometry.topLeft())
+        self.display_widget_container.raise_()
+        #self.display_widget.adjustSize()
 
         # hide the display widget if there is only one screen; set the initial state of the screen buttons
         self.tool_bar.black_screen_button.setChecked(False)
         self.tool_bar.logo_screen_button.setChecked(True)
         if self.primary_screen == self.secondary_screen:
-            self.display_widget.hide()
+            self.display_widget_container.hide()
             self.tool_bar.hide_display_button.setChecked(True)
         else:
-            self.display_widget.show()
+            self.display_widget_container.show()
             self.tool_bar.hide_display_button.setChecked(False)
             self.display_widget.show_logo()
 
@@ -1406,22 +1463,22 @@ class GUI(QObject):
         self.preview_widget.preview_label.clear()
 
         if slide_data['type'] == 'song':
-            slide_data['parsed_text'] = parse_song_data(self.display_widget, self.main.settings, slide_data)
-            if len(slide_data['parsed_text']) > 0:
-                for segment in slide_data['parsed_text']:
-                    # reduce parsed text for this item to only this item's title and text
-                    slide_data['parsed_text'] = {
-                        'title': segment['title'],
-                        'text': segment['text']
-                    }
-                    list_item = QListWidgetItem()
-                    list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+            if len(slide_data['parsed_text']) == 0:
+                slide_data['parsed_text'] = parse_song_data(self.display_widget, self.main.settings, slide_data)
+            for segment in slide_data['parsed_text']:
+                # reduce parsed text for this item to only this item's title and text
+                slide_data['parsed_text'] = {
+                    'title': segment['title'],
+                    'text': segment['text']
+                }
+                list_item = QListWidgetItem()
+                list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
 
-                    lyric_widget = StandardItemWidget(
-                        self, slide_data['parsed_text']['title'], slide_data['parsed_text']['text'])
-                    list_item.setSizeHint(lyric_widget.sizeHint())
-                    self.preview_widget.slide_list.addItem(list_item)
-                    self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+                lyric_widget = StandardItemWidget(
+                    self, slide_data['parsed_text']['title'], slide_data['parsed_text']['text'])
+                list_item.setSizeHint(lyric_widget.sizeHint())
+                self.preview_widget.slide_list.addItem(list_item)
+                self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
         elif slide_data['type'] == 'custom':
             # parse the text if we're splitting it into individual slides
@@ -1437,14 +1494,13 @@ class GUI(QObject):
             else:
                 item.setData(Qt.ItemDataRole.UserRole, slide_data)
             for text in slide_data['parsed_text']:
-                if len(text.strip()) > 0:
-                    lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
-                    list_item = QListWidgetItem()
-                    slide_data['parsed_text'] = text
-                    list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
-                    list_item.setSizeHint(lyric_widget.sizeHint())
-                    self.preview_widget.slide_list.addItem(list_item)
-                    self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
+                lyric_widget = StandardItemWidget(self, slide_data['title'], text, wrap_subtitle=True)
+                list_item = QListWidgetItem()
+                slide_data['parsed_text'] = text
+                list_item.setData(Qt.ItemDataRole.UserRole, slide_data)
+                list_item.setSizeHint(lyric_widget.sizeHint())
+                self.preview_widget.slide_list.addItem(list_item)
+                self.preview_widget.slide_list.setItemWidget(list_item, lyric_widget)
 
         elif slide_data['type'] == 'bible' or slide_data['type'] == 'custom_bible':
             title = slide_data['title']
@@ -1459,6 +1515,16 @@ class GUI(QObject):
                 current_chapter = ''
 
             # find the verse range for each segment of scripture
+            slide_data['parsed_text'] = parsers.parse_scripture_by_verse(self, slide_data['text'])
+            if len(slide_data['parsed_text']) == 0:
+                QMessageBox.information(
+                    self.gui.main_window,
+                    'No Verses',
+                    'No verses were found in the passage. Please ensure that your scripture passage includes verse numbers.',
+                    QMessageBox.StandardButton.Ok
+                )
+                return
+
             slide_texts = slide_data['parsed_text']
             for i in range(len(slide_texts)):
                 # remove any html formatting from the text
@@ -1759,6 +1825,12 @@ class GUI(QObject):
 
         self.live_widget.slide_list.setFocus()
 
+    def show_hide_countdown_widget(self, show_hide):
+        if show_hide == 'show':
+            self.countdown_widget.show()
+        else:
+            self.countdown_widget.hide()
+
 
 class CustomWebEnginePage(QWebEnginePage):
     def __init__(self):
@@ -1785,3 +1857,58 @@ class CustomWebEnginePage(QWebEnginePage):
             f'</p>'
         )
         super().javaScriptConsoleMessage(level, message, lineNumber, sourceID)
+
+
+class SongParsingThread(QThread):
+    def __init__(self, gui):
+        super().__init__()
+        self.gui = gui
+        self.daemon = True
+        self.setPriority(QThread.Priority.IdlePriority)
+        self.keep_running = True
+
+    def run(self):
+        self.gui.status_signal.emit('show_widget', '')
+        self.gui.status_signal.emit('set_text', 'Parsing Songs...')
+        self.gui.status_signal.emit('start_movie', '')
+
+        pixmap = QPixmap('resources/gui_icons/unready.svg')
+        pixmap = pixmap.scaled(
+            20,
+            20,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+
+        iterator = QTreeWidgetItemIterator(self.gui.media_widget.song_list)
+        while iterator.value():
+            self.gui.media_widget.song_list.change_icon_pixmap_signal.emit(iterator.value(), pixmap)
+            iterator.value().data(0, Qt.ItemDataRole.UserRole)['parsed_text'] = []
+            iterator += 1
+        self.gui.media_widget.song_list.update()
+        QApplication.processEvents()
+
+        pixmap = QPixmap('resources/gui_icons/song_icon.svg')
+        pixmap = pixmap.scaled(
+            20,
+            20,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+
+        iterator = QTreeWidgetItemIterator(self.gui.media_widget.song_list)
+        while iterator.value() and self.keep_running:
+            item = iterator.value()
+            song_data = item.data(0, Qt.ItemDataRole.UserRole).copy()
+            if not song_data['type'] == 'folder':
+                song_data['parsed_text'] = parse_song_data(self.gui.display_widget, self.gui.main.settings, song_data)
+                item.setData(0, Qt.ItemDataRole.UserRole, song_data)
+                self.gui.media_widget.song_list.change_icon_pixmap_signal.emit(item, pixmap)
+            iterator += 1
+            time.sleep(0.005)
+
+        if self.keep_running:
+            self.gui.status_signal.emit('set_text', 'Song Parsing Finished.')
+            self.gui.status_signal.emit('stop_movie', '')
+            self.gui.parse_finished_signal.emit()
+            self.keep_running = False

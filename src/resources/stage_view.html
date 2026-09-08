@@ -10,9 +10,13 @@
           }
 
           #lyric_container {
-             width: 100%;
-             height: 100%;
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 80vw;
+             height: 100vh;
              display: table;
+             overflow: clip;
           }
 
           #lyric_display {
@@ -23,36 +27,56 @@
              font-weight: bold;
              line-height: 150%;
              color: white;
-             overflow: hidden;
+             /*overflow: hidden;*/
           }
 
           #image_display {
              position: absolute;
              top: 0;
              left: 0;
-             width: 100vw;
+             width: 80vw;
              height: 100vh;
-             object-fit: fill;          /* Set once, not per-frame */
-             transform: translateZ(0);     /* Promote to compositor layer */
+             object-fit: fill;
+             transform: translateZ(0);
              z-index: 1;
-             will-change: contents;        /* 'contents' only  'transform' is redundant here */
+             will-change: contents;
              image-rendering: crisp-edges;
              display: hidden;
              backface-visibility: hidden;
           }
 
-          #slide_number {
+          #info_container {
              position: absolute;
-             width: 100vw;
-             top: 94vh;
-             margin-right: 1vw;
-             z-index: 10;
-             font-family: "Arial";
+             top: 0;
+             left: 80vw;
+             width: 20vw;
+             height: 100vh;
+             border-left: 2px solid #ffffff;
+             display: flex;
+             justify-content: space-between;
+             flex-direction: column;
+          }
+
+          #clock {
+             width: 100%
+             text-align: center;
+             font-family: "sans";
              font-weight: bold;
-             font-size: 5vh;
+             font-size: 9vh;
              color: #ffffff;
              text-shadow: 5px 5px 5px black;
-             text-align: right;
+             align-self: center;
+          }
+
+          #slide_number {
+             width: 100%;
+             text-align: center;
+             font-family: "sans";
+             font-weight: bold;
+             font-size: 9vh;
+             color: #ffffff;
+             text-shadow: 5px 5px 5px black;
+             align-self: center;
           }
        </style>
     </head>
@@ -61,10 +85,11 @@
        <div id="lyric_container">
           <div id="lyric_display"></div>
        </div>
-       <div id="image_container">
-           <canvas id="image_display"></canvas>
+       <canvas id="image_display"></canvas>
+       <div id="info_container">
+           <div id="clock"></div>
+           <div id="slide_number"></div>
        </div>
-       <div id="slide_number"></div>
     </body>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
@@ -78,6 +103,7 @@
        const lyricDisplay   = document.getElementById('lyric_display');
        const lyricContainer = document.getElementById('lyric_container');
        const slideNumber    = document.getElementById('slide_number');
+       const clock          = document.getElementById('clock');
 
        // -- Mode switching helpers ----------------------------------------------
        function showTextMode() {
@@ -91,11 +117,25 @@
        }
 
        // -- Text update ---------------------------------------------------------
+       let font_size = 90;
        socket.on('update_stage', function(text) {
           showTextMode();
-          lyricDisplay.innerHTML       = text[0];
-          lyricDisplay.style.fontSize  = text[1] + 'px';
-          slideNumber.textContent      = text[2];   // textContent is safer/faster than innerHTML for plain text
+          font_size = text[1];
+          lyricDisplay.innerHTML = text[0];
+          slideNumber.innerHTML = text[2];
+          adjusted_font_size = 120;
+          lyricDisplay.style.fontSize = adjusted_font_size + 'px';
+          slideNumber.style.fontSize = font_size + 'px';
+
+          target_height = window.innerHeight;
+          lyric_display_height = lyricDisplay.getBoundingClientRect().height;
+          console.log(lyric_display_height + ', ' + target_height);
+          while (lyric_display_height > target_height) {
+             adjusted_font_size -= 6;
+             lyricDisplay.style.fontSize = adjusted_font_size + 'px';
+             lyric_display_height = lyricDisplay.getBoundingClientRect().height;
+             console.log(lyric_display_height + ', ' + target_height);
+          }
        });
 
        // -- Image update --------------------------------------------------------
@@ -107,5 +147,22 @@
            const bitmap = await createImageBitmap(blob);
            bitmapCtx.transferFromImageBitmap(bitmap);
        });
+
+       window.onload = function () {
+          let timer = setInterval(changeClock, 1000);
+       };
+
+       function changeClock() {
+          const currentDate = new Date();
+          let hours = currentDate.getHours();
+          let minutes = currentDate.getMinutes();
+          if (minutes < 10) {
+             minutes = '0' + minutes;
+          }
+          let formattedTime = hours + ":" + minutes;
+
+          clock.style.fontSize = font_size + 'px';
+          clock.textContent = formattedTime;
+       }
     </script>
 </html>

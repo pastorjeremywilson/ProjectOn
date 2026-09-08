@@ -128,7 +128,6 @@ class GetScripture:
                                     if (verse_start <= child_verse_num <= verse_end):
                                         verse_number = child.get('vnumber')
                                         this_verse = child.text
-                                        print(f'{verse_number}: {this_verse}')
                                         scripture_text.append(
                                             [
                                                 verse_number,

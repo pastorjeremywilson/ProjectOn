@@ -9,25 +9,25 @@ from os.path import exists
 import requests
 from PyQt5 import sip
 from PyQt5.QtCore import Qt, QSize, QEvent, QPointF, QTimer, pyqtSignal, QRect, QRectF, QPoint, QSizeF, QTime, \
-    QModelIndex, QObject, QByteArray, QBuffer, QIODevice, QUrl
+    QModelIndex, QObject, QBuffer, QIODevice, QUrl
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor, QPainterPath, QBrush, QPen, QPainter, \
     QImage, QFontDatabase, QFontMetrics, QFocusEvent, QMouseEvent, QResizeEvent, \
-    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent, QFontInfo
+    QPaintEvent, QWheelEvent, QHideEvent, QTextDocument, QDropEvent, QKeyEvent, QFontInfo, QMovie
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QGraphicsVideoItem, QVideoWidget
+from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtPrintSupport import QPrinterInfo, QPrinter
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 from PyQt5.QtWidgets import QListWidget, QLabel, QListWidgetItem, QComboBox, QListView, QWidget, QVBoxLayout, \
     QGridLayout, QSlider, QMainWindow, QMessageBox, QScrollArea, QLineEdit, QHBoxLayout, \
     QSpinBox, QRadioButton, QButtonGroup, QCheckBox, QColorDialog, QGraphicsRectItem, QDialog, QTextEdit, QPushButton, \
-    QApplication, QFontComboBox, QGroupBox, QTabWidget, QTimeEdit, QFileDialog, QStyledItemDelegate, QTreeWidget, \
+    QApplication, QFontComboBox, QGroupBox, QTimeEdit, QFileDialog, QStyledItemDelegate, QTreeWidget, \
     QTreeWidgetItem, QMenu, QAction, QStyleOptionViewItem, QProgressBar, QGraphicsView, \
-    QGraphicsScene, QStackedWidget, QSizePolicy, QGraphicsBlurEffect, QGraphicsPixmapItem
+    QGraphicsScene, QStackedWidget, QGraphicsBlurEffect, QSizePolicy
 
 from core.runnables import SlideAutoPlay, TimedPreviewUpdate
 from dataHandling.databaseFunctions import get_audio_data, copy_image, save_song, save_custom, save_image, save_video, \
     save_web_item, delete_items_from_db
-from dataHandling.parsers import get_qcolor_from_str
+from dataHandling.parsers import get_qcolor_from_str, parse_song_data
 from importExport.openlpImport import OpenLPImport
 
 
@@ -101,6 +101,9 @@ class CountdownWidget(QWidget):
     def __init__(self, gui, font: QFont, position: str, bg: str, fg: str):
         super().__init__()
         self.gui = gui
+        self.font = font
+        self.position = position
+        self.setParent(self.gui.display_widget)
 
         self.update_label_signal.connect(self.update_label)
         self.show_self_signal.connect(self.show_self)
@@ -114,27 +117,28 @@ class CountdownWidget(QWidget):
         layout = QGridLayout(self)
 
         self.label = QLabel()
-        self.label.setFont(font)
+        self.label.setFont(self.font)
         self.label.setStyleSheet('color: ' + fg)
         layout.addWidget(self.label, 0, 0, Qt.AlignmentFlag.AlignCenter)
 
-        font_metrics = QFontMetrics(font)
+    def get_geometry(self):
+        font_metrics = QFontMetrics(self.font)
         font_height = font_metrics.height()
         height = font_height + 40
-
         x = 0
         y = 0
         width = 0
-        if position == 'top_full':
-            x = gui.display_widget.x()
-            y = gui.display_widget.y()
-            width = gui.display_widget.width()
-        elif position == 'bottom_full':
-            x = gui.display_widget.x()
-            y = gui.display_widget.y() + gui.display_widget.height() - height
-            width = gui.display_widget.width()
+        if self.position == 'top_full':
+            x = self.gui.display_widget.x()
+            y = self.gui.display_widget.y()
+            width = self.gui.display_widget.width()
+        elif self.position == 'bottom_full':
+            x = self.gui.display_widget.x()
+            y = self.gui.display_widget.y() + self.gui.display_widget.height() - height
+            width = self.gui.display_widget.width()
 
-        self.setGeometry(QRect(x, y, width, height))
+        geometry = QRect(x, y, width, height)
+        return geometry
 
     def update_label(self, text):
         self.label.setText(text)
@@ -215,7 +219,7 @@ class CustomMainWindow(QMainWindow):
                 self.gui.display_widget.slide_auto_play.keep_running = False
 
             self.gui.main.save_settings()
-            self.gui.display_widget.deleteLater()
+            self.gui.display_widget_container.deleteLater()
             evt.accept()
 
 
@@ -273,7 +277,6 @@ class DisplayWidget(QStackedWidget):
 
     def init_components(self):
         self.setObjectName('display_widget')
-        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setContentsMargins(0, 0, 0, 0)
         self.setStyleSheet('#display_widget { background: black; }')
 
@@ -367,12 +370,6 @@ class DisplayWidget(QStackedWidget):
 
         return video_widget, media_player
 
-    def show_hide(self):
-        if self.gui.tool_bar.hide_display_button.isChecked():
-            self.hide()
-        else:
-            self.show()
-
     def show_logo(self, checked: bool | None = None):
         if checked is not None:
             if checked:
@@ -420,8 +417,9 @@ class DisplayWidget(QStackedWidget):
 
         # handle stopping the media player carefully to avoid an Access Violation
         if self.media_player:
-            if self.media_player.state == QMediaPlayer.PlayingState:
-                self.media_player.pause()
+            print(f'DisplayWidget.change_display: media player state: {self.media_player.state()}')
+            if self.media_player.state() == QMediaPlayer.PlayingState:
+                self.media_player.stop()
                 self.media_player.setPosition(0)
 
             # return statusChanged to its default function in case loop audio has been used
@@ -446,6 +444,8 @@ class DisplayWidget(QStackedWidget):
             self.setCurrentWidget(self.lyric_widget)
 
             # start playing audio if this is a custom slide with audio, but only if audio isn't already playing
+            if item_data['type'] == 'custom':
+                print(f'DisplayWidget.change_display: audio_file: {item_data['audio_file']}, loop_audio: {item_data['loop_audio']}')
             if (item_data['type'] == 'custom'
                     and item_data['audio_file']
                     and len(item_data['audio_file']) > 0):
@@ -482,8 +482,11 @@ class DisplayWidget(QStackedWidget):
 
                         self.media_player.mediaStatusChanged.connect(repeat_media)
                     else:
-                        self.media_player.stateChanged.connect(self.media_playing_change)
-                    print('playing')
+                        def media_playing_change():
+                            if self.media_player.mediaStatus() == QMediaPlayer.EndOfMedia:
+                                self.media_player.stop()
+                                self.media_player.setPosition(0)
+                        self.media_player.stateChanged.connect(media_playing_change)
                     self.media_player.play()
 
             # cycle through text paragraphs if auto-play is enabled for this custom slide
@@ -510,20 +513,25 @@ class DisplayWidget(QStackedWidget):
             self.gui.main.thread_pool.start(self.gui.timed_update)
 
         # change the preview image
-        full_size_pixmap = self.grab(self.rect())
+        full_size_pixmap = QPixmap(self.gui.display_widget_container.size())
+        self.gui.display_widget_container.render(full_size_pixmap)
         pixmap = full_size_pixmap.scaled(
             int(self.width() / 5),
             int(self.height() / 5),
             Qt.AspectRatioMode.IgnoreAspectRatio,
             Qt.TransformationMode.SmoothTransformation
         )
-        stage_html = re.sub('<p.*?>', '', self.lyric_widget.text)
-        stage_html = stage_html.replace('</p>', '')
-        stage_html = f'<p style="align-text: center;">{stage_html}</p>'
+
+        if item_data['type'] == 'song' or item_data['type'] == 'custom' or 'bible' in item_data['type']:
+            stage_html = re.sub('<p.*?>', '', self.lyric_widget.text)
+            stage_html = stage_html.replace('</p>', '')
+            stage_html = f'<p style="align-text: center;">{stage_html}</p>'
+        else:
+            stage_html = f'<p style="align-text: center;">{item_data["title"]}</p>'
 
         slide_number = self.gui.live_widget.slide_list.currentRow() + 1
         num_slides = self.gui.live_widget.slide_list.count()
-        slide_info = f'Slide {slide_number} of {num_slides}'
+        slide_info = f'Slide<br>{slide_number} of {num_slides}'
 
         if not item_data['type'] == 'web' and not item_data['type'] == 'video' and not auto_play_text:
             self.gui.live_widget.preview_label.setPixmap(pixmap)
@@ -587,6 +595,22 @@ class DisplayWidget(QStackedWidget):
     def setCurrentWidget(self, widget):
         self.last_current_widget = widget
         super().setCurrentWidget(widget)
+
+
+class DisplayWidgetContainer(QWidget):
+    def __init__(self, gui):
+        super().__init__()
+        self.gui = gui
+        self.setLayout(QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+
+    def show_hide(self):
+        if self.gui.tool_bar.hide_display_button.isChecked():
+            self.hide()
+        else:
+            self.show()
+            self.gui.display_widget.adjustSize()
 
 
 class FontFaceListWidget(QListWidget):
@@ -1112,6 +1136,94 @@ class LyricDisplayWidget(QWidget):
             finally:
                 painter.end()
 
+    def calculate_slide(self, slide_data: dict):
+        if slide_data['type'] == 'song':
+            text = slide_data['parsed_text']['text']
+            footer_text = []
+
+            if len(slide_data['author'].strip()) > 0:
+                footer_text.append(slide_data['author'])
+            if len(slide_data['copyright'].strip()) > 0:
+                footer_text.append('\n\u00A9' + slide_data['copyright'].replace('\n', ' '))
+            if len(slide_data['ccli_song_number'].strip()) > 0:
+                footer_text.append('\nCCLI Song #: ' + slide_data['ccli_song_number'])
+            if len(self.gui.main.settings['ccli_num'].strip()) > 0:
+                footer_text.append('\nCCLI License #: ' + self.gui.main.settings['ccli_num'])
+        elif 'bible' in slide_data['type']:
+            text = slide_data['parsed_text']
+            footer_text = [f'{slide_data['title']} ({slide_data['author']})']
+
+        # set the font
+        (font, fill_color, use_shadow, shadow_color, shadow_offset, use_outline, outline_color,
+         outline_width, use_shade, shade_color, shade_opacity) = self.set_font(slide_data)
+
+        footer_font_pixel_size = round((self.gui.main.settings['footer_font_size'] * 96) / 72.0)
+        footer_font = QFont(font.family())
+        footer_font.setPixelSize(round(footer_font_pixel_size))
+
+        footer_font_metrics = QFontMetrics(footer_font)
+        line_height = footer_font_metrics.height()
+        footer_height = line_height * len(footer_text)
+
+        usable_rect = QRect(
+            0,
+            0,
+            self.gui.display_widget.width(),
+            self.gui.display_widget.height() - footer_height - footer_font_metrics.height()
+        )
+
+        font_metrics = QFontMetrics(font)
+        line_height = font_metrics.height()
+        lines = text.split('<br />')
+        drawn_lines = []
+        space_width = font_metrics.horizontalAdvance(' ')
+        for i in range(len(lines)):
+            line_words = lines[i].split(' ')
+            this_line_string = ''
+            if len(line_words) == 0:
+                line_words = [' ']
+
+            for word in line_words:
+                if '<b>' in word:
+                    font.setWeight(1000)
+                if '<i>' in word:
+                    font.setItalic(True)
+                if '<u>' in word:
+                    font.setUnderline(True)
+
+                if (font_metrics.boundingRect(this_line_string.strip()).width()
+                        + space_width
+                        + font_metrics.boundingRect(word).width()
+                        > usable_rect.width() - 80):
+                    # this word will overflow the usable rect; begin a new line
+                    drawn_lines.append(this_line_string.strip())
+                    this_line_string = ''
+
+                this_line_string += word + ' '
+
+                if '</b>' in word:
+                    font.setWeight(QFont.Weight.Normal)
+                if '</i>' in word:
+                    font.setItalic(False)
+                if '</u>' in word:
+                    font.setUnderline(False)
+            drawn_lines.append(this_line_string.strip())
+
+        longest_line = 0
+        for line in drawn_lines:
+            if font_metrics.boundingRect(line).width() > longest_line:
+                longest_line = font_metrics.boundingRect(line).width()
+        total_height = len(drawn_lines) * line_height
+
+        text_rect = QRectF(
+            0,
+            0,
+            longest_line + 80,
+            total_height - line_height
+        )
+
+        return footer_height, text_rect
+
     def draw_slide(self, painter: QPainter, slide_data: dict, auto_fit: bool | None = True):
         """
         Provides a method for performing all the drawing operations for the text that will be shown on the slide,
@@ -1478,6 +1590,8 @@ class NewFontWidget(QWidget):
     Implements QWidget that contains all of the settings that can be applied to the display font
     """
     mouse_release_signal = pyqtSignal(int)
+    previous_font_size = None
+    previous_font_face = None
 
     def __init__(self,
                  gui,
@@ -1919,7 +2033,7 @@ class NewFontWidget(QWidget):
             )
         )
         self.font_sample.setPixmap(cropped_pixmap)
-
+        
     def color_chooser(self):
         """
         creates a color dialog for the user to select a custom font color
@@ -1949,11 +2063,13 @@ class NewFontWidget(QWidget):
         """
         overrides hideEvent to save settings when the widget is hidden
         """
-        self.gui.main.save_settings()
         self.gui.apply_settings(theme_too=False)
+        self.gui.main.save_settings()
         super().hideEvent(evt)
 
     def showEvent(self, evt):
+        self.previous_font_size = self.gui.main.settings[f'{self.slide_type}_font_size']
+        self.previous_font_face = self.gui.main.settings[f'{self.slide_type}_font_face']
         self.change_font_sample()
         super().showEvent(evt)
 
@@ -3353,10 +3469,12 @@ class IndexedSettingsWidget(QWidget):
                 secondary_screen = screens[0]
             else:
                 for screen in screens:
-                    if screen_name == screen.name():
+                    if screen.name() == screen_name:
                         secondary_screen = screen
                     else:
                         primary_screen = screen
+
+            self.gui.main.logger.debug(f'primary screen: {primary_screen.name()}, secondary screen: {secondary_screen.name()}')
 
         if sys.platform == 'win32':
             self.gui.main.settings['force_software_rendering'] = self.software_checkbox.isChecked()
@@ -3798,7 +3916,7 @@ class Toolbar(QWidget):
         self.hide_display_button.setToolTip('Show/Hide the Display Screen')
         self.hide_display_button.setIconSize(self.gui.toolbar_icon_size)
         self.hide_display_button.setCheckable(True)
-        self.hide_display_button.released.connect(self.gui.display_widget.show_hide)
+        self.hide_display_button.released.connect(self.gui.display_widget_container.show_hide)
         self.layout.addWidget(self.hide_display_button)
 
         self.black_screen_button = QPushButton()
@@ -3904,6 +4022,9 @@ class Toolbar(QWidget):
 
 
 class CustomTreeWidget(QTreeWidget):
+    change_icon_pixmap_signal = pyqtSignal(QTreeWidgetItem, QPixmap)
+    change_icon_movie_signal = pyqtSignal(QTreeWidgetItem, QMovie)
+
     def __init__(self, gui, parent: QWidget = None):
         super().__init__(parent)
         self.gui = gui
@@ -3920,15 +4041,22 @@ class CustomTreeWidget(QTreeWidget):
         self.customContextMenuRequested.connect(self.show_context_menu)
         self.currentItemChanged.connect(self.current_item_changed)
         self.setSelectionMode(self.SelectionMode.ExtendedSelection)
+        self.change_icon_pixmap_signal.connect(self.change_icon)
+        self.change_icon_movie_signal.connect(self.change_icon)
 
-    def add_item(self, item_text: str, item_data: dict, item_pixmap: QPixmap = None, item_parent: QTreeWidgetItem = None):
+    def add_item(self, item_text: str, item_data: dict, item_pixmap: QPixmap | QMovie = None, item_parent: QTreeWidgetItem = None):
         widget = QWidget()
         layout = QHBoxLayout(widget)
 
         if item_pixmap:
             pixmap_label = QLabel()
-            pixmap_label.setPixmap(item_pixmap)
+            pixmap_label.setObjectName('pixmap_label')
             layout.addWidget(pixmap_label)
+            if type(item_pixmap) == QMovie:
+                pixmap_label.setMovie(item_pixmap)
+                item_pixmap.start()
+            else:
+                pixmap_label.setPixmap(item_pixmap)
 
         label = QLabel(item_text)
         label.setFont(self.gui.standard_font)
@@ -3946,6 +4074,15 @@ class CustomTreeWidget(QTreeWidget):
         self.custom_sort()
 
         return item
+
+    def change_icon(self, item: QTreeWidgetItem, icon: QPixmap | QMovie):
+        widget = self.itemWidget(item, 0)
+        label = widget.findChild(QLabel, 'pixmap_label')
+        if type(icon) == QMovie:
+            label.setMovie(icon)
+            label.movie().start()
+        else:
+            label.setPixmap(icon)
 
     def add_folder(self, name: str = None, from_populate: bool = False):
         if not name:
@@ -4085,6 +4222,23 @@ class CustomTreeWidget(QTreeWidget):
         Method to send the current item to the preview widget upon the current item being changed.
         """
         if self.currentItem():
+            data = self.currentItem().data(0, Qt.ItemDataRole.UserRole)
+            # check if this is a song that hasn't been parsed yet; parse on demand if it is
+            if data['type'] == 'song' and len(data['parsed_text']) == 0:
+                item = self.currentItem()
+                song_data = item.data(0, Qt.ItemDataRole.UserRole).copy()
+                if not song_data['type'] == 'folder':
+                    song_data['parsed_text'] = parse_song_data(self.gui.display_widget, self.gui.main.settings,
+                                                               song_data)
+                    item.setData(0, Qt.ItemDataRole.UserRole, song_data)
+                    pixmap = QPixmap('resources/gui_icons/song_icon.svg')
+                    pixmap = pixmap.scaled(
+                        20,
+                        20,
+                        Qt.AspectRatioMode.IgnoreAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation
+                    )
+                    self.gui.media_widget.song_list.change_icon_pixmap_signal.emit(item, pixmap)
             self.gui.send_to_preview(self.currentItem())
 
     def move_items(self):
@@ -4176,7 +4330,7 @@ class CustomTreeWidget(QTreeWidget):
         self.custom_sort()
         self.scrollToItem(target_item)
 
-    def custom_sort(self):
+    def custom_sort(self, show_list_rankings: dict | None = None):
         if self.sorting:
             return
         self.sorting = True
@@ -4189,10 +4343,10 @@ class CustomTreeWidget(QTreeWidget):
             data = item.data(0, Qt.ItemDataRole.UserRole)
 
             if data and data.get('type') == 'folder':
-                folder_items.append((data.get('title', '').lower(), item))
+                folder_items.append((data.get('title', ''), item))
             else:
                 title = data.get('title', '') if data else item.text(0)
-                other_items.append((title.lower(), item))
+                other_items.append((title, item))
 
         # Sort alphabetically in memory
         folder_items.sort(key=lambda x: x[0])
@@ -4207,13 +4361,18 @@ class CustomTreeWidget(QTreeWidget):
         master_list = folder_items + other_items
 
         # Store original text values so we can restore them if needed
-        # (Though if you are using setItemWidget, the text is hidden behind the widget anyway!)
         original_texts = []
 
         for index, (title, item) in enumerate(master_list):
             original_texts.append((item, title))
-            # Pad the index with zeros (e.g., "00001", "00002") so string sorting matches numerical sorting
-            item.setText(0, f"{index:05d}")
+            if show_list_rankings is not None:
+                try:
+                    item.setText(0, str(show_list_rankings[title]))
+                except KeyError:
+                    item.setHidden(True)
+            else:
+                item.setHidden(False)
+                item.setText(0, title)
 
         super().sortItems(0, Qt.SortOrder.AscendingOrder)
 

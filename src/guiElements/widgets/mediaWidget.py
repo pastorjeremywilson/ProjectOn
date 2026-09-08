@@ -5,17 +5,17 @@ from os.path import exists
 from threading import Thread
 from xml.etree import ElementTree
 
-from PyQt5.QtCore import Qt, QSize, QPoint
-from PyQt5.QtGui import QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen, QImage
+from PyQt5.QtCore import Qt, QSize, QPoint, QTimer
+from PyQt5.QtGui import QPixmap, QIcon, QFont, QPainter, QBrush, QColor, QPen, QImage, QMovie
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, \
     QListWidgetItem, QComboBox, QTextEdit, QAbstractItemView, QDialog, QFileDialog, QMessageBox, \
-    QApplication, QTreeWidgetItem
+    QApplication, QTreeWidgetItem, QTreeWidgetItemIterator
 
 from dataHandling import parsers, declarations
 from dataHandling.databaseFunctions import get_all_songs, get_all_custom_slides, get_all_images, get_all_videos, \
     get_all_web, get_folders, save_image, save_video, save_web_item
 from dataHandling.declarations import SLIDE_DATA_DEFAULTS
-from dataHandling.parsers import split_scripture_string
+from dataHandling.parsers import split_scripture_string, parse_song_data
 from guiElements.widgets.editWidget import EditWidget
 from dataHandling.getScripture import GetScripture
 from guiElements.widgets.widgets import AutoSelectLineEdit, StandardItemWidget, SimpleSplash, CustomTreeWidget
@@ -511,47 +511,47 @@ class MediaWidget(QTabWidget):
         """
         search_string = self.search_line_edit.text().strip().lower()
         if len(search_string) == 0:
-            for i in range(self.song_list.topLevelItemCount()):
-                item = self.song_list.topLevelItem(i)
-                item.setHidden(False)
-
-                if item.data(0, Qt.ItemDataRole.UserRole)['type'] == 'folder':
-                    item.setExpanded(False)
-                    if '|' in item.text(0):
-                        item.setText(0, item.text(0).split('|')[1])
-                    for j in range(item.childCount()):
-                        item.child(j).setHidden(False)
-                        if '|' in item.child(j).text(0):
-                            item.child(j).setText(0, item.child(j).text(0).split('|')[0])
+            self.search_line_edit.clear()
+            self.song_list.custom_sort()
             return
+
+        search_terms = []
+        if '"' in search_string:
+            quoted_strings = re.findall(r'(?<=")(.*?)(?=")', search_string)
+            if len(quoted_strings) == 0:
+                search_string = search_string.replace('"', '')
+                search_terms = search_string.split(' ')
+        else:
+            search_terms = search_string.split(' ')
 
         show_list_rankings = {}
         # first, search for the full search term in titles
         for i in range(len(self.song_list_items)):
             data = self.song_list_items[i]
-            if search_string in data['stripped_title'].lower() and data['title'] not in show_list_rankings.keys():
-                show_list_rankings[data['title']] = int(f'{100}{i}')
+            if search_string.replace('"', '') in data['stripped_title'].lower() and data['title'] not in show_list_rankings.keys():
+                print(f'adding title: {data['title']}')
+                show_list_rankings[data['title']] = 1000 + i
 
         # then, search for the full search term in texts
         for i in range(len(self.song_list_items)):
             data = self.song_list_items[i]
-            if search_string in data['text'].lower() and data['title'] not in show_list_rankings.keys():
-                show_list_rankings[data['title']] = int(f'{110}{i}')
+            if search_string.replace('"', '') in data['text'].lower() and data['title'] not in show_list_rankings.keys():
+                print(f'adding title: {data['title']}')
+                show_list_rankings[data['title']] = 2000 + i
 
         # now, search for each search term in the titles
-        search_term_split = search_string.split()
-        for word in search_term_split:
+        for word in search_terms:
             for i in range(len(self.song_list_items)):
                 data = self.song_list_items[i]
                 if word in data['stripped_title'].lower() and data['title'] not in show_list_rankings.keys():
-                    show_list_rankings[data['title']] = int(f'{120}{i}')
+                    show_list_rankings[data['title']] = 3000 + i
 
         # finally, search for each search term in the texts
-        for word in search_term_split:
+        for word in search_terms:
             for i in range(len(self.song_list_items)):
                 data = self.song_list_items[i]
                 if word in data['text'].lower() and data['title'] not in show_list_rankings.keys():
-                    show_list_rankings[data['title']] = int(f'{130}{i}')
+                    show_list_rankings[data['title']] = 4000 + i
 
         # hide whichever items aren't in the list of titles
         all_titles = show_list_rankings.keys()
@@ -596,7 +596,7 @@ class MediaWidget(QTabWidget):
                     item.setHidden(True)
                     if '|' in title:
                         item.setText(0, title)
-        self.song_list.custom_sort()
+        self.song_list.custom_sort(show_list_rankings)
 
     def populate_song_list(self):
         """
@@ -620,7 +620,7 @@ class MediaWidget(QTabWidget):
         for folder in all_folders:
             folder_items[folder] = self.song_list.add_folder(name=folder, from_populate=True)
 
-        # then, add the custom slides, putting them under their folder, if applicable
+        # then, add the songs to the list widget, putting them under their folder, if applicable
         for song_data in all_songs:
             if self.gui.main.initial_startup:
                 self.gui.main.update_status_signal.emit(f'Loading Songs - {song_data['title']}', 'info')
@@ -634,8 +634,35 @@ class MediaWidget(QTabWidget):
                     item_pixmap=pixmap,
                     item_parent=folder_items[song_data['folder']]
                 )
-        thread = Thread(target=self.build_song_search_index())
+        thread = Thread(target=self.build_song_search_index)
         thread.start()
+
+    def parse_all_songs(self):
+        self.gui.status_signal.emit('show_widget', '')
+        self.gui.status_signal.emit('set_text', 'Parsing Songs...')
+        self.gui.status_signal.emit('start_movie', '')
+
+        pixmap = QPixmap('resources/gui_icons/song_icon.svg')
+        pixmap = pixmap.scaled(
+            20,
+            20,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+
+        iterator = QTreeWidgetItemIterator(self.song_list)
+        while iterator.value():
+            item = iterator.value()
+            song_data = item.data(0, Qt.ItemDataRole.UserRole).copy()
+            if not song_data['type'] == 'folder':
+                song_data['parsed_text'] = parse_song_data(self.gui.display_widget, self.gui.main.settings, song_data)
+                item.setData(0, Qt.ItemDataRole.UserRole, song_data)
+                self.song_list.change_icon_pixmap_signal.emit(iterator.value(), pixmap)
+            iterator += 1
+
+        self.gui.status_signal.emit('set_text', 'Song Parsing Finished.')
+        self.gui.status_signal.emit('stop_movie', '')
+        self.gui.parse_finished_signal.emit()
 
     def build_song_search_index(self):
         punctuation = ['"', '\'', '`', '(', ')', ':', ';', '?', '!', '.', ',', '-', '*', '#']
@@ -1312,6 +1339,8 @@ class MediaWidget(QTabWidget):
         else:
             scripture_text = self.scripture_text_edit.toPlainText()
             passages = split_scripture_string(scripture_text)
+            if len(passages) == 0:
+                return
             reference = self.formatted_reference
 
         version = self.bible_selector_combobox.currentText()
@@ -1324,19 +1353,9 @@ class MediaWidget(QTabWidget):
             slide_data['type'] = 'bible'
 
         slide_data['title'] = reference
-        slide_data['text'] = self.passages
-        slide_data['parsed_text'] = parsers.parse_scripture_by_verse(self.gui, passages)
+        slide_data['text'] = passages
         slide_data['author'] = version
         item.setData(Qt.ItemDataRole.UserRole, slide_data)
-
-        if len(slide_data['parsed_text']) == 0:
-            QMessageBox.information(
-                self.main_window,
-                'No Verses',
-                'No verses were found in the passage. Please ensure that your scripture passage includes verse numbers.',
-                QMessageBox.StandardButton.Ok
-            )
-            return
 
         label_pixmap = self.gui.global_bible_background_pixmap.scaled(
             50, 27, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
