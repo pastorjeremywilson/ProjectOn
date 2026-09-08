@@ -148,24 +148,29 @@ class OpenlyricsExport(QWidget):
                         for segment in lyric_split:
                             if len(segment) > 0:
                                 tag_split = segment.split(']')
-                                tag = tag_split[0]
-                                short_tag_split = tag.split(' ')
-                                short_tag = short_tag_split[0][0].lower() + short_tag_split[1].strip()
+                                if len(tag_split) > 1:
+                                    tag = tag_split[0]
+                                    short_tag_split = tag.split(' ')
 
-                                segment_split = re.split('<br.*?>', tag_split[1])
-                                for i in range(len(segment_split)):
-                                    segment_split[i] = re.sub('<.*?>', '', segment_split[i])
-                                lyrics_text = '<br />'.join(segment_split)
-                                if lyrics_text.startswith('<br />'):
-                                    lyrics_text = lyrics_text[6:]
-                                if lyrics_text.endswith('<br />'):
-                                    lyrics_text = lyrics_text[:-6]
+                                    if len(short_tag_split) == 1:
+                                        short_tag = tag
+                                    else:
+                                        short_tag = short_tag_split[0][0].lower() + short_tag_split[1].strip()
 
-                                verse_element = ElementTree.SubElement(lyrics, 'verse')
-                                verse_element.set('name', short_tag)
+                                    segment_split = re.split('<br.*?>', tag_split[1])
+                                    for i in range(len(segment_split)):
+                                        segment_split[i] = re.sub('<.*?>', '', segment_split[i])
+                                    lyrics_text = '<br />'.join(segment_split)
+                                    if lyrics_text.startswith('<br />'):
+                                        lyrics_text = lyrics_text[6:]
+                                    if lyrics_text.endswith('<br />'):
+                                        lyrics_text = lyrics_text[:-6]
 
-                                lines = ElementTree.SubElement(verse_element, 'lines')
-                                lines.text = lyrics_text
+                                    verse_element = ElementTree.SubElement(lyrics, 'verse')
+                                    verse_element.set('name', short_tag)
+
+                                    lines = ElementTree.SubElement(verse_element, 'lines')
+                                    lines.text = lyrics_text
 
                     ElementTree.indent(song, '   ', 0)
                     file_contents = ElementTree.tostring(song, encoding='unicode')
@@ -182,6 +187,7 @@ class OpenlyricsExport(QWidget):
                     invalid = r'<>:"/\|?*'
                     for char in invalid:
                         title = title.replace(char, '')
+                    title = title.strip()
 
                     with open(result + '/' + title + '.xml', 'w', encoding='utf-8') as file:
                         file.write(file_contents)

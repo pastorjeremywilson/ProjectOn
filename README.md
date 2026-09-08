@@ -16,18 +16,20 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.11.0.005?
-This is another major update that adds some more functionality and quality improvements:
-- Media items can now be sorted into folders<
-- Can now specify how backgrounds that don't fit the display screen are resized: stretch, fit, or fill
-- Added the ability to make the chosen font bold
-- Added a combination progress/seek bar to video and audio
-- Many other bug fixes and improvements under the hood
+# What's New in Version 1.11.1?
+This update fixes some important bugs
+- Fixed inordinately long parse time when sending songs and bible verses to the preview
+- The "Countdown to service" bar is no attached to the main display window
+- Fixed custom slide containing no words noe being sent to preview
+- Fixed media player not stopping when changing slides
+- Fixed occasional problem parsing scripture that spans across chapters
+- Fixed display screen not positioning properly on dual-monitor setups
+- Fixed rare crash on exporting songs
 
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.11.0.005) and run
+system only. Download the current ProjectOn installer (v.1.11.1) and run
 it on your computer.
 
 # Using ProjectOn
