@@ -45,12 +45,12 @@ def parse_song_data(display_widget, settings: dict, song_data: dict):
         if ' ' in key:
             key_text = key.replace('[', '').replace(']', '')
             new_key = key_text.split(' ')[0][0].lower() + key_text.split(' ')[1]
-            new_dict['[' + new_key + ']'] = lyric_dictionary[key]
+            new_key = '[' + new_key + ']'
+            new_dict[new_key] = lyric_dictionary[key]
         else:
             new_dict[key] = lyric_dictionary[key]
     lyric_dictionary = new_dict
 
-    # then, build a list of song segments in their proper order with user-friendly tag names
     segments = []
     if len(song_data['verse_order']) > 0:
         song_order = song_data['verse_order']
@@ -64,6 +64,7 @@ def parse_song_data(display_widget, settings: dict, song_data: dict):
     else:
         iterable = lyric_dictionary
 
+    # then, build a list of song segments in their proper order with user-friendly tag names
     for segment in iterable:
         item_num = [i for i in segment if i.isdigit()]
 
@@ -117,10 +118,12 @@ def parse_song_data(display_widget, settings: dict, song_data: dict):
                 new_text = re.sub('</span>', '</u>', new_text)
                 segment_text = segment_text.replace(text, new_text)
 
-        segment_text = '<p style="text-align: center; line-height: 120%;">' + segment_text + '</p>'
-
         segment_text = re.sub('<span.*?>', '', segment_text)
         segment_text = re.sub('</span>', '', segment_text)
+        segment_text = re.sub('<p.*?>', '', segment_text)
+        segment_text = re.sub('</p>', '', segment_text)
+
+        segment_text = '<p style="text-align: center; line-height: 120%;">' + segment_text + '</p>'
         song_data['parsed_text'] = {}
         song_data['parsed_text']['text'] = segment_text
 

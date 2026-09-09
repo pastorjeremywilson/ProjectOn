@@ -1,7 +1,7 @@
 """
 This file and all files contained within this distribution are parts of the ProjectOn worship projection software.
 
-ProjectOn v.1.11.1
+ProjectOn v.1.11.2
 Written by Jeremy G Wilson
 
 ProjectOn is free software: you can redistribute it and/or
@@ -85,7 +85,7 @@ class ProjectOn(QObject):
 
         self.debug = False
         sys.excepthook = log_unhandled_exception
-        self.version = 'v.1.11.1'
+        self.version = 'v.1.11.2'
 
         if sys.platform == 'win32':
             self.user_dir = os.path.expanduser('~') + '/AppData/Roaming/ProjectOn'
