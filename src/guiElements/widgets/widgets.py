@@ -417,7 +417,6 @@ class DisplayWidget(QStackedWidget):
 
         # handle stopping the media player carefully to avoid an Access Violation
         if self.media_player:
-            print(f'DisplayWidget.change_display: media player state: {self.media_player.state()}')
             if self.media_player.state() == QMediaPlayer.PlayingState:
                 self.media_player.stop()
                 self.media_player.setPosition(0)
@@ -993,7 +992,8 @@ class LyricDisplayWidget(QWidget):
     def set_font(self, slide_data):
         if 'override_global' in slide_data.keys() and slide_data['override_global']:
             # first, convert the stored point size of the font to pixel size in order to avoid any system scaling
-            font_pixel_size = round((slide_data['font_size'] * 96) / 72.0)
+            screen_dpi = self.gui.secondary_screen.logicalDotsPerInch()
+            font_pixel_size = round((slide_data['font_size'] * screen_dpi) / 72.0)
 
             # use all the relevant font data stored in slide_data
             font = QFont(slide_data['font_family'])
@@ -1157,9 +1157,10 @@ class LyricDisplayWidget(QWidget):
         (font, fill_color, use_shadow, shadow_color, shadow_offset, use_outline, outline_color,
          outline_width, use_shade, shade_color, shade_opacity) = self.set_font(slide_data)
 
-        footer_font_pixel_size = round((self.gui.main.settings['footer_font_size'] * 96) / 72.0)
+        screen_dpi = self.gui.secondary_screen.logicalDotsPerInch()
+        footer_font_pixel_size = round((self.gui.main.settings['footer_font_size'] * screen_dpi) / 72.0)
         footer_font = QFont(font.family())
-        footer_font.setPixelSize(round(footer_font_pixel_size))
+        footer_font.setPixelSize(footer_font_pixel_size)
 
         footer_font_metrics = QFontMetrics(footer_font)
         line_height = footer_font_metrics.height()
@@ -1171,6 +1172,14 @@ class LyricDisplayWidget(QWidget):
             self.gui.display_widget.width(),
             self.gui.display_widget.height() - footer_height - footer_font_metrics.height()
         )
+
+        if self.gui.display_widget_container.isHidden():
+            usable_rect = QRect(
+                0,
+                0,
+                self.gui.secondary_screen.size().width(),
+                self.gui.secondary_screen.size().height() - footer_height - footer_font_metrics.height()
+            )
 
         font_metrics = QFontMetrics(font)
         line_height = font_metrics.height()
@@ -1376,7 +1385,8 @@ class LyricDisplayWidget(QWidget):
         painter.setBrush(brush)
         pen = QPen(fill_color)
         painter.setPen(pen)
-        footer_font_pixel_size = round((self.gui.main.settings['footer_font_size'] * 96) / 72.0)
+        screen_dpi = self.gui.secondary_screen.logicalDotsPerInch()
+        footer_font_pixel_size = round((self.gui.main.settings['footer_font_size'] * screen_dpi) / 72.0)
         footer_font = QFont(font.family())
         footer_font.setPixelSize(round(footer_font_pixel_size))
         painter.setFont(footer_font)
@@ -1435,12 +1445,21 @@ class LyricDisplayWidget(QWidget):
         # path whenever the line becomes too long
         if len(footer_text) == 0:
             footer_height = 0
+
         usable_rect = QRect(
             0,
             0,
             self.gui.display_widget.width(),
             self.gui.display_widget.height() - footer_height - font_metrics.height()
         )
+
+        if self.gui.display_widget_container.isHidden():
+            usable_rect = QRect(
+                0,
+                0,
+                self.gui.secondary_screen.size().width(),
+                self.gui.secondary_screen.size().height() - footer_height - font_metrics.height()
+            )
 
         # create paths for each of the lines, shrinking the font if the paths are too big for the usable rect
         lines = text.split('<br />')

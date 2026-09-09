@@ -1358,7 +1358,7 @@ class GUI(QObject):
         self.display_widget_container.setWindowState(Qt.WindowState.WindowFullScreen)
         self.display_widget_container.move(display_geometry.topLeft())
         self.display_widget_container.raise_()
-        #self.display_widget.adjustSize()
+        self.display_widget.adjustSize()
 
         # hide the display widget if there is only one screen; set the initial state of the screen buttons
         self.tool_bar.black_screen_button.setChecked(False)
@@ -1463,8 +1463,7 @@ class GUI(QObject):
         self.preview_widget.preview_label.clear()
 
         if slide_data['type'] == 'song':
-            if len(slide_data['parsed_text']) == 0:
-                slide_data['parsed_text'] = parse_song_data(self.display_widget, self.main.settings, slide_data)
+            slide_data['parsed_text'] = parse_song_data(self.display_widget, self.main.settings, slide_data)
             for segment in slide_data['parsed_text']:
                 # reduce parsed text for this item to only this item's title and text
                 slide_data['parsed_text'] = {

@@ -16,7 +16,7 @@ tech-savvy volunteers. ProjectOn seeks to provide an easy to use,
 intuitive, and responsive experience when building and running the
 projection needs of a church service.
 
-# What's New in Version 1.11.1?
+# What's New in Version 1.11.1.001?
 This update fixes some important bugs
 - Fixed inordinately long parse time when sending songs and bible verses to the preview
 - The "Countdown to service" bar is no attached to the main display window
@@ -29,7 +29,7 @@ This update fixes some important bugs
 # Installation
 
 Currently, ProjectOn is available for the Microsoft Windows operating
-system only. Download the current ProjectOn installer (v.1.11.1) and run
+system only. Download the current ProjectOn installer (v.1.11.1.001) and run
 it on your computer.
 
 # Using ProjectOn
